@@ -916,23 +916,26 @@
     ctx.fillStyle = '#fdba74';
     ctx.fillText('🌋 Gempa & Erupsi   •   🌊 Tsunami   •   🔥 Kebakaran   •   🎒 Tas Siaga Darurat', 1754, 1250);
 
-    // 8. Badge Predikat & Skor
-    ctx.fillStyle = 'rgba(249, 115, 22, 0.15)';
-    ctx.strokeStyle = '#f97316';
+   // 8. Badge Predikat & Skor (Otomatis Menyesuaikan Panjang Teks)
+    ctx.font = 'bold 52px Nunito, sans-serif';
+    const teksPredikat = `Predikat: DETEKTIF AHLI   •   Skor: ${totalAccumulatedScore}`;
+    const badgeLebar = ctx.measureText(teksPredikat).width + 160; // Lebar dinamis + padding
+    const badgeTinggi = 130;
+    const badgeX = (3508 - badgeLebar) / 2;
+    const badgeY = 1420;
+
+    ctx.fillStyle = 'rgba(16, 185, 129, 0.15)';
+    ctx.strokeStyle = '#10b981';
     ctx.lineWidth = 4;
     ctx.beginPath();
-    ctx.roundRect(1154, 1370, 1200, 130, [30]);
+    ctx.roundRect(badgeX, badgeY, badgeLebar, badgeTinggi, [30]);
     ctx.fill();
     ctx.stroke();
 
-    ctx.font = 'bold 56px Nunito, sans-serif';
     ctx.fillStyle = '#fde047';
-    ctx.fillText(`Predikat: ${predikatNama.toUpperCase()}   •   Skor: ${score}`, 1754, 1455);
-
-    // Garis Pemisah Footer
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
-    ctx.fillRect(200, 1750, 3108, 3);
-
+    ctx.textAlign = 'center';
+    ctx.fillText(teksPredikat, 1754, badgeY + 82);
+    
     // 9. Sisi Kiri Bawah: Tanggal & Validasi
     const tgl = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
     ctx.textAlign = 'left';
