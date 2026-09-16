@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Misi Penjelajah Rover - Logika & Algoritma</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Nunito', sans-serif; background: #0f172a; color: white; min-height: 100vh; }
+        .font-title { font-family: 'Fredoka', sans-serif; }
+        .grid-cell {
+            width: 50px; height: 50px; display: flex; align-items: center; justify-content: center;
+            background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 1.5rem; border-radius: 12px; transition: all 0.2s;
+        }
+        @media (min-width: 640px) {
+            .grid-cell { width: 64px; height: 64px; font-size: 2rem; }
+        }
+        .glass { background: rgba(255, 255, 255, 0.07); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.15); }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen p-4 md:p-6 justify-between">
+
+    <!-- HEADER -->
+    <header class="text-center max-w-2xl mx-auto mb-4">
+        <div class="inline-flex items-center gap-2 bg-sky-500/10 border border-sky-400/20 text-sky-400 px-3 py-1 rounded-full text-xs font-black uppercase mb-2">
+            🤖 Computational Thinking • Algoritma Sekuensial
+        </div>
+        <h1 class="font-title text-3xl md:text-4xl text-sky-300">Misi Penjelajah Rover</h1>
+        <p class="text-slate-300 text-sm mt-1">Susun urutan perintah balok kode untuk memandu rover mencapai target baterai!</p>
+    </header>
+
+    <!-- HUD / INFO -->
+    <div class="max-w-xl mx-auto w-full flex justify-between items-center bg-slate-800/80 px-5 py-3 rounded-2xl border border-slate-700 mb-4 shadow-lg">
+        <div class="font-bold text-sm text-sky-400">🏆 Level: <span id="current-level">1</span> / 3</div>
+        <div class="font-bold text-sm text-emerald-400">📦 Perintah: <span id="cmd-count">0</span>/10</div>
+        <button onclick="toggleMute()" id="btn-mute" class="text-lg bg-slate-700 hover:bg-slate-600 p-2 rounded-xl transition">🔊</button>
+    </div>
+
+    <!-- MAIN GAME AREA -->
+    <main class="max-w-xl mx-auto w-full flex flex-col items-center gap-6 flex-grow">
+        
+        <!-- GRID BOARD -->
+        <div id="game-grid" class="grid grid-cols-5 gap-2 p-4 glass rounded-3xl shadow-2xl">
+            <!-- Rendered by JS -->
+        </div>
+
+        <!-- COMMAND BUILDER (KODE PERINTAH) -->
+        <div class="w-full glass p-5 rounded-3xl shadow-xl flex flex-col gap-4">
+            <div class="flex justify-between items-center">
+                <span class="font-title text-sm text-slate-300 uppercase tracking-wider">Antrean Perintah Algoritma</span>
+                <button onclick="clearCommands()" class="text-xs text-rose-400 hover:text-rose-300 font-bold">🗑️ Hapus Semua</button>
+            </div>
+
+            <!-- QUEUE SLOT -->
+            <div id="command-queue" class="min-h-[70px] bg-slate-900/80 border-2 border-dashed border-slate-700 rounded-2xl p-3 flex items-center gap-2 overflow-x-auto">
+                <span class="text-slate-500 text-xs italic mx-auto">Klik tombol perintah di bawah untuk menyusun instruksi...</span>
+            </div>
+
+            <!-- BUTTON PALETTE -->
+            <div class="grid grid-cols-4 gap-2">
+                <button onclick="addCommand('FORWARD')" class="bg-sky-600 hover:bg-sky-500 active:scale-95 text-white font-bold py-3 rounded-xl shadow transition text-sm">⬆️ Maju</button>
+                <button onclick="addCommand('LEFT')" class="bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white font-bold py-3 rounded-xl shadow transition text-sm">⬅️ Kiri</button>
+                <button onclick="addCommand('RIGHT')" class="bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white font-bold py-3 rounded-xl shadow transition text-sm">➡️ Kanan</button>
+                <button onclick="runCode()" id="btn-run" class="bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-bold py-3 rounded-xl shadow transition text-sm flex items-center justify-center gap-1">▶️ Jalankan</button>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="mt-8 text-center text-xs text-slate-500 font-semibold">
+        NalarSci Lab • Dikelola oleh Thomas Ryantama, M.Kom., Gr.
+    </footer>
+
+    <!-- WIN / LEVEL COMPLETE MODAL -->
+    <div id="modal-win" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="glass max-w-sm w-full rounded-3xl p-6 text-center border border-sky-400/30 shadow-2xl">
+            <div class="text-6xl mb-3">🎉</div>
+            <h2 class="font-title text-2xl text-emerald-400 mb-2">Misi Berhasil!</h2>
+            <p id="win-desc" class="text-slate-300 text-sm mb-6">Algoritma rover sukses mencapai target dengan sempurna.</p>
+            <button onclick="nextLevel()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-title text-lg py-3 rounded-xl shadow-lg transition">
+                Lanjut Level Berikutnya 🚀
+            </button>
+        </div>
+    </div>
+
+    <!-- SCRIPT LOGIKA GAME -->
+    <script>
+        const levels = [
+            {
+                gridSize: 5,
+                start: { x: 0, y: 4, dir: 0 }, // 0: Up, 1: Right, 2: Down, 3: Left
+                target: { x: 4, y: 0 },
+                obstacles: [{ x: 2, y: 2 }, { x: 1, y: 1 }]
+            },
+            {
+                gridSize: 5,
+                start: { x: 0, y: 4, dir: 0 },
+                target: { x: 4, y: 4 },
+                obstacles: [{ x: 2, y: 4 }, { x: 2, y: 3 }, { x: 2, y: 2 }]
+            },
+            {
+                gridSize: 5,
+                start: { x: 4, y: 4, dir: 3 },
+                target: { x: 0, y: 0 },
+                obstacles: [{ x: 1, y: 4 }, { x: 3, y: 1 }, { x: 2, y: 2 }, { x: 0, y: 2 }]
+            }
+        ];
+
+        let currentLvl = 0;
+        let rover = { ...levels[0].start };
+        let queue = [];
+        let isRunning = false;
+        let isMuted = false;
+
+        // Audio Engine
+        let audioCtx;
+        function initAudio() {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+        }
+        function playTone(freq, type, duration, vol=0.05) {
+            if (isMuted || !audioCtx) return;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = type; osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            osc.start(); osc.stop(audioCtx.currentTime + duration);
+        }
+        function sfxClick() { playTone(500, 'sine', 0.08); }
+        function sfxMove() { playTone(300, 'triangle', 0.1); }
+        function sfxTurn() { playTone(450, 'sine', 0.1); }
+        function sfxWin() { [400, 600, 800, 1000].forEach((f, i) => setTimeout(() => playTone(f, 'square', 0.12), i * 90)); }
+        function sfxCrash() { [200, 140, 100].forEach((f, i) => setTimeout(() => playTone(f, 'sawtooth', 0.15), i * 100)); }
+
+        function toggleMute() {
+            isMuted = !isMuted;
+            document.getElementById('btn-mute').innerText = isMuted ? '🔇' : '🔊';
+        }
+
+        function initLevel() {
+            const lvl = levels[currentLvl];
+            rover = { ...lvl.start };
+            queue = [];
+            isRunning = false;
+            document.getElementById('current-level').innerText = currentLvl + 1;
+            document.getElementById('modal-win').classList.add('hidden');
+            renderQueue();
+            renderGrid();
+        }
+
+        const dirIcons = ['⬆️', '➡️', '⬇️', '⬅️'];
+
+        function renderGrid() {
+            const lvl = levels[currentLvl];
+            const gridEl = document.getElementById('game-grid');
+            gridEl.innerHTML = '';
+
+            for (let y = 0; y < lvl.gridSize; y++) {
+                for (let x = 0; x < lvl.gridSize; x++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'grid-cell';
+
+                    // Cek Rover
+                    if (rover.x === x && rover.y === y) {
+                        cell.innerText = dirIcons[rover.dir];
+                        cell.style.background = 'rgba(56, 189, 248, 0.2)';
+                        cell.style.borderColor = '#38bdf8';
+                    } 
+                    // Cek Target
+                    else if (lvl.target.x === x && lvl.target.y === y) {
+                        cell.innerText = '🔋';
+                    } 
+                    // Cek Rintangan
+                    else if (lvl.obstacles.some(o => o.x === x && o.y === y)) {
+                        cell.innerText = '🪨';
+                    }
+
+                    gridEl.appendChild(cell);
+                }
+            }
+        }
+
+        function addCommand(cmd) {
+            if (isRunning) return;
+            if (queue.length >= 10) {
+                alert('Maksimal 10 perintah dalam satu antrean!');
+                return;
+            }
+            sfxClick();
+            queue.push(cmd);
+            renderQueue();
+        }
+
+        function removeCommand(idx) {
+            if (isRunning) return;
+            sfxClick();
+            queue.splice(idx, 1);
+            renderQueue();
+        }
+
+        function clearCommands() {
+            if (isRunning) return;
+            sfxClick();
+            queue = [];
+            renderQueue();
+        }
+
+        const cmdLabels = { 'FORWARD': '⬆️ Maju', 'LEFT': '⬅️ Kiri', 'RIGHT': '➡️ Kanan' };
+
+        function renderQueue() {
+            const qEl = document.getElementById('command-queue');
+            document.getElementById('cmd-count').innerText = queue.length;
+            if (queue.length === 0) {
+                qEl.innerHTML = `<span class="text-slate-500 text-xs italic mx-auto">Klik tombol perintah di bawah untuk menyusun instruksi...</span>`;
+                return;
+            }
+            qEl.innerHTML = queue.map((c, i) => `
+                <div onclick="removeCommand(${i})" class="bg-slate-800 border border-slate-600 px-3 py-2 rounded-xl text-xs font-bold text-sky-300 flex items-center gap-1 cursor-pointer hover:border-rose-400 transition flex-shrink-0" title="Klik untuk hapus">
+                    ${cmdLabels[c]} ✕
+                </div>
+            `).join('');
+        }
+
+        async function runCode() {
+            if (isRunning || queue.length === 0) return;
+            initAudio();
+            isRunning = true;
+            document.getElementById('btn-run').disabled = true;
+
+            const lvl = levels[currentLvl];
+            let simRover = { ...lvl.start };
+
+            for (let i = 0; i < queue.length; i++) {
+                const cmd = queue[i];
+                if (cmd === 'FORWARD') {
+                    if (simRover.dir === 0) simRover.y--;
+                    else if (simRover.dir === 1) simRover.x++;
+                    else if (simRover.dir === 2) simRover.y++;
+                    else if (simRover.dir === 3) simRover.x--;
+                    sfxMove();
+                } else if (cmd === 'LEFT') {
+                    simRover.dir = (simRover.dir + 3) % 4;
+                    sfxTurn();
+                } else if (cmd === 'RIGHT') {
+                    simRover.dir = (simRover.dir + 1) % 4;
+                    sfxTurn();
+                }
+
+                // Validasi batas grid atau menabrak rintangan
+                const hitWall = simRover.x < 0 || simRover.x >= lvl.gridSize || simRover.y < 0 || simRover.y >= lvl.gridSize;
+                const hitObstacle = lvl.obstacles.some(o => o.x === simRover.x && o.y === simRover.y);
+
+                rover = { ...simRover };
+                renderGrid();
+                await new Promise(r => setTimeout(r, 400));
+
+                if (hitWall || hitObstacle) {
+                    sfxCrash();
+                    alert(hitWall ? 'Rover menabrak dinding luar!' : 'Rover menabrak batu karang!');
+                    initLevel();
+                    document.getElementById('btn-run').disabled = false;
+                    return;
+                }
+            }
+
+            // Cek apakah sampai di target
+            if (rover.x === lvl.target.x && rover.y === lvl.target.y) {
+                sfxWin();
+                if (currentLvl < levels.length - 1) {
+                    document.getElementById('modal-win').classList.remove('hidden');
+                } else {
+                    document.getElementById('win-desc').innerText = 'Luar biasa! Kamu berhasil menamatkan seluruh Misi Penjelajah Rover!';
+                    document.getElementById('modal-win').classList.remove('hidden');
+                }
+            } else {
+                sfxCrash();
+                alert('Rover berhenti, tapi belum mencapai baterai target!');
+                initLevel();
+            }
+
+            document.getElementById('btn-run').disabled = false;
+        }
+
+        function nextLevel() {
+            if (currentLvl < levels.length - 1) {
+                currentLvl++;
+                initLevel();
+            } else {
+                currentLvl = 0;
+                initLevel();
+            }
+        }
+
+        // Load pertama kali
+        initLevel();
+    </script>
+</body>
+</html>
