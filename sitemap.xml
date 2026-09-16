@@ -20,4 +20,8 @@
     <loc>https://nalarsci.id/pengumuman-kelulusan.html</loc>
     <priority>0.7</priority>
   </url>
+<url>
+  <loc>[https://nalarsci.id/game-rover.html](https://nalarsci.id/game-rover.html)</loc>
+  <priority>0.7</priority>
+</url>
 </urlset>
