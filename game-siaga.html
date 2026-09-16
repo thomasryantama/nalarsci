@@ -859,27 +859,93 @@
   // ============================================================
   // GENERATOR KARTU PRESTASI (CANVAS MURNI)
   // ============================================================
- // --- TANGGAL & VERIFIKASI (SISI KIRI BAWAH) ---
+  function unduhKartuSiaga(predikatNama = 'Duta Tanggap Bencana') {
+    const namaPemain = playerName || 'Relawan Muda';
+
+    const canvas = document.createElement('canvas');
+    canvas.width = 1200;
+    canvas.height = 675;
+    const ctx = canvas.getContext('2d');
+
+    // Background Gradient Slate Gelap
+    const grad = ctx.createLinearGradient(0, 0, 1200, 675);
+    grad.addColorStop(0, '#0f172a');
+    grad.addColorStop(1, '#1e293b');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, 1200, 675);
+
+    // Bingkai / Border Warna Oranye
+    ctx.lineWidth = 8;
+    ctx.strokeStyle = '#f97316';
+    ctx.strokeRect(40, 40, 1120, 595);
+
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+    ctx.strokeRect(55, 55, 1090, 565);
+
+    // Header Brand
+    ctx.font = 'bold 24px Nunito, sans-serif';
+    ctx.fillStyle = '#fb923c';
+    ctx.textAlign = 'center';
+    ctx.fillText('NALARSCI LAB • SIMULASI STEM MITIGASI BENCANA', 600, 120);
+
+    // Judul Penghargaan
+    ctx.font = 'bold 44px Fredoka, sans-serif';
+    ctx.fillStyle = '#ffffff';
+    ctx.fillText('KARTU KETANGKASAN SIAGA BENCANA', 600, 185);
+
+    // Garis Aksen Oranye
+    ctx.fillStyle = '#f97316';
+    ctx.fillRect(480, 215, 240, 4);
+
+    // Label Penerima
+    ctx.font = '26px Nunito, sans-serif';
+    ctx.fillStyle = '#94a3b8';
+    ctx.fillText('Diberikan dengan bangga kepada:', 600, 280);
+
+    // Nama Pemain
+    ctx.font = 'bold 52px Fredoka, sans-serif';
+    ctx.fillStyle = '#38bdf8';
+    ctx.fillText(namaPemain, 600, 350);
+
+    // Pencapaian & Skor
+    ctx.font = 'bold 28px Nunito, sans-serif';
+    ctx.fillStyle = '#fdba74';
+    ctx.fillText(`Predikat: ${predikatNama} • Skor: ${score}`, 600, 415);
+
+    // Garis Pemisah Tipis Bawah
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+    ctx.fillRect(80, 470, 1040, 2);
+
+    // --- SISI KIRI BAWAH: TANGGAL & VERIFIKASI ---
     const tgl = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
     ctx.textAlign = 'left';
     ctx.font = '20px Nunito, sans-serif';
     ctx.fillStyle = '#94a3b8';
-    ctx.fillText(`Diterbitkan: ${tgl}`, 80, 525);
-    ctx.fillText(`Verifikasi: https://nalarsci.id/`, 80, 555);
+    ctx.fillText(`Diterbitkan: ${tgl}`, 80, 530);
+    ctx.fillText(`Verifikasi: https://nalarsci.id/`, 80, 565);
 
-    // --- PENGESAH / TANDA TANGAN DIGITAL (SISI KANAN BAWAH) ---
+    // --- SISI KANAN BAWAH: PENGESAH PLATFORM ---
     ctx.textAlign = 'right';
     ctx.font = '18px Nunito, sans-serif';
     ctx.fillStyle = '#94a3b8';
-    ctx.fillText('Fasilitator & Pengembang Platform,', 1120, 500);
+    ctx.fillText('Fasilitator & Pengembang Platform,', 1120, 510);
 
     ctx.font = 'bold 24px Fredoka, sans-serif';
-    ctx.fillStyle = '#38bdf8'; // atau '#34d399' untuk game pilah
-    ctx.fillText('Thomas Ryantama, M.Kom., Gr.', 1120, 535);
+    ctx.fillStyle = '#38bdf8';
+    ctx.fillText('Thomas Ryantama, M.Kom., Gr.', 1120, 545);
 
     ctx.font = '16px Nunito, sans-serif';
     ctx.fillStyle = '#64748b';
-    ctx.fillText('NalarSci STEM & Computing Lab', 1120, 560);
+    ctx.fillText('NalarSci STEM & Computing Lab', 1120, 575);
+
+    // Ekspor File PNG
+    const link = document.createElement('a');
+    link.download = `Sertifikat-SiagaBencana-${namaPemain.replace(/\s+/g, '_')}.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+  }
+
   // Inisialisasi layar pertama
   renderHome();
 </script>
