@@ -1,0 +1,421 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Suara Kita — Saluran Aduan & Bimbingan Terpadu | NalarSci</title>
+  <meta name="description" content="Saluran pelaporan aman dan rahasia untuk siswa, orang tua, dan guru di lingkungan sekolah.">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Nunito', sans-serif; background: #0b0f19; color: #f8fafc; min-height: 100vh; }
+    .font-title { font-family: 'Fredoka', sans-serif; }
+    .glass { background: rgba(255, 255, 255, 0.04); backdrop-filter: blur(14px); border: 1px solid rgba(255, 255, 255, 0.08); }
+  </style>
+</head>
+<body class="flex flex-col min-h-screen p-3 sm:p-6 justify-between max-w-5xl mx-auto">
+
+  <!-- HEADER -->
+  <header class="text-center mb-6">
+    <div class="inline-flex items-center gap-2 bg-emerald-500/10 border border-emerald-400/20 text-emerald-400 px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider mb-2">
+      🛡️ Saluran Aman, Rahasia, & Bebas Perundungan
+    </div>
+    <h1 class="font-title text-3xl sm:text-4xl text-white">Suara Kita</h1>
+    <p class="text-slate-400 text-xs sm:text-sm mt-1 max-w-xl mx-auto">
+      Ruang aman bagi siswa, orang tua, dan guru untuk menyampaikan kendala, usulan, maupun permohonan bimbingan konseling secara anonim atau bernama.
+    </p>
+
+    <!-- NAVIGASI TAB -->
+    <div class="flex justify-center gap-2 mt-5">
+      <button onclick="switchTab('form')" id="btn-tab-form" class="px-4 py-2 rounded-xl text-xs font-bold transition bg-emerald-600 text-white shadow-lg">
+        ✍️ Buat Laporan Baru
+      </button>
+      <button onclick="switchTab('check')" id="btn-tab-check" class="px-4 py-2 rounded-xl text-xs font-bold transition bg-slate-800 text-slate-300 hover:bg-slate-700">
+        🔍 Cek Status Tiket
+      </button>
+      <button onclick="switchTab('admin')" id="btn-tab-admin" class="px-4 py-2 rounded-xl text-xs font-bold transition bg-slate-800 text-slate-300 hover:bg-slate-700">
+        🔐 Panel Tim Sekolah
+      </button>
+    </div>
+  </header>
+
+  <!-- TAB 1: FORMULIR PELAPORAN BARU -->
+  <main id="tab-form" class="w-full glass p-5 sm:p-8 rounded-3xl space-y-5">
+    
+    <!-- TOGGLE ANONIM VS BERNAMA -->
+    <div class="bg-slate-900/80 p-4 rounded-2xl border border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3">
+      <div>
+        <h3 class="font-bold text-sm text-slate-200">Kerahasiaan Identitas Pelapor</h3>
+        <p class="text-xs text-slate-400">Pilih jika Anda tidak ingin mencantumkan nama/identitas diri.</p>
+      </div>
+      <div class="flex bg-slate-800 p-1 rounded-xl border border-slate-700 text-xs font-bold">
+        <button type="button" onclick="setAnonymous(true)" id="opt-anon" class="px-3 py-1.5 rounded-lg bg-emerald-600 text-white transition">
+          🕵️ Anonim (Rahasia)
+        </button>
+        <button type="button" onclick="setAnonymous(false)" id="opt-named" class="px-3 py-1.5 rounded-lg text-slate-300 hover:text-white transition">
+          👤 Sertakan Nama
+        </button>
+      </div>
+    </div>
+
+    <form id="form-report" onsubmit="submitReport(event)" class="space-y-4">
+      
+      <!-- KOLOM IDENTITAS (MUNCUL JIKA TIDAK ANONIM) -->
+      <div id="named-fields" class="hidden grid grid-cols-1 sm:grid-cols-2 gap-3 p-4 bg-slate-900/50 rounded-2xl border border-slate-800">
+        <div>
+          <label class="block text-xs font-bold text-slate-400 mb-1">Nama Lengkap</label>
+          <input type="text" id="rep-name" placeholder="Misal: Budi Santoso" class="w-full p-2.5 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white outline-none focus:border-emerald-400">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-400 mb-1">Nomor WhatsApp / Email Aktif</label>
+          <input type="text" id="rep-contact" placeholder="0812xxxxxx (Untuk update tindak lanjut)" class="w-full p-2.5 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white outline-none focus:border-emerald-400">
+        </div>
+      </div>
+
+      <!-- KATEGORI & URGENSI -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+        <div>
+          <label class="block font-bold text-slate-400 mb-1">Peran Pelapor</label>
+          <select id="rep-role" class="w-full p-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white font-bold outline-none focus:border-emerald-400">
+            <option value="Siswa">Siswa</option>
+            <option value="Orang Tua / Wali">Orang Tua / Wali Siswa</option>
+            <option value="Guru / Tenaga Pendidik">Guru / Tenaga Pendidik</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-400 mb-1">Kategori Masalah</label>
+          <select id="rep-cat" class="w-full p-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white font-bold outline-none focus:border-emerald-400">
+            <option value="Perundungan (Bullying)">🛑 Perundungan (Bullying) / Konflik Teman</option>
+            <option value="Kesulitan Belajar / Akademik">📚 Kendala Belajar / Akademik</option>
+            <option value="Bimbingan Pribadi & Emosi">💬 Permohonan Bimbingan Konseling (BK)</option>
+            <option value="Fasilitas & Keamanan Sekolah">🏫 Sarana / Fasilitas Sekolah</option>
+            <option value="Lainnya">💡 Usulan / Masukan Lain</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-400 mb-1">Tingkat Urgensi</label>
+          <select id="rep-urgency" class="w-full p-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white font-bold outline-none focus:border-emerald-400">
+            <option value="Biasa">Biasa (Informasi / Masukan)</option>
+            <option value="Penting">Penting (Butuh Solusi)</option>
+            <option value="Sangat Mendesak">🚨 Sangat Mendesak (Butuh Tindakan Cepat)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- ISI LAPORAN -->
+      <div>
+        <label class="block text-xs font-bold text-slate-400 mb-1">Detail Masalah / Informasi yang Ingin Disampaikan</label>
+        <textarea id="rep-content" rows="4" required placeholder="Ceritakan apa yang terjadi, waktu kejadian, pihak yang terlibat (jika relevan), atau bantuan apa yang Anda harapkan..." class="w-full p-3 rounded-2xl bg-slate-900 border border-slate-700 text-xs sm:text-sm text-white outline-none focus:border-emerald-400 leading-relaxed"></textarea>
+      </div>
+
+      <button type="submit" id="btn-submit" class="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-title text-base py-3.5 rounded-2xl shadow-lg transition active:scale-95 flex items-center justify-center gap-2">
+        🔒 Kirim Laporan Secara Aman
+      </button>
+    </form>
+  </main>
+
+  <!-- TAB 2: CEK STATUS TIKET -->
+  <main id="tab-check" class="hidden w-full glass p-5 sm:p-8 rounded-3xl space-y-6">
+    <div class="text-center max-w-md mx-auto">
+      <h2 class="font-title text-2xl text-sky-300 mb-1">Cek Status Penanganan</h2>
+      <p class="text-xs text-slate-400 mb-4">Masukkan kode tiket 6-digit yang Anda dapatkan saat mengirim aduan.</p>
+      
+      <div class="flex gap-2">
+        <input type="text" id="check-code" placeholder="Misal: SK-892401" class="flex-grow p-3 rounded-xl bg-slate-900 border border-slate-700 text-center font-mono font-bold text-white uppercase text-base outline-none focus:border-sky-400">
+        <button onclick="checkTicketStatus()" class="bg-sky-600 hover:bg-sky-500 text-white font-bold px-5 py-3 rounded-xl text-xs transition">
+          Lacak
+        </button>
+      </div>
+    </div>
+
+    <!-- HASIL PELACAKAN TIKET -->
+    <div id="ticket-result" class="hidden max-w-lg mx-auto bg-slate-900/90 border border-slate-800 p-5 rounded-2xl space-y-3">
+      <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+        <span id="res-code" class="font-mono font-black text-sky-400 text-sm">SK-000000</span>
+        <span id="res-badge" class="px-2.5 py-1 rounded-full text-[10px] font-black uppercase bg-amber-500/20 text-amber-300 border border-amber-500/30">
+          Menunggu Verifikasi
+        </span>
+      </div>
+      <div class="grid grid-cols-2 gap-2 text-xs">
+        <div><span class="text-slate-500 block text-[10px]">Kategori:</span><b id="res-cat" class="text-slate-300">-</b></div>
+        <div><span class="text-slate-500 block text-[10px]">Tanggal Lapor:</span><b id="res-date" class="text-slate-300">-</b></div>
+      </div>
+      <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800/80">
+        <span class="text-[10px] uppercase font-bold text-slate-500 block mb-1">Catatan Tindak Lanjut Tim Konseling / Kesiswaan:</span>
+        <p id="res-notes" class="text-xs text-slate-300 leading-relaxed font-semibold">-</p>
+      </div>
+    </div>
+  </main>
+
+  <!-- TAB 3: PANEL TIM KESISWAAN / GURU BK (PIN PROTECTED) -->
+  <main id="tab-admin" class="hidden w-full glass p-5 sm:p-8 rounded-3xl space-y-6">
+    
+    <!-- LOGIN FORM KHUSUS GURU -->
+    <div id="admin-auth-box" class="text-center max-w-sm mx-auto space-y-3">
+      <div class="text-5xl mb-2">🔐</div>
+      <h2 class="font-title text-xl text-amber-300">Akses Tim Konseling & Kesiswaan</h2>
+      <p class="text-xs text-slate-400">Masukkan PIN Petugas untuk mengelola aduan yang masuk.</p>
+      <input type="password" id="admin-pin" placeholder="PIN Petugas..." class="w-full p-2.5 rounded-xl bg-slate-900 border border-slate-700 text-center font-bold text-white text-sm outline-none focus:border-amber-400">
+      <button onclick="loginAdmin()" class="w-full bg-amber-600 hover:bg-amber-500 text-white font-bold py-2.5 rounded-xl text-xs transition">
+        Buka Dashboard Petugas
+      </button>
+    </div>
+
+    <!-- LIST ADUAN & UPDATE STATUS -->
+    <div id="admin-dashboard" class="hidden space-y-4">
+      <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+        <div>
+          <h3 class="font-title text-lg text-emerald-400">Kotak Masuk Aduan Siswa & Wali Murid</h3>
+          <span class="text-xs text-slate-400">Semua laporan tersimpan aman di Google Sheets resmi sekolah.</span>
+        </div>
+        <button onclick="loadAdminReports()" class="bg-slate-800 hover:bg-slate-700 text-xs px-3 py-1.5 rounded-lg border border-slate-700 font-bold">
+          🔄 Muat Ulang
+        </button>
+      </div>
+
+      <div id="admin-reports-list" class="space-y-3 max-h-[500px] overflow-y-auto">
+        <!-- Rendered by JS -->
+      </div>
+    </div>
+  </main>
+
+  <!-- MODAL TIKET SUKSES (SETELAH SUBMIT) -->
+  <div id="modal-success" class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+    <div class="glass max-w-md w-full rounded-3xl p-6 sm:p-8 text-center border border-emerald-500/40 shadow-2xl">
+      <div class="text-6xl mb-3">✅</div>
+      <h2 class="font-title text-2xl text-emerald-400 mb-2">Laporan Berhasil Diterima!</h2>
+      <p class="text-slate-300 text-xs mb-4">
+        Terima kasih atas keberanian dan kepedulian Anda. Simpan kode tiket berikut untuk mengecek status penanganan:
+      </p>
+      <div class="bg-slate-900 border-2 border-dashed border-emerald-400 p-3.5 rounded-2xl font-mono text-2xl font-black text-emerald-300 tracking-wider mb-4" id="success-code">
+        SK-XXXXXX
+      </div>
+      <button onclick="closeSuccessModal()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-title text-sm py-3 rounded-xl transition">
+        Tutup & Mengerti
+      </button>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="mt-8 text-center text-xs text-slate-500 border-t border-slate-800/80 pt-4">
+    Suara Kita • Ekosistem Pembelajaran & Kesejahteraan Siswa NalarSci
+  </footer>
+
+  <!-- JAVASCRIPT KONTROLLER -->
+  <script>
+    // ⚠️ GANTI DENGAN URL APPS SCRIPT ANDA
+    const API_URL = "https://script.google.com/macros/s/AKfycbwSlJM_u9iyfjMaUcouPKcgnB9P8fN4uMcOMefrZxGQ5lolOgHwVytX7vPiLftsXCZB/exec";
+
+    let isAnon = true;
+    let verifiedAdminPIN = "";
+
+    function setAnonymous(status) {
+      isAnon = status;
+      const optAnon = document.getElementById('opt-anon');
+      const optNamed = document.getElementById('opt-named');
+      const namedFields = document.getElementById('named-fields');
+
+      if (isAnon) {
+        optAnon.className = 'px-3 py-1.5 rounded-lg bg-emerald-600 text-white transition';
+        optNamed.className = 'px-3 py-1.5 rounded-lg text-slate-300 hover:text-white transition';
+        namedFields.classList.add('hidden');
+      } else {
+        optNamed.className = 'px-3 py-1.5 rounded-lg bg-emerald-600 text-white transition';
+        optAnon.className = 'px-3 py-1.5 rounded-lg text-slate-300 hover:text-white transition';
+        namedFields.classList.remove('hidden');
+      }
+    }
+
+    function switchTab(tab) {
+      ['form', 'check', 'admin'].forEach(t => {
+        document.getElementById(`tab-${t}`).classList.add('hidden');
+        document.getElementById(`btn-tab-${t}`).className = 'px-4 py-2 rounded-xl text-xs font-bold transition bg-slate-800 text-slate-300 hover:bg-slate-700';
+      });
+
+      document.getElementById(`tab-${tab}`).classList.remove('hidden');
+      document.getElementById(`btn-tab-${tab}`).className = 'px-4 py-2 rounded-xl text-xs font-bold transition bg-emerald-600 text-white shadow-lg';
+    }
+
+    // Submit Laporan Baru
+    function submitReport(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btn-submit');
+      btn.disabled = true;
+      btn.innerText = 'Mengenkripsi & Mengirim Laporan...';
+
+      const payload = {
+        action: 'new_report',
+        report: {
+          isAnonymous: isAnon,
+          name: isAnon ? 'Anonim' : (document.getElementById('rep-name').value.trim() || 'Anonim'),
+          contact: isAnon ? '-' : (document.getElementById('rep-contact').value.trim() || '-'),
+          role: document.getElementById('rep-role').value,
+          category: document.getElementById('rep-cat').value,
+          urgency: document.getElementById('rep-urgency').value,
+          content: document.getElementById('rep-content').value.trim()
+        }
+      };
+
+      fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: JSON.stringify(payload)
+      })
+      .then(res => res.json())
+      .then(data => {
+        btn.disabled = false;
+        btn.innerText = '🔒 Kirim Laporan Secara Aman';
+        if (data.status === 'success') {
+          document.getElementById('success-code').innerText = data.ticketCode;
+          document.getElementById('modal-success').classList.remove('hidden');
+          document.getElementById('form-report').reset();
+          setAnonymous(true);
+        } else {
+          alert('Gagal mengirim: ' + data.message);
+        }
+      })
+      .catch(err => {
+        btn.disabled = false;
+        btn.innerText = '🔒 Kirim Laporan Secara Aman';
+        alert('Kendala koneksi ke server: ' + err);
+      });
+    }
+
+    function closeSuccessModal() {
+      document.getElementById('modal-success').classList.add('hidden');
+    }
+
+    // Cek Status Tiket
+    function checkTicketStatus() {
+      const code = document.getElementById('check-code').value.trim();
+      if (!code) {
+        alert('Masukkan kode tiket terlebih dahulu!');
+        return;
+      }
+
+      fetch(`${API_URL}?action=check_ticket&code=${encodeURIComponent(code)}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.status === 'success') {
+            const t = data.ticket;
+            document.getElementById('res-code').innerText = t.code;
+            document.getElementById('res-cat').innerText = t.category;
+            document.getElementById('res-date').innerText = t.date;
+            document.getElementById('res-notes').innerText = t.notes;
+
+            const badge = document.getElementById('res-badge');
+            badge.innerText = t.ticketStatus;
+            if (t.ticketStatus === 'Selesai') {
+              badge.className = 'px-2.5 py-1 rounded-full text-[10px] font-black uppercase bg-emerald-500/20 text-emerald-300 border border-emerald-500/30';
+            } else if (t.ticketStatus === 'Sedang Ditangani') {
+              badge.className = 'px-2.5 py-1 rounded-full text-[10px] font-black uppercase bg-sky-500/20 text-sky-300 border border-sky-500/30';
+            } else {
+              badge.className = 'px-2.5 py-1 rounded-full text-[10px] font-black uppercase bg-amber-500/20 text-amber-300 border border-amber-500/30';
+            }
+
+            document.getElementById('ticket-result').classList.remove('hidden');
+          } else {
+            alert(data.message || 'Tiket tidak ditemukan!');
+            document.getElementById('ticket-result').classList.add('hidden');
+          }
+        })
+        .catch(err => alert('Gagal melacak tiket: ' + err));
+    }
+
+    // Login Panel Petugas
+    function loginAdmin() {
+      const pin = document.getElementById('admin-pin').value.trim();
+      if (!pin) return;
+
+      fetch(`${API_URL}?action=get_all_reports&pin=${encodeURIComponent(pin)}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.status === 'error') {
+            alert(data.message);
+          } else {
+            verifiedAdminPIN = pin;
+            document.getElementById('admin-auth-box').classList.add('hidden');
+            document.getElementById('admin-dashboard').classList.remove('hidden');
+            renderAdminReports(data);
+          }
+        })
+        .catch(err => alert('Gagal memverifikasi PIN: ' + err));
+    }
+
+    function loadAdminReports() {
+      if (!verifiedAdminPIN) return;
+      fetch(`${API_URL}?action=get_all_reports&pin=${encodeURIComponent(verifiedAdminPIN)}`)
+        .then(res => res.json())
+        .then(data => renderAdminReports(data));
+    }
+
+    function renderAdminReports(reports) {
+      const container = document.getElementById('admin-reports-list');
+      if (reports.length === 0) {
+        container.innerHTML = '<p class="text-center text-xs text-slate-500 py-6">Belum ada aduan masuk.</p>';
+        return;
+      }
+
+      container.innerHTML = reports.map(r => `
+        <div class="bg-slate-900/90 border border-slate-800 p-4 rounded-2xl space-y-3 text-xs">
+          <div class="flex flex-wrap justify-between items-center gap-2 border-b border-slate-800 pb-2">
+            <div>
+              <span class="font-mono font-black text-sky-400">${r.code}</span>
+              <span class="text-slate-400 ml-2 font-semibold">(${r.role} • ${r.name})</span>
+            </div>
+            <span class="text-[10px] text-slate-500">${r.date}</span>
+          </div>
+
+          <div class="text-slate-300 bg-slate-950 p-3 rounded-xl leading-relaxed">
+            "${r.content}"
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px]">
+            <div><span class="text-slate-500">Kategori:</span> <b>${r.category}</b></div>
+            <div><span class="text-slate-500">Kontak:</span> <b>${r.contact}</b></div>
+          </div>
+
+          <!-- KONTROL UPDATE STATUS -->
+          <div class="bg-slate-800/60 p-3 rounded-xl border border-slate-700/60 flex flex-col sm:flex-row gap-2 items-center">
+            <select id="status-${r.code}" class="bg-slate-900 border border-slate-700 text-white font-bold p-1.5 rounded-lg text-xs outline-none">
+              <option value="Menunggu Verifikasi" ${r.ticketStatus === 'Menunggu Verifikasi' ? 'selected' : ''}>Menunggu Verifikasi</option>
+              <option value="Sedang Ditangani" ${r.ticketStatus === 'Sedang Ditangani' ? 'selected' : ''}>Sedang Ditangani</option>
+              <option value="Selesai" ${r.ticketStatus === 'Selesai' ? 'selected' : ''}>Selesai</option>
+            </select>
+            <input type="text" id="notes-${r.code}" value="${r.notes}" placeholder="Tulis catatan penanganan..." class="flex-grow bg-slate-900 border border-slate-700 text-white p-1.5 rounded-lg text-xs outline-none">
+            <button onclick="updateTicketStatus('${r.code}')" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-3 py-1.5 rounded-lg text-xs transition whitespace-nowrap">
+              💾 Simpan
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function updateTicketStatus(code) {
+      const newStatus = document.getElementById(`status-${code}`).value;
+      const notes = document.getElementById(`notes-${code}`).value.trim();
+
+      fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: JSON.stringify({
+          action: 'update_status',
+          pin: verifiedAdminPIN,
+          code: code,
+          newStatus: newStatus,
+          notes: notes
+        })
+      })
+      .then(res => res.json())
+      .then(data => {
+        alert(data.message);
+        loadAdminReports();
+      })
+      .catch(err => alert('Gagal memperbarui tiket: ' + err));
+    }
+  </script>
+</body>
+</html>
