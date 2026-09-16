@@ -857,97 +857,120 @@
   }
 
   // ============================================================
-  // GENERATOR KARTU PRESTASI (CANVAS MURNI)
+  // GENERATOR PIAGAM PRESTASI A4 LANDSCAPE (300 DPI)
+  // Ukuran: 3508 x 2480 px (Standar Cetak HD)
   // ============================================================
   function unduhKartuSiaga(predikatNama = 'Duta Tanggap Bencana') {
     const namaPemain = playerName || 'Relawan Muda';
 
     const canvas = document.createElement('canvas');
-    canvas.width = 1200;
-    canvas.height = 675;
+    canvas.width = 3508;
+    canvas.height = 2480;
     const ctx = canvas.getContext('2d');
 
-    // Background Gradient Slate Gelap
-    const grad = ctx.createLinearGradient(0, 0, 1200, 675);
+    // 1. Background Gradient Slate Gelap
+    const grad = ctx.createLinearGradient(0, 0, 3508, 2480);
     grad.addColorStop(0, '#0f172a');
     grad.addColorStop(1, '#1e293b');
     ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, 1200, 675);
+    ctx.fillRect(0, 0, 3508, 2480);
 
-    // Bingkai / Border Warna Oranye
-    ctx.lineWidth = 8;
+    // 2. Bingkai Luar Oranye Tebal
+    ctx.lineWidth = 24;
     ctx.strokeStyle = '#f97316';
-    ctx.strokeRect(40, 40, 1120, 595);
+    ctx.strokeRect(100, 100, 3308, 2280);
 
-    ctx.lineWidth = 2;
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
-    ctx.strokeRect(55, 55, 1090, 565);
+    // Bingkai Dalam Tipis Elegan
+    ctx.lineWidth = 6;
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+    ctx.strokeRect(140, 140, 3228, 2200);
 
-    // Header Brand
-    ctx.font = 'bold 24px Nunito, sans-serif';
+    // 3. Header Lembaga / Laboratorium
+    ctx.font = 'bold 64px Nunito, sans-serif';
     ctx.fillStyle = '#fb923c';
     ctx.textAlign = 'center';
-    ctx.fillText('NALARSCI LAB • SIMULASI STEM MITIGASI BENCANA', 600, 120);
+    ctx.fillText('NALARSCI LAB • SIMULASI STEM MITIGASI BENCANA', 1754, 380);
 
-    // Judul Penghargaan
-    ctx.font = 'bold 44px Fredoka, sans-serif';
+    // 4. Judul Piagam Penghargaan
+    ctx.font = 'bold 110px "Comic Sans MS", Fredoka, sans-serif';
     ctx.fillStyle = '#ffffff';
-    ctx.fillText('KARTU KETANGKASAN SIAGA BENCANA', 600, 185);
+    ctx.fillText('KARTU KETANGKASAN SIAGA BENCANA', 1754, 560);
 
     // Garis Aksen Oranye
     ctx.fillStyle = '#f97316';
-    ctx.fillRect(480, 215, 240, 4);
+    ctx.fillRect(1454, 620, 600, 10);
 
-    // Label Penerima
-    ctx.font = '26px Nunito, sans-serif';
+    // 5. Kalimat Pengantar
+    ctx.font = '64px Nunito, sans-serif';
     ctx.fillStyle = '#94a3b8';
-    ctx.fillText('Diberikan dengan bangga kepada:', 600, 280);
+    ctx.fillText('Diberikan dengan bangga atas ketangkasan, nalar, dan kesiapsiagaan kepada:', 1754, 820);
 
-    // Nama Pemain
-    ctx.font = 'bold 52px Fredoka, sans-serif';
+    // 6. Nama Siswa / Relawan
+    ctx.font = 'bold 140px "Comic Sans MS", Fredoka, sans-serif';
     ctx.fillStyle = '#38bdf8';
-    ctx.fillText(namaPemain, 600, 350);
+    ctx.fillText(namaPemain, 1754, 1040);
 
-    // Pencapaian & Skor
-    ctx.font = 'bold 28px Nunito, sans-serif';
+    // 7. Deskripsi Materi & Pencapaian
+    ctx.font = '72px Nunito, sans-serif';
+    ctx.fillStyle = '#f8fafc';
+    ctx.fillText('Telah berhasil menuntaskan seluruh simulasi 5 babak mitigasi kebencanaan:', 1754, 1220);
+
+    ctx.font = 'bold 68px Nunito, sans-serif';
     ctx.fillStyle = '#fdba74';
-    ctx.fillText(`Predikat: ${predikatNama} • Skor: ${score}`, 600, 415);
+    ctx.fillText('🌋 Gempa & Erupsi  •  🌊 Tsunami  •  🔥 Kebakaran  •  🎒 Tas Siaga Darurat', 1754, 1330);
 
-    // Garis Pemisah Tipis Bawah
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
-    ctx.fillRect(80, 470, 1040, 2);
+    // Kotak Badge Skor
+    ctx.fillStyle = 'rgba(249, 115, 22, 0.15)';
+    ctx.strokeStyle = '#f97316';
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.roundRect(1254, 1440, 1000, 130, [30]);
+    ctx.fill();
+    ctx.stroke();
 
-    // --- SISI KIRI BAWAH: TANGGAL & VERIFIKASI ---
+    ctx.font = 'bold 64px Nunito, sans-serif';
+    ctx.fillStyle = '#fde047';
+    ctx.fillText(`Predikat: ${predikatNama.toUpperCase()}  •  Skor: ${score}`, 1754, 1528);
+
+    // Garis Pembatas Bawah
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
+    ctx.fillRect(250, 1750, 3008, 4);
+
+    // 8. Sisi Kiri Bawah: Tanggal & Tautan Validasi
     const tgl = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
     ctx.textAlign = 'left';
-    ctx.font = '20px Nunito, sans-serif';
+    ctx.font = '52px Nunito, sans-serif';
     ctx.fillStyle = '#94a3b8';
-    ctx.fillText(`Diterbitkan: ${tgl}`, 80, 530);
-    ctx.fillText(`Verifikasi: https://nalarsci.id/`, 80, 565);
+    ctx.fillText(`Diterbitkan pada: ${tgl}`, 250, 1920);
 
-    // --- SISI KANAN BAWAH: PENGESAH PLATFORM ---
-    ctx.textAlign = 'right';
-    ctx.font = '18px Nunito, sans-serif';
-    ctx.fillStyle = '#94a3b8';
-    ctx.fillText('Fasilitator & Pengembang Platform,', 1120, 510);
-
-    ctx.font = 'bold 24px Fredoka, sans-serif';
-    ctx.fillStyle = '#38bdf8';
-    ctx.fillText('Thomas Ryantama, M.Kom., Gr.', 1120, 545);
-
-    ctx.font = '16px Nunito, sans-serif';
+    ctx.font = '46px Nunito, sans-serif';
     ctx.fillStyle = '#64748b';
-    ctx.fillText('NalarSci STEM & Computing Lab', 1120, 575);
+    ctx.fillText('Verifikasi Resmi Dokumen:', 250, 2000);
 
-    // Ekspor File PNG
+    ctx.font = 'bold 48px Nunito, sans-serif';
+    ctx.fillStyle = '#38bdf8';
+    ctx.fillText('https://nalarsci.id/', 250, 2070);
+
+    // 9. Sisi Kanan Bawah: Pengesah Instruktur
+    ctx.textAlign = 'right';
+    ctx.font = '48px Nunito, sans-serif';
+    ctx.fillStyle = '#94a3b8';
+    ctx.fillText('Fasilitator & Pengembang Platform,', 3258, 1900);
+
+    ctx.font = 'bold 64px "Comic Sans MS", Fredoka, sans-serif';
+    ctx.fillStyle = '#38bdf8';
+    ctx.fillText('Thomas Ryantama, M.Kom., Gr.', 3258, 2020);
+
+    ctx.font = '46px Nunito, sans-serif';
+    ctx.fillStyle = '#64748b';
+    ctx.fillText('NalarSci STEM & Computing Laboratory', 3258, 2090);
+
+    // 10. Ekspor File PNG Resolusi Tinggi
     const link = document.createElement('a');
-    link.download = `Sertifikat-SiagaBencana-${namaPemain.replace(/\s+/g, '_')}.png`;
-    link.href = canvas.toDataURL('image/png');
+    link.download = `Piagam-A4-SiagaBencana-${namaPemain.replace(/\s+/g, '_')}.png`;
+    link.href = canvas.toDataURL('image/png', 1.0);
     link.click();
   }
-
-  // Inisialisasi layar pertama
-  renderHome();
 </script>
 </body>
 </html>
