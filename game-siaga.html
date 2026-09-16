@@ -191,12 +191,10 @@
   }
 
   function saveScore(name, finalScore) {
-      // Update lokal agar cepat tampil di layar
       leaderboard.push({ name: name, score: finalScore });
       leaderboard.sort((a, b) => b.score - a.score);
       leaderboard = leaderboard.slice(0, 5);
       
-      // Simpan ke Google Sheets di background
       const url = `${API_URL}?action=save&game=${GAME_ID_SIAGA}&name=${encodeURIComponent(name)}&score=${finalScore}`;
       fetch(url).catch(err => console.log("Gagal menyimpan ke cloud", err));
   }
@@ -214,7 +212,6 @@
           list.innerHTML += `<li class="flex justify-between bg-white px-3 py-2 rounded-xl shadow-sm border border-slate-100"><span>${medals[i]} ${escapeHtml(p.name)}</span> <span class="text-orange-500">⭐ ${p.score}</span></li>`;
       });
   }
-
 
   // ============================================================
   // AUDIO
@@ -474,7 +471,7 @@
   let timerInterval = null;
   let timeLeft = 0;
   let answered = false;
-  const questionsPerStage = 4; // 5 Babak, masing-masing 4 soal
+  const questionsPerStage = 4;
 
   const contentArea = document.getElementById('content-area');
   const infoBar = document.getElementById('info-bar');
@@ -751,20 +748,23 @@
     const maxPossible = questions.reduce((sum, q) => sum + 100 + (q.time * 5), 0) + 25 * (questions.length - 1);
     const percentage = Math.min(100, Math.round((score / maxPossible) * 100));
 
-    let title, message, icon;
+    let title, message, icon, predikat;
 
     if (percentage >= 80) {
       title = 'PAHLAWAN SIAGA! 🏆';
       message = 'Luar biasa! Kamu menunjukkan pengetahuan, ketenangan, dan kesiapsiagaan yang sangat baik.';
       icon = '🏆';
+      predikat = 'Pahlawan Siaga Utama';
     } else if (percentage >= 60) {
       title = 'ANAK TANGGUH! 🥇';
       message = 'Bagus! Kamu sudah memahami banyak langkah keselamatan. Terus berlatih agar semakin siap.';
       icon = '🥇';
+      predikat = 'Duta Tanggap Bencana';
     } else {
       title = 'AYO BELAJAR LAGI! 📚';
       message = 'Tidak apa-apa. Yang penting kamu sudah belajar. Coba lagi dan ingat langkah keselamatan utama.';
       icon = '📚';
+      predikat = 'Relawan Muda';
     }
 
     soundStageClear();
@@ -792,9 +792,16 @@
            </ul>
         </div>
 
-        <button onclick="renderHome()" class="btn bg-green-600 hover:bg-green-700 border-green-800 text-white font-title text-xl py-4 px-9 rounded-2xl shadow-lg">
-          🔄 Menu Utama
-        </button>
+        <!-- TOMBOL UNDUH KARTU PRESTASI -->
+        <div class="max-w-md mx-auto space-y-3">
+          <button onclick="unduhKartuSiaga('${escapeHtml(predikat)}')" class="btn w-full bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 border-orange-700 text-white font-title text-lg py-3.5 px-6 rounded-2xl shadow-lg flex items-center justify-center gap-2">
+            🎓 Unduh Kartu Prestasi (PNG)
+          </button>
+
+          <button onclick="renderHome()" class="btn w-full bg-green-600 hover:bg-green-700 border-green-800 text-white font-title text-xl py-4 px-9 rounded-2xl shadow-lg">
+            🔄 Menu Utama
+          </button>
+        </div>
       </div>
     `;
     
@@ -802,7 +809,7 @@
   }
 
   // ============================================================
-  // LANDING PAGE (SEKARANG ADA FITUR INPUT NAMA)
+  // LANDING PAGE
   // ============================================================
   function renderHome() {
     contentArea.innerHTML = `
@@ -836,7 +843,6 @@
 
       </div>
     `;
-    // Panggil papan peringkat saat halaman depan diload
     loadLeaderboard();
   }
 
@@ -848,6 +854,76 @@
       }
       playerName = inputName;
       startGame();
+  }
+
+  // ============================================================
+  // GENERATOR KARTU PRESTASI (CANVAS MURNI)
+  // ============================================================
+  function unduhKartuSiaga(predikatNama = 'Duta Tanggap Bencana') {
+    const namaPemain = playerName || 'Relawan Muda';
+
+    const canvas = document.createElement('canvas');
+    canvas.width = 1200;
+    canvas.height = 675;
+    const ctx = canvas.getContext('2d');
+
+    // Background Gradient Slate Gelap
+    const grad = ctx.createLinearGradient(0, 0, 1200, 675);
+    grad.addColorStop(0, '#0f172a');
+    grad.addColorStop(1, '#1e293b');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, 1200, 675);
+
+    // Bingkai / Border Warna Oranye
+    ctx.lineWidth = 8;
+    ctx.strokeStyle = '#f97316';
+    ctx.strokeRect(40, 40, 1120, 595);
+
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+    ctx.strokeRect(55, 55, 1090, 565);
+
+    // Header Brand
+    ctx.font = 'bold 24px Nunito, sans-serif';
+    ctx.fillStyle = '#fb923c';
+    ctx.textAlign = 'center';
+    ctx.fillText('NALARSCI LAB • SIMULASI STEM MITIGASI BENCANA', 600, 120);
+
+    // Judul Penghargaan
+    ctx.font = 'bold 44px Fredoka, sans-serif';
+    ctx.fillStyle = '#ffffff';
+    ctx.fillText('KARTU KETANGKASAN SIAGA BENCANA', 600, 185);
+
+    // Garis Aksen Oranye
+    ctx.fillStyle = '#f97316';
+    ctx.fillRect(480, 215, 240, 4);
+
+    // Label Penerima
+    ctx.font = '26px Nunito, sans-serif';
+    ctx.fillStyle = '#94a3b8';
+    ctx.fillText('Diberikan dengan bangga kepada:', 600, 290);
+
+    // Nama Pemain
+    ctx.font = 'bold 52px Fredoka, sans-serif';
+    ctx.fillStyle = '#38bdf8';
+    ctx.fillText(namaPemain, 600, 365);
+
+    // Pencapaian & Skor
+    ctx.font = 'bold 30px Nunito, sans-serif';
+    ctx.fillStyle = '#fdba74';
+    ctx.fillText(`Predikat: ${predikatNama} • Skor: ${score}`, 600, 435);
+
+    // Tanggal & Verifikasi
+    const tgl = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+    ctx.font = '22px Nunito, sans-serif';
+    ctx.fillStyle = '#64748b';
+    ctx.fillText(`Diselesaikan pada: ${tgl} • Verifikasi Resmi: https://nalarsci.id/`, 600, 545);
+
+    // Ekspor File PNG
+    const link = document.createElement('a');
+    link.download = `Sertifikat-SiagaBencana-${namaPemain.replace(/\s+/g, '_')}.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
   }
 
   // Inisialisasi layar pertama
