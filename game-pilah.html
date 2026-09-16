@@ -68,14 +68,12 @@
         /* AREA PERMAINAN */
         main { max-width: 1000px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; padding: 0 15px; }
 
-        /* Tempat Item (Disesuaikan agar muat 12 item) */
         #item-pool {
             display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;
             min-height: 120px; padding: 15px; background: #FFF; border-radius: var(--radius);
             box-shadow: inset 0 0 10px rgba(0,0,0,0.05); border: 2px dashed #CCC;
         }
 
-        /* Kartu Sampah (Diperkecil sedikit agar muat banyak) */
         .item-card {
             background: var(--card-bg); border: 2px solid #E0E0E0; border-radius: 12px;
             padding: 8px 10px; display: flex; flex-direction: column; align-items: center;
@@ -107,7 +105,6 @@
         .bin-title { font-size: 1.2rem; font-weight: bold; margin-bottom: 5px; }
         .bin-desc { font-size: 0.8rem; opacity: 0.8; margin-bottom: 10px; }
         
-        /* Sampah yang sudah masuk tong */
         .bin-items { display: flex; flex-wrap: wrap; justify-content: center; gap: 3px; width: 100%; }
         .bin-items .item-card { 
             width: 45px; padding: 2px; transform: scale(1); border: none; 
@@ -188,6 +185,13 @@
         }
         .btn:hover { background: #E85D04; transform: translateY(-3px); box-shadow: 0 6px 12px rgba(0,0,0,0.25); }
         .btn:active { transform: translateY(0); }
+        .btn-cert {
+            background: linear-gradient(135deg, #10b981, #059669);
+            box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3);
+        }
+        .btn-cert:hover {
+            background: linear-gradient(135deg, #059669, #047857);
+        }
         .btn-outline { background: #FFF; color: var(--secondary); border: 2px solid var(--secondary); }
         .btn-outline:hover { background: #FFF3E0; }
 
@@ -311,7 +315,6 @@
         const GAME_ID = "pilah";
         let leaderboard = [];
 
-        // Load Papan Peringkat dari Google Sheets
         window.onload = () => {
             loadLeaderboard();
         };
@@ -330,13 +333,11 @@
         }
 
         function saveScore(name, finalScore) {
-            // Update lokal agar cepat tampil di layar pemain
             leaderboard.push({ name: name, score: finalScore });
             leaderboard.sort((a, b) => b.score - a.score);
             leaderboard = leaderboard.slice(0, 5);
             renderLeaderboard('result-leaderboard-list');
 
-            // Simpan ke Google Sheets di background
             const url = `${API_URL}?action=save&game=${GAME_ID}&name=${encodeURIComponent(name)}&score=${finalScore}`;
             fetch(url).catch(err => console.log("Gagal menyimpan ke cloud", err));
         }
@@ -484,7 +485,6 @@
             playerName = inputName;
             initAudio();
             
-            // Reset Total
             currentLevelIdx = 0;
             totalAccumulatedScore = 0;
             
@@ -513,7 +513,6 @@
             itemPoolEl.innerHTML = '';
             document.querySelectorAll('.bin-items').forEach(bin => bin.innerHTML = '');
 
-            // Hitung jumlah item per kategori (misal items: 9, berarti 3 per kategori)
             const perCat = lvlData.items / 3;
             const orgs = shuffle(itemDatabase.filter(i => i.category === 'organik')).slice(0, perCat);
             const anorgs = shuffle(itemDatabase.filter(i => i.category === 'anorganik')).slice(0, perCat);
@@ -655,10 +654,9 @@
             const btnContainer = document.getElementById('modal-btn-group');
             const leaderboardContainer = document.getElementById('result-leaderboard-container');
             
-            // Hitung Bonus Level Ini
             const timeBonus = (status === 'clear') ? (timeLeft * 10) : 0;
             const totalLevel = levelScore + timeBonus;
-            totalAccumulatedScore += timeBonus; // Tambahkan bonus waktu ke total skor
+            totalAccumulatedScore += timeBonus;
 
             document.getElementById('res-base-score').innerText = levelScore;
             document.getElementById('res-time-bonus').innerText = timeBonus;
@@ -666,10 +664,9 @@
             document.getElementById('res-accumulated').innerText = `Total Skor Sementara: ⭐ ${totalAccumulatedScore}`;
             
             leaderboardContainer.style.display = 'none';
-            btnContainer.innerHTML = ''; // Bersihkan tombol
+            btnContainer.innerHTML = '';
 
             if (status === 'clear') {
-                // Cek apakah ada level selanjutnya
                 if (currentLevelIdx < gameLevels.length - 1) {
                     sfxLevelUp();
                     title.innerText = `Level ${currentLevelIdx + 1} Selesai!`;
@@ -680,7 +677,6 @@
                         <button class="btn" onclick="nextLevel()">▶️ LANJUT LEVEL ${currentLevelIdx + 2}</button>
                     `;
                 } else {
-                    // TAMAT (Menang Semua Level)
                     sfxWin();
                     title.innerText = "🏆 GAME TAMAT!";
                     title.style.color = "var(--org-color)";
@@ -692,12 +688,12 @@
                     fireConfetti();
 
                     btnContainer.innerHTML = `
+                        <button class="btn btn-cert" onclick="unduhKartuPilah()">🌱 UNDUH KARTU DETEKTIF (PNG)</button>
                         <button class="btn" onclick="startNewGame()">🔄 MAIN LAGI</button>
                         <button class="btn btn-outline" onclick="showStartScreen()">👤 GANTI PEMAIN</button>
                     `;
                 }
             } else if (status === 'timeout') {
-                // KALAH (Kehabisan Waktu)
                 sfxLose();
                 title.innerText = "⏳ Waktu Habis!";
                 title.style.color = "var(--b3-color)";
@@ -743,6 +739,76 @@
                 document.body.appendChild(conf);
                 setTimeout(() => conf.remove(), (duration + 1) * 1000);
             }
+        }
+
+        /* =========================================
+           GENERATOR KARTU PRESTASI (CANVAS MURNI)
+           ========================================= */
+        function unduhKartuPilah() {
+            const namaPemain = playerName || 'Detektif Cilik';
+
+            const canvas = document.createElement('canvas');
+            canvas.width = 1200;
+            canvas.height = 675;
+            const ctx = canvas.getContext('2d');
+
+            // Background Deep Forest Slate
+            const grad = ctx.createLinearGradient(0, 0, 1200, 675);
+            grad.addColorStop(0, '#062016');
+            grad.addColorStop(1, '#0f172a');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, 1200, 675);
+
+            // Bingkai Hijau Emerald
+            ctx.lineWidth = 8;
+            ctx.strokeStyle = '#10b981';
+            ctx.strokeRect(40, 40, 1120, 595);
+
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+            ctx.strokeRect(55, 55, 1090, 565);
+
+            // Header Brand
+            ctx.font = 'bold 24px Nunito, sans-serif';
+            ctx.fillStyle = '#6ee7b7';
+            ctx.textAlign = 'center';
+            ctx.fillText('NALARSCI LAB • MISI EKOLOGI & LOGIKA PEMILAHAN', 600, 120);
+
+            // Judul Penghargaan
+            ctx.font = 'bold 44px Fredoka, sans-serif';
+            ctx.fillStyle = '#ffffff';
+            ctx.fillText('LENCANA DETEKTIF PEMILAH SAMPAH', 600, 185);
+
+            // Garis Aksen Hijau
+            ctx.fillStyle = '#10b981';
+            ctx.fillRect(480, 215, 240, 4);
+
+            // Label Penerima
+            ctx.font = '26px Nunito, sans-serif';
+            ctx.fillStyle = '#94a3b8';
+            ctx.fillText('Diberikan dengan bangga kepada:', 600, 290);
+
+            // Nama Pemain
+            ctx.font = 'bold 52px Fredoka, sans-serif';
+            ctx.fillStyle = '#34d399';
+            ctx.fillText(namaPemain, 600, 365);
+
+            // Predikat & Skor
+            ctx.font = 'bold 30px Nunito, sans-serif';
+            ctx.fillStyle = '#a7f3d0';
+            ctx.fillText(`Predikat: Ahli Pemilah 3 Kategori • Skor: ${totalAccumulatedScore}`, 600, 435);
+
+            // Tanggal & Verifikasi
+            const tgl = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+            ctx.font = '22px Nunito, sans-serif';
+            ctx.fillStyle = '#64748b';
+            ctx.fillText(`Tuntas pada: ${tgl} • Lab Eksplorasi: https://nalarsci.id/`, 600, 545);
+
+            // Ekspor File PNG
+            const link = document.createElement('a');
+            link.download = `Lencana-DetektifSampah-${namaPemain.replace(/\s+/g, '_')}.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
         }
     </script>
 </body>
