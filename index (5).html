@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portal Game Edukasi Sekolah</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+      color: white;
+    }
+    .font-title { font-family: 'Fredoka', sans-serif; }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      transition: all 0.3s ease;
+    }
+    .glass-card:hover {
+      transform: translateY(-5px);
+      background: rgba(255, 255, 255, 0.15);
+      border-color: rgba(255, 255, 255, 0.4);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+    }
+    .badge { animation: pulse 2s infinite; }
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col p-4 md:p-8">
+
+  <!-- Header -->
+  <header class="text-center mb-12 mt-4">
+    <img src="https://iili.io/n9uoPtf.png" alt="Logo Sekolah" class="h-20 mx-auto mb-4 drop-shadow-lg">
+    <h1 class="font-title text-4xl md:text-5xl text-white mb-2 tracking-wide">ARCADE <span class="text-orange-400">EDUKASI</span></h1>
+    <p class="text-blue-200 text-lg md:text-xl font-semibold max-w-2xl mx-auto">
+      Belajar jadi lebih seru! Pilih misi petualanganmu hari ini dan kumpulkan poin sebanyak-banyaknya.
+    </p>
+  </header>
+
+  <!-- Game Grid -->
+  <main class="flex-grow w-full max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+
+    <!-- Card 1: Siaga Bencana (Terbaru) -->
+    <div class="glass-card rounded-3xl p-6 flex flex-col relative overflow-hidden">
+      <div class="absolute top-4 right-4 badge bg-red-500 text-white text-xs font-black px-3 py-1 rounded-full uppercase tracking-wider">
+        Baru!
+      </div>
+      <div class="text-7xl mb-4 text-center mt-2">🌋</div>
+      <h2 class="font-title text-2xl text-orange-300 mb-2 text-center">Petualangan Siaga Bencana</h2>
+      <p class="text-slate-300 text-sm mb-6 flex-grow text-center font-semibold">
+        Gunung Anak Krakatau erupsi! Uji ketangkasanmu menghadapi gempa, abu vulkanik, dan pelajari cara menyelamatkan diri.
+      </p>
+      <a href="game-siaga.html" class="block w-full bg-orange-500 hover:bg-orange-600 text-white font-title text-xl py-3 rounded-xl text-center transition-colors shadow-lg">
+        ▶️ Mainkan
+      </a>
+    </div>
+
+    <!-- Card 2: Memilah Sampah -->
+    <div class="glass-card rounded-3xl p-6 flex flex-col relative">
+      <div class="text-7xl mb-4 text-center mt-2">♻️</div>
+      <h2 class="font-title text-2xl text-green-300 mb-2 text-center">Pahlawan Lingkungan</h2>
+      <p class="text-slate-300 text-sm mb-6 flex-grow text-center font-semibold">
+        Bumi sedang kotor! Bantu pisahkan sampah organik dan anorganik ke tempat yang tepat agar lingkungan kembali bersih.
+      </p>
+      <a href="game-pilah.html" class="block w-full bg-green-500 hover:bg-green-600 text-white font-title text-xl py-3 rounded-xl text-center transition-colors shadow-lg">
+        ▶️ Mainkan
+      </a>
+    </div>
+
+    <!-- Card 3: SD Methodist Immanuel (Baru Ditambahkan) -->
+    <div class="glass-card rounded-3xl p-6 flex flex-col relative overflow-hidden">
+      <div class="absolute top-4 right-4 badge bg-blue-500 text-white text-xs font-black px-3 py-1 rounded-full uppercase tracking-wider">
+        Spesial!
+      </div>
+      <div class="text-7xl mb-4 text-center mt-2">🏫</div>
+      <h2 class="font-title text-2xl text-blue-300 mb-2 text-center">SD Methodist Immanuel</h2>
+      <p class="text-slate-300 text-sm mb-6 flex-grow text-center font-semibold">
+        Eksplorasi portal khusus pembelajaran interaktif dan asesmen sumatif dari SD Methodist Immanuel.
+      </p>
+      <a href="https://thomasryantama.github.io/sts-sdmethodistimmanuel.html" target="_blank" rel="noopener noreferrer" class="block w-full bg-blue-500 hover:bg-blue-600 text-white font-title text-xl py-3 rounded-xl text-center transition-colors shadow-lg">
+        ▶️ Kunjungi
+      </a>
+    </div>
+
+    <!-- Card 4: Coming Soon (Akan Datang) -->
+    <div class="glass-card rounded-3xl p-6 flex flex-col items-center justify-center border-dashed border-2 opacity-70 cursor-not-allowed">
+      <div class="text-6xl mb-4 grayscale">🚀</div>
+      <h2 class="font-title text-xl text-slate-400 mb-2 text-center">Misi Selanjutnya...</h2>
+      <p class="text-slate-500 text-sm mb-4 text-center font-semibold">
+        Sedang dikembangkan oleh Bapak/Ibu Guru. Tunggu petualangan seru lainnya ya!
+      </p>
+      <button disabled class="w-full bg-slate-700 text-slate-400 font-title text-lg py-3 rounded-xl text-center">
+        🔒 Terkunci
+      </button>
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="mt-12 mb-6 text-center text-sm text-slate-400 font-semibold">
+    <p>Dikembangkan oleh Thomas Ryantama, M.Kom. Gr.</p>
+  </footer>
+
+</body>
+</html>

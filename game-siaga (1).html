@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#2563eb">
+  <title>Petualangan Siaga Bencana — Papan Peringkat Global</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --blue: #2563eb;
+      --orange: #f97316;
+      --green: #16a34a;
+      --red: #dc2626;
+      --ink: #172033;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: 'Nunito', sans-serif;
+      color: var(--ink);
+      background:
+        linear-gradient(135deg, rgba(15,23,42,.88), rgba(30,64,175,.72)),
+        url('https://images.unsplash.com/photo-1534274988757-a28bf1a57c17?q=80&w=2000&auto=format&fit=crop')
+        center/cover fixed;
+    }
+
+    h1, h2, h3, .font-title {
+      font-family: 'Fredoka', sans-serif;
+    }
+
+    .glass {
+      background: rgba(255,255,255,.96);
+      backdrop-filter: blur(14px);
+      box-shadow: 0 30px 80px rgba(0,0,0,.28);
+    }
+
+    .btn {
+      transition: transform .18s ease, box-shadow .18s ease, filter .18s ease;
+      border-bottom: 5px solid rgba(0,0,0,.18);
+    }
+
+    .btn:hover {
+      transform: translateY(-2px) scale(1.01);
+      filter: brightness(1.03);
+      box-shadow: 0 12px 24px rgba(15,23,42,.14);
+    }
+
+    .btn:active {
+      transform: translateY(3px);
+      border-bottom-width: 2px;
+      box-shadow: none;
+    }
+
+    .choice {
+      animation: rise .35s ease both;
+    }
+
+    .choice:nth-child(2) { animation-delay: .06s; }
+    .choice:nth-child(3) { animation-delay: .12s; }
+    .choice:nth-child(4) { animation-delay: .18s; }
+
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes float {
+      0%,100% { transform: translateY(0); }
+      50% { transform: translateY(-7px); }
+    }
+
+    .float { animation: float 2.3s ease-in-out infinite; }
+
+    @keyframes shake {
+      10%,90% { transform: translateX(-2px); }
+      20%,80% { transform: translateX(4px); }
+      30%,50%,70% { transform: translateX(-7px); }
+      40%,60% { transform: translateX(7px); }
+    }
+
+    .shake { animation: shake .45s cubic-bezier(.36,.07,.19,.97) both; }
+
+    .progress {
+      transition: width .45s ease;
+    }
+
+    #time-bar {
+      transition: width 1s linear, background-color .25s ease;
+    }
+
+    .correct-ring { box-shadow: 0 0 0 5px rgba(34,197,94,.16); }
+    .wrong-ring { box-shadow: 0 0 0 5px rgba(239,68,68,.14); }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: .01ms !important;
+        transition-duration: .01ms !important;
+      }
+    }
+  </style>
+</head>
+
+<body class="min-h-screen flex items-center justify-center p-3 sm:p-5">
+
+  <main id="game-container" class="glass relative z-10 w-full max-w-4xl rounded-[2rem] border-4 border-white/70 p-4 sm:p-7 md:p-9">
+
+    <!-- HEADER -->
+    <header class="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6">
+      <div class="flex items-center gap-3">
+        <img src="https://iili.io/n9uoPtf.png" alt="Logo Sekolah" class="h-14 sm:h-16 drop-shadow-md">
+        <div>
+          <p class="text-xs font-black uppercase tracking-[.2em] text-blue-500">Game Edukasi</p>
+          <h1 class="font-title text-xl sm:text-2xl text-slate-800">Siaga Bencana</h1>
+        </div>
+      </div>
+
+      <div id="info-bar" class="hidden w-full sm:w-auto flex items-center justify-between gap-2">
+        <div class="bg-orange-50 text-orange-700 px-3 py-2 rounded-xl font-extrabold border-2 border-orange-100">
+          <span id="level-display">Babak 1 (1/4)</span>
+        </div>
+        <div class="bg-blue-50 text-blue-700 px-3 py-2 rounded-xl font-extrabold border-2 border-blue-100">
+          ⭐ <span id="score-display">0</span>
+        </div>
+        <div class="bg-emerald-50 text-emerald-700 px-3 py-2 rounded-xl font-extrabold border-2 border-emerald-100">
+          🔥 <span id="streak-display">0</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- PROGRESS + TIMER -->
+    <section id="game-status" class="hidden mb-6">
+      <div class="flex justify-between text-xs font-extrabold text-slate-500 mb-2">
+        <span>PROGRES PETUALANGAN</span>
+        <span id="progress-text">0%</span>
+      </div>
+      <div class="h-3 bg-slate-100 rounded-full overflow-hidden border border-slate-200 mb-4">
+        <div id="progress-bar" class="progress h-full bg-blue-500 rounded-full" style="width:0%"></div>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <span class="text-xl" aria-hidden="true">⏱️</span>
+        <div class="flex-1 h-4 bg-slate-200 rounded-full overflow-hidden border border-slate-300">
+          <div id="time-bar" class="h-full bg-green-500 rounded-full" style="width:100%"></div>
+        </div>
+        <span id="time-text" class="min-w-10 text-right font-title text-lg text-slate-700">15s</span>
+      </div>
+    </section>
+
+    <!-- CONTENT -->
+    <section id="content-area" class="text-center"></section>
+
+    <!-- FOOTER (SINGLE CREDIT) -->
+    <footer class="mt-7 text-center text-xs text-slate-400 font-semibold">
+      <div>Belajar • Bermain • Siap Menghadapi Bencana</div>
+      <div class="mt-2 font-black text-slate-500">Dibuat oleh Thomas Ryantama, M.Kom. Gr.</div>
+    </footer>
+  </main>
+
+<script>
+  /* ============================================================
+     API LEADERBOARD CONFIGURATION
+     ============================================================ */
+  const API_URL = "https://script.google.com/macros/s/AKfycbyjhNYtkXTyQr76e7D0PaJdv_1tq6GJYl7UmOlL-3vAQgyT5gkOE-RK4C1FzXdQ58oC5w/exec";
+  const GAME_ID_SIAGA = "siaga";
+  
+  let playerName = "";
+  let leaderboard = [];
+
+  function loadLeaderboard() {
+      fetch(API_URL + "?action=get&game=" + GAME_ID_SIAGA)
+          .then(response => response.json())
+          .then(data => {
+              leaderboard = data;
+              renderLeaderboard('start-leaderboard-list');
+              if (document.getElementById('result-leaderboard-list')) {
+                  renderLeaderboard('result-leaderboard-list');
+              }
+          })
+          .catch(error => {
+              console.log("Gagal memuat papan peringkat", error);
+              const list = document.getElementById('start-leaderboard-list');
+              if(list) list.innerHTML = "<li class='text-center text-slate-500'>Gagal memuat data peringkat.</li>";
+          });
+  }
+
+  function saveScore(name, finalScore) {
+      // Update lokal agar cepat tampil di layar
+      leaderboard.push({ name: name, score: finalScore });
+      leaderboard.sort((a, b) => b.score - a.score);
+      leaderboard = leaderboard.slice(0, 5);
+      
+      // Simpan ke Google Sheets di background
+      const url = `${API_URL}?action=save&game=${GAME_ID_SIAGA}&name=${encodeURIComponent(name)}&score=${finalScore}`;
+      fetch(url).catch(err => console.log("Gagal menyimpan ke cloud", err));
+  }
+
+  function renderLeaderboard(containerId) {
+      const list = document.getElementById(containerId);
+      if (!list) return;
+      list.innerHTML = "";
+      if (leaderboard.length === 0) {
+          list.innerHTML = "<li class='text-center text-slate-500'>Belum ada data. Jadilah yang pertama!</li>";
+          return;
+      }
+      const medals = ['🥇', '🥈', '🥉', '4️⃣', '5️⃣'];
+      leaderboard.forEach((p, i) => {
+          list.innerHTML += `<li class="flex justify-between bg-white px-3 py-2 rounded-xl shadow-sm border border-slate-100"><span>${medals[i]} ${escapeHtml(p.name)}</span> <span class="text-orange-500">⭐ ${p.score}</span></li>`;
+      });
+  }
+
+
+  // ============================================================
+  // AUDIO
+  // ============================================================
+  const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+  let audioCtx = null;
+
+  function initAudio() {
+    if (!AudioContextClass) return;
+    if (!audioCtx) audioCtx = new AudioContextClass();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+  }
+
+  function playTone(freq, type='sine', duration=.12, volume=.06, delay=0) {
+    if (!audioCtx) return;
+    setTimeout(() => {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+      gain.gain.setValueAtTime(volume, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(.001, audioCtx.currentTime + duration);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + duration);
+    }, delay);
+  }
+
+  function soundCorrect() {
+    initAudio();
+    playTone(600, 'sine', .10, .06);
+    playTone(800, 'sine', .18, .06, 100);
+    playTone(1000, 'sine', .25, .05, 220);
+  }
+
+  function soundWrong() {
+    initAudio();
+    playTone(210, 'sawtooth', .22, .05);
+    playTone(150, 'sawtooth', .30, .05, 170);
+  }
+
+  function soundTick() { initAudio(); playTone(900, 'square', .045, .018); }
+  function soundTimeout() { initAudio(); playTone(300, 'square', .25, .05); playTone(180, 'square', .3, .04, 180); }
+  function soundStageClear() { initAudio(); playTone(500, 'sine', 0.2); playTone(700, 'sine', 0.2, 0.06, 200); playTone(900, 'sine', 0.4, 0.06, 400); }
+
+  // ============================================================
+  // DATA SOAL (20 Soal)
+  // ============================================================
+  const questions = [
+    {
+      icon:"🫨", scene:"🏠  🪑  🧒", title:"AWAS GEMPA!",
+      text:"Saat sedang belajar, tiba-tiba bumi bergetar kuat. Apa yang paling tepat dilakukan saat guncangan terjadi?",
+      time:15,
+      choices:[
+        {text:"Berlindung di bawah meja yang kuat, lindungi kepala, dan berpegangan",isCorrect:true,feedback:"Benar! Saat gempa, lindungi kepala dan tubuh di tempat yang kokoh. Tetap tenang sampai guncangan berhenti."},
+        {text:"Berlari ke tangga sambil berdesak-desakan",isCorrect:false,feedback:"Jangan terburu-buru saat guncangan masih berlangsung. Benda bisa jatuh dan kamu dapat terluka."},
+        {text:"Berdiri dekat jendela untuk melihat keadaan",isCorrect:false,feedback:"Jendela dan kaca dapat pecah. Jauhi kaca dan benda yang mudah jatuh."}
+      ]
+    },
+    {
+      icon:"🚪", scene:"🏫  👧  🧑‍🤝‍🧑", title:"EVAKUASI SEKOLAH",
+      text:"Alarm evakuasi berbunyi. Guru meminta semua siswa keluar kelas. Apa yang harus kamu lakukan?",
+      time:15,
+      choices:[
+        {text:"Mengikuti arahan guru dan berjalan tertib melalui jalur evakuasi",isCorrect:true,feedback:"Hebat! Ikuti guru, jangan berlari atau saling mendorong, dan gunakan jalur evakuasi yang sudah ditentukan."},
+        {text:"Kembali mengambil mainan atau barang kesayangan",isCorrect:false,feedback:"Keselamatan lebih penting daripada barang. Ikuti arahan evakuasi terlebih dahulu."},
+        {text:"Berlomba menjadi siswa pertama yang keluar",isCorrect:false,feedback:"Jangan berlomba. Berjalan tertib membantu semua orang keluar dengan aman."}
+      ]
+    },
+    {
+      icon:"🎒", scene:"💧 🔦 🩹 🍪", title:"TAS SIAGA",
+      text:"Kamu membantu keluarga menyiapkan tas siaga. Barang mana yang paling tepat diprioritaskan?",
+      time:15,
+      choices:[
+        {text:"Air minum, makanan tahan lama, senter, P3K, dan kebutuhan penting",isCorrect:true,feedback:"Tepat! Tas siaga berisi kebutuhan dasar yang membantu keluarga saat harus mengungsi atau menghadapi keadaan darurat."},
+        {text:"Mainan sebanyak mungkin dan koleksi buku",isCorrect:false,feedback:"Boleh membawa satu benda kesayangan jika memungkinkan, tetapi kebutuhan keselamatan harus diprioritaskan."},
+        {text:"Barang mahal agar tidak hilang",isCorrect:false,feedback:"Saat darurat, keselamatan dan kebutuhan dasar jauh lebih penting daripada barang berharga."}
+      ]
+    },
+    {
+      icon:"😷", scene:"🌋 ☁️ 🧒", title:"HUJAN ABU VULKANIK",
+      text:"Abu vulkanik mulai turun dan kamu harus keluar untuk keadaan penting. Apa perlindungan yang tepat?",
+      time:15,
+      choices:[
+        {text:"Menggunakan masker pelindung, pelindung mata, dan pakaian yang menutup tubuh",isCorrect:true,feedback:"Benar! Abu vulkanik dapat mengganggu pernapasan dan mata. Gunakan perlindungan yang sesuai dan ikuti arahan petugas."},
+        {text:"Keluar tanpa perlindungan karena hanya sebentar",isCorrect:false,feedback:"Walaupun sebentar, abu tetap dapat terhirup atau masuk ke mata. Lindungi diri."},
+        {text:"Hanya memakai topi",isCorrect:false,feedback:"Topi saja belum cukup. Saluran pernapasan dan mata juga perlu dilindungi."}
+      ]
+    },
+    {
+      icon:"🌊", scene:"🌊 🏃‍♀️ ⛰️", title:"TANDA TSUNAMI",
+      text:"Setelah gempa kuat di dekat pantai, air laut tiba-tiba surut jauh. Apa yang harus kamu lakukan?",
+      time:12,
+      choices:[
+        {text:"Segera menjauh dari pantai dan menuju tempat yang lebih tinggi",isCorrect:true,feedback:"Sangat tepat! Gempa kuat dan perubahan air laut yang tidak biasa dapat menjadi tanda bahaya tsunami. Segera evakuasi."},
+        {text:"Mendekati pantai untuk melihat ikan",isCorrect:false,feedback:"Jangan mendekati pantai. Keselamatanmu lebih penting daripada melihat atau mengambil ikan."},
+        {text:"Menunggu teman untuk mengambil video",isCorrect:false,feedback:"Jangan menunda evakuasi untuk merekam. Segera menuju tempat aman."}
+      ]
+    },
+    {
+      icon:"🔥", scene:"🍳 🧯 🏠", title:"KEBAKARAN DI DAPUR",
+      text:"Kamu melihat api kecil dari peralatan memasak. Apa yang paling tepat dilakukan anak?",
+      time:15,
+      choices:[
+        {text:"Segera menjauh, beri tahu orang dewasa, dan ikuti rencana evakuasi",isCorrect:true,feedback:"Benar! Anak tidak perlu mencoba memadamkan kebakaran sendiri. Segera beri tahu orang dewasa dan menjauh dari bahaya."},
+        {text:"Mengambil minyak untuk menyiram api",isCorrect:false,feedback:"Jangan! Menambahkan minyak dapat membuat api semakin besar."},
+        {text:"Mendekat untuk melihat api dari jarak dekat",isCorrect:false,feedback:"Api dapat membesar tiba-tiba. Segera menjauh dan panggil orang dewasa."}
+      ]
+    },
+    {
+      icon:"🌧️", scene:"🌧️ 🏠 💧", title:"HUJAN DERAS",
+      text:"Hujan sangat deras dan air mulai masuk ke halaman rumah. Apa tindakan yang aman?",
+      time:15,
+      choices:[
+        {text:"Tetap bersama keluarga dan mengikuti informasi serta arahan resmi",isCorrect:true,feedback:"Bagus! Tetap bersama keluarga, siapkan barang penting, dan ikuti informasi resmi jika ada arahan evakuasi."},
+        {text:"Bermain air di luar rumah",isCorrect:false,feedback:"Air banjir dapat membawa bahaya dan arus yang tidak terlihat. Jangan bermain di area banjir."},
+        {text:"Pergi ke sungai untuk melihat ketinggian air",isCorrect:false,feedback:"Jangan mendekati sungai saat hujan deras. Air dapat naik dan mengalir sangat kuat."}
+      ]
+    },
+    {
+      icon:"⚡", scene:"⛈️ ⚡ 🏠", title:"PETIR",
+      text:"Saat bermain di luar, terdengar petir berkali-kali. Apa pilihan yang paling aman?",
+      time:15,
+      choices:[
+        {text:"Masuk ke bangunan yang aman dan menjauh dari tempat terbuka",isCorrect:true,feedback:"Tepat! Saat ada petir, cari tempat berlindung di dalam bangunan yang aman dan hindari area terbuka."},
+        {text:"Berteduh di bawah pohon tinggi",isCorrect:false,feedback:"Pohon tinggi bukan tempat berlindung yang aman dari sambaran petir."},
+        {text:"Tetap bermain karena hujan belum turun",isCorrect:false,feedback:"Petir dapat berbahaya meskipun hujan belum deras. Segera cari tempat aman."}
+      ]
+    },
+    {
+      icon:"📱", scene:"📱 📢 👨‍👩‍👧", title:"INFO DARURAT",
+      text:"Kamu menerima pesan di grup yang membuat semua orang panik. Apa yang sebaiknya dilakukan?",
+      time:15,
+      choices:[
+        {text:"Cek sumber resmi dan tanyakan kepada orang dewasa sebelum percaya atau membagikan",isCorrect:true,feedback:"Pintar! Jangan langsung percaya atau menyebarkan pesan. Periksa sumber resmi dan mintalah bantuan orang dewasa."},
+        {text:"Langsung teruskan ke semua grup",isCorrect:false,feedback:"Jangan menyebarkan informasi yang belum terverifikasi karena dapat membuat orang lain panik."},
+        {text:"Menambahkan cerita agar pesannya lebih menarik",isCorrect:false,feedback:"Jangan menambah atau mengubah informasi darurat. Gunakan sumber yang terpercaya."}
+      ]
+    },
+    {
+      icon:"🧯", scene:"🧯 👨‍🚒 🏫", title:"ALAT PEMADAM",
+      text:"Di sekolah ada alat pemadam api. Siapa yang sebaiknya menggunakan alat tersebut ketika terjadi kebakaran?",
+      time:15,
+      choices:[
+        {text:"Orang dewasa yang terlatih dan hanya jika kondisinya aman",isCorrect:true,feedback:"Benar! Anak-anak sebaiknya segera menjauh dan meminta bantuan. Penggunaan alat pemadam perlu dilakukan oleh orang yang terlatih."},
+        {text:"Siapa saja yang paling berani",isCorrect:false,feedback:"Keberanian saja tidak cukup. Pemadam api harus digunakan dengan benar dan hanya bila aman."},
+        {text:"Anak yang paling dekat dengan alat",isCorrect:false,feedback:"Anak sebaiknya tidak mengambil risiko. Segera beri tahu guru atau orang dewasa."}
+      ]
+    },
+    {
+      icon:"🩹", scene:"🩹 🧑‍⚕️ 👧", title:"PERTOLONGAN PERTAMA",
+      text:"Temanmu mendapat luka kecil. Apa yang sebaiknya kamu lakukan?",
+      time:15,
+      choices:[
+        {text:"Memberi tahu guru/orang dewasa dan meminta pertolongan sesuai kebutuhan",isCorrect:true,feedback:"Bagus! Beri tahu orang dewasa dan ikuti petunjuknya. Jangan mencoba tindakan medis yang belum kamu pahami."},
+        {text:"Mengoleskan obat apa saja yang ada",isCorrect:false,feedback:"Jangan sembarang menggunakan obat. Mintalah bantuan orang dewasa."},
+        {text:"Menyentuh luka dengan tangan kotor",isCorrect:false,feedback:"Hindari menyentuh luka dengan tangan kotor. Segera minta bantuan orang dewasa."}
+      ]
+    },
+    {
+      icon:"🏢", scene:"🏢 ⬇️ 🚶", title:"SETELAH GEMPA",
+      text:"Setelah guncangan berhenti, kamu berada di lantai atas gedung. Jika harus keluar, apa yang dilakukan?",
+      time:15,
+      choices:[
+        {text:"Mengikuti jalur evakuasi dan menggunakan tangga sesuai arahan",isCorrect:true,feedback:"Benar! Ikuti jalur evakuasi. Hindari lift jika ada arahan untuk tidak menggunakannya."},
+        {text:"Menggunakan lift tanpa memeriksa keadaan",isCorrect:false,feedback:"Lift dapat mengalami gangguan setelah gempa. Ikuti petunjuk keselamatan dan gunakan jalur evakuasi."},
+        {text:"Melompat dari jendela",isCorrect:false,feedback:"Sangat berbahaya. Jangan melompat dari ketinggian. Gunakan jalur evakuasi yang aman."}
+      ]
+    },
+    {
+      icon:"🌋", scene:"🌋 🏃‍♂️ 📢", title:"SAAT ERUPSI",
+      text:"Jika petugas meminta warga mengungsi karena aktivitas gunung api meningkat, apa yang harus kamu lakukan?",
+      time:15,
+      choices:[
+        {text:"Mengikuti arahan evakuasi bersama keluarga dan membawa tas siaga",isCorrect:true,feedback:"Tepat! Ikuti arahan petugas, gunakan jalur evakuasi, dan tetap bersama keluarga."},
+        {text:"Mendekati gunung untuk melihat erupsi",isCorrect:false,feedback:"Jangan mendekati sumber bahaya. Ikuti zona aman dan arahan petugas."},
+        {text:"Menolak mengungsi karena merasa rumah lebih aman",isCorrect:false,feedback:"Jika ada perintah atau arahan evakuasi, ikuti petugas dan menuju tempat yang ditentukan."}
+      ]
+    },
+    {
+      icon:"🚰", scene:"💧 🚰 🥤", title:"AIR BERSIH",
+      text:"Saat keadaan darurat, mengapa air minum perlu disiapkan?",
+      time:15,
+      choices:[
+        {text:"Karena tubuh membutuhkan air dan akses air bersih bisa terganggu",isCorrect:true,feedback:"Benar! Air bersih adalah kebutuhan dasar yang penting saat keadaan darurat."},
+        {text:"Agar bisa bermain perang air",isCorrect:false,feedback:"Air dalam tas siaga diprioritaskan untuk kebutuhan penting, terutama minum dan kebersihan."},
+        {text:"Supaya tas terasa lebih berat",isCorrect:false,feedback:"Air dibawa karena merupakan kebutuhan dasar, bukan untuk menambah berat tas."}
+      ]
+    },
+    {
+      icon:"🔦", scene:"🌙 🔦 🧒", title:"LISTRIK PADAM",
+      text:"Listrik tiba-tiba padam setelah bencana. Apa alat yang paling berguna untuk membantu penerangan?",
+      time:15,
+      choices:[
+        {text:"Senter",isCorrect:true,feedback:"Tepat! Senter dapat membantu penerangan saat listrik padam. Simpan baterai cadangan jika tersedia."},
+        {text:"Lilin diletakkan dekat tirai",isCorrect:false,feedback:"Api terbuka dapat menyebabkan kebakaran. Mintalah bantuan orang dewasa dan gunakan penerangan yang aman."},
+        {text:"Layar HP sepanjang malam",isCorrect:false,feedback:"Baterai HP sebaiknya dihemat untuk komunikasi darurat."}
+      ]
+    },
+    {
+      icon:"👨‍👩‍👧", scene:"🏠 ❤️ 👨‍👩‍👧", title:"TETAP BERSAMA",
+      text:"Saat harus mengungsi, apa kebiasaan yang membantu keluarga tetap aman?",
+      time:15,
+      choices:[
+        {text:"Tetap bersama, saling memberi tahu, dan mengikuti arahan orang dewasa",isCorrect:true,feedback:"Hebat! Tetap bersama keluarga dan saling memberi informasi membantu mencegah anggota keluarga terpisah."},
+        {text:"Pergi sendiri mencari tempat yang menurutmu bagus",isCorrect:false,feedback:"Jangan pergi sendiri. Tetap bersama keluarga atau kelompok dan ikuti arahan."},
+        {text:"Berjalan paling jauh dari rombongan",isCorrect:false,feedback:"Tetap dekat dengan kelompok agar mudah saling membantu dan tidak tersesat."}
+      ]
+    },
+    {
+      icon:"🗺️", scene:"🗺️ 📍 🚶", title:"JALUR EVAKUASI",
+      text:"Di sekolah ada tanda jalur evakuasi. Mengapa kamu perlu mengenalinya sebelum bencana?",
+      time:15,
+      choices:[
+        {text:"Agar tahu jalan menuju tempat aman saat keadaan darurat",isCorrect:true,feedback:"Benar! Mengenal jalur evakuasi sejak awal membuat kita lebih siap dan tidak mudah bingung."},
+        {text:"Agar bisa mencoret-coret tandanya",isCorrect:false,feedback:"Tanda evakuasi harus dijaga agar semua orang dapat menggunakannya."},
+        {text:"Agar bisa berlari di koridor kapan saja",isCorrect:false,feedback:"Jalur evakuasi digunakan sesuai kebutuhan dan harus tetap bebas dari penghalang."}
+      ]
+    },
+    {
+      icon:"🌳", scene:"🌳 🏠 👀", title:"TEMPAT AMAN",
+      text:"Saat bencana, kamu diminta memilih tempat berkumpul. Tempat seperti apa yang lebih aman?",
+      time:15,
+      choices:[
+        {text:"Tempat terbuka yang telah ditentukan sebagai titik kumpul",isCorrect:true,feedback:"Bagus! Titik kumpul yang sudah ditentukan membantu semua orang berkumpul dan didata dengan lebih mudah."},
+        {text:"Di bawah papan reklame atau tiang",isCorrect:false,feedback:"Hindari benda yang dapat roboh atau jatuh."},
+        {text:"Di dekat kaca besar",isCorrect:false,feedback:"Jauhi kaca dan benda yang berpotensi pecah atau jatuh."}
+      ]
+    },
+    {
+      icon:"📢", scene:"📢 🧑‍🏫 👂", title:"DENGARKAN ARAHAN",
+      text:"Saat guru atau petugas memberikan instruksi evakuasi, apa yang sebaiknya kamu lakukan?",
+      time:15,
+      choices:[
+        {text:"Mendengarkan, mengikuti instruksi, dan bertanya jika tidak memahami",isCorrect:true,feedback:"Sangat baik! Dengarkan instruksi dan jangan malu bertanya jika ada yang belum kamu pahami."},
+        {text:"Berteriak agar semua orang mengikuti caramu",isCorrect:false,feedback:"Tetap tenang dan ikuti arahan petugas yang bertanggung jawab."},
+        {text:"Memilih jalan sendiri tanpa memberi tahu siapa pun",isCorrect:false,feedback:"Tetap bersama kelompok dan ikuti jalur yang diarahkan."}
+      ]
+    },
+    {
+      icon:"🐾", scene:"🐶 🏠 ❤️", title:"HEWAN PELIHARAAN",
+      text:"Keluargamu harus mengungsi dan memiliki hewan peliharaan. Apa yang sebaiknya dilakukan?",
+      time:15,
+      choices:[
+        {text:"Beri tahu orang dewasa dan siapkan kebutuhan hewan jika memungkinkan",isCorrect:true,feedback:"Benar! Rencanakan evakuasi hewan bersama orang dewasa dan jangan sampai keselamatanmu sendiri terabaikan."},
+        {text:"Meninggalkan hewan tanpa memberi tahu siapa pun",isCorrect:false,feedback:"Sampaikan kepada orang dewasa agar hewan dapat ditangani dalam rencana evakuasi."},
+        {text:"Kembali ke rumah sendirian jika sudah berada di tempat aman",isCorrect:false,feedback:"Jangan kembali ke area bahaya tanpa arahan. Mintalah orang dewasa atau petugas membantu."}
+      ]
+    }
+  ];
+
+  let currentQ = 0;
+  let score = 0;
+  let streak = 0;
+  let bestStreak = 0;
+  let timerInterval = null;
+  let timeLeft = 0;
+  let answered = false;
+  const questionsPerStage = 4; // 5 Babak, masing-masing 4 soal
+
+  const contentArea = document.getElementById('content-area');
+  const infoBar = document.getElementById('info-bar');
+  const gameStatus = document.getElementById('game-status');
+  const timeBar = document.getElementById('time-bar');
+  const timeText = document.getElementById('time-text');
+  const progressBar = document.getElementById('progress-bar');
+  const progressText = document.getElementById('progress-text');
+  const levelDisplay = document.getElementById('level-display');
+  const scoreDisplay = document.getElementById('score-display');
+  const streakDisplay = document.getElementById('streak-display');
+
+  // ============================================================
+  // UTILITIES
+  // ============================================================
+  function escapeHtml(value) {
+    return String(value)
+      .replaceAll('&', '&amp;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;')
+      .replaceAll('"', '&quot;')
+      .replaceAll("'", '&#039;');
+  }
+
+  function updateHUD() {
+    const currentStage = Math.floor(currentQ / questionsPerStage) + 1;
+    const maxStage = Math.ceil(questions.length / questionsPerStage);
+    const qInStage = (currentQ % questionsPerStage) + 1;
+    
+    levelDisplay.textContent = `Babak ${Math.min(currentStage, maxStage)} (${qInStage}/${questionsPerStage})`;
+    scoreDisplay.textContent = score;
+    streakDisplay.textContent = streak;
+  }
+
+  function updateProgress() {
+    const completed = currentQ;
+    const percent = Math.round((completed / questions.length) * 100);
+    progressBar.style.width = percent + '%';
+    progressText.textContent = percent + '%';
+  }
+
+  // ============================================================
+  // START / RESET
+  // ============================================================
+  function startGame() {
+    initAudio();
+    clearInterval(timerInterval);
+    currentQ = 0;
+    score = 0;
+    streak = 0;
+    bestStreak = 0;
+    answered = false;
+
+    infoBar.classList.remove('hidden');
+    gameStatus.classList.remove('hidden');
+    updateHUD();
+    updateProgress();
+    renderQuestion();
+  }
+
+  // ============================================================
+  // QUESTION
+  // ============================================================
+  function renderQuestion() {
+    if (currentQ >= questions.length) {
+      showResult();
+      return;
+    }
+
+    answered = false;
+    const q = questions[currentQ];
+    const currentStage = Math.floor(currentQ / questionsPerStage) + 1;
+    const qInStage = (currentQ % questionsPerStage) + 1;
+
+    updateHUD();
+    updateProgress();
+
+    const shuffled = [...q.choices].sort(() => Math.random() - .5);
+
+    const choicesHtml = shuffled.map((choice, index) => `
+      <button
+        class="choice btn w-full text-left bg-white hover:bg-blue-50 border-2 border-slate-200 rounded-2xl p-4 shadow-sm font-bold text-base sm:text-lg flex gap-3 items-start"
+        onclick='handleChoice(${JSON.stringify(choice)})' >
+        <span class="shrink-0 flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-700 font-black">
+          ${String.fromCharCode(65 + index)}
+        </span>
+        <span>${escapeHtml(choice.text)}</span>
+      </button>
+    `).join('');
+
+    contentArea.innerHTML = `
+      <div class="max-w-3xl mx-auto">
+        <div class="relative overflow-hidden rounded-[1.75rem] bg-gradient-to-br from-blue-50 via-white to-orange-50 border-2 border-slate-100 p-4 sm:p-5 mb-5 shadow-inner">
+          <div class="absolute -top-8 -right-8 text-6xl opacity-20">☁️</div>
+          <div class="absolute -bottom-8 -left-8 text-6xl opacity-20">✨</div>
+          <div class="relative text-4xl sm:text-5xl tracking-[.12em] mb-2 float" aria-hidden="true">${q.scene}</div>
+          <div class="relative text-6xl sm:text-7xl" aria-hidden="true">${q.icon}</div>
+        </div>
+        <div class="inline-flex items-center gap-2 bg-blue-50 text-blue-700 border border-blue-100 px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider mb-3">
+          Babak ${currentStage} - Soal ${qInStage}
+        </div>
+        <h2 class="font-title text-3xl sm:text-4xl text-blue-600 mb-3">${escapeHtml(q.title)}</h2>
+        <p class="text-lg sm:text-xl md:text-2xl font-extrabold text-slate-700 leading-snug mb-6">
+          ${escapeHtml(q.text)}
+        </p>
+        <div class="grid gap-3">${choicesHtml}</div>
+      </div>
+    `;
+
+    startTimer(q.time);
+  }
+
+  // ============================================================
+  // TIMER
+  // ============================================================
+  function startTimer(seconds) {
+    clearInterval(timerInterval);
+    timeLeft = seconds;
+    timeBar.style.width = '100%';
+    timeBar.className = 'h-full bg-green-500 rounded-full';
+    timeText.textContent = `${seconds}s`;
+
+    timerInterval = setInterval(() => {
+      timeLeft--;
+
+      const pct = Math.max(0, (timeLeft / seconds) * 100);
+      timeBar.style.width = pct + '%';
+      timeText.textContent = `${Math.max(0, timeLeft)}s`;
+
+      if (timeLeft > 0 && timeLeft <= 5) {
+        soundTick();
+        timeBar.classList.remove('bg-green-500', 'bg-yellow-400');
+        timeBar.classList.add('bg-red-500');
+      } else if (timeLeft > 5 && pct <= 50) {
+        timeBar.classList.remove('bg-green-500');
+        timeBar.classList.add('bg-yellow-400');
+      }
+
+      if (timeLeft <= 0) {
+        clearInterval(timerInterval);
+        if (!answered) {
+          answered = true;
+          streak = 0;
+          soundTimeout();
+          showFeedback(false, 'Waktu habis! Dalam keadaan darurat, tetap tenang dan ingat langkah keselamatan utama.', true);
+        }
+      }
+    }, 1000);
+  }
+
+  // ============================================================
+  // ANSWER
+  // ============================================================
+  function handleChoice(choice) {
+    if (answered) return;
+    answered = true;
+    clearInterval(timerInterval);
+
+    if (choice.isCorrect) {
+      const speedBonus = Math.max(0, timeLeft) * 5;
+      streak++;
+      bestStreak = Math.max(bestStreak, streak);
+
+      const streakBonus = streak >= 2 ? 25 * (streak - 1) : 0;
+      score += 100 + speedBonus + streakBonus;
+
+      soundCorrect();
+      showFeedback(true, choice.feedback, false, speedBonus, streakBonus);
+    } else {
+      streak = 0;
+      soundWrong();
+
+      const box = document.getElementById('game-container');
+      box.classList.remove('shake');
+      void box.offsetWidth;
+      box.classList.add('shake');
+
+      showFeedback(false, choice.feedback, false);
+    }
+  }
+
+  // ============================================================
+  // FEEDBACK
+  // ============================================================
+  function showFeedback(isCorrect, feedbackText, isTimeout=false, speedBonus=0, streakBonus=0) {
+    gameStatus.classList.add('hidden');
+
+    const title = isCorrect ? 'BENAR! HEBAT! 🎉' : (isTimeout ? 'WAKTU HABIS! ⏰' : 'BELUM TEPAT 💥');
+    const titleClass = isCorrect ? 'text-green-600' : 'text-red-600';
+    const icon = isCorrect ? '🌟' : (isTimeout ? '⏰' : '🧭');
+
+    const bonusHtml = isCorrect ? `
+      <div class="flex flex-wrap justify-center gap-2 mt-4">
+        <span class="px-3 py-2 rounded-xl bg-green-50 text-green-700 font-extrabold text-sm">+100 poin dasar</span>
+        ${speedBonus ? `<span class="px-3 py-2 rounded-xl bg-yellow-50 text-yellow-700 font-extrabold text-sm">⚡ +${speedBonus} cepat</span>` : ''}
+        ${streakBonus ? `<span class="px-3 py-2 rounded-xl bg-orange-50 text-orange-700 font-extrabold text-sm">🔥 +${streakBonus} combo</span>` : ''}
+      </div>
+    ` : '';
+
+    contentArea.innerHTML = `
+      <div class="max-w-2xl mx-auto py-4">
+        <div class="text-7xl mb-3 ${isCorrect ? 'float' : ''}">${icon}</div>
+        <h2 class="font-title text-3xl sm:text-4xl mb-4 ${titleClass}">${title}</h2>
+
+        <div class="${isCorrect ? 'correct-ring' : 'wrong-ring'} bg-slate-50 p-5 sm:p-6 rounded-2xl border-2 border-slate-200">
+          <p class="text-slate-700 font-bold text-lg sm:text-xl leading-relaxed">${escapeHtml(feedbackText)}</p>
+          ${bonusHtml}
+        </div>
+
+        <div class="mt-5 text-sm font-bold text-slate-500">
+          Skor saat ini: <span class="text-blue-600">${score}</span>
+        </div>
+
+        <button onclick="nextQuestion()" class="btn mt-7 bg-blue-600 hover:bg-blue-700 border-blue-800 text-white font-title text-xl py-4 px-9 rounded-2xl shadow-lg">
+          Lanjut ➡️
+        </button>
+      </div>
+    `;
+  }
+
+  // ============================================================
+  // STAGE BREAK LOGIC
+  // ============================================================
+  function nextQuestion() {
+    currentQ++;
+    if (currentQ >= questions.length) {
+      showResult();
+    } else if (currentQ % questionsPerStage === 0) {
+      showStageBreak();
+    } else {
+      gameStatus.classList.remove('hidden');
+      renderQuestion();
+    }
+  }
+
+  function showStageBreak() {
+    gameStatus.classList.add('hidden');
+    soundStageClear();
+    
+    const completedStage = Math.floor(currentQ / questionsPerStage);
+    const nextStage = completedStage + 1;
+
+    contentArea.innerHTML = `
+      <div class="max-w-2xl mx-auto py-8">
+        <div class="text-8xl mb-4 float">🎉</div>
+        <h2 class="font-title text-4xl sm:text-5xl text-blue-600 mb-4">BABAK ${completedStage} SELESAI!</h2>
+        <div class="bg-blue-50 border-4 border-blue-200 rounded-3xl p-6 mb-6 inline-block min-w-[250px]">
+          <p class="text-sm font-black uppercase text-blue-700">Skor Sementara</p>
+          <p class="font-title text-6xl text-blue-500 mt-2">${score}</p>
+        </div>
+        <p class="text-slate-600 font-bold text-xl mb-8 leading-relaxed max-w-md mx-auto">
+          Wah, kamu hebat! Tarik napas sebentar ya. Bersiaplah menghadapi rintangan selanjutnya!
+        </p>
+        <button onclick="startNextStage()" class="btn bg-orange-500 hover:bg-orange-600 border-orange-700 text-white font-title text-2xl py-4 px-10 rounded-2xl shadow-lg">
+          Mulai Babak ${nextStage} 🚀
+        </button>
+      </div>
+    `;
+  }
+
+  function startNextStage() {
+    gameStatus.classList.remove('hidden');
+    renderQuestion();
+  }
+
+  // ============================================================
+  // RESULT
+  // ============================================================
+  function showResult() {
+    clearInterval(timerInterval);
+    infoBar.classList.add('hidden');
+    gameStatus.classList.add('hidden');
+
+    const maxPossible = questions.reduce((sum, q) => sum + 100 + (q.time * 5), 0) + 25 * (questions.length - 1);
+    const percentage = Math.min(100, Math.round((score / maxPossible) * 100));
+
+    let title, message, icon;
+
+    if (percentage >= 80) {
+      title = 'PAHLAWAN SIAGA! 🏆';
+      message = 'Luar biasa! Kamu menunjukkan pengetahuan, ketenangan, dan kesiapsiagaan yang sangat baik.';
+      icon = '🏆';
+    } else if (percentage >= 60) {
+      title = 'ANAK TANGGUH! 🥇';
+      message = 'Bagus! Kamu sudah memahami banyak langkah keselamatan. Terus berlatih agar semakin siap.';
+      icon = '🥇';
+    } else {
+      title = 'AYO BELAJAR LAGI! 📚';
+      message = 'Tidak apa-apa. Yang penting kamu sudah belajar. Coba lagi dan ingat langkah keselamatan utama.';
+      icon = '📚';
+    }
+
+    soundStageClear();
+    
+    // Simpan ke Google Sheets
+    saveScore(playerName, score);
+
+    contentArea.innerHTML = `
+      <div class="max-w-2xl mx-auto">
+        <div class="text-7xl mb-3 float">${icon}</div>
+        <h1 class="font-title text-4xl sm:text-5xl text-slate-800 mb-2">${title}</h1>
+        <p class="text-slate-600 font-bold text-lg sm:text-xl mb-6">${message}</p>
+
+        <div class="bg-orange-50 border-4 border-orange-200 rounded-3xl p-5 mb-5">
+          <p class="text-sm font-black uppercase tracking-wider text-orange-700">Total Skor Akhir</p>
+          <p class="font-title text-6xl text-orange-500">${score}</p>
+          <p class="font-extrabold text-slate-500">${percentage}% performa sempurna</p>
+        </div>
+        
+        <!-- GLOBAL LEADERBOARD AKHIR -->
+        <div class="bg-yellow-50 border-2 border-yellow-200 rounded-2xl p-4 text-left max-w-md mx-auto mb-6">
+           <h3 class="font-title text-orange-600 text-center mb-3">🏆 Papan Peringkat Akhir</h3>
+           <ul id="result-leaderboard-list" class="text-sm font-bold text-slate-700 space-y-2">
+              <li class="text-center text-slate-500">Memuat data dari server...</li>
+           </ul>
+        </div>
+
+        <button onclick="renderHome()" class="btn bg-green-600 hover:bg-green-700 border-green-800 text-white font-title text-xl py-4 px-9 rounded-2xl shadow-lg">
+          🔄 Menu Utama
+        </button>
+      </div>
+    `;
+    
+    renderLeaderboard('result-leaderboard-list');
+  }
+
+  // ============================================================
+  // LANDING PAGE (SEKARANG ADA FITUR INPUT NAMA)
+  // ============================================================
+  function renderHome() {
+    contentArea.innerHTML = `
+      <div class="max-w-3xl mx-auto py-3 sm:py-6">
+        <div class="text-7xl sm:text-8xl mb-4 float" aria-hidden="true">🌋🏃‍♀️🎒</div>
+
+        <h1 class="font-title text-4xl sm:text-6xl leading-tight text-slate-800 mb-2">
+          PETUALANGAN
+          <span class="block text-orange-500">SIAGA BENCANA!</span>
+        </h1>
+
+        <p class="text-slate-600 mb-7 text-lg sm:text-xl font-bold leading-relaxed max-w-2xl mx-auto">
+          Uji pengetahuanmu tentang gempa bumi, erupsi gunung api, tsunami,
+          serta perlengkapan darurat.
+        </p>
+
+        <!-- INPUT NAMA & LEADERBOARD AWAL -->
+        <div class="max-w-md mx-auto mb-8">
+            <input type="text" id="player-input" placeholder="Ketik Namamu..." class="w-full p-4 rounded-2xl border-2 border-slate-300 text-center text-xl font-bold text-slate-700 outline-none focus:border-orange-500 mb-4 shadow-sm" maxlength="15">
+            <div class="bg-yellow-50 border-2 border-yellow-200 rounded-2xl p-4 text-left">
+               <h3 class="font-title text-orange-600 text-center mb-3">🏆 Top 5 Pahlawan Siaga</h3>
+               <ul id="start-leaderboard-list" class="text-sm font-bold text-slate-700 space-y-2">
+                  <li class="text-center text-slate-500">Memuat data dari server...</li>
+               </ul>
+            </div>
+        </div>
+
+        <button onclick="startNewGame()" class="btn bg-orange-500 hover:bg-orange-600 border-orange-700 text-white font-title text-2xl py-4 px-10 rounded-2xl shadow-lg">
+          ▶️ MULAI PETUALANGAN
+        </button>
+
+      </div>
+    `;
+    // Panggil papan peringkat saat halaman depan diload
+    loadLeaderboard();
+  }
+
+  function startNewGame() {
+      const inputName = document.getElementById('player-input').value.trim();
+      if (inputName === "") {
+          alert("Hei Pahlawan, ketik namamu dulu ya!");
+          return;
+      }
+      playerName = inputName;
+      startGame();
+  }
+
+  // Inisialisasi layar pertama
+  renderHome();
+</script>
+</body>
+</html>
