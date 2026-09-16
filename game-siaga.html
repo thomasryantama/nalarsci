@@ -795,7 +795,7 @@
         <!-- TOMBOL UNDUH KARTU PRESTASI -->
         <div class="max-w-md mx-auto space-y-3">
           <button onclick="unduhKartuSiaga('${escapeHtml(predikat)}')" class="btn w-full bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 border-orange-700 text-white font-title text-lg py-3.5 px-6 rounded-2xl shadow-lg flex items-center justify-center gap-2">
-            🎓 Unduh Kartu Prestasi A4 (PNG)
+            🎓 Unduh Kartu Prestasi A4
           </button>
 
           <button onclick="renderHome()" class="btn w-full bg-green-600 hover:bg-green-700 border-green-800 text-white font-title text-xl py-4 px-9 rounded-2xl shadow-lg">
@@ -857,8 +857,7 @@
   }
 
   // ============================================================
-  // GENERATOR PIAGAM PRESTASI A4 LANDSCAPE (300 DPI)
-  // Ukuran: 3508 x 2480 px (Standar Cetak HD)
+  // GENERATOR PIAGAM PRESTASI A4 LANDSCAPE (OPTIMAL & RINGAN)
   // ============================================================
   function unduhKartuSiaga(predikatNama = 'Duta Tanggap Bencana') {
     const namaPemain = playerName || 'Relawan Muda';
@@ -868,111 +867,109 @@
     canvas.height = 2480;
     const ctx = canvas.getContext('2d');
 
-    // 1. Background Gradient Slate Gelap
+    // 1. Background Slate Gelap
     const grad = ctx.createLinearGradient(0, 0, 3508, 2480);
     grad.addColorStop(0, '#0f172a');
     grad.addColorStop(1, '#1e293b');
     ctx.fillStyle = grad;
     ctx.fillRect(0, 0, 3508, 2480);
 
-    // 2. Bingkai Luar Oranye Tebal
-    ctx.lineWidth = 24;
+    // 2. Bingkai Ganda Oranye
+    ctx.lineWidth = 20;
     ctx.strokeStyle = '#f97316';
     ctx.strokeRect(100, 100, 3308, 2280);
 
-    // Bingkai Dalam Tipis Elegan
-    ctx.lineWidth = 6;
+    ctx.lineWidth = 4;
     ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
-    ctx.strokeRect(140, 140, 3228, 2200);
+    ctx.strokeRect(135, 135, 3238, 2210);
 
-    // 3. Header Lembaga / Laboratorium
-    ctx.font = 'bold 64px Nunito, sans-serif';
+    // 3. Header Lembaga
+    ctx.font = 'bold 56px Nunito, sans-serif';
     ctx.fillStyle = '#fb923c';
     ctx.textAlign = 'center';
-    ctx.fillText('NALARSCI LAB • SIMULASI STEM MITIGASI BENCANA', 1754, 380);
+    ctx.fillText('NALARSCI LAB • SIMULASI STEM MITIGASI BENCANA', 1754, 400);
 
-    // 4. Judul Piagam Penghargaan
-    ctx.font = 'bold 110px "Comic Sans MS", Fredoka, sans-serif';
+    // 4. Judul Piagam
+    ctx.font = 'bold 105px Fredoka, sans-serif';
     ctx.fillStyle = '#ffffff';
-    ctx.fillText('KARTU KETANGKASAN SIAGA BENCANA', 1754, 560);
+    ctx.fillText('KARTU KETANGKASAN SIAGA BENCANA', 1754, 550);
 
-    // Garis Aksen Oranye
     ctx.fillStyle = '#f97316';
-    ctx.fillRect(1454, 620, 600, 10);
+    ctx.fillRect(1454, 600, 600, 8);
 
     // 5. Kalimat Pengantar
-    ctx.font = '64px Nunito, sans-serif';
+    ctx.font = '54px Nunito, sans-serif';
     ctx.fillStyle = '#94a3b8';
-    ctx.fillText('Diberikan dengan bangga atas ketangkasan, nalar, dan kesiapsiagaan kepada:', 1754, 820);
+    ctx.fillText('Diberikan dengan bangga atas ketangkasan, nalar, dan kesiapsiagaan kepada:', 1754, 760);
 
     // 6. Nama Siswa / Relawan
-    ctx.font = 'bold 140px "Comic Sans MS", Fredoka, sans-serif';
+    ctx.font = 'bold 130px Fredoka, sans-serif';
     ctx.fillStyle = '#38bdf8';
-    ctx.fillText(namaPemain, 1754, 1040);
+    ctx.fillText(namaPemain, 1754, 960);
 
-    // 7. Deskripsi Materi & Pencapaian
-    ctx.font = '72px Nunito, sans-serif';
+    // 7. Materi & Kompetensi
+    ctx.font = '56px Nunito, sans-serif';
     ctx.fillStyle = '#f8fafc';
-    ctx.fillText('Telah berhasil menuntaskan seluruh simulasi 5 babak mitigasi kebencanaan:', 1754, 1220);
+    ctx.fillText('Telah berhasil menuntaskan seluruh simulasi 5 babak mitigasi kebencanaan:', 1754, 1140);
 
-    ctx.font = 'bold 68px Nunito, sans-serif';
+    ctx.font = 'bold 58px Nunito, sans-serif';
     ctx.fillStyle = '#fdba74';
-    ctx.fillText('🌋 Gempa & Erupsi  •  🌊 Tsunami  •  🔥 Kebakaran  •  🎒 Tas Siaga Darurat', 1754, 1330);
+    ctx.fillText('🌋 Gempa & Erupsi   •   🌊 Tsunami   •   🔥 Kebakaran   •   🎒 Tas Siaga Darurat', 1754, 1250);
 
-    // Kotak Badge Skor
+    // 8. Badge Predikat & Skor
     ctx.fillStyle = 'rgba(249, 115, 22, 0.15)';
     ctx.strokeStyle = '#f97316';
     ctx.lineWidth = 4;
     ctx.beginPath();
-    ctx.roundRect(1254, 1440, 1000, 130, [30]);
+    ctx.roundRect(1154, 1370, 1200, 130, [30]);
     ctx.fill();
     ctx.stroke();
 
-    ctx.font = 'bold 64px Nunito, sans-serif';
+    ctx.font = 'bold 56px Nunito, sans-serif';
     ctx.fillStyle = '#fde047';
-    ctx.fillText(`Predikat: ${predikatNama.toUpperCase()}  •  Skor: ${score}`, 1754, 1528);
+    ctx.fillText(`Predikat: ${predikatNama.toUpperCase()}   •   Skor: ${score}`, 1754, 1455);
 
-    // Garis Pembatas Bawah
+    // Garis Pemisah Footer
     ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
-    ctx.fillRect(250, 1750, 3008, 4);
+    ctx.fillRect(200, 1750, 3108, 3);
 
-    // 8. Sisi Kiri Bawah: Tanggal & Tautan Validasi
+    // 9. Sisi Kiri Bawah: Tanggal & Validasi
     const tgl = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
     ctx.textAlign = 'left';
-    ctx.font = '52px Nunito, sans-serif';
-    ctx.fillStyle = '#94a3b8';
-    ctx.fillText(`Diterbitkan pada: ${tgl}`, 250, 1920);
-
     ctx.font = '46px Nunito, sans-serif';
+    ctx.fillStyle = '#94a3b8';
+    ctx.fillText(`Diterbitkan pada: ${tgl}`, 220, 1920);
+
+    ctx.font = '40px Nunito, sans-serif';
     ctx.fillStyle = '#64748b';
-    ctx.fillText('Verifikasi Resmi Dokumen:', 250, 2000);
+    ctx.fillText('Verifikasi Keaslian Dokumen:', 220, 1995);
 
-    ctx.font = 'bold 48px Nunito, sans-serif';
+    ctx.font = 'bold 44px Nunito, sans-serif';
     ctx.fillStyle = '#38bdf8';
-    ctx.fillText('https://nalarsci.id/', 250, 2070);
+    ctx.fillText('https://nalarsci.id/', 220, 2060);
 
-    // 9. Sisi Kanan Bawah: Pengesah Instruktur
+    // 10. Sisi Kanan Bawah: Pengesah Instruktur
     ctx.textAlign = 'right';
-    ctx.font = '48px Nunito, sans-serif';
+    ctx.font = '42px Nunito, sans-serif';
     ctx.fillStyle = '#94a3b8';
-    ctx.fillText('Fasilitator & Pengembang Platform,', 3258, 1900);
+    ctx.fillText('Fasilitator & Pengembang Platform,', 3288, 1900);
 
-    ctx.font = 'bold 64px "Comic Sans MS", Fredoka, sans-serif';
+    ctx.font = 'bold 58px Fredoka, sans-serif';
     ctx.fillStyle = '#38bdf8';
-    ctx.fillText('Thomas Ryantama, M.Kom., Gr.', 3258, 2020);
+    ctx.fillText('Thomas Ryantama, M.Kom., Gr.', 3288, 2000);
 
-    ctx.font = '46px Nunito, sans-serif';
+    ctx.font = '40px Nunito, sans-serif';
     ctx.fillStyle = '#64748b';
-    ctx.fillText('NalarSci STEM & Computing Laboratory', 3258, 2090);
+    ctx.fillText('NalarSci STEM & Computing Laboratory', 3288, 2065);
 
-    // 10. Ekspor File PNG Resolusi Tinggi
+    // 11. Ekspor Berkas sebagai JPG Kompresi Tinggi (File ~350 KB)
     const link = document.createElement('a');
-    link.download = `Piagam-A4-SiagaBencana-${namaPemain.replace(/\s+/g, '_')}.png`;
-    link.href = canvas.toDataURL('image/png', 1.0);
+    link.download = `Piagam-SiagaBencana-${namaPemain.replace(/\s+/g, '_')}.jpg`;
+    link.href = canvas.toDataURL('image/jpeg', 0.88);
     link.click();
   }
 
-  // Inisialisasi layar pertama game
+  // Inisialisasi tampilan awal
   renderHome();
 </script>
 </body>
