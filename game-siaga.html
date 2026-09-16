@@ -156,7 +156,7 @@
     <!-- CONTENT -->
     <section id="content-area" class="text-center"></section>
 
-    <!-- FOOTER (SINGLE CREDIT) -->
+    <!-- FOOTER -->
     <footer class="mt-7 text-center text-xs text-slate-400 font-semibold">
       <div>Belajar • Bermain • Siap Menghadapi Bencana</div>
       <div class="mt-2 font-black text-slate-500">Dibuat oleh Thomas Ryantama, M.Kom. Gr.</div>
@@ -795,7 +795,7 @@
         <!-- TOMBOL UNDUH KARTU PRESTASI -->
         <div class="max-w-md mx-auto space-y-3">
           <button onclick="unduhKartuSiaga('${escapeHtml(predikat)}')" class="btn w-full bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 border-orange-700 text-white font-title text-lg py-3.5 px-6 rounded-2xl shadow-lg flex items-center justify-center gap-2">
-            🎓 Unduh Kartu Prestasi (PNG)
+            🎓 Unduh Kartu Prestasi A4 (PNG)
           </button>
 
           <button onclick="renderHome()" class="btn w-full bg-green-600 hover:bg-green-700 border-green-800 text-white font-title text-xl py-4 px-9 rounded-2xl shadow-lg">
@@ -971,6 +971,9 @@
     link.href = canvas.toDataURL('image/png', 1.0);
     link.click();
   }
+
+  // Inisialisasi layar pertama game
+  renderHome();
 </script>
 </body>
 </html>
