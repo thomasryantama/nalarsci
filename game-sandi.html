@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Misi Agen Sandi Rahasia | NalarSci Lab</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: radial-gradient(circle at 50% 10%, #1e1b4b 0%, #0f172a 60%, #030712 100%);
+      color: white;
+      min-height: 100vh;
+      user-select: none;
+    }
+    .font-title { font-family: 'Fredoka', sans-serif; }
+    .glass {
+      background: rgba(255, 255, 255, 0.06);
+      backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+    .cipher-letter {
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    @keyframes pulseGlow {
+      0%, 100% { box-shadow: 0 0 15px rgba(99, 102, 241, 0.4); }
+      50% { box-shadow: 0 0 30px rgba(99, 102, 241, 0.8); }
+    }
+    .pulse-box { animation: pulseGlow 2s infinite; }
+  </style>
+</head>
+<body class="flex flex-col min-h-screen p-3 sm:p-6 justify-between">
+
+  <!-- TOP HEADER -->
+  <header class="text-center max-w-xl mx-auto w-full mb-3">
+    <div class="inline-flex items-center gap-2 bg-indigo-500/10 border border-indigo-400/20 text-indigo-400 px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider mb-2">
+      🕵️ KKA & Cybersecurity • Logika Kriptografi
+    </div>
+    <h1 class="font-title text-2xl sm:text-4xl text-indigo-300 tracking-wide">Misi Agen Sandi Rahasia</h1>
+    <p class="text-slate-400 text-xs sm:text-sm mt-1">Pecahkan teks enkripsi Caesar Cipher untuk membuka brankas rahasia!</p>
+  </header>
+
+  <!-- HUD STATUS -->
+  <section id="hud-bar" class="max-w-xl mx-auto w-full flex justify-between items-center glass px-4 py-2.5 rounded-2xl mb-4 text-xs sm:text-sm font-bold">
+    <div class="text-indigo-400">👤 Agen: <span id="hud-name" class="text-white">Tamu</span></div>
+    <div class="text-emerald-400">🏆 Misi: <span id="hud-level">1</span>/5</div>
+    <div class="text-amber-400">⭐ Skor: <span id="hud-score">0</span></div>
+    <button onclick="toggleMute()" id="btn-mute" class="bg-slate-800 hover:bg-slate-700 p-1.5 rounded-xl border border-slate-700 text-base">🔊</button>
+  </section>
+
+  <!-- GAME AREA UTAMA -->
+  <main class="max-w-xl mx-auto w-full flex-grow flex flex-col items-center gap-4">
+
+    <!-- KOTAK DEKODER & PETUNJUK KUNCI -->
+    <div class="w-full glass p-5 rounded-3xl text-center relative overflow-hidden pulse-box">
+      <div class="flex justify-between items-center mb-3">
+        <span class="text-xs uppercase tracking-widest text-slate-400 font-extrabold">Petunjuk Transmisi</span>
+        <span id="key-badge" class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 text-xs font-black px-3 py-1 rounded-full">
+          🔑 Geser Mundur: -1 Huruf
+        </span>
+      </div>
+
+      <!-- KATA TERENKRIPSI (CIPHERTEXT) -->
+      <div class="mb-2">
+        <div class="text-xs text-slate-400 font-semibold mb-1">Teks Sandi Masuk:</div>
+        <div id="cipher-text" class="text-3xl sm:text-4xl font-extrabold tracking-[0.35em] text-amber-300 font-mono">
+          BJS
+        </div>
+      </div>
+
+      <p id="clue-desc" class="text-xs sm:text-sm text-slate-300 italic mt-2">
+        Petunjuk: Tiap huruf telah dimajukan 1 langkah (Contoh: B → A, J → I, S → R).
+      </p>
+    </div>
+
+    <!-- PANDUAN CAESAR WHEEL VISUAL CEPAT -->
+    <div class="w-full glass p-3 rounded-2xl overflow-x-auto">
+      <div class="text-[10px] uppercase tracking-wider text-indigo-300 font-bold mb-1 text-center">
+        Peta Geser Alfabet (A ↔ Z)
+      </div>
+      <div id="cipher-strip" class="flex justify-center gap-1.5 text-xs font-mono font-bold text-slate-300">
+        <!-- Rendered by JS -->
+      </div>
+    </div>
+
+    <!-- SLOT JAWABAN SISWA -->
+    <div class="w-full">
+      <div class="text-xs text-center text-slate-400 font-bold mb-2">Pecahkan Kata Asli:</div>
+      <div id="answer-slots" class="flex justify-center gap-2 sm:gap-3 min-h-[55px]">
+        <!-- Slot Huruf -->
+      </div>
+    </div>
+
+    <!-- KEYBOARD VIRTUAL RESPONSIF (A-Z + Hapus) -->
+    <div class="w-full glass p-3 sm:p-4 rounded-3xl mt-auto">
+      <div id="keyboard" class="grid grid-cols-7 sm:grid-cols-9 gap-1.5">
+        <!-- Rendered by JS -->
+      </div>
+      <div class="grid grid-cols-2 gap-2 mt-2.5">
+        <button onclick="deleteChar()" class="bg-rose-900/60 hover:bg-rose-800 text-rose-200 border border-rose-700/50 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition active:scale-95">
+          ⌫ Hapus Huruf
+        </button>
+        <button onclick="checkAnswer()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-title text-sm sm:text-base py-2.5 rounded-xl shadow-lg transition active:scale-95">
+          🔓 Buka Sandi!
+        </button>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="mt-4 text-center text-[11px] text-slate-500 font-semibold">
+    NalarSci Lab • Dikelola oleh Thomas Ryantama, M.Kom., Gr.
+  </footer>
+
+  <!-- START MODAL (INPUT NAMA SISWA) -->
+  <div id="start-modal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4">
+    <div class="glass max-w-md w-full rounded-3xl p-6 sm:p-8 text-center border border-indigo-500/30 shadow-2xl">
+      <div class="text-6xl mb-3">🕵️‍♂️</div>
+      <h2 class="font-title text-2xl sm:text-3xl text-indigo-300 mb-2">Markas Sandi Rahasia</h2>
+      <p class="text-slate-300 text-xs sm:text-sm mb-5 leading-relaxed">
+        Selamat datang Agen Muda! Penjahat siber telah mengunci brankas sains. Gunakan nalar kriptografimu untuk memecahkan sandi kata sandi geser!
+      </p>
+      <input type="text" id="player-input" placeholder="Ketik Nama Agen..." maxlength="15" class="w-full p-3.5 rounded-2xl bg-slate-900/90 border-2 border-indigo-400 text-center font-bold text-white text-lg outline-none focus:border-amber-400 mb-4">
+      <button onclick="startGame()" class="w-full bg-gradient-to-r from-indigo-500 to-blue-600 hover:from-indigo-400 hover:to-blue-500 text-white font-title text-lg py-3.5 rounded-2xl shadow-lg transition active:scale-95">
+        🚀 Terima Misi Agen
+      </button>
+    </div>
+  </div>
+
+  <!-- MODAL SUKSES LEVEL / TAMAT -->
+  <div id="win-modal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+    <div class="glass max-w-md w-full rounded-3xl p-6 sm:p-8 text-center border border-emerald-500/40 shadow-2xl">
+      <div class="text-7xl mb-3">🔓</div>
+      <h2 id="win-title" class="font-title text-2xl sm:text-3xl text-emerald-400 mb-2">Sandi Terpecahkan!</h2>
+      <p id="win-desc" class="text-slate-300 text-xs sm:text-sm mb-6 leading-relaxed">
+        Kerja cerdas Agen! Brankas berhasil dibuka dengan sempurna.
+      </p>
+      <div id="win-btn-group" class="space-y-3">
+        <!-- Tombol Lanjut / Unduh Sertifikat -->
+      </div>
+    </div>
+  </div>
+
+  <!-- SCRIPT LOGIKA KRIPTOGRAFI & CANVAS A4 -->
+  <script>
+    // Audio Engine Synthesizer
+    let audioCtx, isMuted = false;
+    function initAudio() {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+    }
+    function playTone(freq, type, dur, vol=0.06) {
+      if (isMuted || !audioCtx) return;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = type; osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+      gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
+      osc.connect(gain); gain.connect(audioCtx.destination);
+      osc.start(); osc.stop(audioCtx.currentTime + dur);
+    }
+    function sfxKey() { playTone(440, 'sine', 0.06); }
+    function sfxCorrect() { [523, 659, 784, 1046].forEach((f, i) => setTimeout(() => playTone(f, 'sine', 0.12), i * 90)); }
+    function sfxWrong() { [220, 160].forEach((f, i) => setTimeout(() => playTone(f, 'sawtooth', 0.15), i * 110)); }
+
+    function toggleMute() {
+      isMuted = !isMuted;
+      document.getElementById('btn-mute').innerText = isMuted ? '🔇' : '🔊';
+    }
+
+    // Database Soal Kriptografi Khusus Anak SD
+    const missions = [
+      {
+        word: "AIR",
+        shift: 1, // Diberi teks BJS -> mundur 1 jadi AIR
+        hint: "Sumber daya alam penting untuk minum dan kehidupan."
+      },
+      {
+        word: "ROBOT",
+        shift: 1, // SPCPU -> mundur 1 jadi ROBOT
+        hint: "Mesin pintar buatan manusia yang menjalankan program otomatis."
+      },
+      {
+        word: "SAINS",
+        shift: 2, // UCKPU -> mundur 2 jadi SAINS
+        hint: "Ilmu pengetahuan yang mempelajari rahasia alam semesta."
+      },
+      {
+        word: "DATA",
+        shift: 2, // FCVB -> mundur 2 jadi DATA
+        hint: "Kumpulan fakta atau angka yang diproses oleh komputer."
+      },
+      {
+        word: "INTERNET",
+        shift: 3, // L Q W H U Q H W -> mundur 3 jadi INTERNET
+        hint: "Jaringan komputer global yang menghubungkan seluruh dunia."
+      }
+    ];
+
+    let currentLvl = 0;
+    let score = 0;
+    let currentInput = [];
+    let playerName = "";
+
+    function shiftChar(char, shift) {
+      const code = char.charCodeAt(0) - 65;
+      return String.fromCharCode(((code + shift + 26) % 26) + 65);
+    }
+
+    function startGame() {
+      const name = document.getElementById('player-input').value.trim();
+      if (!name) {
+        alert('Tulis nama sandi agenmu terlebih dahulu!');
+        return;
+      }
+      playerName = name;
+      initAudio();
+      document.getElementById('hud-name').innerText = playerName;
+      document.getElementById('start-modal').classList.add('hidden');
+      loadMission();
+      renderKeyboard();
+    }
+
+    function loadMission() {
+      const m = missions[currentLvl];
+      currentInput = [];
+      document.getElementById('hud-level').innerText = currentLvl + 1;
+      document.getElementById('hud-score').innerText = score;
+      document.getElementById('win-modal').classList.add('hidden');
+
+      // Buat kata sandi (Ciphertext)
+      const cipherText = m.word.split('').map(c => shiftChar(c, m.shift)).join('');
+      document.getElementById('cipher-text').innerText = cipherText;
+
+      document.getElementById('key-badge').innerText = `🔑 Aturan Sandi: Mundur -${m.shift} Huruf`;
+      document.getElementById('clue-desc').innerText = `Petunjuk: ${m.hint}`;
+
+      renderSlots();
+      renderStrip(m.shift);
+    }
+
+    function renderStrip(shift) {
+      const stripEl = document.getElementById('cipher-strip');
+      const examples = ['A', 'B', 'C', 'D', 'E'];
+      stripEl.innerHTML = examples.map(ch => {
+        const shifted = shiftChar(ch, shift);
+        return `<span class="bg-slate-800 px-2 py-1 rounded border border-slate-700">${shifted} → ${ch}</span>`;
+      }).join('');
+    }
+
+    function renderSlots() {
+      const slotsEl = document.getElementById('answer-slots');
+      const targetLen = missions[currentLvl].word.length;
+      slotsEl.innerHTML = '';
+
+      for (let i = 0; i < targetLen; i++) {
+        const val = currentInput[i] || '';
+        const slot = document.createElement('div');
+        slot.className = `w-11 h-12 sm:w-13 sm:h-14 rounded-2xl flex items-center justify-center font-title text-xl sm:text-2xl font-bold border-2 transition-all ${
+          val ? 'bg-indigo-600/30 border-indigo-400 text-white shadow-lg' : 'bg-slate-900/60 border-slate-700 text-slate-500'
+        }`;
+        slot.innerText = val;
+        slotsEl.appendChild(slot);
+      }
+    }
+
+    function renderKeyboard() {
+      const kbEl = document.getElementById('keyboard');
+      kbEl.innerHTML = '';
+      const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+
+      letters.forEach(l => {
+        const btn = document.createElement('button');
+        btn.className = 'bg-slate-800 hover:bg-indigo-600 text-slate-100 font-bold py-2 rounded-xl text-xs sm:text-sm border border-slate-700 transition active:scale-90';
+        btn.innerText = l;
+        btn.onclick = () => inputChar(l);
+        kbEl.appendChild(btn);
+      });
+    }
+
+    function inputChar(char) {
+      const maxLen = missions[currentLvl].word.length;
+      if (currentInput.length < maxLen) {
+        sfxKey();
+        currentInput.push(char);
+        renderSlots();
+      }
+    }
+
+    function deleteChar() {
+      if (currentInput.length > 0) {
+        sfxKey();
+        currentInput.pop();
+        renderSlots();
+      }
+    }
+
+    function checkAnswer() {
+      const target = missions[currentLvl].word;
+      const userWord = currentInput.join('');
+
+      if (userWord === target) {
+        sfxCorrect();
+        score += 200;
+        document.getElementById('hud-score').innerText = score;
+
+        if (currentLvl < missions.length - 1) {
+          document.getElementById('win-title').innerText = 'Sandi Terbuka! 🔓';
+          document.getElementById('win-desc').innerText = `Hebat Agen ${playerName}! Kode ${target} terverifikasi asli.`;
+          document.getElementById('win-btn-group').innerHTML = `
+            <button onclick="nextMission()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-title text-base py-3.5 rounded-2xl shadow-lg transition">
+              Lanjut Misi Berikutnya ➡️
+            </button>
+          `;
+        } else {
+          document.getElementById('win-title').innerText = '🏆 MISI SELESAI!';
+          document.getElementById('win-desc').innerText = `Luar biasa Master Agen ${playerName}! Kamu berhasil memecahkan seluruh enkripsi rahasia dengan skor akhir: ${score}!`;
+          document.getElementById('win-btn-group').innerHTML = `
+            <button onclick="unduhPiagamAgen()" class="w-full bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 text-white font-title text-base py-3.5 rounded-2xl shadow-lg transition">
+              📜 Unduh Piagam Agen Sandi (A4)
+            </button>
+            <button onclick="location.reload()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs py-2.5 rounded-xl transition">
+              🔄 Main Ulang
+            </button>
+          `;
+        }
+        document.getElementById('win-modal').classList.remove('hidden');
+      } else {
+        sfxWrong();
+        alert('Kombinasi huruf belum cocok! Perhatikan arah geser alfabetnya kembali.');
+      }
+    }
+
+    function nextMission() {
+      currentLvl++;
+      loadMission();
+    }
+
+    // ============================================================
+    // GENERATOR PIAGAM PRESTASI A4 LANDSCAPE (300 DPI, JPG ~350 KB)
+    // ============================================================
+    function unduhPiagamAgen() {
+      const nama = playerName || 'Agen Rahasia';
+      const canvas = document.createElement('canvas');
+      canvas.width = 3508;
+      canvas.height = 2480;
+      const ctx = canvas.getContext('2d');
+
+      // 1. Background Gradient Indigo Gelap
+      const grad = ctx.createLinearGradient(0, 0, 3508, 2480);
+      grad.addColorStop(0, '#1e1b4b');
+      grad.addColorStop(1, '#030712');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, 3508, 2480);
+
+      // 2. Bingkai Ganda Indigo Emas
+      ctx.lineWidth = 20;
+      ctx.strokeStyle = '#6366f1';
+      ctx.strokeRect(100, 100, 3308, 2280);
+
+      ctx.lineWidth = 4;
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+      ctx.strokeRect(135, 135, 3238, 2210);
+
+      // 3. Header Laboratorium
+      ctx.font = 'bold 56px Nunito, sans-serif';
+      ctx.fillStyle = '#a5b4fc';
+      ctx.textAlign = 'center';
+      ctx.fillText('NALARSCI LAB • KKA & CYBERSECURITY LABORATORY', 1754, 400);
+
+      // 4. Judul Piagam
+      ctx.font = 'bold 105px Fredoka, sans-serif';
+      ctx.fillStyle = '#ffffff';
+      ctx.fillText('LENCANA MASTER AGEN SANDI RAHASIA', 1754, 550);
+
+      ctx.fillStyle = '#6366f1';
+      ctx.fillRect(1454, 600, 600, 8);
+
+      // 5. Kalimat Pengantar
+      ctx.font = '54px Nunito, sans-serif';
+      ctx.fillStyle = '#94a3b8';
+      ctx.fillText('Diberikan dengan bangga atas kecerdasan logika kriptografi dan dekripsi data kepada:', 1754, 760);
+
+      // 6. Nama Agen / Siswa
+      ctx.font = 'bold 130px Fredoka, sans-serif';
+      ctx.fillStyle = '#38bdf8';
+      ctx.fillText(nama, 1754, 960);
+
+      // 7. Materi Pembelajaran
+      ctx.font = '56px Nunito, sans-serif';
+      ctx.fillStyle = '#f8fafc';
+      ctx.fillText('Telah menuntaskan tantangan pembongkaran cipher algoritma sandi geser:', 1754, 1140);
+
+      ctx.font = 'bold 58px Nunito, sans-serif';
+      ctx.fillStyle = '#c7d2fe';
+      ctx.fillText('🔑 Caesar Cipher   •   🛡️ Keamanan Siber   •   🧩 Pengenalan Pola Data', 1754, 1250);
+
+      // 8. Badge Predikat & Skor Dinamis
+      ctx.font = 'bold 52px Nunito, sans-serif';
+      const teksPredikat = `Predikat: MASTER KRIPTOGRAFI KKA   •   Skor Akhir: ${score}`;
+      const badgeLebar = ctx.measureText(teksPredikat).width + 160;
+      const badgeX = (3508 - badgeLebar) / 2;
+      const badgeY = 1380;
+
+      ctx.fillStyle = 'rgba(99, 102, 241, 0.15)';
+      ctx.strokeStyle = '#6366f1';
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.roundRect(badgeX, badgeY, badgeLebar, 130, [30]);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = '#fde047';
+      ctx.fillText(teksPredikat, 1754, badgeY + 82);
+
+      // Garis Pembatas
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
+      ctx.fillRect(200, 1750, 3108, 3);
+
+      // 9. Bawah Kiri: Tanggal & Validasi
+      const tgl = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+      ctx.textAlign = 'left';
+      ctx.font = '46px Nunito, sans-serif';
+      ctx.fillStyle = '#94a3b8';
+      ctx.fillText(`Diterbitkan pada: ${tgl}`, 220, 1920);
+
+      ctx.font = '40px Nunito, sans-serif';
+      ctx.fillStyle = '#64748b';
+      ctx.fillText('Verifikasi Resmi Laboratorium:', 220, 1995);
+
+      ctx.font = 'bold 44px Nunito, sans-serif';
+      ctx.fillStyle = '#38bdf8';
+      ctx.fillText('https://nalarsci.id/', 220, 2060);
+
+      // 10. Bawah Kanan: Tanda Tangan Instruktur
+      ctx.textAlign = 'right';
+      ctx.font = '42px Nunito, sans-serif';
+      ctx.fillStyle = '#94a3b8';
+      ctx.fillText('Fasilitator & Pengembang Platform,', 3288, 1900);
+
+      ctx.font = 'bold 58px Fredoka, sans-serif';
+      ctx.fillStyle = '#38bdf8';
+      ctx.fillText('Thomas Ryantama, M.Kom., Gr.', 3288, 2000);
+
+      ctx.font = '40px Nunito, sans-serif';
+      ctx.fillStyle = '#64748b';
+      ctx.fillText('NalarSci STEM & Computing Laboratory', 3288, 2065);
+
+      // 11. Ekspor Berkas Ringan ~350 KB
+      const link = document.createElement('a');
+      link.download = `Piagam-AgenSandi-${nama.replace(/\s+/g, '_')}.jpg`;
+      link.href = canvas.toDataURL('image/jpeg', 0.88);
+      link.click();
+    }
+  </script>
+</body>
+</html>
