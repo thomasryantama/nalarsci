@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Command Center — Wakasis & Admin Sistem | NalarSci Lab</title>
+  <meta name="robots" content="noindex, nofollow">
+  
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: radial-gradient(circle at 50% 0%, #1e293b 0%, #0b0f19 80%);
+      color: #f8fafc;
+      min-height: 100vh;
+    }
+    .font-title { font-family: 'Fredoka', sans-serif; }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.04);
+      backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      transition: all 0.25s ease;
+    }
+    .admin-tab.active {
+      background-color: #e11d48 !important;
+      color: #ffffff !important;
+      border-color: #fb7185 !important;
+      box-shadow: 0 4px 14px rgba(225, 29, 72, 0.3);
+    }
+    @media print {
+      body { background: white !important; color: black !important; padding: 0 !important; }
+      header, #tab-bar, footer, button, .no-print { display: none !important; }
+      .glass-card { background: transparent !important; border: 1px solid #ccc !important; box-shadow: none !important; }
+      table { border-collapse: collapse !important; width: 100% !important; }
+      th, td { border: 1px solid #333 !important; color: black !important; padding: 8px !important; }
+    }
+  </style>
+</head>
+<body class="p-4 md:p-8 max-w-6xl mx-auto flex flex-col justify-between min-h-screen">
+
+  <!-- GERBANG LOGIN ADMIN (ZERO-TRUST GATEKEEPER) -->
+  <div id="gatekeeper" class="fixed inset-0 bg-[#070a12] z-50 flex items-center justify-center p-4">
+    <div class="glass-card max-w-md w-full rounded-3xl p-8 border border-rose-500/30 text-center shadow-2xl bg-slate-950/80">
+      <div class="w-16 h-16 bg-rose-500/10 border border-rose-500/30 rounded-2xl flex items-center justify-center mx-auto mb-4 text-3xl shadow-[0_0_20px_rgba(244,63,94,0.2)]">
+        🛡️
+      </div>
+      <h2 class="font-title text-2xl text-white mb-1">Pusat Kendali Ekosistem</h2>
+      <p class="text-xs text-slate-400 mb-6 leading-relaxed">
+        Area otorisasi pimpinan sekolah dan administrator sistem. Masukkan kunci otorisasi untuk membuka instrumen kesiswaan.
+      </p>
+
+      <form onsubmit="verifikasiAdmin(event)" class="space-y-4 text-xs">
+        <input type="password" id="admin-pass" required placeholder="Masukkan Master Key..." class="w-full p-3.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-center tracking-widest outline-none focus:border-rose-400 text-sm">
+        <button type="submit" id="btn-login" class="w-full bg-rose-600 hover:bg-rose-500 text-white font-title text-xs py-3.5 rounded-xl font-bold transition shadow-lg flex items-center justify-center gap-2">
+          🔐 Buka Akses Konsol
+        </button>
+      </form>
+
+      <div class="mt-6 border-t border-slate-800/80 pt-4">
+        <a href="index.html" class="text-slate-500 hover:text-slate-300 text-xs">← Kembali ke Portal Publik</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- PANEL KENDALI UTAMA (MUNCUL SETELAH VERIFIKASI) -->
+  <div id="command-center" class="hidden flex-col flex-grow">
+    
+    <!-- HEADER NAVIGASI -->
+    <header class="mb-8">
+      <div class="flex justify-between items-center border-b border-slate-800 pb-3 mb-6">
+        <a href="index.html" class="text-sky-400 hover:text-sky-300 font-bold text-xs flex items-center gap-1 transition">
+          ← Menuju Tampilan Publik
+        </a>
+        <div class="flex items-center gap-2">
+          <span class="text-xs bg-rose-500/10 border border-rose-500/30 text-rose-400 px-3 py-1 rounded-full font-bold">
+            ⚡ Konsol Utama: Otoritas Penuh
+          </span>
+          <button onclick="logoutAdmin()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs px-3 py-1 rounded-full border border-slate-700 transition font-semibold">
+            Kunci Keluar
+          </button>
+        </div>
+      </div>
+
+      <div class="text-center max-w-2xl mx-auto">
+        <div class="inline-flex items-center gap-2 bg-rose-500/10 border border-rose-400/20 text-rose-300 px-3.5 py-1 rounded-full text-xs font-black uppercase tracking-wider mb-2">
+          Ruang Kendali Kesiswaan & Kedisiplinan
+        </div>
+        <h1 class="font-title text-3xl sm:text-4xl text-white mb-2">Command Center Sekolah</h1>
+        <p class="text-slate-400 text-xs sm:text-sm">
+          Pusat pencatatan insiden kesiswaan, pemantauan kehadiran disiplin, serta peluncuran data prestasi siswa.
+        </p>
+      </div>
+
+      <!-- TAB MENU ADMIN -->
+      <div class="flex flex-wrap justify-center gap-2 mt-6" id="tab-bar">
+        <button onclick="bukaTabAdmin('kasus')" id="tab-btn-kasus" class="admin-tab active px-4 py-2 rounded-xl bg-slate-800 border border-slate-700 text-xs font-bold text-slate-300 transition">
+          📖 Buku Kasus & Solusi
+        </button>
+        <button onclick="bukaTabAdmin('terlambat')" id="tab-btn-terlambat" class="admin-tab px-4 py-2 rounded-xl bg-slate-800 border border-slate-700 text-xs font-bold text-slate-300 hover:bg-slate-700 transition">
+          ⏰ Presensi Keterlambatan
+        </button>
+        <button onclick="bukaTabAdmin('prestasi')" id="tab-btn-prestasi" class="admin-tab px-4 py-2 rounded-xl bg-slate-800 border border-slate-700 text-xs font-bold text-slate-300 hover:bg-slate-700 transition">
+          🏆 Terbitkan Prestasi Juara
+        </button>
+        <button onclick="bukaTabAdmin('database')" id="tab-btn-database" class="admin-tab px-4 py-2 rounded-xl bg-slate-800 border border-slate-700 text-xs font-bold text-slate-300 hover:bg-slate-700 transition">
+          🗄️ Status Database
+        </button>
+      </div>
+    </header>
+
+    <!-- SECTION 1: BUKU KASUS & KONSELING -->
+    <section id="konten-admin-kasus" class="space-y-6 flex-grow mb-12">
+      <div class="glass-card rounded-3xl p-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h2 class="font-title text-lg text-emerald-300">Buku Kasus & Catatan Pembinaan Restoratif</h2>
+          <p class="text-xs text-slate-400">Data terlindungi dan terhubung langsung ke Google Sheets privat.</p>
+        </div>
+        <button onclick="toggleModalKasus(true)" class="bg-emerald-600 hover:bg-emerald-500 text-white font-title text-xs px-4 py-2.5 rounded-xl font-bold shadow-lg transition flex-shrink-0">
+          + Catat Kasus Baru
+        </button>
+      </div>
+
+      <div class="glass-card rounded-3xl overflow-hidden border border-slate-800">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs text-slate-300">
+            <thead class="bg-slate-900 text-slate-400 uppercase font-black text-[10px] border-b border-slate-800">
+              <tr>
+                <th class="p-3.5">Tanggal</th>
+                <th class="p-3.5">Nama & Kelas</th>
+                <th class="p-3.5">Masalah / Kasus</th>
+                <th class="p-3.5">Solusi & Tindakan</th>
+                <th class="p-3.5">PIC</th>
+                <th class="p-3.5">Status</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-800/60" id="tabel-admin-kasus">
+              <tr><td colspan="6" class="p-6 text-center text-slate-500">Memuat catatan kasus...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 2: PRESENSI KETERLAMBATAN -->
+    <section id="konten-admin-terlambat" class="hidden space-y-6 flex-grow mb-12">
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
+        <div class="glass-card rounded-2xl p-5 border border-slate-800">
+          <p class="text-xs text-slate-400 font-bold">Total Terlambat Bulan Ini</p>
+          <p class="font-title text-3xl text-amber-300 mt-1" id="stat-total-terlambat">0 Siswa</p>
+          <p class="text-[10px] text-slate-500 mt-1">Batas bel masuk: 07.15 WIB</p>
+        </div>
+        <div class="glass-card rounded-2xl p-5 border border-slate-800">
+          <p class="text-xs text-slate-400 font-bold">Penerima SP-1 (Akumulasi $\ge$ 3x)</p>
+          <p class="font-title text-3xl text-orange-400 mt-1" id="stat-sp">0 Siswa</p>
+          <p class="text-[10px] text-slate-500 mt-1">Surat peringatan kedisiplinan</p>
+        </div>
+        <div class="glass-card rounded-2xl p-5 border border-slate-800">
+          <p class="text-xs text-slate-400 font-bold">Panggilan Ortu (Akumulasi $\ge$ 5x)</p>
+          <p class="font-title text-3xl text-rose-400 mt-1" id="stat-ortu">0 Siswa</p>
+          <p class="text-[10px] text-slate-500 mt-1">Konferensi kasus bersama Wakasis</p>
+        </div>
+      </div>
+
+      <div class="glass-card rounded-3xl overflow-hidden border border-slate-800">
+        <div class="p-4 bg-slate-900 border-b border-slate-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+          <h3 class="font-title text-sm text-amber-300">Daftar Rekap Siswa Terlambat</h3>
+          <div class="flex items-center gap-2">
+            <button onclick="toggleModalTerlambat(true)" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-title text-xs px-3.5 py-1.5 rounded-xl font-bold transition">
+              + Catat Terlambat
+            </button>
+            <button onclick="window.print()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-title text-xs px-3.5 py-1.5 rounded-xl font-bold border border-slate-700 transition">
+              📄 Cetak Rekap
+            </button>
+          </div>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs text-slate-300">
+            <thead class="bg-slate-950 text-slate-400 uppercase font-black text-[10px] border-b border-slate-800">
+              <tr>
+                <th class="p-3.5">Tanggal</th>
+                <th class="p-3.5">Jam Masuk</th>
+                <th class="p-3.5">Nama Siswa</th>
+                <th class="p-3.5">Kelas</th>
+                <th class="p-3.5">Akumulasi Bulan Ini</th>
+                <th class="p-3.5">Tindakan / Sanksi</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-800/60" id="tabel-admin-terlambat">
+              <tr><td colspan="6" class="p-6 text-center text-slate-500">Memuat rekap keterlambatan...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 3: TERBITKAN PRESTASI JUARA -->
+    <section id="konten-admin-prestasi" class="hidden space-y-6 flex-grow mb-12">
+      <div class="glass-card max-w-xl mx-auto rounded-3xl p-6 md:p-8 border border-amber-500/30">
+        <div class="mb-5 border-b border-slate-800 pb-3">
+          <h2 class="font-title text-xl text-amber-300">Input Prestasi Siswa ke Publik</h2>
+          <p class="text-xs text-slate-400 mt-1">Data yang dimasukkan di sini akan langsung terbit di halaman publik <em>Hall of Fame</em>.</p>
+        </div>
+
+        <form onsubmit="kirimPrestasiAdmin(event)" class="space-y-3 text-xs">
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-slate-400 font-bold mb-1">Nama Siswa / Tim</label>
+              <input type="text" id="pres-nama" required placeholder="Nama siswa..." class="w-full p-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white outline-none focus:border-amber-400">
+            </div>
+            <div>
+              <label class="block text-slate-400 font-bold mb-1">Kelas</label>
+              <input type="text" id="pres-kelas" required placeholder="Misal: Kelas 5B" class="w-full p-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white outline-none focus:border-amber-400">
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-slate-400 font-bold mb-1">Bidang / Kategori</label>
+              <select id="pres-kat" class="w-full p-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white font-bold outline-none focus:border-amber-400">
+                <option value="Sains">🔬 Sains</option>
+                <option value="KKA & IT">🤖 KKA & IT</option>
+                <option value="Akademik">📚 Akademik</option>
+                <option value="Seni & Budaya">🎨 Seni & Budaya</option>
+                <option value="Olahraga">⚽ Olahraga</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-slate-400 font-bold mb-1">Tingkat</label>
+              <select id="pres-tingkat" class="w-full p-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white font-bold outline-none focus:border-amber-400">
+                <option value="Tingkat Kota">Tingkat Kota</option>
+                <option value="Tingkat Provinsi">Tingkat Provinsi</option>
+                <option value="Tingkat Nasional">Tingkat Nasional</option>
+                <option value="Tingkat Internasional">Tingkat Internasional</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-slate-400 font-bold mb-1">Peringkat / Medali</label>
+              <input type="text" id="pres-peringkat" required placeholder="Misal: Juara 1 / Emas" class="w-full p-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white outline-none focus:border-amber-400">
+            </div>
+            <div>
+              <label class="block text-slate-400 font-bold mb-1">Tanggal</label>
+              <input type="date" id="pres-tanggal" required class="w-full p-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white outline-none focus:border-amber-400">
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-slate-400 font-bold mb-1">Nama Kejuaraan / Acara</label>
+            <input type="text" id="pres-lomba" required placeholder="Nama lengkap kompetisi..." class="w-full p-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white outline-none focus:border-amber-400">
+          </div>
+
+          <div>
+            <label class="block text-slate-400 font-bold mb-1">URL Foto Dokumentasi (Opsional)</label>
+            <input type="url" id="pres-foto" placeholder="https://..." class="w-full p-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white outline-none focus:border-amber-400">
+          </div>
+
+          <button type="submit" id="btn-submit-prestasi" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-title text-xs py-3 rounded-xl font-bold transition shadow-lg mt-2">
+            🚀 Terbitkan Prestasi ke Halaman Publik
+          </button>
+        </form>
+      </div>
+    </section>
+
+    <!-- SECTION 4: STATUS DATABASE & BACKUP -->
+    <section id="konten-admin-database" class="hidden space-y-6 flex-grow mb-12">
+      <div class="glass-card rounded-3xl p-6 border border-slate-800">
+        <h2 class="font-title text-xl text-sky-300 mb-2">Tautan Cepat Database Induk</h2>
+        <p class="text-xs text-slate-400 mb-6">Akses langsung ke spreadsheet Google Drive kamu untuk keperluan audit data, ekspor Excel, atau backup mingguan.</p>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+          <div class="bg-slate-900/80 p-5 rounded-2xl border border-slate-800 flex flex-col justify-between">
+            <div>
+              <span class="text-emerald-400 font-bold block mb-1">📊 Database Kesiswaan</span>
+              <p class="text-slate-400 leading-relaxed mb-4">Memuat log Buku Kasus, tindakan mediasi, dan catatan absensi keterlambatan harian.</p>
+            </div>
+            <a href="https://docs.google.com/spreadsheets" target="_blank" class="w-full bg-slate-800 hover:bg-slate-700 text-emerald-400 text-center py-2 rounded-xl border border-slate-700 font-bold transition">
+              Buka Google Sheets ↗
+            </a>
+          </div>
+
+          <div class="bg-slate-900/80 p-5 rounded-2xl border border-slate-800 flex flex-col justify-between">
+            <div>
+              <span class="text-amber-400 font-bold block mb-1">🏆 Database Prestasi</span>
+              <p class="text-slate-400 leading-relaxed mb-4">Daftar rekapitulasi juara lomba, foto piagam, dan riwayat medali siswa.</p>
+            </div>
+            <a href="https://docs.google.com/spreadsheets" target="_blank" class="w-full bg-slate-800 hover:bg-slate-700 text-amber-400 text-center py-2 rounded-xl border border-slate-700 font-bold transition">
+              Buka Google Sheets ↗
+            </a>
+          </div>
+
+          <div class="bg-slate-900/80 p-5 rounded-2xl border border-slate-800 flex flex-col justify-between">
+            <div>
+              <span class="text-purple-400 font-bold block mb-1">📚 Database Materi & Tugas</span>
+              <p class="text-slate-400 leading-relaxed mb-4">Tampungan pengumpulan link tugas siswa dan lembar evaluasi refleksi sesi.</p>
+            </div>
+            <a href="https://docs.google.com/spreadsheets" target="_blank" class="w-full bg-slate-800 hover:bg-slate-700 text-purple-400 text-center py-2 rounded-xl border border-slate-700 font-bold transition">
+              Buka Google Sheets ↗
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MODAL 1: INPUT KASUS BARU -->
+    <div id="modal-admin-kasus" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden no-print">
+      <div class="glass-card max-w-lg w-full rounded-3xl p-6 border border-emerald-500/40 bg-slate-900 shadow-2xl">
+        <div class="flex justify-between items-center mb-4 border-b border-slate-800 pb-3">
+          <h3 class="font-title text-xl text-emerald-300">Catat Kasus Siswa</h3>
+          <button onclick="toggleModalKasus(false)" class="text-slate-400 hover:text-white font-bold text-xl">✕</button>
+        </div>
+
+        <form onsubmit="simpanKasusAdmin(event)" class="space-y-3 text-xs">
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-slate-400 font-bold mb-1">Nama Siswa</label>
+              <input type="text" id="admin-kasus-nama" required placeholder="Nama siswa..." class="w-full p-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white outline-none focus:border-emerald-400">
+            </div>
+            <div>
+              <label class="block text-slate-400 font-bold mb-1">Kelas</label>
+              <input type="text" id="admin-kasus-kelas" required placeholder="Misal: 5A SD" class="w-full p-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white outline-none focus:border-emerald-400">
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-slate-400 font-bold mb-1">Tanggal Kejadian</label>
+            <input type="date" id="admin-kasus-tanggal" required class="w-full p-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white outline-none focus:border-emerald-400">
+          </div>
+
+          <div>
+            <label class="block text-slate-400 font-bold mb-1">Kronologi Masalah</label>
+            <textarea id="admin-kasus-kronologi" required rows="2" placeholder="Uraikan kejadian objektif..." class="w-full p-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white outline-none focus:border-emerald-400"></textarea>
+          </div>
+
+          <div>
+            <label class="block text-slate-400 font-bold mb-1">Tindakan / Solusi Mediasi</label>
+            <textarea id="admin-kasus-solusi" required rows="2" placeholder="Tindakan pembinaan atau kesepakatan..." class="w-full p-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white outline-none focus:border-emerald-400"></textarea>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-slate-400 font-bold mb-1">PIC Penangan</label>
+              <input type="text" id="admin-kasus-pic" required value="Pak Thomas (Wakasis)" class="w-full p-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white outline-none focus:border-emerald-400">
+            </div>
+            <div>
+              <label class="block text-slate-400 font-bold mb-1">Status Penanganan</label>
+              <select id="admin-kasus-status" class="w-full p-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white font-bold outline-none focus:border-emerald-400">
+                <option value="✅ Selesai">✅ Selesai</option>
+                <option value="⏳ Proses Solusi">⏳ Proses Solusi</option>
+              </select>
+            </div>
+          </div>
+
+          <button type="submit" id="btn-simpan-kasus" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-title text-xs py-3 rounded-xl font-bold transition shadow-lg mt-2">
+            💾 Simpan Data Kasus
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- MODAL 2: INPUT TERLAMBAT BARU -->
+    <div id="modal-admin-terlambat" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden no-print">
+      <div class="glass-card max-w-md w-full rounded-3xl p-6 border border-amber-500/40 bg-slate-900 shadow-2xl">
+        <div class="flex justify-between items-center mb-4 border-b border-slate-800 pb-3">
+          <h3 class="font-title text-xl text-amber-300">Presensi Keterlambatan</h3>
+          <button onclick="toggleModalTerlambat(false)" class="text-slate-400 hover:text-white font-bold text-xl">✕</button>
+        </div>
+
+        <form onsubmit="simpanTerlambatAdmin(event)" class="space-y-3 text-xs">
+          <div>
+            <label class="block text-slate-400 font-bold mb-1">Nama Lengkap Siswa</label>
+            <input type="text" id="admin-terlambat-nama" required placeholder="Nama siswa..." class="w-full p-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white outline-none focus:border-amber-400">
+          </div>
+
+          <div>
+            <label class="block text-slate-400 font-bold mb-1">Kelas</label>
+            <input type="text" id="admin-terlambat-kelas" required placeholder="Misal: 5B SD" class="w-full p-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white outline-none focus:border-amber-400">
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <div class="flex justify-between items-center mb-1">
+                <label class="text-slate-400 font-bold">Jam Masuk</label>
+                <button type="button" onclick="setJamSekarang()" class="text-[10px] text-amber-400 hover:underline font-semibold">
+                  ⏱️ Sekarang
+                </button>
+              </div>
+              <input type="time" id="admin-terlambat-jam" required class="w-full p-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white outline-none focus:border-amber-400">
+            </div>
+
+            <div>
+              <label class="block text-slate-400 font-bold mb-1">Tanggal</label>
+              <input type="date" id="admin-terlambat-tanggal" required class="w-full p-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white outline-none focus:border-amber-400">
+            </div>
+          </div>
+
+          <button type="submit" id="btn-simpan-terlambat" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-title text-xs py-3 rounded-xl font-bold transition shadow-lg mt-2">
+            💾 Rekam Keterlambatan Siswa
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="text-center text-xs text-slate-500 border-t border-slate-800 pt-6">
+      © 2026 <strong>NalarSci Lab</strong> • Command Center Sistem Terintegrasi
+    </footer>
+
+  </div>
+
+  <script>
+    // URL Backend Google Apps Script
+    const API_KESISWAAN = "https://script.google.com/macros/s/AKfycbwe93R1_RRKDkWUunA4nSyyRvOE_un4wCAFQwWQc1Dg/exec";
+    const API_PRESTASI = "https://script.google.com/macros/s/AKfycbwkdabeWz_6MTalQgyyIGOQeHgTIk0IvRzKY1xg7LSa-iq-FatlVIZ2Eq3W0ry8ltrg/exec";
+
+    let activeKey = sessionStorage.getItem("admin_master_key") || "";
+
+    function verifikasiAdmin(e) {
+      e.preventDefault();
+      const input = document.getElementById('admin-pass').value.trim();
+      const btn = document.getElementById('btn-login');
+      btn.disabled = true;
+      btn.innerText = "⏳ Memvalidasi...";
+
+      fetch(API_KESISWAAN, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({
+          action: "login_dan_ambil_data",
+          key: input
+        })
+      })
+      .then(res => res.json())
+      .then(res => {
+        btn.disabled = false;
+        btn.innerText = "🔐 Buka Akses Konsol";
+
+        if (res.status === "success") {
+          activeKey = input;
+          sessionStorage.setItem("admin_master_key", activeKey);
+          bukaPanelAdmin(res);
+        } else {
+          alert("Akses Ditolak: Master Key salah!");
+          document.getElementById('admin-pass').value = "";
+        }
+      })
+      .catch(err => {
+        btn.disabled = false;
+        btn.innerText = "🔐 Buka Akses Konsol";
+        alert("Gagal terhubung ke database: " + err);
+      });
+    }
+
+    function bukaPanelAdmin(data) {
+      document.getElementById('gatekeeper').classList.add('hidden');
+      document.getElementById('command-center').classList.remove('hidden');
+      document.getElementById('command-center').classList.add('flex');
+      renderKasus(data.kasus || []);
+      renderTerlambat(data.terlambat || []);
+    }
+
+    function logoutAdmin() {
+      sessionStorage.removeItem("admin_master_key");
+      location.reload();
+    }
+
+    function bukaTabAdmin(tab) {
+      document.querySelectorAll('.admin-tab').forEach(b => b.classList.remove('active'));
+      document.getElementById('konten-admin-kasus').classList.add('hidden');
+      document.getElementById('konten-admin-terlambat').classList.add('hidden');
+      document.getElementById('konten-admin-prestasi').classList.add('hidden');
+      document.getElementById('konten-admin-database').classList.add('hidden');
+
+      if (tab === 'kasus') {
+        document.getElementById('tab-btn-kasus').classList.add('active');
+        document.getElementById('konten-admin-kasus').classList.remove('hidden');
+      } else if (tab === 'terlambat') {
+        document.getElementById('tab-btn-terlambat').classList.add('active');
+        document.getElementById('konten-admin-terlambat').classList.remove('hidden');
+      } else if (tab === 'prestasi') {
+        document.getElementById('tab-btn-prestasi').classList.add('active');
+        document.getElementById('konten-admin-prestasi').classList.remove('hidden');
+      } else if (tab === 'database') {
+        document.getElementById('tab-btn-database').classList.add('active');
+        document.getElementById('konten-admin-database').classList.remove('hidden');
+      }
+    }
+
+    function setJamSekarang() {
+      const now = new Date();
+      const jam = String(now.getHours()).padStart(2, '0');
+      const mnt = String(now.getMinutes()).padStart(2, '0');
+      document.getElementById('admin-terlambat-jam').value = `${jam}:${mnt}`;
+    }
+
+    function toggleModalKasus(show) {
+      document.getElementById('modal-admin-kasus').classList.toggle('hidden', !show);
+      if (show) document.getElementById('admin-kasus-tanggal').valueAsDate = new Date();
+    }
+
+    function toggleModalTerlambat(show) {
+      document.getElementById('modal-admin-terlambat').classList.toggle('hidden', !show);
+      if (show) {
+        document.getElementById('admin-terlambat-tanggal').valueAsDate = new Date();
+        setJamSekarang();
+      }
+    }
+
+    function renderKasus(list) {
+      const tbody = document.getElementById('tabel-admin-kasus');
+      if (!list || list.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="p-6 text-center text-slate-500">Belum ada catatan kasus siswa.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = list.map(item => {
+        const isSelesai = item.status && item.status.includes('Selesai');
+        const badgeClass = isSelesai ? 'bg-emerald-500/20 text-emerald-400' : 'bg-amber-500/20 text-amber-300';
+        return `
+          <tr>
+            <td class="p-3.5 text-slate-400 font-mono">${item.tanggal || '-'}</td>
+            <td class="p-3.5 font-bold text-white">${item.nama} (${item.kelas})</td>
+            <td class="p-3.5 text-slate-300">${item.masalah}</td>
+            <td class="p-3.5 text-slate-300">${item.solusi}</td>
+            <td class="p-3.5 text-sky-400 font-semibold">${item.pic}</td>
+            <td class="p-3.5"><span class="${badgeClass} font-bold px-2 py-0.5 rounded-full text-[10px]">${item.status}</span></td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function renderTerlambat(list) {
+      const tbody = document.getElementById('tabel-admin-terlambat');
+      if (!list || list.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="p-6 text-center text-slate-500">Belum ada siswa terlambat.</td></tr>';
+        document.getElementById('stat-total-terlambat').innerText = "0 Siswa";
+        document.getElementById('stat-sp').innerText = "0 Siswa";
+        document.getElementById('stat-ortu').innerText = "0 Siswa";
+        return;
+      }
+
+      let countSp = 0;
+      let countOrtu = 0;
+
+      tbody.innerHTML = list.map(item => {
+        if (item.akumulasi >= 5) countOrtu++;
+        else if (item.akumulasi >= 3) countSp++;
+
+        const isSp = item.akumulasi >= 3;
+        const spBadge = isSp 
+          ? `<span class="bg-orange-500/20 text-orange-300 font-bold px-2 py-0.5 rounded-full text-[10px]">${item.teguran || 'SP-1'}</span>`
+          : `<span class="text-slate-400">${item.teguran || 'Pembinaan piket'}</span>`;
+
+        return `
+          <tr>
+            <td class="p-3.5 text-slate-400 font-mono">${item.tanggal || '-'}</td>
+            <td class="p-3.5 text-rose-400 font-mono font-bold">${item.jam}</td>
+            <td class="p-3.5 font-bold text-white">${item.nama}</td>
+            <td class="p-3.5 text-slate-300">${item.kelas}</td>
+            <td class="p-3.5 text-amber-400 font-bold">${item.akumulasi} Kali</td>
+            <td class="p-3.5">${spBadge}</td>
+          </tr>
+        `;
+      }).join('');
+
+      document.getElementById('stat-total-terlambat').innerText = list.length + " Siswa";
+      document.getElementById('stat-sp').innerText = countSp + " Siswa";
+      document.getElementById('stat-ortu').innerText = countOrtu + " Siswa";
+    }
+
+    function segarkanDataAdmin() {
+      fetch(API_KESISWAAN, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({
+          action: "login_dan_ambil_data",
+          key: activeKey
+        })
+      })
+      .then(r => r.json())
+      .then(res => {
+        if (res.status === "success") {
+          renderKasus(res.kasus || []);
+          renderTerlambat(res.terlambat || []);
+        }
+      });
+    }
+
+    function simpanKasusAdmin(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btn-simpan-kasus');
+      btn.disabled = true;
+      btn.innerText = "⏳ Menyimpan...";
+
+      const payload = {
+        action: "tambah_kasus",
+        key: activeKey,
+        data: {
+          tanggal: document.getElementById('admin-kasus-tanggal').value,
+          nama: document.getElementById('admin-kasus-nama').value.trim(),
+          kelas: document.getElementById('admin-kasus-kelas').value.trim(),
+          masalah: document.getElementById('admin-kasus-kronologi').value.trim(),
+          solusi: document.getElementById('admin-kasus-solusi').value.trim(),
+          pic: document.getElementById('admin-kasus-pic').value.trim(),
+          status: document.getElementById('admin-kasus-status').value
+        }
+      };
+
+      fetch(API_KESISWAAN, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify(payload)
+      })
+      .then(res => res.json())
+      .then(res => {
+        btn.disabled = false;
+        btn.innerText = "💾 Simpan Data Kasus";
+        if (res.status === "success") {
+          alert("Berhasil! " + res.message);
+          toggleModalKasus(false);
+          e.target.reset();
+          segarkanDataAdmin();
+        } else {
+          alert("Gagal: " + res.message);
+        }
+      })
+      .catch(err => {
+        btn.disabled = false;
+        btn.innerText = "💾 Simpan Data Kasus";
+        alert("Kesalahan jaringan: " + err);
+      });
+    }
+
+    function simpanTerlambatAdmin(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btn-simpan-terlambat');
+      btn.disabled = true;
+      btn.innerText = "⏳ Menghitung akumulasi...";
+
+      const jamInput = document.getElementById('admin-terlambat-jam').value;
+      const jamDisplay = jamInput ? `${jamInput.replace(':', '.')} WIB` : "07.20 WIB";
+
+      const payload = {
+        action: "tambah_terlambat",
+        key: activeKey,
+        data: {
+          tanggal: document.getElementById('admin-terlambat-tanggal').value,
+          nama: document.getElementById('admin-terlambat-nama').value.trim(),
+          kelas: document.getElementById('admin-terlambat-kelas').value.trim(),
+          jam: jamDisplay
+        }
+      };
+
+      fetch(API_KESISWAAN, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify(payload)
+      })
+      .then(res => res.json())
+      .then(res => {
+        btn.disabled = false;
+        btn.innerText = "💾 Rekam Keterlambatan Siswa";
+        if (res.status === "success") {
+          alert("Tercatat! " + res.message);
+          toggleModalTerlambat(false);
+          e.target.reset();
+          segarkanDataAdmin();
+        } else {
+          alert("Gagal: " + res.message);
+        }
+      })
+      .catch(err => {
+        btn.disabled = false;
+        btn.innerText = "💾 Rekam Keterlambatan Siswa";
+        alert("Kesalahan jaringan: " + err);
+      });
+    }
+
+    function kirimPrestasiAdmin(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btn-submit-prestasi');
+      btn.disabled = true;
+      btn.innerText = "⏳ Menerbitkan ke publik...";
+
+      const payload = {
+        action: "tambah_prestasi",
+        pin: "2026",
+        data: {
+          nama: document.getElementById('pres-nama').value.trim(),
+          kelas: document.getElementById('pres-kelas').value.trim(),
+          kategori: document.getElementById('pres-kat').value,
+          tingkat: document.getElementById('pres-tingkat').value,
+          peringkat: document.getElementById('pres-peringkat').value.trim(),
+          tanggal: document.getElementById('pres-tanggal').value,
+          lomba: document.getElementById('pres-lomba').value.trim(),
+          foto: document.getElementById('pres-foto').value.trim() || 'https://images.unsplash.com/photo-1578269174936-2709b6aeb913?w=600&auto=format&fit=crop&q=80'
+        }
+      };
+
+      fetch(API_PRESTASI, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify(payload)
+      })
+      .then(res => res.json())
+      .then(res => {
+        btn.disabled = false;
+        btn.innerText = "🚀 Terbitkan Prestasi ke Halaman Publik";
+        if (res.status === "success") {
+          alert("Prestasi siswa berhasil diterbitkan ke publik!");
+          e.target.reset();
+        } else {
+          alert("Gagal: " + res.message);
+        }
+      })
+      .catch(err => {
+        btn.disabled = false;
+        btn.innerText = "🚀 Terbitkan Prestasi ke Halaman Publik";
+        alert("Kesalahan: " + err);
+      });
+    }
+
+    // Auto-login saat sesi masih ada
+    if (activeKey) {
+      fetch(API_KESISWAAN, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({
+          action: "login_dan_ambil_data",
+          key: activeKey
+        })
+      })
+      .then(r => r.json())
+      .then(res => {
+        if (res.status === "success") {
+          bukaPanelAdmin(res);
+        } else {
+          sessionStorage.removeItem("admin_master_key");
+        }
+      });
+    }
+  </script>
+</body>
+</html>
