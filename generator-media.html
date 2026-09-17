@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Generator Media Ajar & Slide Canva | NalarSci Lab</title>
+  <meta name="description" content="Alat bantu pendidik merancang kerangka slide presentasi interaktif dan media pembelajaran aktif siap ekspor ke Canva Bulk Create.">
+  
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: radial-gradient(circle at 50% 0%, #1e293b 0%, #0b0f19 75%);
+      color: #f8fafc;
+      min-height: 100vh;
+    }
+    .font-title { font-family: 'Fredoka', sans-serif; }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.04);
+      backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      transition: all 0.3s ease;
+    }
+  </style>
+</head>
+<body class="p-4 md:p-8 max-w-5xl mx-auto flex flex-col justify-between min-h-screen">
+
+  <!-- HEADER NAVIGASI -->
+  <header class="mb-8">
+    <div class="flex justify-between items-center border-b border-slate-800 pb-3 mb-6">
+      <a href="index.html" class="text-purple-400 hover:text-purple-300 font-bold text-xs flex items-center gap-1 transition">
+        ← Kembali ke Beranda Lab
+      </a>
+      <span class="text-xs bg-purple-500/10 border border-purple-500/20 text-purple-300 px-3 py-1 rounded-full font-bold">
+        🪄 Alat Pedagogi Guru
+      </span>
+    </div>
+
+    <div class="text-center max-w-2xl mx-auto">
+      <div class="inline-flex items-center gap-2 bg-purple-500/10 border border-purple-400/20 text-purple-300 px-3.5 py-1 rounded-full text-xs font-black uppercase tracking-wider mb-2">
+        Alat Bantu Media Ajar Interaktif
+      </div>
+      <h1 class="font-title text-3xl sm:text-4xl text-white mb-2">Generator Slide Pembelajaran</h1>
+      <p class="text-slate-400 text-xs sm:text-sm">
+        Susun alur presentasi berbasis inkuiri dan pertanyaan pemantik, lalu salin datanya langsung ke fitur <strong>Bulk Create Canva</strong>.
+      </p>
+    </div>
+  </header>
+
+  <!-- FORM PENGATURAN -->
+  <main class="space-y-6 mb-12">
+    <div class="glass-card rounded-3xl p-6 border border-purple-500/30 bg-slate-900/60">
+      <h2 class="font-title text-lg text-purple-300 mb-4">Parameter Rencana Ajar</h2>
+      
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+        <div>
+          <label class="block text-slate-400 font-bold mb-1">Mata Pelajaran</label>
+          <input type="text" id="mapel" value="Informatika / KKA" class="w-full p-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white outline-none focus:border-purple-400">
+        </div>
+
+        <div>
+          <label class="block text-slate-400 font-bold mb-1">Fase / Jenjang</label>
+          <select id="fase" class="w-full p-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white font-bold outline-none focus:border-purple-400">
+            <option value="Fase A (Kelas 1-2 SD)">Fase A (Kelas 1–2 SD)</option>
+            <option value="Fase B (Kelas 3-4 SD)">Fase B (Kelas 3–4 SD)</option>
+            <option value="Fase C (Kelas 5-6 SD)" selected>Fase C (Kelas 5–6 SD)</option>
+            <option value="Fase D (Kelas 7-9 SMP)">Fase D (Kelas 7–9 SMP)</option>
+            <option value="Fase E/F (SMA)">Fase E/F (SMA)</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-slate-400 font-bold mb-1">Pendekatan Kelas</label>
+          <select id="model" class="w-full p-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white font-bold outline-none focus:border-purple-400">
+            <option value="Inkuiri & Pemantik Masalah">Inkuiri & Pemantik Masalah</option>
+            <option value="Tantangan Logika / Gamifikasi">Tantangan Logika / Gamifikasi</option>
+            <option value="Proyek Mini (PjBL)">Proyek Mini (PjBL)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="mt-4 text-xs">
+        <label class="block text-slate-400 font-bold mb-1">Topik Materi Spesifik</label>
+        <div class="flex gap-2">
+          <input type="text" id="topik" placeholder="Contoh: Mengenal Pola & Algoritma Percabangan" class="flex-grow p-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white outline-none focus:border-purple-400">
+          <button onclick="buatSlide()" class="bg-purple-600 hover:bg-purple-500 text-white font-title px-5 py-2.5 rounded-xl transition shadow-lg flex-shrink-0 font-bold">
+            ✨ Susun Slide
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- OUTPUT HASIL GENERATE -->
+    <div id="hasil-box" class="hidden space-y-6">
+      
+      <!-- PETUNJUK CANVA & TOMBOL COPY -->
+      <div class="bg-purple-950/40 border border-purple-800/60 p-4 rounded-2xl text-xs flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+        <div class="text-purple-200">
+          💡 <strong>Cara Pakai di Canva:</strong> Pilih desain presentasi $\rightarrow$ buka menu <em>Aplikasi</em> di kiri Canva $\rightarrow$ pilih <strong>Buat Banyak (Bulk Create)</strong> $\rightarrow$ klik <em>Masukkan data manual</em> $\rightarrow$ tempel data yang sudah disalin.
+        </div>
+        <button onclick="salinData()" id="btn-salin" class="bg-purple-600 hover:bg-purple-500 text-white font-bold px-4 py-2 rounded-xl text-xs flex-shrink-0 transition shadow-md">
+          📋 Salin Data Canva
+        </button>
+      </div>
+
+      <!-- TABEL DATA HASIL SLIDE -->
+      <div class="glass-card rounded-2xl overflow-hidden border border-slate-800">
+        <div class="p-4 bg-slate-900 border-b border-slate-800 flex justify-between items-center">
+          <h3 class="font-title text-sm text-purple-300">Rancangan 5 Slide Interaktif</h3>
+          <span class="text-[11px] text-slate-400">Format TSV/CSV Ready</span>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs text-slate-300">
+            <thead class="bg-slate-950 text-slate-400 uppercase font-black text-[10px] border-b border-slate-800">
+              <tr>
+                <th class="p-3">Slide</th>
+                <th class="p-3">Peran_Slide</th>
+                <th class="p-3">Judul_Slide</th>
+                <th class="p-3">Inti_Materi_Pertanyaan</th>
+                <th class="p-3">Saran_Visual</th>
+              </tr>
+            </thead>
+            <tbody id="tabel-slide" class="divide-y divide-slate-800/60">
+              <!-- Diisi JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- CATATAN PEDAGOGI GURU -->
+      <div class="glass-card rounded-2xl p-5 border border-slate-800 text-xs space-y-2">
+        <h3 class="font-title text-sm text-sky-400">🎯 Panduan Eksekusi di Kelas</h3>
+        <div id="catatan-guru" class="text-slate-300 leading-relaxed space-y-1.5">
+          <!-- Diisi JS -->
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="text-center text-xs text-slate-500 border-t border-slate-800 pt-6">
+    © 2026 <strong>NalarSci Lab</strong> • Efisiensi Persiapan Pendidik Tanpa Mengorbankan Esensi
+  </footer>
+
+  <script>
+    let tsvData = "";
+
+    function buatSlide() {
+      const mapel = document.getElementById('mapel').value.trim() || "Informatika";
+      const fase = document.getElementById('fase').value;
+      const model = document.getElementById('model').value;
+      const topik = document.getElementById('topik').value.trim() || "Konsep Dasar Komputasi";
+
+      const listSlide = [
+        {
+          no: "1",
+          peran: "Pemantik Rasa Ingin Tahu",
+          judul: `Teka-Teki Awal: ${topik}`,
+          konten: "Menurut kalian, apa yang terjadi jika urutan langkah ini terbalik?",
+          visual: "Ilustrasi tanda tanya besar, animasi robot kebingungan, atau komik singkat"
+        },
+        {
+          no: "2",
+          peran: "Konsep Konkret",
+          judul: "Bagaimana Ini Terjadi di Sekitar Kita?",
+          konten: `Prinsip ${topik} sebenarnya kita temui setiap hari tanpa kita sadari.`,
+          visual: "Foto analogi nyata (rambu lalu lintas, resep memasak, atau denah jalan)"
+        },
+        {
+          no: "3",
+          peran: "Tantangan Berpasangan",
+          judul: "Misi Detektif: Pecahkan Bersama!",
+          konten: "Diskusikan dengan teman sebangkumu: Temukan 1 langkah perbaikan tercepat!",
+          visual: "Ikon dua anak berdiskusi, papan skor mini, atau timer tantangan 3 menit"
+        },
+        {
+          no: "4",
+          peran: "Penerapan & Uji Coba",
+          judul: "Uji Logika di Simulasi",
+          konten: "Saatnya mencoba langsung di game/lembar aktivitas NalarSci!",
+          visual: "Tangkapan layar game simulasi atau balok koding Scratch"
+        },
+        {
+          no: "5",
+          peran: "Refleksi & Apresiasi",
+          judul: "Kekuatan Barumu Hari Ini",
+          konten: "Satu hal penting yang aku pahami hari ini dan bagaimana aku memanfaatkannya.",
+          visual: "Karakter piala/bintang penghargaan, balon kata refleksi siswa"
+        }
+      ];
+
+      // Render ke tabel
+      const tbody = document.getElementById('tabel-slide');
+      tbody.innerHTML = listSlide.map(s => `
+        <tr>
+          <td class="p-3 text-purple-400 font-bold">${s.no}</td>
+          <td class="p-3 font-semibold text-white">${s.peran}</td>
+          <td class="p-3 text-slate-200">${s.judul}</td>
+          <td class="p-3 text-slate-300">${s.konten}</td>
+          <td class="p-3 text-slate-400 text-[11px]">${s.visual}</td>
+        </tr>
+      `).join('');
+
+      // Susun data TSV
+      tsvData = "No_Slide\tPeran_Slide\tJudul_Slide\tInti_Materi\tSaran_Visual\n" +
+        listSlide.map(s => `${s.no}\t${s.peran}\t${s.judul}\t${s.konten}\t${s.visual}`).join('\n');
+
+      // Catatan Pedagogi
+      document.getElementById('catatan-guru').innerHTML = `
+        <p>• <strong>Sasaran Belajar:</strong> Pembelajaran aktif untuk <em>${fase}</em> materi <em>${topik}</em> (${mapel}).</p>
+        <p>• <strong>Pendekatan:</strong> <em>${model}</em>. Hindari langsung memberi teori hafalan di 10 menit awal.</p>
+        <p>• <strong>Tips Guru:</strong> Izinkan siswa menjawab bebas di Slide 1 untuk memetakan pemahaman awal (*asesmen diagnostik spontan*).</p>
+      `;
+
+      document.getElementById('hasil-box').classList.remove('hidden');
+      document.getElementById('hasil-box').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function salinData() {
+      navigator.clipboard.writeText(tsvData).then(() => {
+        const btn = document.getElementById('btn-salin');
+        btn.innerText = '✅ Tersalin! Tempel di Canva';
+        btn.classList.replace('bg-purple-600', 'bg-emerald-600');
+        setTimeout(() => {
+          btn.innerText = '📋 Salin Data Canva';
+          btn.classList.replace('bg-emerald-600', 'bg-purple-600');
+        }, 3000);
+      });
+    }
+  </script>
+</body>
+</html>
