@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pusat Kesiswaan, Kedisiplinan & BK | NalarSci</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Nunito', sans-serif; background: #0b0f19; color: #f8fafc; }
+    .font-title { font-family: 'Fredoka', sans-serif; }
+    .glass-card { background: rgba(255, 255, 255, 0.04); backdrop-filter: blur(14px); border: 1px solid rgba(255, 255, 255, 0.08); }
+    .tab-pilihan.active { background: #059669; color: white; }
+  </style>
+</head>
+<body class="p-4 md:p-8 max-w-6xl mx-auto flex flex-col justify-between min-h-screen">
+
+  <header class="mb-6">
+    <div class="flex justify-between items-center border-b border-slate-800 pb-3 mb-6">
+      <a href="index.html" class="text-sky-400 hover:text-sky-300 font-bold text-xs">← Kembali ke Beranda</a>
+      <span class="text-xs text-emerald-400 font-bold">Panel Khusus: Wakasis & Guru BK</span>
+    </div>
+    <div class="text-center">
+      <h1 class="font-title text-3xl text-white">Sistem Kedisiplinan & Buku Kasus Siswa</h1>
+      <p class="text-xs text-slate-400 mt-1">Pemantauan rekap keterlambatan, penanganan konseling, dan pembinaan karakter.</p>
+    </div>
+
+    <!-- PILIHAN SUB-MODUL KESISWAAN -->
+    <div class="flex justify-center gap-2 mt-6">
+      <button onclick="bukaTabKesiswaan('kasus')" id="btn-kasus" class="tab-pilihan active px-4 py-2 rounded-xl bg-slate-800 text-xs font-bold transition">
+        📖 Buku Kasus & Konseling
+      </button>
+      <button onclick="bukaTabKesiswaan('terlambat')" id="btn-terlambat" class="tab-pilihan px-4 py-2 rounded-xl bg-slate-800 text-xs font-bold transition">
+        ⏰ Rekap Siswa Terlambat
+      </button>
+      <button onclick="bukaTabKesiswaan('poin')" id="btn-poin" class="tab-pilihan px-4 py-2 rounded-xl bg-slate-800 text-xs font-bold transition">
+        ⚖️ Buku Saku Pelanggaran
+      </button>
+    </div>
+  </header>
+
+  <!-- KONTEN TAB 1: BUKU KASUS & KONSELING -->
+  <main id="konten-kasus" class="space-y-6">
+    <div class="glass-card rounded-2xl p-5 flex flex-col sm:flex-row justify-between items-center gap-4">
+      <div>
+        <h3 class="font-title text-lg text-emerald-400">Daftar Penanganan Masalah Siswa</h3>
+        <p class="text-xs text-slate-400">Pantau status penanganan: apakah masih proses atau sudah terselesaikan oleh guru/BK.</p>
+      </div>
+      <button onclick="alert('Buka Form Input Kasus Baru')" class="bg-emerald-600 hover:bg-emerald-500 text-white font-title text-xs px-4 py-2.5 rounded-xl font-bold transition">
+        + Catat Masalah Siswa
+      </button>
+    </div>
+
+    <!-- TABEL KASUS SISWA -->
+    <div class="glass-card rounded-2xl overflow-x-auto">
+      <table class="w-full text-left text-xs text-slate-300">
+        <thead class="bg-slate-900 text-slate-400 uppercase font-black text-[10px] border-b border-slate-800">
+          <tr>
+            <th class="p-3.5">Tanggal</th>
+            <th class="p-3.5">Nama & Kelas</th>
+            <th class="p-3.5">Masalah / Kasus</th>
+            <th class="p-3.5">Solusi & Tindakan</th>
+            <th class="p-3.5">PIC Penangan</th>
+            <th class="p-3.5">Status</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-800/60">
+          <tr>
+            <td class="p-3.5 text-slate-400">16 Sep 2026</td>
+            <td class="p-3.5 font-bold text-white">David Pratama (5A)</td>
+            <td class="p-3.5">Perselisihan saat jam istirahat di lapangan</td>
+            <td class="p-3.5">Mediasi bersama kedua belah pihak & komitmen berteman</td>
+            <td class="p-3.5 text-sky-400 font-semibold">Pak Thomas (Wakasis)</td>
+            <td class="p-3.5"><span class="bg-emerald-500/20 text-emerald-400 font-bold px-2 py-0.5 rounded-full text-[10px]">✅ Selesai</span></td>
+          </tr>
+          <tr>
+            <td class="p-3.5 text-slate-400">14 Sep 2026</td>
+            <td class="p-3.5 font-bold text-white">Riko Wijaya (6B)</td>
+            <td class="p-3.5">Sering tertidur di kelas & tugas belum tuntas</td>
+            <td class="p-3.5">Konseling individual & observasi pola belajar di rumah</td>
+            <td class="p-3.5 text-purple-400 font-semibold">Ibu Maria (Guru BK)</td>
+            <td class="p-3.5"><span class="bg-amber-500/20 text-amber-300 font-bold px-2 py-0.5 rounded-full text-[10px]">⏳ Proses Solusi</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+  <!-- KONTEN TAB 2: REKAP KETERLAMBATAN -->
+  <main id="konten-terlambat" class="hidden space-y-6">
+    <div class="glass-card rounded-2xl p-5 flex flex-col sm:flex-row justify-between items-center gap-4">
+      <div>
+        <h3 class="font-title text-lg text-amber-300">Rekap Siswa Terlambat Masuk Sekolah</h3>
+        <p class="text-xs text-slate-400">Terintegrasi otomatis dengan batas toleransi jam masuk (07.15).</p>
+      </div>
+      <button onclick="alert('Generate Surat Panggilan Ortu')" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-title text-xs px-4 py-2.5 rounded-xl font-bold transition">
+        📄 Cetak Rekap & Panggilan
+      </button>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
+      <div class="glass-card rounded-2xl p-4">
+        <p class="text-xs text-slate-400">Terlambat Hari Ini</p>
+        <p class="font-title text-3xl text-amber-300 mt-1">4 Siswa</p>
+      </div>
+      <div class="glass-card rounded-2xl p-4">
+        <p class="text-xs text-slate-400">Akumulasi $\ge$ 3x (Peringatan)</p>
+        <p class="font-title text-3xl text-orange-400 mt-1">2 Siswa</p>
+      </div>
+      <div class="glass-card rounded-2xl p-4">
+        <p class="text-xs text-slate-400">Panggilan Orang Tua ($\ge$ 5x)</p>
+        <p class="font-title text-3xl text-rose-400 mt-1">0 Siswa</p>
+      </div>
+    </div>
+  </main>
+
+  <!-- KONTEN TAB 3: POIN PELANGGARAN -->
+  <main id="konten-poin" class="hidden glass-card rounded-2xl p-6 text-center text-slate-400 text-xs">
+    <p class="mb-2">Buku Saku Digital & Poin Pelanggaran Kedisiplinan siap disinkronkan dengan Google Sheets.</p>
+  </main>
+
+  <footer class="text-center text-xs text-slate-500 pt-6 border-t border-slate-800">
+    © 2026 NalarSci • Sistem Manajemen Kesiswaan & Bimbingan Konseling
+  </footer>
+
+  <script>
+    function bukaTabKesiswaan(tab) {
+      document.querySelectorAll('.tab-pilihan').forEach(b => b.classList.remove('active'));
+      document.getElementById('konten-kasus').classList.add('hidden');
+      document.getElementById('konten-terlambat').classList.add('hidden');
+      document.getElementById('konten-poin').classList.add('hidden');
+
+      if (tab === 'kasus') {
+        document.getElementById('btn-kasus').classList.add('active');
+        document.getElementById('konten-kasus').classList.remove('hidden');
+      } else if (tab === 'terlambat') {
+        document.getElementById('btn-terlambat').classList.add('active');
+        document.getElementById('konten-terlambat').classList.remove('hidden');
+      } else if (tab === 'poin') {
+        document.getElementById('btn-poin').classList.add('active');
+        document.getElementById('konten-poin').classList.remove('hidden');
+      }
+    }
+  </script>
+</body>
+</html>
