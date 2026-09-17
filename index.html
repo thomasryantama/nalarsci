@@ -4,8 +4,21 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>NalarSci Lab — Ekosistem Belajar Sains, KKA & Layanan Sekolah</title>
-  <meta name="description" content="Laboratorium sains komputasi interaktif, etalase prestasi, administrasi kesiswaan, dan ruang karya siswa.">
+  <meta name="description" content="Laboratorium sains komputasi interaktif, etalase prestasi juara, administrasi kesiswaan, dan ruang karya digital siswa.">
   
+  <!-- FAVICON & PWA ICONS -->
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="apple-touch-icon" sizes="152x152" href="icon-152.png">
+  <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+
+  <!-- OPEN GRAPH META -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="NalarSci Lab — Ekosistem Belajar Sains, KKA & Layanan Sekolah">
+  <meta property="og:description" content="Laboratorium sains komputasi interaktif, etalase prestasi juara, administrasi kesiswaan, dan ruang karya digital siswa.">
+  <meta property="og:image" content="icon-192.png">
+
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 
@@ -20,6 +33,7 @@
     .glass-card {
       background: rgba(255, 255, 255, 0.04);
       backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
       border: 1px solid rgba(255, 255, 255, 0.08);
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
@@ -37,11 +51,11 @@
 </head>
 <body class="p-4 md:p-8 flex flex-col justify-between max-w-6xl mx-auto min-h-screen">
 
-  <!-- NAVBAR ATAS -->
+  <!-- NAVBAR ATAS DENGAN LOGO RESMI -->
   <header class="mb-8">
     <nav class="flex flex-wrap justify-between items-center gap-4 bg-slate-900/80 border border-slate-800 p-4 rounded-2xl mb-8 backdrop-blur-md">
       <div class="flex items-center gap-3">
-        <span class="text-3xl">🚀</span>
+        <img src="icon-192.png" alt="Logo NalarSci Lab" class="w-11 h-11 rounded-2xl border border-sky-400/40 shadow-lg object-contain bg-slate-950 p-1" onerror="this.src='icon-152.png'">
         <div>
           <h1 class="font-title text-xl text-white tracking-wide leading-tight">NALAR<span class="text-sky-400">SCI</span> LAB</h1>
           <p class="text-[11px] text-slate-400">Panggung Belajar, Koding & Kesiswaan</p>
@@ -54,18 +68,18 @@
       </div>
     </nav>
 
-    <!-- BANNER HERO RINGKAS -->
+    <!-- BANNER HERO -->
     <div class="text-center max-w-2xl mx-auto mb-8">
       <div class="inline-flex items-center gap-2 bg-sky-500/10 border border-sky-400/20 text-sky-400 px-3.5 py-1 rounded-full text-xs font-black uppercase tracking-wider mb-3">
         Wadah Eksplorasi Digital & Karakter Siswa
       </div>
       <h2 class="font-title text-3xl sm:text-4xl text-white mb-2">Pusat Layanan & Pembelajaran Interaktif</h2>
       <p class="text-slate-400 text-xs sm:text-sm">
-        Pilih kategori menu di bawah untuk membuka modul game komputasi, galeri juara, portal layanan kesiswaan, atau administrasi pendidik.
+        Pilih kategori di bawah untuk membuka laboratorium komputasi, galeri karya, portal kesiswaan, atau administrasi sekolah.
       </p>
     </div>
 
-    <!-- FILTER MENU KATEGORI / TAB -->
+    <!-- TAB FILTER KATEGORI -->
     <div class="flex flex-wrap justify-center gap-2" id="kategori-bar">
       <button onclick="setKategori('semua')" class="tab-btn tab-active px-4 py-2 rounded-xl bg-slate-800 border border-slate-700 text-xs font-bold text-slate-300 transition">
         🌟 Semua Modul
@@ -85,10 +99,10 @@
     </div>
   </header>
 
-  <!-- GRID DAFTAR MODUL UTAMA -->
+  <!-- GRID DAFTAR 10 MODUL UTAMA -->
   <main class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 flex-grow mb-12" id="modul-grid">
 
-    <!-- 1. KARYA SISWA -->
+    <!-- 1. GALERI KARYA SISWA -->
     <div class="modul-item glass-card rounded-3xl p-6 flex flex-col" data-cat="lab">
       <div class="flex justify-between items-start mb-3">
         <div class="text-4xl">🎨</div>
@@ -111,74 +125,29 @@
       </div>
       <h3 class="font-title text-xl text-amber-300 mb-1">Papan Prestasi Juara</h3>
       <p class="text-xs text-slate-300 leading-relaxed mb-4 flex-grow">
-        Rekam jejak piala, sertifikat, dan juara lomba siswa tingkat Kota, Provinsi hingga Nasional.
+        Rekam jejak piala, piagam penghargaan, dan prestasi lomba siswa tingkat Kota, Provinsi hingga Nasional.
       </p>
       <a href="prestasi-siswa.html" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-title text-xs py-2.5 rounded-xl text-center font-bold transition">
         Lihat Rekap Juara
       </a>
     </div>
 
-    <!-- 3. PEMBAYARAN EKSKUL -->
-    <div class="modul-item glass-card rounded-3xl p-6 flex flex-col" data-cat="wali">
+    <!-- 3. DETEKTIF PEMILAH SAMPAH -->
+    <div class="modul-item glass-card rounded-3xl p-6 flex flex-col" data-cat="lab">
       <div class="flex justify-between items-start mb-3">
-        <div class="text-4xl">💳</div>
-        <span class="bg-teal-500/20 text-teal-300 border border-teal-400/30 text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full">Iuran</span>
+        <div class="text-4xl">♻️</div>
+        <span class="bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full">Edukasi Sains</span>
       </div>
-      <h3 class="font-title text-xl text-teal-300 mb-1">Iuran Ekskul Koding</h3>
+      <h3 class="font-title text-xl text-emerald-300 mb-1">Detektif Sampah</h3>
       <p class="text-xs text-slate-300 leading-relaxed mb-4 flex-grow">
-        Cek kehadiran sesi latihan, rincian tagihan per bulan, status lunas, dan saldo lebih siswa.
+        Game edukasi interaktif memilah jenis sampah organik, anorganik, dan limbah B3 untuk mengasah kepedulian lingkungan.
       </p>
-      <a href="pembayaran-ekskul.html" class="w-full bg-teal-600 hover:bg-teal-500 text-white font-title text-xs py-2.5 rounded-xl text-center font-bold transition">
-        Portal Iuran Ekskul
+      <a href="game-sampah.html" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-title text-xs py-2.5 rounded-xl text-center font-bold transition">
+        Mainkan Game
       </a>
     </div>
 
-    <!-- 4. KESISWAAN, ABSENSI & BK -->
-    <div class="modul-item glass-card rounded-3xl p-6 flex flex-col" data-cat="kesiswaan">
-      <div class="flex justify-between items-start mb-3">
-        <div class="text-4xl">🛡️</div>
-        <span class="bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full">Wakasis</span>
-      </div>
-      <h3 class="font-title text-xl text-emerald-300 mb-1">Manajemen Kesiswaan & BK</h3>
-      <p class="text-xs text-slate-300 leading-relaxed mb-4 flex-grow">
-        Pusat log absensi/terlambat, buku kasus konseling siswa (status & PIC), serta rekap poin pelanggaran.
-      </p>
-      <a href="kesiswaan.html" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-title text-xs py-2.5 rounded-xl text-center font-bold transition">
-        Buka Panel Wakasis
-      </a>
-    </div>
-
-    <!-- 5. SUARA KITA (KOTAK ADUAN) -->
-    <div class="modul-item glass-card rounded-3xl p-6 flex flex-col" data-cat="kesiswaan wali">
-      <div class="flex justify-between items-start mb-3">
-        <div class="text-4xl">📬</div>
-        <span class="bg-rose-500/20 text-rose-300 border border-rose-400/30 text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full">Konseling</span>
-      </div>
-      <h3 class="font-title text-xl text-rose-300 mb-1">Suara Kita (Layanan Aduan)</h3>
-      <p class="text-xs text-slate-300 leading-relaxed mb-4 flex-grow">
-        Kotak curhat dan pencegahan perundungan yang aman dan terlindungi untuk siswa dan orang tua.
-      </p>
-      <a href="suara-kita.html" class="w-full bg-rose-600 hover:bg-rose-500 text-white font-title text-xs py-2.5 rounded-xl text-center font-bold transition">
-        Kirim Aduan / Curhat
-      </a>
-    </div>
-
-    <!-- 6. GENERATOR MEDIA AJAR GURU -->
-    <div class="modul-item glass-card rounded-3xl p-6 flex flex-col" data-cat="guru">
-      <div class="flex justify-between items-start mb-3">
-        <div class="text-4xl">🪄</div>
-        <span class="bg-purple-500/20 text-purple-300 border border-purple-400/30 text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full">Pedagogi</span>
-      </div>
-      <h3 class="font-title text-xl text-purple-300 mb-1">Generator Media Ajar Canva</h3>
-      <p class="text-xs text-slate-300 leading-relaxed mb-4 flex-grow">
-        Rancang kerangka slide presentasi interaktif dan LKPD aktif siap salin ke Canva Bulk Create.
-      </p>
-      <a href="generator-media.html" class="w-full bg-purple-600 hover:bg-purple-500 text-white font-title text-xs py-2.5 rounded-xl text-center font-bold transition">
-        Buka Generator Guru
-      </a>
-    </div>
-
-    <!-- 7. GAME SIAGA BENCANA -->
+    <!-- 4. GAME SIAGA BENCANA -->
     <div class="modul-item glass-card rounded-3xl p-6 flex flex-col" data-cat="lab">
       <div class="flex justify-between items-start mb-3">
         <div class="text-4xl">🌋</div>
@@ -186,14 +155,14 @@
       </div>
       <h3 class="font-title text-xl text-orange-300 mb-1">Game Siaga Bencana</h3>
       <p class="text-xs text-slate-300 leading-relaxed mb-4 flex-grow">
-        Simulasi mitigasi gempa bumi, evakuasi tsunami, dan zona bahaya erupsi gunung api.
+        Simulasi mitigasi gempa bumi, jalur evakuasi tsunami, dan pemetaan zona bahaya letusan gunung api.
       </p>
       <a href="game-siaga.html" class="w-full bg-orange-600 hover:bg-orange-500 text-white font-title text-xs py-2.5 rounded-xl text-center font-bold transition">
-        Mainkan Game
+        Mulai Simulasi
       </a>
     </div>
 
-    <!-- 8. MISI ROVER & AGEN SANDI -->
+    <!-- 5. MISI ROVER & KRIPTO -->
     <div class="modul-item glass-card rounded-3xl p-6 flex flex-col" data-cat="lab">
       <div class="flex justify-between items-start mb-3">
         <div class="text-4xl">🤖</div>
@@ -201,14 +170,74 @@
       </div>
       <h3 class="font-title text-xl text-indigo-300 mb-1">Misi Rover & Kripto</h3>
       <p class="text-xs text-slate-300 leading-relaxed mb-4 flex-grow">
-        Asah logika pemrograman sekuensial dan pecahkan sandi geser kriptografi rahasia.
+        Latihan berpikir komputasional: susun balok instruksi robot penjelajah dan pecahkan sandi kriptografi rahasia.
       </p>
       <a href="game-rover.html" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-title text-xs py-2.5 rounded-xl text-center font-bold transition">
         Jelajahi Lab KKA
       </a>
     </div>
 
-    <!-- 9. PORTAL STS & ASESMEN -->
+    <!-- 6. PEMBAYARAN IURAN EKSKUL -->
+    <div class="modul-item glass-card rounded-3xl p-6 flex flex-col" data-cat="wali">
+      <div class="flex justify-between items-start mb-3">
+        <div class="text-4xl">💳</div>
+        <span class="bg-teal-500/20 text-teal-300 border border-teal-400/30 text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full">Wali Murid</span>
+      </div>
+      <h3 class="font-title text-xl text-teal-300 mb-1">Iuran Ekskul Koding</h3>
+      <p class="text-xs text-slate-300 leading-relaxed mb-4 flex-grow">
+        Cek absensi sesi latihan siswa, rincian iuran per bulan, status lunas, dan saldo lebih secara transparan.
+      </p>
+      <a href="pembayaran-ekskul.html" class="w-full bg-teal-600 hover:bg-teal-500 text-white font-title text-xs py-2.5 rounded-xl text-center font-bold transition">
+        Portal Iuran Ekskul
+      </a>
+    </div>
+
+    <!-- 7. MANAJEMEN KESISWAAN & BK -->
+    <div class="modul-item glass-card rounded-3xl p-6 flex flex-col" data-cat="kesiswaan">
+      <div class="flex justify-between items-start mb-3">
+        <div class="text-4xl">🛡️</div>
+        <span class="bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full">Wakasis</span>
+      </div>
+      <h3 class="font-title text-xl text-emerald-300 mb-1">Manajemen Kesiswaan & BK</h3>
+      <p class="text-xs text-slate-300 leading-relaxed mb-4 flex-grow">
+        Buku kasus masalah siswa (status & PIC penangan), rekap akumulasi siswa terlambat, dan catatan pembinaan.
+      </p>
+      <a href="kesiswaan.html" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-title text-xs py-2.5 rounded-xl text-center font-bold transition">
+        Buka Panel Wakasis
+      </a>
+    </div>
+
+    <!-- 8. SUARA KITA (LAYANAN ADUAN) -->
+    <div class="modul-item glass-card rounded-3xl p-6 flex flex-col" data-cat="kesiswaan wali">
+      <div class="flex justify-between items-start mb-3">
+        <div class="text-4xl">📬</div>
+        <span class="bg-rose-500/20 text-rose-300 border border-rose-400/30 text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full">Konseling</span>
+      </div>
+      <h3 class="font-title text-xl text-rose-300 mb-1">Suara Kita (Layanan Aduan)</h3>
+      <p class="text-xs text-slate-300 leading-relaxed mb-4 flex-grow">
+        Kanal pengaduan aman dan terenkripsi untuk pencegahan perundungan, konseling siswa, dan aspirasi wali murid.
+      </p>
+      <a href="suara-kita.html" class="w-full bg-rose-600 hover:bg-rose-500 text-white font-title text-xs py-2.5 rounded-xl text-center font-bold transition">
+        Kirim Aduan / Curhat
+      </a>
+    </div>
+
+    <!-- 9. GENERATOR MEDIA AJAR CANVA -->
+    <div class="modul-item glass-card rounded-3xl p-6 flex flex-col" data-cat="guru">
+      <div class="flex justify-between items-start mb-3">
+        <div class="text-4xl">🪄</div>
+        <span class="bg-purple-500/20 text-purple-300 border border-purple-400/30 text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full">Pedagogi</span>
+      </div>
+      <h3 class="font-title text-xl text-purple-300 mb-1">Generator Media Ajar Canva</h3>
+      <p class="text-xs text-slate-300 leading-relaxed mb-4 flex-grow">
+        Alat bantu guru menyusun kerangka slide presentasi aktif inkuiri dan LKPD siap salin ke Canva Bulk Create.
+      </p>
+      <a href="generator-media.html" class="w-full bg-purple-600 hover:bg-purple-500 text-white font-title text-xs py-2.5 rounded-xl text-center font-bold transition">
+        Buka Generator Guru
+      </a>
+    </div>
+
+    <!-- 10. PORTAL ASESMEN STS -->
     <div class="modul-item glass-card rounded-3xl p-6 flex flex-col" data-cat="wali">
       <div class="flex justify-between items-start mb-3">
         <div class="text-4xl">📝</div>
@@ -216,7 +245,7 @@
       </div>
       <h3 class="font-title text-xl text-blue-300 mb-1">Portal Asesmen STS</h3>
       <p class="text-xs text-slate-300 leading-relaxed mb-4 flex-grow">
-        Akses ujian sumatif tengah semester digital dengan sistem validasi aman.
+        Akses ujian sumatif tengah semester berbasis komputer dengan protokol penegakan kejujuran siswa.
       </p>
       <a href="sts-sdmethodistimmanuel.html" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-title text-xs py-2.5 rounded-xl text-center font-bold transition">
         Buka Portal Asesmen
@@ -230,13 +259,12 @@
     <p>© 2026 <strong>NalarSci</strong> • Laboratorium Sains, Komputasi & Layanan Pendidikan Terpadu</p>
   </footer>
 
+  <!-- SCRIPT LOGIKA FILTER TAB KATEGORI -->
   <script>
     function setKategori(kat) {
-      // Ubah gaya tombol aktif
       document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('tab-active'));
       event.target.classList.add('tab-active');
 
-      // Filter kartu modul
       const items = document.querySelectorAll('.modul-item');
       items.forEach(item => {
         const itemCats = item.dataset.cat.split(' ');
