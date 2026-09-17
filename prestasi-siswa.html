@@ -166,7 +166,7 @@
 
   <script>
     // ⚠️ GANTI DENGAN URL DEPLOYMENT APPS SCRIPT ANDA
-    const API_PRESTASI_URL = "TEMPEL_URL_APPS_SCRIPT_DI_SINI";
+    const API_PRESTASI_URL = "https://script.google.com/macros/s/AKfycbwkdabeWz_6MTalQgyyIGOQeHgTIk0IvRzKY1xg7LSa-iq-FatlVIZ2Eq3W0ry8ltrg/exec";
 
     // Data cadangan lokal bila API belum diisi atau offline
     const backupPrestasi = [
@@ -299,7 +299,7 @@
         }
       };
 
-      if (API_PRESTASI_URL === "https://script.google.com/macros/s/AKfycbwkdabeWz_6MTalQgyyIGOQeHgTIk0IvRzKY1xg7LSa-iq-FatlVIZ2Eq3W0ry8ltrg/exec") {
+      if (API_PRESTASI_URL === "TEMPEL_URL_APPS_SCRIPT_DI_SINI") {
         alert("Peringatan: URL Apps Script belum dipasang di kode. Data hanya dimasukkan sementara ke tampilan layar.");
         daftarPrestasi.unshift(payload.data);
         renderCards(daftarPrestasi);
