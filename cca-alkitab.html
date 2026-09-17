@@ -37,6 +37,19 @@
       color: white !important;
       box-shadow: 0 0 20px rgba(99, 102, 241, 0.5);
     }
+    .babak-card.unlocked {
+      border-color: rgba(99, 102, 241, 0.5);
+      cursor: pointer;
+    }
+    .babak-card.unlocked:hover {
+      transform: translateY(-4px);
+      background: rgba(99, 102, 241, 0.1);
+    }
+    .babak-card.locked {
+      opacity: 0.5;
+      cursor: not-allowed;
+      filter: grayscale(0.8);
+    }
   </style>
 </head>
 <body class="p-4 md:p-8 max-w-4xl mx-auto flex flex-col justify-between min-h-screen">
@@ -51,57 +64,90 @@
     </span>
   </header>
 
-  <!-- SCREEN 1: FORM PENDAFTARAN & LOBI UJIAN -->
-  <div id="screen-lobi" class="glass-card rounded-3xl p-6 md:p-10 border border-indigo-500/30 max-w-xl mx-auto my-auto w-full shadow-2xl">
+  <!-- SCREEN 1: REGISTRASI PESERTA -->
+  <div id="screen-regis" class="glass-card rounded-3xl p-6 md:p-10 border border-indigo-500/30 max-w-md mx-auto my-auto w-full shadow-2xl">
     <div class="text-center mb-6">
       <div class="w-16 h-16 bg-indigo-500/10 border border-indigo-400/30 rounded-2xl flex items-center justify-center mx-auto mb-4 text-3xl shadow-[0_0_20px_rgba(99,102,241,0.25)]">
         📖
       </div>
-      <h1 class="font-title text-3xl text-white mb-2">Tantangan CCA Alkitab</h1>
-      <p class="text-xs text-slate-400 leading-relaxed">
-        Uji ketelitian dan pemahaman Firman Tuhan secara cepat dan tepat. Skor dihitung dari ketepatan jawaban + kecepatan waktu!
-      </p>
+      <h1 class="font-title text-2xl sm:text-3xl text-white mb-1">Arena CCA Alkitab</h1>
+      <p class="text-xs text-slate-400">Masukkan identitas untuk membuka peta babak kompetisi.</p>
     </div>
 
-    <form onsubmit="mulaiUjian(event)" class="space-y-4 text-xs">
+    <form onsubmit="daftarPeserta(event)" class="space-y-4 text-xs">
       <div>
-        <label class="block text-slate-400 font-bold mb-1">Nama Lengkap Peserta</label>
-        <input type="text" id="peserta-nama" required placeholder="Ketik nama lengkapmu..." class="w-full p-3 rounded-xl bg-slate-950 border border-slate-700 text-white outline-none focus:border-indigo-400 text-sm">
+        <label class="block text-slate-400 font-bold mb-1">Nama Lengkap</label>
+        <input type="text" id="reg-nama" required placeholder="Nama lengkap peserta..." class="w-full p-3 rounded-xl bg-slate-950 border border-slate-700 text-white outline-none focus:border-indigo-400 text-sm">
       </div>
-
       <div>
-        <label class="block text-slate-400 font-bold mb-1">Kelas / Asal Sekolah / Gereja</label>
-        <input type="text" id="peserta-kelas" required placeholder="Misal: Kelas 5B atau Remaja GKI" class="w-full p-3 rounded-xl bg-slate-950 border border-slate-700 text-white outline-none focus:border-indigo-400 text-sm">
+        <label class="block text-slate-400 font-bold mb-1">Kelas / Asal Gereja</label>
+        <input type="text" id="reg-kelas" required placeholder="Misal: Kelas 5B atau Remaja" class="w-full p-3 rounded-xl bg-slate-950 border border-slate-700 text-white outline-none focus:border-indigo-400 text-sm">
       </div>
-
-      <div class="p-4 bg-slate-950/80 rounded-2xl border border-slate-800 text-slate-400 space-y-1">
-        <p class="font-bold text-indigo-300">Aturan Main Arena:</p>
-        <p>⏱️ Setiap soal diberi waktu <strong>20 detik</strong>.</p>
-        <p>⚡ Semakin cepat kamu memilih jawaban yang benar, skor bonusmu semakin besar!</p>
-        <p>🚫 Jangan menutup tab browser saat ujian berlangsung.</p>
-      </div>
-
-      <button type="submit" id="btn-mulai" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-title text-sm py-3.5 rounded-xl font-bold transition shadow-lg flex items-center justify-center gap-2">
-        ⚔️ Masuk Arena Ujian CCA
+      <button type="submit" id="btn-reg" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-title text-xs py-3.5 rounded-xl font-bold transition shadow-lg">
+        ⚔️ Buka Peta Babak
       </button>
     </form>
 
     <div class="mt-6 text-center">
-      <button onclick="lihatLeaderboardModal()" class="text-xs text-amber-400 hover:underline font-bold flex items-center justify-center gap-1 mx-auto">
-        🏆 Lihat Papan Juara Saat Ini
+      <button onclick="lihatLeaderboardModal()" class="text-xs text-amber-400 hover:underline font-bold">
+        🏆 Lihat Papan Peringkat Juara
       </button>
     </div>
   </div>
 
-  <!-- SCREEN 2: ARENA CBT (PENGERJAAN SOAL) -->
+  <!-- SCREEN 2: PETA TAHAPAN / LEVEL SELECT -->
+  <div id="screen-babak" class="hidden flex-col flex-grow max-w-xl mx-auto w-full my-auto">
+    <div class="text-center mb-6">
+      <h2 class="font-title text-2xl text-white mb-1">Pilih Tahapan Babak</h2>
+      <p class="text-xs text-slate-400" id="halo-peserta">Halo Peserta, selesaikan babak untuk membuka babak berikutnya!</p>
+    </div>
+
+    <div class="space-y-3.5">
+      <!-- BABAK 1 -->
+      <div onclick="pilihBabak(1)" id="card-babak-1" class="babak-card unlocked glass-card rounded-2xl p-5 border flex items-center justify-between">
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-title text-xl">1</div>
+          <div>
+            <h3 class="font-title text-base text-white">Babak 1: Penyisihan</h3>
+            <p class="text-[11px] text-slate-400">Fondasi Tokoh & Kisah Utama Alkitab</p>
+          </div>
+        </div>
+        <span class="text-xs font-bold text-emerald-400" id="status-babak-1">🟢 Terbuka</span>
+      </div>
+
+      <!-- BABAK 2 -->
+      <div onclick="pilihBabak(2)" id="card-babak-2" class="babak-card locked glass-card rounded-2xl p-5 border border-slate-800 flex items-center justify-between">
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center font-title text-xl">2</div>
+          <div>
+            <h3 class="font-title text-base text-white">Babak 2: Semifinal</h3>
+            <p class="text-[11px] text-slate-400">Mukjizat & Sejarah Bangsa Israel</p>
+          </div>
+        </div>
+        <span class="text-xs font-bold text-slate-500" id="status-babak-2">🔒 Terkunci</span>
+      </div>
+
+      <!-- BABAK 3 -->
+      <div onclick="pilihBabak(3)" id="card-babak-3" class="babak-card locked glass-card rounded-2xl p-5 border border-slate-800 flex items-center justify-between">
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 rounded-xl bg-rose-500/20 text-rose-400 flex items-center justify-center font-title text-xl">3</div>
+          <div>
+            <h3 class="font-title text-base text-white">Babak 3: Grand Final</h3>
+            <p class="text-[11px] text-slate-400">Pemahaman Ayat, Hikmat & Kecepatan HOTS</p>
+          </div>
+        </div>
+        <span class="text-xs font-bold text-slate-500" id="status-babak-3">🔒 Terkunci</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCREEN 3: ARENA CBT SOAL -->
   <div id="screen-ujian" class="hidden flex-col flex-grow max-w-2xl mx-auto w-full my-auto">
-    <!-- PANEL INDIKATOR ATAS -->
     <div class="flex justify-between items-center mb-4">
       <div>
-        <span class="text-xs text-slate-400" id="indikator-nomor">Soal 1 dari 10</span>
-        <h4 class="font-title text-sm text-indigo-300" id="indikator-kategori">Kategori: Perjanjian Lama</h4>
+        <span class="text-xs text-slate-400" id="soal-nomor">Soal 1/5</span>
+        <h4 class="font-title text-sm text-indigo-300" id="soal-babak-judul">Babak 1: Penyisihan</h4>
       </div>
-      <!-- TIMER LINGKARAN -->
       <div class="relative w-12 h-12 flex items-center justify-center">
         <div class="w-full h-full rounded-full border-4 border-indigo-500/20 absolute"></div>
         <span class="font-title text-lg font-bold text-amber-300 z-10" id="timer-text">20</span>
@@ -109,61 +155,38 @@
     </div>
 
     <!-- KARTU PERTANYAAN -->
-    <div class="glass-card rounded-3xl p-6 md:p-8 border border-indigo-500/30 mb-6 shadow-2xl relative">
-      <p class="text-base sm:text-lg font-bold text-white leading-relaxed" id="soal-teks">
-        Sedang memuat pertanyaan Alkitab...
-      </p>
+    <div class="glass-card rounded-3xl p-6 md:p-8 border border-indigo-500/30 mb-6 shadow-2xl">
+      <p class="text-base sm:text-lg font-bold text-white leading-relaxed" id="soal-teks">Memuat pertanyaan...</p>
     </div>
 
-    <!-- 4 PILIHAN JAWABAN (A, B, C, D) -->
-    <div class="grid grid-cols-1 gap-3 text-xs sm:text-sm font-semibold mb-6" id="container-opsi">
-      <button onclick="pilihOpsi('A')" id="btn-opsi-A" class="opsi-btn glass-card p-4 rounded-2xl border border-slate-800 text-left flex items-center gap-3 text-slate-200">
-        <span class="w-7 h-7 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center font-title text-indigo-400">A</span>
-        <span id="teks-opsi-A">Opsi A</span>
-      </button>
-      <button onclick="pilihOpsi('B')" id="btn-opsi-B" class="opsi-btn glass-card p-4 rounded-2xl border border-slate-800 text-left flex items-center gap-3 text-slate-200">
-        <span class="w-7 h-7 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center font-title text-indigo-400">B</span>
-        <span id="teks-opsi-B">Opsi B</span>
-      </button>
-      <button onclick="pilihOpsi('C')" id="btn-opsi-C" class="opsi-btn glass-card p-4 rounded-2xl border border-slate-800 text-left flex items-center gap-3 text-slate-200">
-        <span class="w-7 h-7 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center font-title text-indigo-400">C</span>
-        <span id="teks-opsi-C">Opsi C</span>
-      </button>
-      <button onclick="pilihOpsi('D')" id="btn-opsi-D" class="opsi-btn glass-card p-4 rounded-2xl border border-slate-800 text-left flex items-center gap-3 text-slate-200">
-        <span class="w-7 h-7 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center font-title text-indigo-400">D</span>
-        <span id="teks-opsi-D">Opsi D</span>
-      </button>
+    <!-- OPSI 4 JAWABAN (TEKS ACAK) -->
+    <div class="grid grid-cols-1 gap-3 text-xs sm:text-sm font-semibold mb-6" id="box-opsi">
+      <!-- Diisi dinamis -->
     </div>
 
-    <!-- TOMBOL LANJUT -->
-    <button onclick="soalSelanjutnya()" id="btn-next" disabled class="w-full bg-slate-800 text-slate-500 font-title text-xs py-3.5 rounded-xl font-bold transition">
-      Kunci Jawaban & Lanjut →
+    <button onclick="kunciJawaban()" id="btn-next" disabled class="w-full bg-slate-800 text-slate-500 font-title text-xs py-3.5 rounded-xl font-bold transition">
+      Pilih Jawaban Dulu
     </button>
   </div>
 
-  <!-- SCREEN 3: HASIL SKOR AKHIR -->
-  <div id="screen-hasil" class="hidden glass-card rounded-3xl p-8 max-w-md mx-auto my-auto w-full text-center border border-indigo-500/30 shadow-2xl">
-    <div class="text-5xl mb-2">🎉</div>
-    <h2 class="font-title text-2xl text-white mb-1">Tantangan Selesai!</h2>
-    <p class="text-xs text-slate-400 mb-6" id="hasil-peserta-nama">Nama Peserta</p>
+  <!-- SCREEN 4: TRANSISI BABAK SELESAI -->
+  <div id="screen-transisi" class="hidden glass-card rounded-3xl p-8 max-w-md mx-auto my-auto w-full text-center border border-indigo-500/30 shadow-2xl">
+    <div class="text-5xl mb-2" id="transisi-icon">⭐</div>
+    <h2 class="font-title text-2xl text-white mb-1" id="transisi-judul">Babak 1 Tuntas!</h2>
+    <p class="text-xs text-slate-400 mb-6" id="transisi-sub">Kinerja hebat! Kamu berhak melaju ke babak berikutnya.</p>
 
-    <div class="bg-indigo-950/40 border border-indigo-500/30 rounded-2xl p-6 mb-6">
-      <p class="text-xs text-indigo-300 font-bold uppercase tracking-wider">Total Perolehan Skor</p>
-      <p class="font-title text-5xl text-amber-300 my-2" id="hasil-skor">0</p>
-      <p class="text-xs text-slate-400" id="hasil-rincian">Menjawab benar 0 dari 10 soal</p>
+    <div class="bg-indigo-950/40 border border-indigo-500/30 rounded-2xl p-5 mb-6">
+      <p class="text-xs text-indigo-300 font-bold uppercase tracking-wider">Perolehan Poin Sementara</p>
+      <p class="font-title text-4xl text-amber-300 my-1" id="transisi-skor">0 Pts</p>
+      <p class="text-xs text-slate-400" id="transisi-ket">0 Soal terjawab benar</p>
     </div>
 
-    <div class="space-y-2 text-xs">
-      <button onclick="lihatLeaderboardModal()" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-title py-3 rounded-xl font-bold transition shadow-lg">
-        🏆 Buka Papan Peringkat Juara
-      </button>
-      <button onclick="location.reload()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 font-title py-2.5 rounded-xl transition">
-        🔄 Coba Tantangan Lagi
-      </button>
-    </div>
+    <button onclick="lanjutKePetaBabak()" id="btn-lanjut-babak" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-title text-xs py-3.5 rounded-xl font-bold transition shadow-lg">
+      🗺️ Lanjut ke Peta Babak Berikutnya
+    </button>
   </div>
 
-  <!-- MODAL: PAPAN PERINGKAT (LEADERBOARD REAL-TIME) -->
+  <!-- MODAL: LEADERBOARD -->
   <div id="modal-lb" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
     <div class="glass-card max-w-lg w-full rounded-3xl p-6 border border-amber-500/40 bg-slate-900 shadow-2xl">
       <div class="flex justify-between items-center mb-4 border-b border-slate-800 pb-3">
@@ -175,7 +198,7 @@
       </div>
 
       <div class="overflow-y-auto max-h-80 divide-y divide-slate-800/60 text-xs text-slate-300" id="list-leaderboard">
-        <p class="p-6 text-center text-slate-500">Memuat papan peringkat...</p>
+        <p class="p-6 text-center text-slate-500">Memuat peringkat...</p>
       </div>
 
       <div class="mt-4 pt-3 border-t border-slate-800 text-center">
@@ -186,30 +209,32 @@
     </div>
   </div>
 
-  <!-- FOOTER -->
   <footer class="text-center text-xs text-slate-500 border-t border-slate-800 pt-6">
-    © 2026 <strong>NalarSci Lab</strong> • Arena Literasi & Kuis Cerdas Cermat Firman Tuhan
+    © 2026 <strong>NalarSci Lab</strong> • Arena Literasi Firman Tuhan Berbasis CBT Gamifikasi
   </footer>
 
   <script>
     // ⚠️ GANTI DENGAN URL DEPLOYMENT APPS SCRIPT ANDA
     const API_CCA_URL = "https://script.google.com/macros/s/AKfycby6tsmNp4fzTPQLo2Etp9A4FeeRrGFZ0wjg3NyUYbtVOCrNH3-ZKHiUy-LBOFmzAMS5pg/exec";
 
-    let daftarSoal = [];
-    let indeksSekarang = 0;
-    let jawabanSiswa = [];
+    let semuaSoal = [];
+    let soalBabakAktif = [];
+    let babakTerbuka = 1;
+    let babakSedangJalan = 1;
+    let indeksSoal = 0;
     let peserta = { nama: "", kelas: "" };
+    let seluruhJawaban = [];
     let timer = null;
     let sisaWaktu = 20;
-    let opsiTerpilih = null;
+    let teksOpsiTerpilih = null;
     let waktuMulai = 0;
 
-    function mulaiUjian(e) {
+    function daftarPeserta(e) {
       e.preventDefault();
-      peserta.nama = document.getElementById('peserta-nama').value.trim();
-      peserta.kelas = document.getElementById('peserta-kelas').value.trim();
+      peserta.nama = document.getElementById('reg-nama').value.trim();
+      peserta.kelas = document.getElementById('reg-kelas').value.trim();
 
-      const btn = document.getElementById('btn-mulai');
+      const btn = document.getElementById('btn-reg');
       btn.disabled = true;
       btn.innerText = "⏳ Menyiapkan Naskah Soal...";
 
@@ -217,51 +242,81 @@
         .then(r => r.json())
         .then(res => {
           if (res.status === "success" && res.soal.length > 0) {
-            // Acak urutan soal (Shuffle)
-            daftarSoal = res.soal.sort(() => Math.random() - 0.5);
-            indeksSekarang = 0;
-            jawabanSiswa = [];
+            semuaSoal = res.soal;
             waktuMulai = Date.now();
-
-            document.getElementById('screen-lobi').classList.add('hidden');
-            document.getElementById('screen-ujian').classList.remove('hidden');
-            document.getElementById('screen-ujian').classList.add('flex');
-            muatSoal(indeksSekarang);
+            document.getElementById('screen-regis').classList.add('hidden');
+            document.getElementById('screen-babak').classList.remove('hidden');
+            document.getElementById('screen-babak').classList.add('flex');
+            document.getElementById('halo-peserta').innerText = `Halo ${peserta.nama} (${peserta.kelas}), silakan mulai dari Babak 1!`;
           } else {
-            alert("Belum ada soal di spreadsheet! Silakan isi tab 'Soal' terlebih dahulu.");
+            alert("Bank soal kosong! Isi tab 'Soal' di spreadsheet terlebih dahulu.");
             btn.disabled = false;
-            btn.innerText = "⚔️ Masuk Arena Ujian CCA";
+            btn.innerText = "⚔️ Buka Peta Babak";
           }
         })
         .catch(err => {
           btn.disabled = false;
-          btn.innerText = "⚔️ Masuk Arena Ujian CCA";
-          alert("Gagal memuat soal: " + err);
+          btn.innerText = "⚔️ Buka Peta Babak";
+          alert("Gagal koneksi: " + err);
         });
     }
 
-    function muatSoal(idx) {
+    function pilihBabak(nomor) {
+      if (nomor > babakTerbuka) {
+        alert(`Babak ${nomor} masih terkunci! Selesaikan babak sebelumnya terlebih dahulu.`);
+        return;
+      }
+
+      babakSedangJalan = nomor;
+      // Filter soal khusus babak ini
+      soalBabakAktif = semuaSoal.filter(s => s.babak == nomor.toString());
+      if (soalBabakAktif.length === 0) {
+        alert(`Belum ada soal untuk Babak ${nomor} di database.`);
+        return;
+      }
+
+      // Acak urutan soal dalam babak ini
+      soalBabakAktif.sort(() => Math.random() - 0.5);
+      indeksSoal = 0;
+
+      document.getElementById('screen-babak').classList.add('hidden');
+      document.getElementById('screen-ujian').classList.remove('hidden');
+      document.getElementById('screen-ujian').classList.add('flex');
+
+      tampilkanSoal(indeksSoal);
+    }
+
+    function tampilkanSoal(idx) {
       clearInterval(timer);
-      const s = daftarSoal[idx];
-      opsiTerpilih = null;
+      teksOpsiTerpilih = null;
+      const s = soalBabakAktif[idx];
 
-      // Update tampilan teks
-      document.getElementById('indikator-nomor').innerText = `Soal ${idx + 1} dari ${daftarSoal.length}`;
-      document.getElementById('indikator-kategori').innerText = `Kategori: ${s.kategori}`;
+      document.getElementById('soal-nomor').innerText = `Soal ${idx + 1} dari ${soalBabakAktif.length}`;
+      document.getElementById('soal-babak-judul').innerText = `Babak ${babakSedangJalan}`;
       document.getElementById('soal-teks').innerText = s.pertanyaan;
-      document.getElementById('teks-opsi-A').innerText = s.opsi.A;
-      document.getElementById('teks-opsi-B').innerText = s.opsi.B;
-      document.getElementById('teks-opsi-C').innerText = s.opsi.C;
-      document.getElementById('teks-opsi-D').innerText = s.opsi.D;
 
-      // Reset tombol
-      document.querySelectorAll('.opsi-btn').forEach(b => b.classList.remove('terpilih'));
+      // Acak 4 opsi teks agar posisinya dinamis
+      const opsiAcak = [...s.opsi].sort(() => Math.random() - 0.5);
+
+      const box = document.getElementById('box-opsi');
+      box.innerHTML = opsiAcak.map((teks, i) => {
+        const huruf = ['A', 'B', 'C', 'D'][i];
+        // Escape kutip untuk safety
+        const teksEscaped = teks.replace(/"/g, '&quot;');
+        return `
+          <button onclick="pilihTeksJawaban('${teksEscaped}', this)" class="opsi-btn glass-card p-4 rounded-2xl border border-slate-800 text-left flex items-center gap-3 text-slate-200">
+            <span class="w-7 h-7 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center font-title text-indigo-400">${huruf}</span>
+            <span>${teks}</span>
+          </button>
+        `;
+      }).join('');
+
       const btnNext = document.getElementById('btn-next');
       btnNext.disabled = true;
       btnNext.className = "w-full bg-slate-800 text-slate-500 font-title text-xs py-3.5 rounded-xl font-bold transition";
-      btnNext.innerText = (idx === daftarSoal.length - 1) ? "Kunci Jawaban & Selesaikan Ujian 🏁" : "Kunci Jawaban & Lanjut →";
+      btnNext.innerText = "Pilih Salah Satu Jawaban";
 
-      // Jalankan Timer 20 Detik
+      // Timer 20 Detik
       sisaWaktu = 20;
       document.getElementById('timer-text').innerText = sisaWaktu;
       timer = setInterval(() => {
@@ -269,52 +324,92 @@
         document.getElementById('timer-text').innerText = sisaWaktu;
         if (sisaWaktu <= 0) {
           clearInterval(timer);
-          // Jika waktu habis tanpa memilih, catat kosong
-          rekamDanLanjut(null, 0);
+          rekamDanNext(null, 0);
         }
       }, 1000);
     }
 
-    function pilihOpsi(huruf) {
-      opsiTerpilih = huruf;
+    function pilihTeksJawaban(teks, btnEl) {
+      teksOpsiTerpilih = teks;
       document.querySelectorAll('.opsi-btn').forEach(b => b.classList.remove('terpilih'));
-      document.getElementById(`btn-opsi-${huruf}`).classList.add('terpilih');
+      btnEl.classList.add('terpilih');
 
       const btnNext = document.getElementById('btn-next');
       btnNext.disabled = false;
       btnNext.className = "w-full bg-indigo-600 hover:bg-indigo-500 text-white font-title text-xs py-3.5 rounded-xl font-bold transition shadow-lg cursor-pointer";
+      btnNext.innerText = (indeksSoal === soalBabakAktif.length - 1) ? "Kunci & Selesaikan Babak Ini 🏁" : "Kunci Jawaban & Lanjut →";
     }
 
-    function soalSelanjutnya() {
+    function kunciJawaban() {
       clearInterval(timer);
-      rekamDanLanjut(opsiTerpilih, sisaWaktu);
+      rekamDanNext(teksOpsiTerpilih, sisaWaktu);
     }
 
-    function rekamDanLanjut(pilih, sisa) {
-      const s = daftarSoal[indeksSekarang];
-      jawabanSiswa.push({
+    function rekamDanNext(teks, sisa) {
+      const s = soalBabakAktif[indeksSoal];
+      seluruhJawaban.push({
         id: s.id,
-        pilih: pilih,
+        teksPilihan: teks,
         sisaWaktu: sisa
       });
 
-      indeksSekarang++;
-      if (indeksSekarang < daftarSoal.length) {
-        muatSoal(indeksSekarang);
+      indeksSoal++;
+      if (indeksSoal < soalBabakAktif.length) {
+        tampilkanSoal(indeksSoal);
       } else {
-        kirimJawabanAkhir();
+        // Babak selesai!
+        selesaiSatuBabak();
       }
     }
 
-    function kirimJawabanAkhir() {
+    function selesaiSatuBabak() {
       document.getElementById('screen-ujian').classList.add('hidden');
-      document.getElementById('screen-hasil').classList.remove('hidden');
-      document.getElementById('hasil-peserta-nama').innerText = `${peserta.nama} (${peserta.kelas})`;
-      document.getElementById('hasil-skor').innerText = "⏳...";
-      document.getElementById('hasil-rincian').innerText = "Sedang mengalkulasi skor di database...";
+      document.getElementById('screen-transisi').classList.remove('hidden');
 
-      const durasiDetik = Math.round((Date.now() - waktuMulai) / 1000);
+      if (babakSedangJalan < 3) {
+        babakTerbuka = Math.max(babakTerbuka, babakSedangJalan + 1);
+        document.getElementById('transisi-icon').innerText = "⭐";
+        document.getElementById('transisi-judul').innerText = `Babak ${babakSedangJalan} Tuntas!`;
+        document.getElementById('transisi-sub').innerText = `Luar biasa! Babak ${babakSedangJalan + 1} kini telah terbuka.`;
+        document.getElementById('btn-lanjut-babak').innerText = `🗺️ Buka Babak ${babakSedangJalan + 1}`;
+        document.getElementById('transisi-skor').innerText = `${seluruhJawaban.length * 100} Est. Pts`;
+        document.getElementById('transisi-ket').innerText = `${seluruhJawaban.length} Soal telah terselesaikan`;
+      } else {
+        // Final selesai -> kirim seluruh hasil ke backend
+        document.getElementById('transisi-icon').innerText = "👑";
+        document.getElementById('transisi-judul').innerText = "Selamat! Seluruh Babak Selesai!";
+        document.getElementById('transisi-sub').innerText = "Data hasil ujian sedang disimpan ke papan peringkat...";
+        document.getElementById('btn-lanjut-babak').innerText = "🏆 Buka Papan Juara";
+        kirimHasilKeServer();
+      }
+    }
 
+    function lanjutKePetaBabak() {
+      if (babakSedangJalan >= 3) {
+        lihatLeaderboardModal();
+        return;
+      }
+
+      document.getElementById('screen-transisi').classList.add('hidden');
+      document.getElementById('screen-babak').classList.remove('hidden');
+
+      // Update tampilan kartu babak yang terbuka
+      if (babakTerbuka >= 2) {
+        const c2 = document.getElementById('card-babak-2');
+        c2.className = "babak-card unlocked glass-card rounded-2xl p-5 border flex items-center justify-between";
+        document.getElementById('status-babak-2').innerText = "🟢 Terbuka";
+        document.getElementById('status-babak-2').className = "text-xs font-bold text-amber-400";
+      }
+      if (babakTerbuka >= 3) {
+        const c3 = document.getElementById('card-babak-3');
+        c3.className = "babak-card unlocked glass-card rounded-2xl p-5 border flex items-center justify-between";
+        document.getElementById('status-babak-3').innerText = "🟢 Terbuka";
+        document.getElementById('status-babak-3').className = "text-xs font-bold text-rose-400";
+      }
+    }
+
+    function kirimHasilKeServer() {
+      const durasi = Math.round((Date.now() - waktuMulai) / 1000);
       fetch(API_CCA_URL, {
         method: "POST",
         headers: { "Content-Type": "text/plain;charset=utf-8" },
@@ -322,26 +417,24 @@
           action: "submit_ujian",
           nama: peserta.nama,
           kelas: peserta.kelas,
-          durasiDetik: durasiDetik,
-          jawaban: jawabanSiswa
+          babakTuntas: "Grand Final",
+          durasiDetik: durasi,
+          jawaban: seluruhJawaban
         })
       })
       .then(r => r.json())
       .then(res => {
         if (res.status === "success") {
-          document.getElementById('hasil-skor').innerText = res.skor;
-          document.getElementById('hasil-rincian').innerText = `Menjawab benar ${res.benar} dari ${res.totalSoal} soal!`;
+          document.getElementById('transisi-skor').innerText = `${res.skor} Pts`;
+          document.getElementById('transisi-ket').innerText = `Menjawab tepat ${res.benar} dari ${res.totalSoal} soal!`;
         }
-      })
-      .catch(err => {
-        alert("Gagal merekam skor: " + err);
       });
     }
 
     function lihatLeaderboardModal() {
       document.getElementById('modal-lb').classList.remove('hidden');
       const box = document.getElementById('list-leaderboard');
-      box.innerHTML = '<p class="p-6 text-center text-slate-500">Mengambil data peringkat terkini...</p>';
+      box.innerHTML = '<p class="p-6 text-center text-slate-500">Mengambil peringkat terkini...</p>';
 
       fetch(`${API_CCA_URL}?action=leaderboard`)
         .then(r => r.json())
@@ -359,7 +452,7 @@
                     <span class="font-title text-base w-6 text-center">${medali}</span>
                     <div>
                       <p class="font-bold text-white text-sm">${item.nama}</p>
-                      <p class="text-[11px] text-slate-400">${item.kelas} • ${item.benar}/${item.total} Benar</p>
+                      <p class="text-[11px] text-slate-400">${item.kelas} • ${item.benar}/${item.total} Tepat</p>
                     </div>
                   </div>
                   <span class="font-title text-amber-300 font-bold text-base">${item.skor} Pts</span>
