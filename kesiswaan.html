@@ -41,7 +41,7 @@
 </head>
 <body class="p-4 md:p-8 max-w-6xl mx-auto flex flex-col justify-between min-h-screen">
 
-  <!-- GERBANG LOGIN SUPER KETAT (LOCKSCREEN) -->
+  <!-- GERBANG LOGIN (LOCKSCREEN) -->
   <div id="gatekeeper" class="fixed inset-0 bg-[#0b0f19] z-50 flex items-center justify-center p-4">
     <div class="glass-card max-w-md w-full rounded-3xl p-8 border border-emerald-500/30 text-center shadow-2xl">
       <div class="w-16 h-16 bg-emerald-500/10 border border-emerald-400/30 rounded-2xl flex items-center justify-center mx-auto mb-4 text-3xl">
@@ -65,7 +65,7 @@
     </div>
   </div>
 
-  <!-- KONTEN UTAMA (TERSEMBUNYI TOTAL SEBELUM LOGIN) -->
+  <!-- KONTEN UTAMA (TERSEMBUNYI SEBELUM LOGIN) -->
   <div id="panel-rahasia" class="hidden flex-col flex-grow">
     
     <!-- HEADER -->
@@ -162,11 +162,16 @@
       </div>
 
       <div class="glass-card rounded-3xl overflow-hidden border border-slate-800">
-        <div class="p-4 bg-slate-900 border-b border-slate-800 flex justify-between items-center">
+        <div class="p-4 bg-slate-900 border-b border-slate-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
           <h3 class="font-title text-sm text-amber-300">Daftar Rekap Siswa Terlambat</h3>
-          <button onclick="window.print()" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-title text-xs px-3.5 py-1.5 rounded-xl font-bold transition">
-            📄 Cetak Lembar Rekap
-          </button>
+          <div class="flex items-center gap-2">
+            <button onclick="toggleModalTerlambat(true)" class="bg-emerald-600 hover:bg-emerald-500 text-white font-title text-xs px-3.5 py-1.5 rounded-xl font-bold transition flex items-center gap-1 shadow-md">
+              + Catat Terlambat
+            </button>
+            <button onclick="window.print()" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-title text-xs px-3.5 py-1.5 rounded-xl font-bold transition">
+              📄 Cetak Lembar Rekap
+            </button>
+          </div>
         </div>
         <div class="overflow-x-auto">
           <table class="w-full text-left text-xs text-slate-300">
@@ -212,7 +217,7 @@
       </div>
     </section>
 
-    <!-- MODAL INPUT KASUS -->
+    <!-- MODAL 1: INPUT KASUS BARU -->
     <div id="modal-kasus" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden no-print">
       <div class="glass-card max-w-lg w-full rounded-3xl p-6 border border-emerald-500/40 bg-slate-900 shadow-2xl">
         <div class="flex justify-between items-center mb-4 border-b border-slate-800 pb-3">
@@ -262,7 +267,54 @@
           </div>
 
           <button type="submit" id="btn-simpan-kasus" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-title text-xs py-3 rounded-xl font-bold transition shadow-lg mt-2">
-            💾 Simpan Data Rahasia
+            💾 Simpan Data Kasus
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- MODAL 2: INPUT KETERLAMBATAN BARU (FLEKSIBEL MANUAL/OTOMATIS) -->
+    <div id="modal-terlambat" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden no-print">
+      <div class="glass-card max-w-md w-full rounded-3xl p-6 border border-amber-500/40 bg-slate-900 shadow-2xl">
+        <div class="flex justify-between items-center mb-4 border-b border-slate-800 pb-3">
+          <h3 class="font-title text-xl text-amber-300">Catat Siswa Terlambat</h3>
+          <button onclick="toggleModalTerlambat(false)" class="text-slate-400 hover:text-white font-bold text-xl">✕</button>
+        </div>
+
+        <form onsubmit="simpanTerlambat(event)" class="space-y-3 text-xs">
+          <div>
+            <label class="block text-slate-400 font-bold mb-1">Nama Siswa</label>
+            <input type="text" id="terlambat-nama" required placeholder="Nama lengkap siswa..." class="w-full p-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white outline-none focus:border-amber-400">
+          </div>
+
+          <div>
+            <label class="block text-slate-400 font-bold mb-1">Kelas</label>
+            <input type="text" id="terlambat-kelas" required placeholder="Misal: 5B SD" class="w-full p-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white outline-none focus:border-amber-400">
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <div class="flex justify-between items-center mb-1">
+                <label class="text-slate-400 font-bold">Jam Masuk</label>
+                <button type="button" onclick="setJamSekarang()" class="text-[10px] text-amber-400 hover:underline font-semibold">
+                  ⏱️ Jam Sekarang
+                </button>
+              </div>
+              <input type="time" id="terlambat-jam" required class="w-full p-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white outline-none focus:border-amber-400">
+            </div>
+
+            <div>
+              <label class="block text-slate-400 font-bold mb-1">Tanggal</label>
+              <input type="date" id="terlambat-tanggal" required class="w-full p-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white outline-none focus:border-amber-400">
+            </div>
+          </div>
+
+          <p class="text-[11px] text-slate-400 italic bg-slate-950 p-2.5 rounded-xl border border-slate-800">
+            💡 <strong>Fleksibel:</strong> Jam dan tanggal otomatis terisi, namun Anda bisa mengetik/mengubah jam kedatangan secara manual bila baru sempat input belakangan.
+          </p>
+
+          <button type="submit" id="btn-simpan-terlambat" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-title text-xs py-3 rounded-xl font-bold transition shadow-lg mt-2">
+            💾 Simpan Log Keterlambatan
           </button>
         </form>
       </div>
@@ -276,8 +328,8 @@
   </div>
 
   <script>
-    // ⚠️ GANTI DENGAN URL DEPLOYMENT APPS SCRIPT KESISWAAN ANDA
-    const API_KESISWAAN_URL = "https://script.google.com/macros/s/AKfycbzYdXRIHIi1RGHWmb61__IRiR2DkdQYpjxj-xiEBiXAmSyyIRmCXLum6vJoAPQmWqcIDg/exec";
+    // URL Google Apps Script Kesiswaan
+    const API_KESISWAAN_URL = "https://script.google.com/macros/s/AKfycbwe93R1_RRKDkWUunA4nSyyRvOE_un4wCAFQwWQc1Dg/exec";
 
     let activeKey = sessionStorage.getItem("wakasis_key") || "";
 
@@ -288,27 +340,33 @@
       btn.disabled = true;
       btn.innerText = "⏳ Memvalidasi Kunci...";
 
-      // Cek ke server Apps Script dengan mengirimkan parameter key
-      fetch(`${API_KESISWAAN_URL}?key=${encodeURIComponent(input)}`)
-        .then(res => res.json())
-        .then(res => {
-          btn.disabled = false;
-          btn.innerText = "🔓 Buka Enkripsi & Muat Data";
-
-          if (res.status === "success") {
-            activeKey = input;
-            sessionStorage.setItem("wakasis_key", activeKey);
-            bukaAksesPanel(res);
-          } else {
-            alert("Akses Ditolak: Kunci keamanan salah!");
-            document.getElementById('auth-key').value = "";
-          }
+      fetch(API_KESISWAAN_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({
+          action: "login_dan_ambil_data",
+          key: input
         })
-        .catch(err => {
-          btn.disabled = false;
-          btn.innerText = "🔓 Buka Enkripsi & Muat Data";
-          alert("Gagal terhubung ke database server: " + err);
-        });
+      })
+      .then(res => res.json())
+      .then(res => {
+        btn.disabled = false;
+        btn.innerText = "🔓 Buka Enkripsi & Muat Data";
+
+        if (res.status === "success") {
+          activeKey = input;
+          sessionStorage.setItem("wakasis_key", activeKey);
+          bukaAksesPanel(res);
+        } else {
+          alert("Akses Ditolak: Kunci keamanan salah!");
+          document.getElementById('auth-key').value = "";
+        }
+      })
+      .catch(err => {
+        btn.disabled = false;
+        btn.innerText = "🔓 Buka Enkripsi & Muat Data";
+        alert("Gagal terhubung ke database: " + err);
+      });
     }
 
     function bukaAksesPanel(data) {
@@ -349,6 +407,21 @@
       }
     }
 
+    function setJamSekarang() {
+      const now = new Date();
+      const jam = String(now.getHours()).padStart(2, '0');
+      const mnt = String(now.getMinutes()).padStart(2, '0');
+      document.getElementById('terlambat-jam').value = `${jam}:${mnt}`;
+    }
+
+    function toggleModalTerlambat(show) {
+      document.getElementById('modal-terlambat').classList.toggle('hidden', !show);
+      if (show) {
+        document.getElementById('terlambat-tanggal').valueAsDate = new Date();
+        setJamSekarang();
+      }
+    }
+
     function renderTabelKasus(list) {
       const tbody = document.getElementById('body-kasus');
       if (!list || list.length === 0) {
@@ -377,6 +450,9 @@
       const tbody = document.getElementById('body-terlambat');
       if (!list || list.length === 0) {
         tbody.innerHTML = '<tr><td colspan="6" class="p-6 text-center text-slate-500">Tidak ada data siswa terlambat.</td></tr>';
+        document.getElementById('stat-total-terlambat').innerText = "0 Siswa";
+        document.getElementById('stat-sp').innerText = "0 Siswa";
+        document.getElementById('stat-ortu').innerText = "0 Siswa";
         return;
       }
 
@@ -409,6 +485,24 @@
       document.getElementById('stat-ortu').innerText = countOrtu + " Siswa";
     }
 
+    function segarkanData() {
+      fetch(API_KESISWAAN_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({
+          action: "login_dan_ambil_data",
+          key: activeKey
+        })
+      })
+      .then(r => r.json())
+      .then(res => {
+        if (res.status === "success") {
+          renderTabelKasus(res.kasus || []);
+          renderTabelTerlambat(res.terlambat || []);
+        }
+      });
+    }
+
     function simpanKasus(e) {
       e.preventDefault();
       const btn = document.getElementById('btn-simpan-kasus');
@@ -437,37 +531,86 @@
       .then(res => res.json())
       .then(res => {
         btn.disabled = false;
-        btn.innerText = "💾 Simpan Data Rahasia";
+        btn.innerText = "💾 Simpan Data Kasus";
         if (res.status === "success") {
           alert("Berhasil! " + res.message);
           toggleModalKasus(false);
           e.target.reset();
-          // Segarkan data
-          fetch(`${API_KESISWAAN_URL}?key=${encodeURIComponent(activeKey)}`)
-            .then(r => r.json())
-            .then(d => renderTabelKasus(d.kasus || []));
+          segarkanData();
         } else {
           alert("Gagal: " + res.message);
         }
       })
       .catch(err => {
         btn.disabled = false;
-        btn.innerText = "💾 Simpan Data Rahasia";
+        btn.innerText = "💾 Simpan Data Kasus";
         alert("Kesalahan jaringan: " + err);
       });
     }
 
-    // Auto-login jika sesi masih aktif di browser saat ini
+    function simpanTerlambat(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btn-simpan-terlambat');
+      btn.disabled = true;
+      btn.innerText = "⏳ Menghitung akumulasi...";
+
+      const jamInput = document.getElementById('terlambat-jam').value;
+      const jamDisplay = jamInput ? `${jamInput.replace(':', '.')} WIB` : "07.20 WIB";
+
+      const payload = {
+        action: "tambah_terlambat",
+        key: activeKey,
+        data: {
+          tanggal: document.getElementById('terlambat-tanggal').value,
+          nama: document.getElementById('terlambat-nama').value.trim(),
+          kelas: document.getElementById('terlambat-kelas').value.trim(),
+          jam: jamDisplay
+        }
+      };
+
+      fetch(API_KESISWAAN_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify(payload)
+      })
+      .then(res => res.json())
+      .then(res => {
+        btn.disabled = false;
+        btn.innerText = "💾 Simpan Log Keterlambatan";
+        if (res.status === "success") {
+          alert("Tercatat! " + res.message);
+          toggleModalTerlambat(false);
+          e.target.reset();
+          segarkanData();
+        } else {
+          alert("Gagal: " + res.message);
+        }
+      })
+      .catch(err => {
+        btn.disabled = false;
+        btn.innerText = "💾 Simpan Log Keterlambatan";
+        alert("Kesalahan jaringan: " + err);
+      });
+    }
+
+    // Auto-login jika sesi aktif
     if (activeKey) {
-      fetch(`${API_KESISWAAN_URL}?key=${encodeURIComponent(activeKey)}`)
-        .then(r => r.json())
-        .then(res => {
-          if (res.status === "success") {
-            bukaAksesPanel(res);
-          } else {
-            sessionStorage.removeItem("wakasis_key");
-          }
-        });
+      fetch(API_KESISWAAN_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({
+          action: "login_dan_ambil_data",
+          key: activeKey
+        })
+      })
+      .then(r => r.json())
+      .then(res => {
+        if (res.status === "success") {
+          bukaAksesPanel(res);
+        } else {
+          sessionStorage.removeItem("wakasis_key");
+        }
+      });
     }
   </script>
 </body>
