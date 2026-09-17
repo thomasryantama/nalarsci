@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ruang Belajar, Materi & Refleksi — NalarSci Lab</title>
+  <meta name="description" content="Akses materi presentasi, modul praktikum, pengumpulan tugas koding, dan evaluasi refleksi sesi belajar/seminar.">
+  
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: radial-gradient(circle at 50% 0%, #1e293b 0%, #0b0f19 75%);
+      color: #f8fafc;
+      min-height: 100vh;
+    }
+    .font-title { font-family: 'Fredoka', sans-serif; }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.04);
+      backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      transition: all 0.25s ease;
+    }
+    .subtab-btn.active {
+      background-color: #0284c7 !important;
+      color: #ffffff !important;
+      border-color: #38bdf8 !important;
+    }
+  </style>
+</head>
+<body class="p-4 md:p-8 max-w-5xl mx-auto flex flex-col justify-between min-h-screen">
+
+  <!-- NAVIGASI ATAS -->
+  <header class="mb-8">
+    <div class="flex justify-between items-center border-b border-slate-800 pb-3 mb-6">
+      <a href="index.html" class="text-sky-400 hover:text-sky-300 font-bold text-xs flex items-center gap-1 transition">
+        ← Kembali ke Beranda Lab
+      </a>
+      <span class="text-xs text-slate-400 font-semibold">Ruang Belajar & Interaksi Sesi</span>
+    </div>
+
+    <div class="text-center max-w-2xl mx-auto">
+      <div class="inline-flex items-center gap-2 bg-sky-500/10 border border-sky-400/20 text-sky-400 px-3.5 py-1 rounded-full text-xs font-black uppercase tracking-wider mb-2">
+        📚 Materi • Penugasan • Evaluasi
+      </div>
+      <h1 class="font-title text-3xl sm:text-4xl text-white mb-2">Pusat Materi & Refleksi</h1>
+      <p class="text-slate-400 text-xs sm:text-sm">
+        Unduh materi pembelajaran/seminar, kumpulkan karya proyek praktikum, dan sampaikan evaluasi refleksi sesi Anda.
+      </p>
+    </div>
+
+    <!-- SUB-TAB NAVIGASI -->
+    <div class="flex flex-wrap justify-center gap-2 mt-6" id="subtab-bar">
+      <button onclick="bukaTab('materi')" id="tab-materi" class="subtab-btn active px-4 py-2 rounded-xl bg-slate-800 border border-slate-700 text-xs font-bold text-slate-300 transition">
+        📂 Materi & Slide Presentasi
+      </button>
+      <button onclick="bukaTab('tugas')" id="tab-tugas" class="subtab-btn px-4 py-2 rounded-xl bg-slate-800 border border-slate-700 text-xs font-bold text-slate-300 hover:bg-slate-700 transition">
+        📤 Kantung Kumpul Tugas
+      </button>
+      <button onclick="bukaTab('refleksi')" id="tab-refleksi" class="subtab-btn px-4 py-2 rounded-xl bg-slate-800 border border-slate-700 text-xs font-bold text-slate-300 hover:bg-slate-700 transition">
+        💬 Refleksi & Feedback Sesi
+      </button>
+    </div>
+  </header>
+
+  <!-- KONTEN 1: ETALASE MATERI & SLIDE -->
+  <section id="konten-materi" class="space-y-6 flex-grow mb-12">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="grid-materi">
+      
+      <!-- Contoh Kartu Slide PPT -->
+      <div class="glass-card rounded-3xl p-5 flex flex-col justify-between border border-slate-800">
+        <div>
+          <div class="flex justify-between items-start mb-2">
+            <span class="bg-purple-500/20 text-purple-300 border border-purple-400/30 text-[10px] font-black uppercase px-2 py-0.5 rounded-full">Slide PPT</span>
+            <span class="text-[10px] text-slate-500">Informatika / KKA</span>
+          </div>
+          <h3 class="font-title text-lg text-white mb-1">Berpikir Komputasional: Dekomposisi & Pola</h3>
+          <p class="text-xs text-slate-300 leading-relaxed mb-4">
+            Materi fondasi pemecahan masalah komputasi terstruktur melalui studi kasus kehidupan sehari-hari anak.
+          </p>
+        </div>
+        <a href="#" target="_blank" class="w-full bg-slate-800 hover:bg-slate-700 text-sky-400 border border-slate-700 text-xs font-bold py-2 rounded-xl transition text-center flex items-center justify-center gap-1.5">
+          📥 Unduh Slide / Buka PDF ↗
+        </a>
+      </div>
+
+      <!-- Contoh Kartu Rekaman Workshop -->
+      <div class="glass-card rounded-3xl p-5 flex flex-col justify-between border border-slate-800">
+        <div>
+          <div class="flex justify-between items-start mb-2">
+            <span class="bg-rose-500/20 text-rose-300 border border-rose-400/30 text-[10px] font-black uppercase px-2 py-0.5 rounded-full">Video Seminar</span>
+            <span class="text-[10px] text-slate-500">Workshop Guru</span>
+          </div>
+          <h3 class="font-title text-lg text-white mb-1">Integrasi AI & Media Aktif di Kelas SD</h3>
+          <p class="text-xs text-slate-300 leading-relaxed mb-4">
+            Dokumentasi dan panduan praktis pemanfaatan kecerdasan buatan etis untuk menyusun lembar kerja interaktif.
+          </p>
+        </div>
+        <a href="#" target="_blank" class="w-full bg-slate-800 hover:bg-slate-700 text-rose-400 border border-slate-700 text-xs font-bold py-2 rounded-xl transition text-center flex items-center justify-center gap-1.5">
+          📺 Tonton Video Materi ↗
+        </a>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- KONTEN 2: KANTUNG KUMPUL TUGAS -->
+  <section id="konten-tugas" class="hidden space-y-6 flex-grow mb-12">
+    <div class="glass-card max-w-xl mx-auto rounded-3xl p-6 md:p-8 border border-sky-500/30">
+      <div class="mb-5 border-b border-slate-800 pb-3">
+        <h2 class="font-title text-xl text-sky-300">Pengumpulan Tugas Proyek / Praktik</h2>
+        <p class="text-xs text-slate-400 mt-1">
+          Tempelkan link tugasmu (proyek Scratch, slide Canva, Google Drive, atau GitHub). Pastikan izin link sudah disetel <em>Siapa saja yang memiliki link</em>.
+        </p>
+      </div>
+
+      <form onsubmit="kirimTugas(event)" class="space-y-4 text-xs">
+        <div>
+          <label class="block text-slate-400 font-bold mb-1">Nama Lengkap Siswa / Peserta</label>
+          <input type="text" id="tugas-nama" required placeholder="Nama lengkap Anda..." class="w-full p-3 rounded-xl bg-slate-950 border border-slate-700 text-white outline-none focus:border-sky-400">
+        </div>
+
+        <div>
+          <label class="block text-slate-400 font-bold mb-1">Kelas atau Asal Sekolah/Instansi</label>
+          <input type="text" id="tugas-asal" required placeholder="Contoh: Kelas 5B SD atau SD Methodist Immanuel" class="w-full p-3 rounded-xl bg-slate-950 border border-slate-700 text-white outline-none focus:border-sky-400">
+        </div>
+
+        <div>
+          <label class="block text-slate-400 font-bold mb-1">Judul Tugas / Proyek</label>
+          <input type="text" id="tugas-judul" required placeholder="Contoh: Game Labirin Scratch Misi 2" class="w-full p-3 rounded-xl bg-slate-950 border border-slate-700 text-white outline-none focus:border-sky-400">
+        </div>
+
+        <div>
+          <label class="block text-slate-400 font-bold mb-1">Tautan Link Tugas (URL)</label>
+          <input type="url" id="tugas-link" required placeholder="https://scratch.mit.edu/projects/... atau link Drive" class="w-full p-3 rounded-xl bg-slate-950 border border-slate-700 text-white outline-none focus:border-sky-400">
+        </div>
+
+        <div>
+          <label class="block text-slate-400 font-bold mb-1">Catatan Singkat / Cerita Pembuatan (Opsional)</label>
+          <textarea id="tugas-catatan" rows="2" placeholder="Tantangan apa yang kamu hadapi saat mengerjakan ini?..." class="w-full p-3 rounded-xl bg-slate-950 border border-slate-700 text-white outline-none focus:border-sky-400"></textarea>
+        </div>
+
+        <button type="submit" id="btn-kumpul-tugas" class="w-full bg-sky-600 hover:bg-sky-500 text-white font-title text-xs py-3 rounded-xl font-bold transition shadow-lg mt-2">
+          🚀 Kumpulkan Tugas Sekarang
+        </button>
+      </form>
+    </div>
+  </section>
+
+  <!-- KONTEN 3: REFLEKSI & FEEDBACK SESI -->
+  <section id="konten-refleksi" class="hidden space-y-6 flex-grow mb-12">
+    <div class="glass-card max-w-xl mx-auto rounded-3xl p-6 md:p-8 border border-purple-500/30">
+      <div class="mb-5 border-b border-slate-800 pb-3">
+        <h2 class="font-title text-xl text-purple-300">Lembar Refleksi & Evaluasi Sesi</h2>
+        <p class="text-xs text-slate-400 mt-1">
+          Masukan jujur Anda sangat penting untuk meningkatkan kualitas penyampaian dan kejelasan materi pada sesi berikutnya.
+        </p>
+      </div>
+
+      <form onsubmit="kirimRefleksi(event)" class="space-y-4 text-xs">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-slate-400 font-bold mb-1">Nama Anda (Boleh Anonim)</label>
+            <input type="text" id="refleksi-nama" placeholder="Contoh: Anonim / Peserta Seminar" class="w-full p-3 rounded-xl bg-slate-950 border border-slate-700 text-white outline-none focus:border-purple-400">
+          </div>
+          <div>
+            <label class="block text-slate-400 font-bold mb-1">Sesi / Pertemuan yang Diikuti</label>
+            <input type="text" id="refleksi-sesi" required placeholder="Contoh: Kelas Koding Pertemuan 4 / Seminar AI" class="w-full p-3 rounded-xl bg-slate-950 border border-slate-700 text-white outline-none focus:border-purple-400">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-slate-400 font-bold mb-1">Bagaimana Kepuasan / Pemahaman Anda?</label>
+          <div class="flex gap-2">
+            <label class="flex-1 text-center p-2.5 rounded-xl bg-slate-950 border border-slate-800 cursor-pointer hover:border-purple-400 transition">
+              <input type="radio" name="rating" value="1" class="hidden peer">
+              <span class="peer-checked:font-bold peer-checked:text-purple-300 text-base">😕 1</span>
+            </label>
+            <label class="flex-1 text-center p-2.5 rounded-xl bg-slate-950 border border-slate-800 cursor-pointer hover:border-purple-400 transition">
+              <input type="radio" name="rating" value="2" class="hidden peer">
+              <span class="peer-checked:font-bold peer-checked:text-purple-300 text-base">😐 2</span>
+            </label>
+            <label class="flex-1 text-center p-2.5 rounded-xl bg-slate-950 border border-slate-800 cursor-pointer hover:border-purple-400 transition">
+              <input type="radio" name="rating" value="3" class="hidden peer">
+              <span class="peer-checked:font-bold peer-checked:text-purple-300 text-base">🙂 3</span>
+            </label>
+            <label class="flex-1 text-center p-2.5 rounded-xl bg-slate-950 border border-slate-800 cursor-pointer hover:border-purple-400 transition">
+              <input type="radio" name="rating" value="4" class="hidden peer">
+              <span class="peer-checked:font-bold peer-checked:text-purple-300 text-base">😃 4</span>
+            </label>
+            <label class="flex-1 text-center p-2.5 rounded-xl bg-slate-950 border border-slate-800 cursor-pointer hover:border-purple-400 transition">
+              <input type="radio" name="rating" value="5" checked class="hidden peer">
+              <span class="peer-checked:font-bold peer-checked:text-purple-300 text-base">🤩 5</span>
+            </label>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-slate-400 font-bold mb-1">1 Hal Paling Berharga yang Anda Pelajari</label>
+          <textarea id="refleksi-insight" required rows="2" placeholder="Konsep apa yang paling membuka wawasan Anda?..." class="w-full p-3 rounded-xl bg-slate-950 border border-slate-700 text-white outline-none focus:border-purple-400"></textarea>
+        </div>
+
+        <div>
+          <label class="block text-slate-400 font-bold mb-1">Saran / Masukan untuk Fasilitator (Pak Thomas)</label>
+          <textarea id="refleksi-saran" rows="2" placeholder="Hal apa yang perlu ditingkatkan di sesi berikutnya?..." class="w-full p-3 rounded-xl bg-slate-950 border border-slate-700 text-white outline-none focus:border-purple-400"></textarea>
+        </div>
+
+        <button type="submit" id="btn-kirim-refleksi" class="w-full bg-purple-600 hover:bg-purple-500 text-white font-title text-xs py-3 rounded-xl font-bold transition shadow-lg mt-2">
+          💌 Kirim Refleksi & Masukan
+        </button>
+      </form>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="text-center text-xs text-slate-500 border-t border-slate-800 pt-6">
+    © 2026 <strong>NalarSci Lab</strong> • Media Belajar Aktif & Ruang Tumbuh Kolaboratif
+  </footer>
+
+  <script>
+    // ⚠️ GANTI DENGAN URL DEPLOYMENT APPS SCRIPT ANDA
+    const API_RUANG_URL = "https://script.google.com/macros/s/AKfycbxqfAtvi76FZZQbaYhQESDA0IA86na16QWAdh4dFQIEBUKblXrUnXvoYbxQ7aEPwZZ-/exec";
+
+    function bukaTab(tab) {
+      document.querySelectorAll('.subtab-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('konten-materi').classList.add('hidden');
+      document.getElementById('konten-tugas').classList.add('hidden');
+      document.getElementById('konten-refleksi').classList.add('hidden');
+
+      if (tab === 'materi') {
+        document.getElementById('tab-materi').classList.add('active');
+        document.getElementById('konten-materi').classList.remove('hidden');
+      } else if (tab === 'tugas') {
+        document.getElementById('tab-tugas').classList.add('active');
+        document.getElementById('konten-tugas').classList.remove('hidden');
+      } else if (tab === 'refleksi') {
+        document.getElementById('tab-refleksi').classList.add('active');
+        document.getElementById('konten-refleksi').classList.remove('hidden');
+      }
+    }
+
+    function kirimTugas(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btn-kumpul-tugas');
+      btn.disabled = true;
+      btn.innerText = "⏳ Mengirim data tugas...";
+
+      const payload = {
+        action: "kumpul_tugas",
+        data: {
+          nama: document.getElementById('tugas-nama').value.trim(),
+          asal: document.getElementById('tugas-asal').value.trim(),
+          judulTugas: document.getElementById('tugas-judul').value.trim(),
+          linkTugas: document.getElementById('tugas-link').value.trim(),
+          catatan: document.getElementById('tugas-catatan').value.trim()
+        }
+      };
+
+      fetch(API_RUANG_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify(payload)
+      })
+      .then(res => res.json())
+      .then(res => {
+        btn.disabled = false;
+        btn.innerText = "🚀 Kumpulkan Tugas Sekarang";
+        if (res.status === "success") {
+          alert("Selamat! " + res.message);
+          e.target.reset();
+        } else {
+          alert("Gagal: " + res.message);
+        }
+      })
+      .catch(err => {
+        btn.disabled = false;
+        btn.innerText = "🚀 Kumpulkan Tugas Sekarang";
+        alert("Kesalahan jaringan: " + err);
+      });
+    }
+
+    function kirimRefleksi(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btn-kirim-refleksi');
+      btn.disabled = true;
+      btn.innerText = "⏳ Mengirim evaluasi...";
+
+      const ratingEl = document.querySelector('input[name="rating"]:checked');
+      const rating = ratingEl ? ratingEl.value : "5";
+
+      const payload = {
+        action: "kirim_refleksi",
+        data: {
+          nama: document.getElementById('refleksi-nama').value.trim() || "Anonim",
+          sesi: document.getElementById('refleksi-sesi').value.trim(),
+          rating: rating,
+          insight: document.getElementById('refleksi-insight').value.trim(),
+          saran: document.getElementById('refleksi-saran').value.trim()
+        }
+      };
+
+      fetch(API_RUANG_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify(payload)
+      })
+      .then(res => res.json())
+      .then(res => {
+        btn.disabled = false;
+        btn.innerText = "💌 Kirim Refleksi & Masukan";
+        if (res.status === "success") {
+          alert("Terima kasih banyak! " + res.message);
+          e.target.reset();
+        } else {
+          alert("Gagal: " + res.message);
+        }
+      })
+      .catch(err => {
+        btn.disabled = false;
+        btn.innerText = "💌 Kirim Refleksi & Masukan";
+        alert("Kesalahan jaringan: " + err);
+      });
+    }
+  </script>
+</body>
+</html>
