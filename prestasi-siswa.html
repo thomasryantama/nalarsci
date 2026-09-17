@@ -71,26 +71,29 @@
         <button onclick="filterPrestasi('Olahraga')" class="btn-filter px-3.5 py-1.5 rounded-xl bg-slate-800 border border-slate-700 text-slate-300 font-bold hover:bg-slate-700 transition">⚽ Olahraga</button>
       </div>
 
-      <input type="text" id="cari-input" oninput="cariPrestasi()" placeholder="Cari nama siswa atau ajang..." class="w-full sm:w-64 p-2.5 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white outline-none focus:border-amber-400">
+      <input type="text" id="cari-input" oninput="cariPrestasi()" placeholder="Cari nama siswa atau ajang lomba..." class="w-full sm:w-64 p-2.5 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white outline-none focus:border-amber-400">
     </div>
   </header>
 
   <!-- GRID PRESTASI -->
   <main class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 flex-grow mb-12" id="grid-prestasi">
-    <!-- Di-render oleh JavaScript -->
+    <div class="col-span-full text-center text-slate-400 py-16 flex flex-col items-center gap-2">
+      <div class="w-8 h-8 border-4 border-amber-400 border-t-transparent rounded-full animate-spin"></div>
+      <p class="text-xs font-semibold">Memuat data juara siswa...</p>
+    </div>
   </main>
 
   <!-- MODAL FORM INPUT WAKASIS -->
   <div id="modal-wakasis" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-    <div class="glass-card max-w-md w-full rounded-3xl p-6 border border-amber-500/40 bg-slate-900 shadow-2xl">
+    <div class="glass-card max-w-lg w-full rounded-3xl p-6 border border-amber-500/40 bg-slate-900 shadow-2xl">
       <div class="flex justify-between items-center mb-4 border-b border-slate-800 pb-3">
-        <h3 class="font-title text-xl text-amber-300">Catat Prestasi Baru</h3>
+        <h3 class="font-title text-xl text-amber-300">Catat Prestasi Baru (Wakasis)</h3>
         <button onclick="toggleModalWakasis(false)" class="text-slate-400 hover:text-white font-bold text-xl">✕</button>
       </div>
 
       <form onsubmit="tambahPrestasi(event)" class="space-y-3 text-xs">
         <div>
-          <label class="block text-slate-400 font-bold mb-1">PIN Wakasis</label>
+          <label class="block text-slate-400 font-bold mb-1">PIN Rahasia Wakasis</label>
           <input type="password" id="input-pin" required placeholder="Masukkan PIN Wakasis..." class="w-full p-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white outline-none focus:border-amber-400">
         </div>
 
@@ -101,7 +104,7 @@
           </div>
           <div>
             <label class="block text-slate-400 font-bold mb-1">Kelas</label>
-            <input type="text" id="pres-kelas" required placeholder="Misal: Kelas 5B" class="w-full p-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white outline-none focus:border-amber-400">
+            <input type="text" id="pres-kelas" required placeholder="Misal: Kelas 5B SD" class="w-full p-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white outline-none focus:border-amber-400">
           </div>
         </div>
 
@@ -117,12 +120,12 @@
             </select>
           </div>
           <div>
-            <label class="block text-slate-400 font-bold mb-1">Tingkat</label>
+            <label class="block text-slate-400 font-bold mb-1">Tingkat Kejuaraan</label>
             <select id="pres-tingkat" class="w-full p-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white font-bold outline-none focus:border-amber-400">
-              <option value="Tingkat Kota">Tingkat Kota</option>
+              <option value="Tingkat Kota / Kabupaten">Tingkat Kota / Kabupaten</option>
               <option value="Tingkat Provinsi">Tingkat Provinsi</option>
               <option value="Tingkat Nasional">Tingkat Nasional</option>
-              <option value="Internasional">Internasional</option>
+              <option value="Tingkat Internasional">Tingkat Internasional</option>
             </select>
           </div>
         </div>
@@ -130,21 +133,27 @@
         <div class="grid grid-cols-2 gap-3">
           <div>
             <label class="block text-slate-400 font-bold mb-1">Peringkat / Medali</label>
-            <input type="text" id="pres-peringkat" required placeholder="Misal: Juara 1 / Emas" class="w-full p-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white outline-none focus:border-amber-400">
+            <input type="text" id="pres-peringkat" required placeholder="Misal: Juara 1 / Medali Emas" class="w-full p-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white outline-none focus:border-amber-400">
           </div>
           <div>
-            <label class="block text-slate-400 font-bold mb-1">Tahun</label>
-            <input type="number" id="pres-tahun" required value="2026" class="w-full p-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white outline-none focus:border-amber-400">
+            <label class="block text-slate-400 font-bold mb-1">Tanggal Kegiatan</label>
+            <input type="date" id="pres-tanggal" required class="w-full p-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white outline-none focus:border-amber-400">
           </div>
         </div>
 
         <div>
-          <label class="block text-slate-400 font-bold mb-1">Nama Kejuaraan / Acara</label>
-          <input type="text" id="pres-lomba" required placeholder="Nama lengkap kompetisi..." class="w-full p-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white outline-none focus:border-amber-400">
+          <label class="block text-slate-400 font-bold mb-1">Nama Kejuaraan / Event</label>
+          <input type="text" id="pres-lomba" required placeholder="Misal: Olimpiade Sains Nasional (OSN) Tingkat Kota" class="w-full p-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white outline-none focus:border-amber-400">
         </div>
 
-        <button type="submit" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-title text-xs py-3 rounded-xl font-bold transition shadow-lg mt-2">
-          💾 Simpan Data Prestasi
+        <div>
+          <label class="block text-slate-400 font-bold mb-1">Link URL Foto Dokumentasi</label>
+          <input type="url" id="pres-foto" placeholder="https://i.ibb.co/... atau link publik Google Drive" class="w-full p-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white outline-none focus:border-amber-400">
+          <p class="text-[10px] text-slate-500 mt-1">Kosongkan jika belum ada foto, sistem akan menggunakan gambar ilustrasi bawaan.</p>
+        </div>
+
+        <button type="submit" id="btn-submit" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-title text-xs py-3 rounded-xl font-bold transition shadow-lg mt-2">
+          💾 Simpan Data Prestasi ke Cloud
         </button>
       </form>
     </div>
@@ -156,10 +165,11 @@
   </footer>
 
   <script>
-    const PIN_VALID = "2026"; // Ganti PIN Anda sesuai kebutuhan
+    // ⚠️ GANTI DENGAN URL DEPLOYMENT APPS SCRIPT ANDA
+    const API_PRESTASI_URL = "TEMPEL_URL_APPS_SCRIPT_DI_SINI";
 
-    // Data awal
-    let daftarPrestasi = [
+    // Data cadangan lokal bila API belum diisi atau offline
+    const backupPrestasi = [
       {
         nama: "Kenzo Alvaro",
         kelas: "Kelas 5 SD",
@@ -167,7 +177,7 @@
         lomba: "Kompetisi Koding & Robotik Pelajar",
         peringkat: "Juara 1 (Medali Emas)",
         tingkat: "Tingkat Provinsi",
-        tahun: 2026,
+        tanggal: "12 Agt 2026",
         foto: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=600&auto=format&fit=crop&q=80"
       },
       {
@@ -177,22 +187,33 @@
         lomba: "Olimpiade Sains & Eksperimen Cilik",
         peringkat: "Juara 2 (Perak)",
         tingkat: "Tingkat Nasional",
-        tahun: 2026,
+        tanggal: "28 Jul 2026",
         foto: "https://images.unsplash.com/photo-1578269174936-2709b6aeb913?w=600&auto=format&fit=crop&q=80"
-      },
-      {
-        nama: "Tim Paduan Suara",
-        kelas: "Kelas 4–6 SD",
-        kategori: "Seni & Budaya",
-        lomba: "Festival Seni Musik & Vokal Pelajar",
-        peringkat: "Juara 1 Utama",
-        tingkat: "Tingkat Kota",
-        tahun: 2026,
-        foto: "https://images.unsplash.com/photo-1465847899084-d164df4dedc6?w=600&auto=format&fit=crop&q=80"
       }
     ];
 
+    let daftarPrestasi = [];
     let kategoriAktif = "Semua";
+
+    function ambilDataPrestasi() {
+      if (API_PRESTASI_URL === "TEMPEL_URL_APPS_SCRIPT_DI_SINI") {
+        daftarPrestasi = backupPrestasi;
+        renderCards(daftarPrestasi);
+        return;
+      }
+
+      fetch(API_PRESTASI_URL)
+        .then(res => res.json())
+        .then(data => {
+          daftarPrestasi = (Array.isArray(data) && data.length > 0) ? data : backupPrestasi;
+          renderCards(daftarPrestasi);
+        })
+        .catch(err => {
+          console.warn("Gagal memuat API, memakai data cadangan:", err);
+          daftarPrestasi = backupPrestasi;
+          renderCards(daftarPrestasi);
+        });
+    }
 
     function renderCards(list) {
       const grid = document.getElementById('grid-prestasi');
@@ -213,7 +234,10 @@
             </div>
           </div>
           <div class="p-5 flex flex-col flex-grow">
-            <span class="text-[10px] text-amber-400 font-bold uppercase tracking-wider mb-1">${item.kategori} • ${item.tahun}</span>
+            <div class="flex justify-between items-center text-[10px] text-amber-400 font-bold uppercase tracking-wider mb-1">
+              <span>${item.kategori}</span>
+              <span class="text-slate-400">${item.tanggal || ''}</span>
+            </div>
             <h3 class="font-title text-xl text-white mb-0.5">${item.nama}</h3>
             <p class="text-xs text-sky-400 font-semibold mb-3">📍 ${item.kelas}</p>
             <p class="text-xs text-slate-300 leading-relaxed flex-grow border-t border-slate-800/80 pt-3">
@@ -255,31 +279,65 @@
 
     function tambahPrestasi(e) {
       e.preventDefault();
-      const pin = document.getElementById('input-pin').value;
-      if (pin !== PIN_VALID) {
-        alert('PIN Wakasis salah! Akses ditolak.');
+      const btn = document.getElementById('btn-submit');
+      btn.disabled = true;
+      btn.innerText = "⏳ Menyimpan ke Database...";
+
+      const pin = document.getElementById('input-pin').value.trim();
+      const payload = {
+        action: "tambah_prestasi",
+        pin: pin,
+        data: {
+          nama: document.getElementById('pres-nama').value.trim(),
+          kelas: document.getElementById('pres-kelas').value.trim(),
+          kategori: document.getElementById('pres-kat').value,
+          tingkat: document.getElementById('pres-tingkat').value,
+          peringkat: document.getElementById('pres-peringkat').value.trim(),
+          tanggal: document.getElementById('pres-tanggal').value,
+          lomba: document.getElementById('pres-lomba').value.trim(),
+          foto: document.getElementById('pres-foto').value.trim() || 'https://images.unsplash.com/photo-1578269174936-2709b6aeb913?w=600&auto=format&fit=crop&q=80'
+        }
+      };
+
+      if (API_PRESTASI_URL === "https://script.google.com/macros/s/AKfycbwkdabeWz_6MTalQgyyIGOQeHgTIk0IvRzKY1xg7LSa-iq-FatlVIZ2Eq3W0ry8ltrg/exec") {
+        alert("Peringatan: URL Apps Script belum dipasang di kode. Data hanya dimasukkan sementara ke tampilan layar.");
+        daftarPrestasi.unshift(payload.data);
+        renderCards(daftarPrestasi);
+        toggleModalWakasis(false);
+        btn.disabled = false;
+        btn.innerText = "💾 Simpan Data Prestasi ke Cloud";
+        e.target.reset();
         return;
       }
 
-      const itemBaru = {
-        nama: document.getElementById('pres-nama').value.trim(),
-        kelas: document.getElementById('pres-kelas').value.trim(),
-        kategori: document.getElementById('pres-kat').value,
-        tingkat: document.getElementById('pres-tingkat').value,
-        peringkat: document.getElementById('pres-peringkat').value.trim(),
-        tahun: document.getElementById('pres-tahun').value,
-        lomba: document.getElementById('pres-lomba').value.trim(),
-        foto: 'https://images.unsplash.com/photo-1578269174936-2709b6aeb913?w=600&auto=format&fit=crop&q=80'
-      };
+      fetch(API_PRESTASI_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify(payload)
+      })
+      .then(res => res.json())
+      .then(res => {
+        btn.disabled = false;
+        btn.innerText = "💾 Simpan Data Prestasi ke Cloud";
 
-      daftarPrestasi.unshift(itemBaru);
-      alert('Prestasi siswa berhasil dicatat!');
-      toggleModalWakasis(false);
-      e.target.reset();
-      renderCards(daftarPrestasi);
+        if (res.status === "success") {
+          alert("Berhasil! " + res.message);
+          toggleModalWakasis(false);
+          e.target.reset();
+          ambilDataPrestasi(); // Tarik ulang data agar kartu terbaru langsung muncul
+        } else {
+          alert("Gagal: " + res.message);
+        }
+      })
+      .catch(err => {
+        btn.disabled = false;
+        btn.innerText = "💾 Simpan Data Prestasi ke Cloud";
+        alert("Terjadi kesalahan jaringan: " + err);
+      });
     }
 
-    renderCards(daftarPrestasi);
+    // Eksekusi pengambilan data awal saat web dibuka
+    ambilDataPrestasi();
   </script>
 </body>
 </html>
