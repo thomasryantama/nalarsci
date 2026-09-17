@@ -23,7 +23,7 @@
       background: rgba(255, 255, 255, 0.04);
       backdrop-filter: blur(14px);
       border: 1px solid rgba(255, 255, 255, 0.08);
-      transition: all 0.3s ease;
+      transition: all 0.25s ease;
     }
     .glass-card:hover {
       transform: translateY(-4px);
@@ -39,7 +39,7 @@
 </head>
 <body class="p-4 md:p-8 max-w-6xl mx-auto flex flex-col justify-between min-h-screen">
 
-  <!-- HEADER NAVIGASI -->
+  <!-- HEADER -->
   <header class="mb-8">
     <div class="flex justify-between items-center border-b border-slate-800 pb-3 mb-6">
       <a href="index.html" class="text-sky-400 hover:text-sky-300 font-bold text-xs flex items-center gap-1 transition">
@@ -60,7 +60,7 @@
       </p>
     </div>
 
-    <!-- PENCARIAN & FILTER KATEGORI -->
+    <!-- PENCARIAN & FILTER -->
     <div class="flex flex-col sm:flex-row justify-between items-center gap-3 mt-8 bg-slate-900/60 p-3 rounded-2xl border border-slate-800">
       <div class="flex flex-wrap gap-1.5 text-xs w-full sm:w-auto" id="filter-bar">
         <button onclick="filterPrestasi('Semua')" class="btn-filter active px-3.5 py-1.5 rounded-xl bg-slate-800 border border-slate-700 text-slate-300 font-bold transition">Semua</button>
@@ -71,19 +71,19 @@
         <button onclick="filterPrestasi('Olahraga')" class="btn-filter px-3.5 py-1.5 rounded-xl bg-slate-800 border border-slate-700 text-slate-300 font-bold hover:bg-slate-700 transition">⚽ Olahraga</button>
       </div>
 
-      <input type="text" id="cari-input" oninput="cariPrestasi()" placeholder="Cari nama siswa atau ajang lomba..." class="w-full sm:w-64 p-2.5 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white outline-none focus:border-amber-400">
+      <input type="text" id="cari-input" oninput="cariPrestasi()" placeholder="Cari nama siswa atau ajang..." class="w-full sm:w-64 p-2.5 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white outline-none focus:border-amber-400">
     </div>
   </header>
 
   <!-- GRID PRESTASI -->
-  <main class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 flex-grow mb-12" id="grid-prestasi">
+  <main class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 flex-grow mb-12 items-start" id="grid-prestasi">
     <div class="col-span-full text-center text-slate-400 py-16 flex flex-col items-center gap-2">
       <div class="w-8 h-8 border-4 border-amber-400 border-t-transparent rounded-full animate-spin"></div>
       <p class="text-xs font-semibold">Memuat data juara siswa...</p>
     </div>
   </main>
 
-  <!-- MODAL FORM INPUT WAKASIS -->
+  <!-- MODAL FORM WAKASIS -->
   <div id="modal-wakasis" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
     <div class="glass-card max-w-lg w-full rounded-3xl p-6 border border-amber-500/40 bg-slate-900 shadow-2xl">
       <div class="flex justify-between items-center mb-4 border-b border-slate-800 pb-3">
@@ -122,7 +122,7 @@
           <div>
             <label class="block text-slate-400 font-bold mb-1">Tingkat Kejuaraan</label>
             <select id="pres-tingkat" class="w-full p-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white font-bold outline-none focus:border-amber-400">
-              <option value="Tingkat Kota / Kabupaten">Tingkat Kota / Kabupaten</option>
+              <option value="Tingkat Kota">Tingkat Kota</option>
               <option value="Tingkat Provinsi">Tingkat Provinsi</option>
               <option value="Tingkat Nasional">Tingkat Nasional</option>
               <option value="Tingkat Internasional">Tingkat Internasional</option>
@@ -143,13 +143,12 @@
 
         <div>
           <label class="block text-slate-400 font-bold mb-1">Nama Kejuaraan / Event</label>
-          <input type="text" id="pres-lomba" required placeholder="Misal: Olimpiade Sains Nasional (OSN) Tingkat Kota" class="w-full p-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white outline-none focus:border-amber-400">
+          <input type="text" id="pres-lomba" required placeholder="Nama kompetisi..." class="w-full p-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white outline-none focus:border-amber-400">
         </div>
 
         <div>
           <label class="block text-slate-400 font-bold mb-1">Link URL Foto Dokumentasi</label>
-          <input type="url" id="pres-foto" placeholder="https://i.ibb.co/... atau link publik Google Drive" class="w-full p-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white outline-none focus:border-amber-400">
-          <p class="text-[10px] text-slate-500 mt-1">Kosongkan jika belum ada foto, sistem akan menggunakan gambar ilustrasi bawaan.</p>
+          <input type="url" id="pres-foto" placeholder="https://..." class="w-full p-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white outline-none focus:border-amber-400">
         </div>
 
         <button type="submit" id="btn-submit" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-title text-xs py-3 rounded-xl font-bold transition shadow-lg mt-2">
@@ -165,82 +164,66 @@
   </footer>
 
   <script>
-    // ⚠️ GANTI DENGAN URL DEPLOYMENT APPS SCRIPT ANDA
     const API_PRESTASI_URL = "https://script.google.com/macros/s/AKfycbwkdabeWz_6MTalQgyyIGOQeHgTIk0IvRzKY1xg7LSa-iq-FatlVIZ2Eq3W0ry8ltrg/exec";
-
-    // Data cadangan lokal bila API belum diisi atau offline
-    const backupPrestasi = [
-      {
-        nama: "Kenzo Alvaro",
-        kelas: "Kelas 5 SD",
-        kategori: "KKA & IT",
-        lomba: "Kompetisi Koding & Robotik Pelajar",
-        peringkat: "Juara 1 (Medali Emas)",
-        tingkat: "Tingkat Provinsi",
-        tanggal: "12 Agt 2026",
-        foto: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=600&auto=format&fit=crop&q=80"
-      },
-      {
-        nama: "Michelle Salim",
-        kelas: "Kelas 6 SD",
-        kategori: "Sains",
-        lomba: "Olimpiade Sains & Eksperimen Cilik",
-        peringkat: "Juara 2 (Perak)",
-        tingkat: "Tingkat Nasional",
-        tanggal: "28 Jul 2026",
-        foto: "https://images.unsplash.com/photo-1578269174936-2709b6aeb913?w=600&auto=format&fit=crop&q=80"
-      }
-    ];
 
     let daftarPrestasi = [];
     let kategoriAktif = "Semua";
 
-    function ambilDataPrestasi() {
-      if (API_PRESTASI_URL === "TEMPEL_URL_APPS_SCRIPT_DI_SINI") {
-        daftarPrestasi = backupPrestasi;
-        renderCards(daftarPrestasi);
-        return;
+    // Format tanggal ramah baca (DD MMM YYYY)
+    function rapikanTanggal(tglRaw) {
+      if (!tglRaw) return "";
+      const d = new Date(tglRaw);
+      if (isNaN(d.getTime())) {
+        // Jika format string biasa, buang bagian jam GMT
+        return tglRaw.toString().split(" 00:00:00")[0].substring(0, 15);
       }
+      return d.toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" });
+    }
 
+    function ambilDataPrestasi() {
       fetch(API_PRESTASI_URL)
         .then(res => res.json())
         .then(data => {
-          daftarPrestasi = (Array.isArray(data) && data.length > 0) ? data : backupPrestasi;
+          daftarPrestasi = Array.isArray(data) ? data : [];
           renderCards(daftarPrestasi);
         })
         .catch(err => {
-          console.warn("Gagal memuat API, memakai data cadangan:", err);
-          daftarPrestasi = backupPrestasi;
-          renderCards(daftarPrestasi);
+          console.warn("Gagal memuat API:", err);
+          document.getElementById('grid-prestasi').innerHTML = `
+            <div class="col-span-full text-center text-slate-500 py-12">
+              Gagal memuat data. Silakan refresh halaman.
+            </div>`;
         });
     }
 
     function renderCards(list) {
       const grid = document.getElementById('grid-prestasi');
       if (list.length === 0) {
-        grid.innerHTML = '<div class="col-span-full text-center text-slate-500 py-12">Tidak ada data prestasi yang cocok.</div>';
+        grid.innerHTML = '<div class="col-span-full text-center text-slate-500 py-12">Belum ada data prestasi yang cocok.</div>';
         return;
       }
 
       grid.innerHTML = list.map(item => `
-        <div class="glass-card rounded-3xl overflow-hidden flex flex-col">
+        <div class="glass-card rounded-3xl overflow-hidden flex flex-col h-full">
           <div class="relative aspect-video w-full overflow-hidden bg-slate-950">
             <img src="${item.foto}" alt="${item.nama}" class="w-full h-full object-cover">
             <div class="absolute top-3 left-3 bg-amber-500 text-slate-950 text-[10px] font-black uppercase px-2.5 py-1 rounded-full shadow">
               🏆 ${item.peringkat}
             </div>
-            <div class="absolute top-3 right-3 bg-black/60 backdrop-blur-md text-white text-[10px] font-bold px-2 py-0.5 rounded-lg border border-white/10">
+            <div class="absolute top-3 right-3 bg-black/70 backdrop-blur-md text-white text-[10px] font-bold px-2 py-0.5 rounded-lg border border-white/10">
               ${item.tingkat}
             </div>
           </div>
-          <div class="p-5 flex flex-col flex-grow">
-            <div class="flex justify-between items-center text-[10px] text-amber-400 font-bold uppercase tracking-wider mb-1">
-              <span>${item.kategori}</span>
-              <span class="text-slate-400">${item.tanggal || ''}</span>
+          <div class="p-5 flex flex-col flex-grow justify-between gap-3">
+            <div>
+              <div class="flex justify-between items-center text-[10px] font-bold uppercase tracking-wider mb-1.5">
+                <span class="text-amber-400">${item.kategori}</span>
+                <span class="text-slate-400 font-semibold lowercase">${rapikanTanggal(item.tanggal)}</span>
+              </div>
+              <h3 class="font-title text-xl text-white mb-0.5">${item.nama}</h3>
+              <p class="text-xs text-sky-400 font-semibold mb-2">📍 ${item.kelas}</p>
             </div>
-            <h3 class="font-title text-xl text-white mb-0.5">${item.nama}</h3>
-            <p class="text-xs text-sky-400 font-semibold mb-3">📍 ${item.kelas}</p>
-            <p class="text-xs text-slate-300 leading-relaxed flex-grow border-t border-slate-800/80 pt-3">
+            <p class="text-xs text-slate-300 leading-relaxed border-t border-slate-800/80 pt-3">
               ${item.lomba}
             </p>
           </div>
@@ -265,9 +248,9 @@
       const q = document.getElementById('cari-input').value.toLowerCase();
       const filtered = daftarPrestasi.filter(p => {
         const matchKategori = (kategoriAktif === 'Semua') || (p.kategori === kategoriAktif);
-        const matchKeyword = p.nama.toLowerCase().includes(q) || 
-                             p.lomba.toLowerCase().includes(q) || 
-                             p.kelas.toLowerCase().includes(q);
+        const matchKeyword = (p.nama && p.nama.toLowerCase().includes(q)) || 
+                             (p.lomba && p.lomba.toLowerCase().includes(q)) || 
+                             (p.kelas && p.kelas.toLowerCase().includes(q));
         return matchKategori && matchKeyword;
       });
       renderCards(filtered);
@@ -281,7 +264,7 @@
       e.preventDefault();
       const btn = document.getElementById('btn-submit');
       btn.disabled = true;
-      btn.innerText = "⏳ Menyimpan ke Database...";
+      btn.innerText = "⏳ Menyimpan ke Cloud...";
 
       const pin = document.getElementById('input-pin').value.trim();
       const payload = {
@@ -299,17 +282,6 @@
         }
       };
 
-      if (API_PRESTASI_URL === "TEMPEL_URL_APPS_SCRIPT_DI_SINI") {
-        alert("Peringatan: URL Apps Script belum dipasang di kode. Data hanya dimasukkan sementara ke tampilan layar.");
-        daftarPrestasi.unshift(payload.data);
-        renderCards(daftarPrestasi);
-        toggleModalWakasis(false);
-        btn.disabled = false;
-        btn.innerText = "💾 Simpan Data Prestasi ke Cloud";
-        e.target.reset();
-        return;
-      }
-
       fetch(API_PRESTASI_URL, {
         method: "POST",
         headers: { "Content-Type": "text/plain;charset=utf-8" },
@@ -324,7 +296,7 @@
           alert("Berhasil! " + res.message);
           toggleModalWakasis(false);
           e.target.reset();
-          ambilDataPrestasi(); // Tarik ulang data agar kartu terbaru langsung muncul
+          ambilDataPrestasi();
         } else {
           alert("Gagal: " + res.message);
         }
@@ -336,7 +308,6 @@
       });
     }
 
-    // Eksekusi pengambilan data awal saat web dibuka
     ambilDataPrestasi();
   </script>
 </body>
