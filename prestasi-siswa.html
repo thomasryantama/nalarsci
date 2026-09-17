@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Papan Prestasi Siswa — Hall of Fame | NalarSci Lab</title>
+  <meta name="description" content="Daftar rekam jejak juara, medali, dan prestasi membanggakan siswa di bidang sains, koding, seni, dan olahraga.">
+  
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: radial-gradient(circle at 50% 0%, #1e293b 0%, #0b0f19 75%);
+      color: #f8fafc;
+      min-height: 100vh;
+    }
+    .font-title { font-family: 'Fredoka', sans-serif; }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.04);
+      backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      transition: all 0.3s ease;
+    }
+    .glass-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(250, 204, 21, 0.4);
+      box-shadow: 0 16px 32px -10px rgba(0, 0, 0, 0.5);
+    }
+    .btn-filter.active {
+      background-color: #eab308 !important;
+      color: #0f172a !important;
+      border-color: #fde047 !important;
+    }
+  </style>
+</head>
+<body class="p-4 md:p-8 max-w-6xl mx-auto flex flex-col justify-between min-h-screen">
+
+  <!-- HEADER NAVIGASI -->
+  <header class="mb-8">
+    <div class="flex justify-between items-center border-b border-slate-800 pb-3 mb-6">
+      <a href="index.html" class="text-sky-400 hover:text-sky-300 font-bold text-xs flex items-center gap-1 transition">
+        ← Kembali ke Beranda Lab
+      </a>
+      <button onclick="toggleModalWakasis(true)" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-title text-xs px-3.5 py-1.5 rounded-xl font-bold transition flex items-center gap-1.5 shadow-md">
+        🔐 Catat Prestasi (Wakasis)
+      </button>
+    </div>
+
+    <div class="text-center max-w-2xl mx-auto">
+      <div class="inline-flex items-center gap-2 bg-amber-500/10 border border-amber-400/20 text-amber-300 px-3.5 py-1 rounded-full text-xs font-black uppercase tracking-wider mb-2">
+        🏆 Hall of Fame • Generasi Juara
+      </div>
+      <h1 class="font-title text-3xl sm:text-4xl text-white mb-2">Papan Prestasi Siswa</h1>
+      <p class="text-slate-400 text-xs sm:text-sm">
+        Apresiasi pencapaian dan dedikasi siswa dalam kompetisi sains, teknologi komputasi, seni budaya, dan olahraga.
+      </p>
+    </div>
+
+    <!-- PENCARIAN & FILTER KATEGORI -->
+    <div class="flex flex-col sm:flex-row justify-between items-center gap-3 mt-8 bg-slate-900/60 p-3 rounded-2xl border border-slate-800">
+      <div class="flex flex-wrap gap-1.5 text-xs w-full sm:w-auto" id="filter-bar">
+        <button onclick="filterPrestasi('Semua')" class="btn-filter active px-3.5 py-1.5 rounded-xl bg-slate-800 border border-slate-700 text-slate-300 font-bold transition">Semua</button>
+        <button onclick="filterPrestasi('Sains')" class="btn-filter px-3.5 py-1.5 rounded-xl bg-slate-800 border border-slate-700 text-slate-300 font-bold hover:bg-slate-700 transition">🔬 Sains</button>
+        <button onclick="filterPrestasi('KKA & IT')" class="btn-filter px-3.5 py-1.5 rounded-xl bg-slate-800 border border-slate-700 text-slate-300 font-bold hover:bg-slate-700 transition">🤖 KKA & IT</button>
+        <button onclick="filterPrestasi('Akademik')" class="btn-filter px-3.5 py-1.5 rounded-xl bg-slate-800 border border-slate-700 text-slate-300 font-bold hover:bg-slate-700 transition">📚 Akademik</button>
+        <button onclick="filterPrestasi('Seni & Budaya')" class="btn-filter px-3.5 py-1.5 rounded-xl bg-slate-800 border border-slate-700 text-slate-300 font-bold hover:bg-slate-700 transition">🎨 Seni</button>
+        <button onclick="filterPrestasi('Olahraga')" class="btn-filter px-3.5 py-1.5 rounded-xl bg-slate-800 border border-slate-700 text-slate-300 font-bold hover:bg-slate-700 transition">⚽ Olahraga</button>
+      </div>
+
+      <input type="text" id="cari-input" oninput="cariPrestasi()" placeholder="Cari nama siswa atau ajang..." class="w-full sm:w-64 p-2.5 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white outline-none focus:border-amber-400">
+    </div>
+  </header>
+
+  <!-- GRID PRESTASI -->
+  <main class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 flex-grow mb-12" id="grid-prestasi">
+    <!-- Di-render oleh JavaScript -->
+  </main>
+
+  <!-- MODAL FORM INPUT WAKASIS -->
+  <div id="modal-wakasis" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="glass-card max-w-md w-full rounded-3xl p-6 border border-amber-500/40 bg-slate-900 shadow-2xl">
+      <div class="flex justify-between items-center mb-4 border-b border-slate-800 pb-3">
+        <h3 class="font-title text-xl text-amber-300">Catat Prestasi Baru</h3>
+        <button onclick="toggleModalWakasis(false)" class="text-slate-400 hover:text-white font-bold text-xl">✕</button>
+      </div>
+
+      <form onsubmit="tambahPrestasi(event)" class="space-y-3 text-xs">
+        <div>
+          <label class="block text-slate-400 font-bold mb-1">PIN Wakasis</label>
+          <input type="password" id="input-pin" required placeholder="Masukkan PIN Wakasis..." class="w-full p-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white outline-none focus:border-amber-400">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-slate-400 font-bold mb-1">Nama Siswa / Tim</label>
+            <input type="text" id="pres-nama" required placeholder="Nama siswa..." class="w-full p-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white outline-none focus:border-amber-400">
+          </div>
+          <div>
+            <label class="block text-slate-400 font-bold mb-1">Kelas</label>
+            <input type="text" id="pres-kelas" required placeholder="Misal: Kelas 5B" class="w-full p-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white outline-none focus:border-amber-400">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-slate-400 font-bold mb-1">Bidang / Kategori</label>
+            <select id="pres-kat" class="w-full p-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white font-bold outline-none focus:border-amber-400">
+              <option value="Sains">🔬 Sains</option>
+              <option value="KKA & IT">🤖 KKA & IT</option>
+              <option value="Akademik">📚 Akademik</option>
+              <option value="Seni & Budaya">🎨 Seni & Budaya</option>
+              <option value="Olahraga">⚽ Olahraga</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-slate-400 font-bold mb-1">Tingkat</label>
+            <select id="pres-tingkat" class="w-full p-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white font-bold outline-none focus:border-amber-400">
+              <option value="Tingkat Kota">Tingkat Kota</option>
+              <option value="Tingkat Provinsi">Tingkat Provinsi</option>
+              <option value="Tingkat Nasional">Tingkat Nasional</option>
+              <option value="Internasional">Internasional</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-slate-400 font-bold mb-1">Peringkat / Medali</label>
+            <input type="text" id="pres-peringkat" required placeholder="Misal: Juara 1 / Emas" class="w-full p-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white outline-none focus:border-amber-400">
+          </div>
+          <div>
+            <label class="block text-slate-400 font-bold mb-1">Tahun</label>
+            <input type="number" id="pres-tahun" required value="2026" class="w-full p-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white outline-none focus:border-amber-400">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-slate-400 font-bold mb-1">Nama Kejuaraan / Acara</label>
+          <input type="text" id="pres-lomba" required placeholder="Nama lengkap kompetisi..." class="w-full p-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white outline-none focus:border-amber-400">
+        </div>
+
+        <button type="submit" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-title text-xs py-3 rounded-xl font-bold transition shadow-lg mt-2">
+          💾 Simpan Data Prestasi
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="text-center text-xs text-slate-500 border-t border-slate-800 pt-6">
+    © 2026 <strong>NalarSci Lab</strong> • Apresiasi Bakat & Karakter Siswa
+  </footer>
+
+  <script>
+    const PIN_VALID = "2026"; // Ganti PIN Anda sesuai kebutuhan
+
+    // Data awal
+    let daftarPrestasi = [
+      {
+        nama: "Kenzo Alvaro",
+        kelas: "Kelas 5 SD",
+        kategori: "KKA & IT",
+        lomba: "Kompetisi Koding & Robotik Pelajar",
+        peringkat: "Juara 1 (Medali Emas)",
+        tingkat: "Tingkat Provinsi",
+        tahun: 2026,
+        foto: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=600&auto=format&fit=crop&q=80"
+      },
+      {
+        nama: "Michelle Salim",
+        kelas: "Kelas 6 SD",
+        kategori: "Sains",
+        lomba: "Olimpiade Sains & Eksperimen Cilik",
+        peringkat: "Juara 2 (Perak)",
+        tingkat: "Tingkat Nasional",
+        tahun: 2026,
+        foto: "https://images.unsplash.com/photo-1578269174936-2709b6aeb913?w=600&auto=format&fit=crop&q=80"
+      },
+      {
+        nama: "Tim Paduan Suara",
+        kelas: "Kelas 4–6 SD",
+        kategori: "Seni & Budaya",
+        lomba: "Festival Seni Musik & Vokal Pelajar",
+        peringkat: "Juara 1 Utama",
+        tingkat: "Tingkat Kota",
+        tahun: 2026,
+        foto: "https://images.unsplash.com/photo-1465847899084-d164df4dedc6?w=600&auto=format&fit=crop&q=80"
+      }
+    ];
+
+    let kategoriAktif = "Semua";
+
+    function renderCards(list) {
+      const grid = document.getElementById('grid-prestasi');
+      if (list.length === 0) {
+        grid.innerHTML = '<div class="col-span-full text-center text-slate-500 py-12">Tidak ada data prestasi yang cocok.</div>';
+        return;
+      }
+
+      grid.innerHTML = list.map(item => `
+        <div class="glass-card rounded-3xl overflow-hidden flex flex-col">
+          <div class="relative aspect-video w-full overflow-hidden bg-slate-950">
+            <img src="${item.foto}" alt="${item.nama}" class="w-full h-full object-cover">
+            <div class="absolute top-3 left-3 bg-amber-500 text-slate-950 text-[10px] font-black uppercase px-2.5 py-1 rounded-full shadow">
+              🏆 ${item.peringkat}
+            </div>
+            <div class="absolute top-3 right-3 bg-black/60 backdrop-blur-md text-white text-[10px] font-bold px-2 py-0.5 rounded-lg border border-white/10">
+              ${item.tingkat}
+            </div>
+          </div>
+          <div class="p-5 flex flex-col flex-grow">
+            <span class="text-[10px] text-amber-400 font-bold uppercase tracking-wider mb-1">${item.kategori} • ${item.tahun}</span>
+            <h3 class="font-title text-xl text-white mb-0.5">${item.nama}</h3>
+            <p class="text-xs text-sky-400 font-semibold mb-3">📍 ${item.kelas}</p>
+            <p class="text-xs text-slate-300 leading-relaxed flex-grow border-t border-slate-800/80 pt-3">
+              ${item.lomba}
+            </p>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function filterPrestasi(kat) {
+      kategoriAktif = kat;
+      document.querySelectorAll('.btn-filter').forEach(b => b.classList.remove('active'));
+      event.target.classList.add('active');
+
+      if (kat === 'Semua') {
+        renderCards(daftarPrestasi);
+      } else {
+        const filtered = daftarPrestasi.filter(p => p.kategori === kat);
+        renderCards(filtered);
+      }
+    }
+
+    function cariPrestasi() {
+      const q = document.getElementById('cari-input').value.toLowerCase();
+      const filtered = daftarPrestasi.filter(p => {
+        const matchKategori = (kategoriAktif === 'Semua') || (p.kategori === kategoriAktif);
+        const matchKeyword = p.nama.toLowerCase().includes(q) || 
+                             p.lomba.toLowerCase().includes(q) || 
+                             p.kelas.toLowerCase().includes(q);
+        return matchKategori && matchKeyword;
+      });
+      renderCards(filtered);
+    }
+
+    function toggleModalWakasis(show) {
+      document.getElementById('modal-wakasis').classList.toggle('hidden', !show);
+    }
+
+    function tambahPrestasi(e) {
+      e.preventDefault();
+      const pin = document.getElementById('input-pin').value;
+      if (pin !== PIN_VALID) {
+        alert('PIN Wakasis salah! Akses ditolak.');
+        return;
+      }
+
+      const itemBaru = {
+        nama: document.getElementById('pres-nama').value.trim(),
+        kelas: document.getElementById('pres-kelas').value.trim(),
+        kategori: document.getElementById('pres-kat').value,
+        tingkat: document.getElementById('pres-tingkat').value,
+        peringkat: document.getElementById('pres-peringkat').value.trim(),
+        tahun: document.getElementById('pres-tahun').value,
+        lomba: document.getElementById('pres-lomba').value.trim(),
+        foto: 'https://images.unsplash.com/photo-1578269174936-2709b6aeb913?w=600&auto=format&fit=crop&q=80'
+      };
+
+      daftarPrestasi.unshift(itemBaru);
+      alert('Prestasi siswa berhasil dicatat!');
+      toggleModalWakasis(false);
+      e.target.reset();
+      renderCards(daftarPrestasi);
+    }
+
+    renderCards(daftarPrestasi);
+  </script>
+</body>
+</html>
