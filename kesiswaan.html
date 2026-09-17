@@ -7,6 +7,7 @@
   <meta name="description" content="Sistem Informasi Manajemen Kesiswaan: Rekap absensi keterlambatan, buku kasus konseling, dan pembinaan karakter siswa.">
   
   <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="apple-touch-icon" href="icon-192.png">
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 
@@ -22,12 +23,19 @@
       background: rgba(255, 255, 255, 0.04);
       backdrop-filter: blur(14px);
       border: 1px solid rgba(255, 255, 255, 0.08);
-      transition: all 0.3s ease;
+      transition: all 0.25s ease;
     }
     .subtab-btn.active {
       background-color: #059669 !important;
       color: #ffffff !important;
       border-color: #34d399 !important;
+    }
+    @media print {
+      body { background: white !important; color: black !important; padding: 0 !important; }
+      header, #subtab-bar, footer, button, .no-print { display: none !important; }
+      .glass-card { background: transparent !important; border: 1px solid #ccc !important; box-shadow: none !important; }
+      table { border-collapse: collapse !important; width: 100% !important; }
+      th, td { border: 1px solid #333 !important; color: black !important; padding: 8px !important; }
     }
   </style>
 </head>
@@ -50,7 +58,7 @@
       </div>
       <h1 class="font-title text-3xl sm:text-4xl text-white mb-2">Buku Kasus & Absensi Siswa</h1>
       <p class="text-slate-400 text-xs sm:text-sm">
-        Pencatatan penanganan insiden, pembinaan karakter, dan rekapitulasi keterlambatan siswa harian.
+        Pencatatan penanganan masalah siswa terstruktur, pembinaan restoratif, dan rekapitulasi keterlambatan harian.
       </p>
     </div>
 
@@ -73,7 +81,7 @@
     <div class="glass-card rounded-3xl p-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
       <div>
         <h2 class="font-title text-lg text-emerald-300">Penanganan Masalah & Tindak Lanjut Siswa</h2>
-        <p class="text-xs text-slate-400">Setiap catatan memiliki status penanganan yang jelas dan penanggung jawab (PIC).</p>
+        <p class="text-xs text-slate-400">Setiap catatan tersimpan di Google Sheets dengan status penyelesaian dan PIC penanggung jawab.</p>
       </div>
       <button onclick="toggleModalKasus(true)" class="bg-emerald-600 hover:bg-emerald-500 text-white font-title text-xs px-4 py-2.5 rounded-xl font-bold shadow-lg transition flex-shrink-0">
         + Catat Kasus Baru
@@ -88,28 +96,18 @@
             <tr>
               <th class="p-3.5">Tanggal</th>
               <th class="p-3.5">Nama & Kelas</th>
-              <th class="p-3.5">Masalah / Kasus</th>
-              <th class="p-3.5">Solusi & Tindakan</th>
+              <th class="p-3.5">Deskripsi Masalah</th>
+              <th class="p-3.5">Tindakan / Solusi</th>
               <th class="p-3.5">PIC Penangan</th>
               <th class="p-3.5">Status</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-slate-800/60" id="body-kasus">
             <tr>
-              <td class="p-3.5 text-slate-400">17 Sep 2026</td>
-              <td class="p-3.5 font-bold text-white">David Pratama (5A)</td>
-              <td class="p-3.5 text-slate-300">Perselisihan saat jam istirahat di lapangan</td>
-              <td class="p-3.5 text-slate-300">Mediasi bersama kedua belah pihak & komitmen berteman baik</td>
-              <td class="p-3.5 text-sky-400 font-semibold">Pak Thomas (Wakasis)</td>
-              <td class="p-3.5"><span class="bg-emerald-500/20 text-emerald-400 font-bold px-2 py-0.5 rounded-full text-[10px]">✅ Selesai</span></td>
-            </tr>
-            <tr>
-              <td class="p-3.5 text-slate-400">15 Sep 2026</td>
-              <td class="p-3.5 font-bold text-white">Riko Wijaya (6B)</td>
-              <td class="p-3.5 text-slate-300">Sering tertidur di jam pelajaran pertama & tugas terhambat</td>
-              <td class="p-3.5 text-slate-300">Konseling pola istirahat malam & koordinasi dengan orang tua</td>
-              <td class="p-3.5 text-purple-400 font-semibold">Ibu Maria (Guru BK)</td>
-              <td class="p-3.5"><span class="bg-amber-500/20 text-amber-300 font-bold px-2 py-0.5 rounded-full text-[10px]">⏳ Proses Solusi</span></td>
+              <td colspan="6" class="p-6 text-center text-slate-400">
+                <div class="inline-block w-6 h-6 border-2 border-emerald-400 border-t-transparent rounded-full animate-spin mb-2"></div>
+                <p>Menghubungkan ke database kesiswaan...</p>
+              </td>
             </tr>
           </tbody>
         </table>
@@ -122,55 +120,45 @@
     <!-- STATISTIK KETERLAMBATAN -->
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
       <div class="glass-card rounded-2xl p-5 border border-slate-800">
-        <p class="text-xs text-slate-400 font-bold">Terlambat Hari Ini</p>
-        <p class="font-title text-3xl text-amber-300 mt-1">3 Siswa</p>
-        <p class="text-[10px] text-slate-500 mt-1">Batas toleransi: 07.15 WIB</p>
+        <p class="text-xs text-slate-400 font-bold">Total Terdata</p>
+        <p class="font-title text-3xl text-amber-300 mt-1" id="stat-total-terlambat">0 Siswa</p>
+        <p class="text-[10px] text-slate-500 mt-1">Batas toleransi bel: 07.15 WIB</p>
       </div>
       <div class="glass-card rounded-2xl p-5 border border-slate-800">
-        <p class="text-xs text-slate-400 font-bold">Teguran 1 (Akumulasi $\ge$ 3x)</p>
-        <p class="font-title text-3xl text-orange-400 mt-1">2 Siswa</p>
-        <p class="text-[10px] text-slate-500 mt-1">Diberikan surat peringatan tertulis</p>
+        <p class="text-xs text-slate-400 font-bold">Surat Peringatan (Akumulasi $\ge$ 3x)</p>
+        <p class="font-title text-3xl text-orange-400 mt-1" id="stat-sp">0 Siswa</p>
+        <p class="text-[10px] text-slate-500 mt-1">Diterbitkan SP Keterlambatan</p>
       </div>
       <div class="glass-card rounded-2xl p-5 border border-slate-800">
         <p class="text-xs text-slate-400 font-bold">Panggilan Ortu (Akumulasi $\ge$ 5x)</p>
-        <p class="font-title text-3xl text-rose-400 mt-1">0 Siswa</p>
-        <p class="text-[10px] text-slate-500 mt-1">Wajib mediasi bersama Wakasis</p>
+        <p class="font-title text-3xl text-rose-400 mt-1" id="stat-ortu">0 Siswa</p>
+        <p class="text-[10px] text-slate-500 mt-1">Konferensi kasus bersama Wakasis</p>
       </div>
     </div>
 
     <!-- LOG HARIAN KETERLAMBATAN -->
     <div class="glass-card rounded-3xl overflow-hidden border border-slate-800">
       <div class="p-4 bg-slate-900 border-b border-slate-800 flex justify-between items-center">
-        <h3 class="font-title text-sm text-amber-300">Log Siswa Terlambat Hari Ini</h3>
+        <h3 class="font-title text-sm text-amber-300">Daftar Rekap Siswa Terlambat</h3>
         <button onclick="cetakRekap()" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-title text-xs px-3.5 py-1.5 rounded-xl font-bold transition">
-          📄 Ekspor Rekap / Cetak
+          📄 Cetak Lembar Rekap
         </button>
       </div>
       <div class="overflow-x-auto">
         <table class="w-full text-left text-xs text-slate-300">
           <thead class="bg-slate-950 text-slate-400 uppercase font-black text-[10px] border-b border-slate-800">
             <tr>
+              <th class="p-3.5">Tanggal</th>
               <th class="p-3.5">Jam Masuk</th>
               <th class="p-3.5">Nama Siswa</th>
               <th class="p-3.5">Kelas</th>
-              <th class="p-3.5">Total Terlambat Bulan Ini</th>
-              <th class="p-3.5">Tindakan / Status Teguran</th>
+              <th class="p-3.5">Akumulasi Bulan Ini</th>
+              <th class="p-3.5">Status Tindakan</th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-slate-800/60">
+          <tbody class="divide-y divide-slate-800/60" id="body-terlambat">
             <tr>
-              <td class="p-3.5 text-rose-400 font-mono font-bold">07.24 WIB</td>
-              <td class="p-3.5 font-bold text-white">Kevin Adiputra</td>
-              <td class="p-3.5">Kelas 5B</td>
-              <td class="p-3.5 text-amber-400 font-bold">1 Kali</td>
-              <td class="p-3.5"><span class="text-slate-400">Pembinaan guru piket</span></td>
-            </tr>
-            <tr>
-              <td class="p-3.5 text-rose-400 font-mono font-bold">07.31 WIB</td>
-              <td class="p-3.5 font-bold text-white">Samuel Christian</td>
-              <td class="p-3.5">Kelas 6A</td>
-              <td class="p-3.5 text-orange-400 font-bold">3 Kali (⚠️ Peringatan)</td>
-              <td class="p-3.5"><span class="bg-orange-500/20 text-orange-300 font-bold px-2 py-0.5 rounded-full text-[10px]">Surat Peringatan 1</span></td>
+              <td colspan="6" class="p-6 text-center text-slate-400">Belum ada data keterlambatan yang dimuat.</td>
             </tr>
           </tbody>
         </table>
@@ -183,28 +171,28 @@
     <div class="glass-card rounded-3xl p-6 border border-slate-800">
       <h2 class="font-title text-lg text-sky-300 mb-2">Panduan Sistem Poin Kedisiplinan Siswa</h2>
       <p class="text-xs text-slate-400 leading-relaxed mb-6">
-        Sistem pembinaan karakter berbasis restoratif: siswa yang memiliki poin pelanggaran dapat memulihkan catatannya melalui kegiatan positif (literasi, membantu perpustakaan, atau aksi peduli lingkungan).
+        Pendekatan restoratif berfokus pada perbaikan perilaku. Siswa yang memperoleh poin dapat memulihkan catatannya melalui program pembiasaan positif di bawah bimbingan guru dan wali kelas.
       </p>
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
         <div class="bg-slate-900/80 p-4 rounded-2xl border border-slate-800">
           <span class="text-sky-400 font-bold block mb-1">Pelanggaran Ringan (5 Poin)</span>
-          <p class="text-slate-400 leading-relaxed">Atribut seragam tidak lengkap, terlambat tanpa keterangan, atau membuang bungkus makanan sembarangan.</p>
+          <p class="text-slate-400 leading-relaxed">Atribut seragam tidak lengkap, terlambat masuk tanpa surat izin piket, atau membuang sampah tidak pada tempatnya.</p>
         </div>
         <div class="bg-slate-900/80 p-4 rounded-2xl border border-slate-800">
           <span class="text-amber-400 font-bold block mb-1">Pelanggaran Sedang (15 Poin)</span>
-          <p class="text-slate-400 leading-relaxed">Meninggalkan jam pelajaran tanpa izin piket, bermain gawai tanpa instruksi guru, atau membuat gaduh berulang.</p>
+          <p class="text-slate-400 leading-relaxed">Keluar lingkungan sekolah saat jam belajar tanpa izin, menggunakan gawai saat pembelajaran tanpa arahan guru, atau berulang kali tidak tertib.</p>
         </div>
         <div class="bg-slate-900/80 p-4 rounded-2xl border border-slate-800">
           <span class="text-rose-400 font-bold block mb-1">Pelanggaran Berat (30+ Poin)</span>
-          <p class="text-slate-400 leading-relaxed">Perundungan (*bullying* fisik/verbal/siber), merusak fasilitas sekolah dengan sengaja, atau ketidakjujuran berat.</p>
+          <p class="text-slate-400 leading-relaxed">Tindakan perundungan (*bullying* verbal, fisik, siber), merusak sarana kelas dengan sengaja, atau tindakan tidak jujur berat.</p>
         </div>
       </div>
     </div>
   </section>
 
   <!-- MODAL FORM INPUT KASUS BARU -->
-  <div id="modal-kasus" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+  <div id="modal-kasus" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden no-print">
     <div class="glass-card max-w-lg w-full rounded-3xl p-6 border border-emerald-500/40 bg-slate-900 shadow-2xl">
       <div class="flex justify-between items-center mb-4 border-b border-slate-800 pb-3">
         <h3 class="font-title text-xl text-emerald-300">Catat Masalah Siswa Baru</h3>
@@ -212,10 +200,15 @@
       </div>
 
       <form onsubmit="simpanKasus(event)" class="space-y-3 text-xs">
+        <div>
+          <label class="block text-slate-400 font-bold mb-1">PIN Keamanan Wakasis</label>
+          <input type="password" id="kasus-pin" required placeholder="Masukkan PIN Wakasis..." class="w-full p-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white outline-none focus:border-emerald-400">
+        </div>
+
         <div class="grid grid-cols-2 gap-3">
           <div>
             <label class="block text-slate-400 font-bold mb-1">Nama Siswa</label>
-            <input type="text" id="kasus-nama" required placeholder="Nama lengkap..." class="w-full p-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white outline-none focus:border-emerald-400">
+            <input type="text" id="kasus-nama" required placeholder="Nama siswa..." class="w-full p-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white outline-none focus:border-emerald-400">
           </div>
           <div>
             <label class="block text-slate-400 font-bold mb-1">Kelas</label>
@@ -224,13 +217,18 @@
         </div>
 
         <div>
-          <label class="block text-slate-400 font-bold mb-1">Deskripsi Masalah / Kronologi</label>
-          <textarea id="kasus-kronologi" required rows="2" placeholder="Jelaskan insiden atau masalah yang terjadi..." class="w-full p-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white outline-none focus:border-emerald-400"></textarea>
+          <label class="block text-slate-400 font-bold mb-1">Tanggal Kejadian</label>
+          <input type="date" id="kasus-tanggal" required class="w-full p-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white outline-none focus:border-emerald-400">
         </div>
 
         <div>
-          <label class="block text-slate-400 font-bold mb-1">Tindakan / Solusi yang Diberikan</label>
-          <textarea id="kasus-solusi" required rows="2" placeholder="Langkah pembinaan atau penyelesaian..." class="w-full p-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white outline-none focus:border-emerald-400"></textarea>
+          <label class="block text-slate-400 font-bold mb-1">Deskripsi Masalah / Kronologi</label>
+          <textarea id="kasus-kronologi" required rows="2" placeholder="Uraikan kronologi masalah atau insiden..." class="w-full p-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white outline-none focus:border-emerald-400"></textarea>
+        </div>
+
+        <div>
+          <label class="block text-slate-400 font-bold mb-1">Tindakan Pembinaan / Solusi</label>
+          <textarea id="kasus-solusi" required rows="2" placeholder="Solusi mediasi, konseling, atau kesepakatan..." class="w-full p-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white outline-none focus:border-emerald-400"></textarea>
         </div>
 
         <div class="grid grid-cols-2 gap-3">
@@ -242,13 +240,13 @@
             <label class="block text-slate-400 font-bold mb-1">Status Penanganan</label>
             <select id="kasus-status" class="w-full p-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white font-bold outline-none focus:border-emerald-400">
               <option value="✅ Selesai">✅ Selesai</option>
-              <option value="⏳ Proses Solusi">⏳ Masih Proses</option>
+              <option value="⏳ Proses Solusi">⏳ Proses Solusi</option>
             </select>
           </div>
         </div>
 
-        <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-title text-xs py-3 rounded-xl font-bold transition shadow-lg mt-2">
-          💾 Simpan ke Buku Kasus
+        <button type="submit" id="btn-simpan-kasus" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-title text-xs py-3 rounded-xl font-bold transition shadow-lg mt-2">
+          💾 Simpan Catatan ke Cloud
         </button>
       </form>
     </div>
@@ -260,6 +258,27 @@
   </footer>
 
   <script>
+    // ⚠️ GANTI DENGAN URL DEPLOYMENT APPS SCRIPT KESISWAAN ANDA
+    const API_KESISWAAN_URL = "https://script.google.com/macros/s/AKfycbzYdXRIHIi1RGHWmb61__IRiR2DkdQYpjxj-xiEBiXAmSyyIRmCXLum6vJoAPQmWqcIDg/exec";
+
+    // Data cadangan jika API belum terpasang
+    const backupKasus = [
+      {
+        tanggal: "17 Sep 2026",
+        nama: "David Pratama",
+        kelas: "5A",
+        masalah: "Perselisihan saat jam istirahat di lapangan",
+        solusi: "Mediasi bersama kedua belah pihak & komitmen berteman baik",
+        pic: "Pak Thomas (Wakasis)",
+        status: "✅ Selesai"
+      }
+    ];
+
+    const backupTerlambat = [
+      { tanggal: "17 Sep 2026", jam: "07.24 WIB", nama: "Kevin Adiputra", kelas: "5B", akumulasi: 1, teguran: "Pembinaan piket" },
+      { tanggal: "17 Sep 2026", jam: "07.31 WIB", nama: "Samuel Christian", kelas: "6A", akumulasi: 3, teguran: "Surat Peringatan 1" }
+    ];
+
     function bukaTab(tab) {
       document.querySelectorAll('.subtab-btn').forEach(b => b.classList.remove('active'));
       document.getElementById('konten-kasus').classList.add('hidden');
@@ -280,40 +299,158 @@
 
     function toggleModalKasus(show) {
       document.getElementById('modal-kasus').classList.toggle('hidden', !show);
+      if (show) {
+        document.getElementById('kasus-tanggal').valueAsDate = new Date();
+      }
+    }
+
+    function ambilDataKesiswaan() {
+      if (API_KESISWAAN_URL === "TEMPEL_URL_APPS_SCRIPT_KESISWAAN_DI_SINI") {
+        renderTabelKasus(backupKasus);
+        renderTabelTerlambat(backupTerlambat);
+        return;
+      }
+
+      fetch(API_KESISWAAN_URL)
+        .then(res => res.json())
+        .then(data => {
+          if (data.status === "success") {
+            renderTabelKasus(data.kasus || []);
+            renderTabelTerlambat(data.terlambat || []);
+          } else {
+            renderTabelKasus(backupKasus);
+            renderTabelTerlambat(backupTerlambat);
+          }
+        })
+        .catch(err => {
+          console.warn("Gagal memuat data:", err);
+          renderTabelKasus(backupKasus);
+          renderTabelTerlambat(backupTerlambat);
+        });
+    }
+
+    function renderTabelKasus(list) {
+      const tbody = document.getElementById('body-kasus');
+      if (!list || list.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="p-6 text-center text-slate-500">Belum ada catatan kasus yang terdaftar.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = list.map(item => {
+        const isSelesai = item.status && item.status.includes('Selesai');
+        const badgeClass = isSelesai ? 'bg-emerald-500/20 text-emerald-400' : 'bg-amber-500/20 text-amber-300';
+
+        return `
+          <tr>
+            <td class="p-3.5 text-slate-400 font-mono">${item.tanggal || '-'}</td>
+            <td class="p-3.5 font-bold text-white">${item.nama} (${item.kelas})</td>
+            <td class="p-3.5 text-slate-300">${item.masalah}</td>
+            <td class="p-3.5 text-slate-300">${item.solusi}</td>
+            <td class="p-3.5 text-sky-400 font-semibold">${item.pic}</td>
+            <td class="p-3.5"><span class="${badgeClass} font-bold px-2 py-0.5 rounded-full text-[10px]">${item.status}</span></td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function renderTabelTerlambat(list) {
+      const tbody = document.getElementById('body-terlambat');
+      if (!list || list.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="p-6 text-center text-slate-500">Tidak ada data keterlambatan.</td></tr>';
+        return;
+      }
+
+      let countSp = 0;
+      let countOrtu = 0;
+
+      tbody.innerHTML = list.map(item => {
+        if (item.akumulasi >= 5) countOrtu++;
+        else if (item.akumulasi >= 3) countSp++;
+
+        const isSp = item.akumulasi >= 3;
+        const spBadge = isSp 
+          ? `<span class="bg-orange-500/20 text-orange-300 font-bold px-2 py-0.5 rounded-full text-[10px]">${item.teguran || 'SP-1'}</span>`
+          : `<span class="text-slate-400">${item.teguran || 'Pembinaan piket'}</span>`;
+
+        return `
+          <tr>
+            <td class="p-3.5 text-slate-400 font-mono">${item.tanggal || '-'}</td>
+            <td class="p-3.5 text-rose-400 font-mono font-bold">${item.jam}</td>
+            <td class="p-3.5 font-bold text-white">${item.nama}</td>
+            <td class="p-3.5 text-slate-300">${item.kelas}</td>
+            <td class="p-3.5 text-amber-400 font-bold">${item.akumulasi} Kali</td>
+            <td class="p-3.5">${spBadge}</td>
+          </tr>
+        `;
+      }).join('');
+
+      document.getElementById('stat-total-terlambat').innerText = list.length + " Siswa";
+      document.getElementById('stat-sp').innerText = countSp + " Siswa";
+      document.getElementById('stat-ortu').innerText = countOrtu + " Siswa";
     }
 
     function simpanKasus(e) {
       e.preventDefault();
-      const nama = document.getElementById('kasus-nama').value;
-      const kelas = document.getElementById('kasus-kelas').value;
-      const kronologi = document.getElementById('kasus-kronologi').value;
-      const solusi = document.getElementById('kasus-solusi').value;
-      const pic = document.getElementById('kasus-pic').value;
-      const status = document.getElementById('kasus-status').value;
+      const btn = document.getElementById('btn-simpan-kasus');
+      btn.disabled = true;
+      btn.innerText = "⏳ Menyimpan ke Database...";
 
-      const badge = status.includes('Selesai') 
-        ? `<span class="bg-emerald-500/20 text-emerald-400 font-bold px-2 py-0.5 rounded-full text-[10px]">${status}</span>`
-        : `<span class="bg-amber-500/20 text-amber-300 font-bold px-2 py-0.5 rounded-full text-[10px]">${status}</span>`;
+      const pin = document.getElementById('kasus-pin').value.trim();
+      const payload = {
+        action: "tambah_kasus",
+        pin: pin,
+        data: {
+          tanggal: document.getElementById('kasus-tanggal').value,
+          nama: document.getElementById('kasus-nama').value.trim(),
+          kelas: document.getElementById('kasus-kelas').value.trim(),
+          masalah: document.getElementById('kasus-kronologi').value.trim(),
+          solusi: document.getElementById('kasus-solusi').value.trim(),
+          pic: document.getElementById('kasus-pic').value.trim(),
+          status: document.getElementById('kasus-status').value
+        }
+      };
 
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td class="p-3.5 text-slate-400">Hari ini</td>
-        <td class="p-3.5 font-bold text-white">${nama} (${kelas})</td>
-        <td class="p-3.5 text-slate-300">${kronologi}</td>
-        <td class="p-3.5 text-slate-300">${solusi}</td>
-        <td class="p-3.5 text-sky-400 font-semibold">${pic}</td>
-        <td class="p-3.5">${badge}</td>
-      `;
+      if (API_KESISWAAN_URL === "TEMPEL_URL_APPS_SCRIPT_KESISWAAN_DI_SINI") {
+        backupKasus.unshift(payload.data);
+        renderTabelKasus(backupKasus);
+        alert("Peringatan: URL Apps Script belum dipasang. Data masuk sementara ke tampilan browser.");
+        toggleModalKasus(false);
+        btn.disabled = false;
+        btn.innerText = "💾 Simpan Catatan ke Cloud";
+        e.target.reset();
+        return;
+      }
 
-      document.getElementById('body-kasus').prepend(tr);
-      alert('Catatan kasus baru berhasil ditambahkan!');
-      toggleModalKasus(false);
-      e.target.reset();
+      fetch(API_KESISWAAN_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify(payload)
+      })
+      .then(res => res.json())
+      .then(res => {
+        btn.disabled = false;
+        btn.innerText = "💾 Simpan Catatan ke Cloud";
+        if (res.status === "success") {
+          alert("Berhasil! " + res.message);
+          toggleModalKasus(false);
+          e.target.reset();
+          ambilDataKesiswaan();
+        } else {
+          alert("Gagal: " + res.message);
+        }
+      })
+      .catch(err => {
+        btn.disabled = false;
+        btn.innerText = "💾 Simpan Catatan ke Cloud";
+        alert("Terjadi gangguan jaringan: " + err);
+      });
     }
 
     function cetakRekap() {
       window.print();
     }
+
+    ambilDataKesiswaan();
   </script>
 </body>
 </html>
