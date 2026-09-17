@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ruang Kerja Guru & Riset — NalarSci Lab</title>
+  <meta name="description" content="Pusat perangkat ajar aktif, generator LKPD Canva, rubrik penilaian, dan materi pembelajaran sekolah.">
+  
+  <link rel="icon" type="image/png" href="favicon.png">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: radial-gradient(circle at 50% 0%, #1e293b 0%, #0b0f19 75%);
+      color: #f8fafc;
+      min-height: 100vh;
+    }
+    .font-title { font-family: 'Fredoka', sans-serif; }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.04);
+      backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .glass-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(168, 85, 247, 0.4);
+      box-shadow: 0 16px 32px -10px rgba(0, 0, 0, 0.5);
+    }
+  </style>
+</head>
+<body class="p-4 md:p-8 max-w-5xl mx-auto flex flex-col justify-between min-h-screen">
+
+  <header class="mb-8">
+    <div class="flex justify-between items-center border-b border-slate-800 pb-3 mb-6">
+      <a href="index.html" class="text-sky-400 hover:text-sky-300 font-bold text-xs flex items-center gap-1 transition">
+        ← Kembali ke Portal Publik
+      </a>
+      <span class="text-xs bg-purple-500/10 border border-purple-400/20 text-purple-300 px-3 py-1 rounded-full font-bold">
+        👨‍🏫 Ruang Kolaborasi Guru & Fasilitator
+      </span>
+    </div>
+
+    <div class="text-center max-w-2xl mx-auto mb-8">
+      <div class="inline-flex items-center gap-2 bg-purple-500/10 border border-purple-400/20 text-purple-300 px-3.5 py-1 rounded-full text-xs font-black uppercase tracking-wider mb-2">
+        Pedagogi • Otomasi • Riset Pembelajaran
+      </div>
+      <h1 class="font-title text-3xl sm:text-4xl text-white mb-2">Ruang Kerja Pengajar</h1>
+      <p class="text-slate-400 text-xs sm:text-sm">
+        Kumpulan perangkat bantu guru untuk menyusun media presentasi aktif, rubrik penilaian proyek, materi ajar komputasi, dan evaluasi kelas.
+      </p>
+    </div>
+  </header>
+
+  <main class="grid grid-cols-1 md:grid-cols-2 gap-6 flex-grow mb-12">
+    
+    <!-- 1. RUANG MATERI & REFLEKSI -->
+    <div class="glass-card rounded-3xl p-6 flex flex-col justify-between">
+      <div>
+        <div class="flex justify-between items-start mb-3">
+          <div class="text-4xl">📚</div>
+          <span class="bg-sky-500/20 text-sky-300 text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full border border-sky-400/30">Materi & Tugas</span>
+        </div>
+        <h3 class="font-title text-xl text-white mb-1">Ruang Materi & Kantung Tugas</h3>
+        <p class="text-xs text-slate-300 leading-relaxed mb-6">
+          Bagikan slide PPT pembelajaran/seminar kepada siswa dan terima pengumpulan link proyek Scratch/Canva secara terpusat.
+        </p>
+      </div>
+      <a href="ruang-materi.html" class="w-full bg-sky-600 hover:bg-sky-500 text-white font-title text-xs py-2.5 rounded-xl text-center font-bold transition">
+        Buka Ruang Materi & Tugas →
+      </a>
+    </div>
+
+    <!-- 2. GENERATOR CANVA -->
+    <div class="glass-card rounded-3xl p-6 flex flex-col justify-between">
+      <div>
+        <div class="flex justify-between items-start mb-3">
+          <div class="text-4xl">🪄</div>
+          <span class="bg-purple-500/20 text-purple-300 text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full border border-purple-400/30">Otomasi Slide</span>
+        </div>
+        <h3 class="font-title text-xl text-white mb-1">Generator Media Ajar Canva</h3>
+        <p class="text-xs text-slate-300 leading-relaxed mb-6">
+          Rancang struktur slide inkuiri aktif dan lembar kerja peserta didik (LKPD) siap salin massal ke fitur <em>Bulk Create</em> Canva.
+        </p>
+      </div>
+      <a href="generator-media.html" class="w-full bg-purple-600 hover:bg-purple-500 text-white font-title text-xs py-2.5 rounded-xl text-center font-bold transition">
+        Buka Generator Canva →
+      </a>
+    </div>
+
+    <!-- 3. GALERI PAMERAN KARYA SISWA -->
+    <div class="glass-card rounded-3xl p-6 flex flex-col justify-between">
+      <div>
+        <div class="flex justify-between items-start mb-3">
+          <div class="text-4xl">🎨</div>
+          <span class="bg-emerald-500/20 text-emerald-300 text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full border border-emerald-400/30">Portofolio</span>
+        </div>
+        <h3 class="font-title text-xl text-white mb-1">Etalase Proyek & Kreasi Siswa</h3>
+        <p class="text-xs text-slate-300 leading-relaxed mb-6">
+          Lihat kumpulan karya game komputasi, poster digital, dan dokumentasi riset sains yang telah dihasilkan siswa di kelas.
+        </p>
+      </div>
+      <a href="galeri-karya.html" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-title text-xs py-2.5 rounded-xl text-center font-bold transition">
+        Lihat Galeri Siswa →
+      </a>
+    </div>
+
+    <!-- 4. PANDUAN KURIKULUM & INTEGRASI INFORMATIKA -->
+    <div class="glass-card rounded-3xl p-6 flex flex-col justify-between">
+      <div>
+        <div class="flex justify-between items-start mb-3">
+          <div class="text-4xl">💡</div>
+          <span class="bg-amber-500/20 text-amber-300 text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full border border-amber-400/30">Pedagogi</span>
+        </div>
+        <h3 class="font-title text-xl text-white mb-1">Panduan Berpikir Komputasional</h3>
+        <p class="text-xs text-slate-300 leading-relaxed mb-6">
+          Kerangka integrasi logika dekomposisi, pengenalan pola, dan abstraksi untuk pembelajaran tematik IPAS dan Matematika.
+        </p>
+      </div>
+      <a href="tentang.html" class="w-full bg-slate-800 hover:bg-slate-700 text-amber-300 font-title text-xs py-2.5 rounded-xl text-center font-bold border border-slate-700 transition">
+        Pelajari Pendekatan Lab →
+      </a>
+    </div>
+
+  </main>
+
+  <footer class="text-center text-xs text-slate-500 border-t border-slate-800 pt-6">
+    © 2026 <strong>NalarSci Lab</strong> • Wadah Inovasi Guru & Pengajar Pembelajar
+  </footer>
+
+</body>
+</html>
