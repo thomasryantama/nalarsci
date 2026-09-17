@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Galeri Karya Siswa — NalarSci Lab</title>
+  <meta name="description" content="Panggung etalase kreasi koding, game Scratch, eksperimen sains, dan karya digital siswa.">
+  
+  <link rel="icon" type="image/png" href="favicon.png">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: radial-gradient(circle at 50% 0%, #1e293b 0%, #0b0f19 75%);
+      color: #f8fafc;
+      min-height: 100vh;
+    }
+    .font-title { font-family: 'Fredoka', sans-serif; }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.04);
+      backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      transition: all 0.3s ease;
+    }
+    .glass-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(56, 189, 248, 0.4);
+      box-shadow: 0 16px 32px -10px rgba(0, 0, 0, 0.5);
+    }
+    .btn-filter.active {
+      background-color: #0284c7;
+      color: #ffffff;
+      border-color: #38bdf8;
+    }
+  </style>
+</head>
+<body class="p-4 md:p-8 max-w-6xl mx-auto flex flex-col justify-between min-h-screen">
+
+  <!-- HEADER -->
+  <header class="mb-8">
+    <div class="flex justify-between items-center border-b border-slate-800 pb-3 mb-6">
+      <a href="index.html" class="text-sky-400 hover:text-sky-300 font-bold text-xs flex items-center gap-1 transition">
+        ← Kembali ke Beranda Lab
+      </a>
+      <span class="text-xs text-slate-400 font-semibold">Pameran Proyek Siswa</span>
+    </div>
+
+    <div class="text-center max-w-2xl mx-auto">
+      <div class="inline-flex items-center gap-2 bg-sky-500/10 border border-sky-400/20 text-sky-400 px-3.5 py-1 rounded-full text-xs font-black uppercase tracking-wider mb-2">
+        🎨 Ruang Kreasi & Inovasi
+      </div>
+      <h1 class="font-title text-3xl sm:text-4xl text-white mb-2">Galeri Karya Siswa</h1>
+      <p class="text-slate-400 text-xs sm:text-sm">
+        Kumpulan proyek koding Scratch, animasi komputasi, poster edukasi, dan dokumentasi riset sains karya siswa sekolah.
+      </p>
+    </div>
+
+    <!-- FILTER KATEGORI -->
+    <div class="flex flex-wrap justify-center gap-2 mt-6" id="filter-bar">
+      <button onclick="filterKarya('semua')" class="btn-filter active px-4 py-1.5 rounded-xl bg-slate-800 border border-slate-700 text-xs font-bold text-slate-300 transition">
+        Semua Karya
+      </button>
+      <button onclick="filterKarya('game')" class="btn-filter px-4 py-1.5 rounded-xl bg-slate-800 border border-slate-700 text-xs font-bold text-slate-300 hover:bg-slate-700 transition">
+        🎮 Game & Animasi Scratch
+      </button>
+      <button onclick="filterKarya('sains')" class="btn-filter px-4 py-1.5 rounded-xl bg-slate-800 border border-slate-700 text-xs font-bold text-slate-300 hover:bg-slate-700 transition">
+        🔬 Eksperimen Sains
+      </button>
+      <button onclick="filterKarya('desain')" class="btn-filter px-4 py-1.5 rounded-xl bg-slate-800 border border-slate-700 text-xs font-bold text-slate-300 hover:bg-slate-700 transition">
+        🖼️ Poster & Infografis
+      </button>
+    </div>
+  </header>
+
+  <!-- GRID KARYA SISWA -->
+  <main class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 flex-grow mb-12" id="karya-grid">
+    
+    <!-- KARYA 1 -->
+    <div class="karya-card glass-card rounded-3xl overflow-hidden flex flex-col" data-cat="game">
+      <div class="relative aspect-video bg-slate-950 overflow-hidden">
+        <img src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=600&auto=format&fit=crop&q=80" alt="Petualangan Robot Maze" class="w-full h-full object-cover">
+        <span class="absolute top-3 left-3 bg-sky-600 text-white text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full">
+          Scratch 3.0
+        </span>
+      </div>
+      <div class="p-5 flex flex-col flex-grow">
+        <h3 class="font-title text-lg text-white mb-1">Petualangan Robot Labirin</h3>
+        <p class="text-xs text-sky-400 font-semibold mb-2">Karya: Jonathan Bryan (Kelas 5A)</p>
+        <p class="text-xs text-slate-300 leading-relaxed flex-grow mb-4">
+          Game berbasis penalaran logika perulangan dan percabangan (*if-else*). Siswa memandu robot melewati rintangan laser menuju baterai energi.
+        </p>
+        <button onclick="bukaModalKarya('Petualangan Robot Labirin', 'Jonathan Bryan (Kelas 5A)', 'Game Scratch mengasah konsep algoritma dan pengenalan sensor tabrakan warna.', 'https://scratch.mit.edu')" class="w-full bg-slate-800 hover:bg-slate-700 text-sky-300 border border-slate-700 text-xs font-bold py-2 rounded-xl transition text-center">
+          Lihat Proyek →
+        </button>
+      </div>
+    </div>
+
+    <!-- KARYA 2 -->
+    <div class="karya-card glass-card rounded-3xl overflow-hidden flex flex-col" data-cat="sains">
+      <div class="relative aspect-video bg-slate-950 overflow-hidden">
+        <img src="https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=600&auto=format&fit=crop&q=80" alt="Miniatur Siklus Hidrologi" class="w-full h-full object-cover">
+        <span class="absolute top-3 left-3 bg-emerald-600 text-white text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full">
+          IPAS / Sains
+        </span>
+      </div>
+      <div class="p-5 flex flex-col flex-grow">
+        <h3 class="font-title text-lg text-white mb-1">Diorama Siklus Air & Hujan</h3>
+        <p class="text-xs text-emerald-400 font-semibold mb-2">Karya: Tim Sains Cilik (Kelas 4B)</p>
+        <p class="text-xs text-slate-300 leading-relaxed flex-grow mb-4">
+          Model peraga siklus evaporasi, kondensasi, dan presipitasi menggunakan bahan daur ulang toples kaca dan es batu.
+        </p>
+        <button onclick="bukaModalKarya('Diorama Siklus Air & Hujan', 'Tim Sains Cilik (Kelas 4B)', 'Eksperimen pembuktian perubahan wujud zat dan siklus air tertutup sederhana.', '')" class="w-full bg-slate-800 hover:bg-slate-700 text-emerald-300 border border-slate-700 text-xs font-bold py-2 rounded-xl transition text-center">
+          Lihat Dokumentasi →
+        </button>
+      </div>
+    </div>
+
+    <!-- KARYA 3 -->
+    <div class="karya-card glass-card rounded-3xl overflow-hidden flex flex-col" data-cat="desain">
+      <div class="relative aspect-video bg-slate-950 overflow-hidden">
+        <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=600&auto=format&fit=crop&q=80" alt="Poster Netiket Digital" class="w-full h-full object-cover">
+        <span class="absolute top-3 left-3 bg-purple-600 text-white text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full">
+          Desain Digital
+        </span>
+      </div>
+      <div class="p-5 flex flex-col flex-grow">
+        <h3 class="font-title text-lg text-white mb-1">Poster Etika Warganet Cilik</h3>
+        <p class="text-xs text-purple-400 font-semibold mb-2">Karya: Amanda Valerie (Kelas 6)</p>
+        <p class="text-xs text-slate-300 leading-relaxed flex-grow mb-4">
+          Infografis panduan berinteraksi sopan di internet, menjaga kerahasiaan kata sandi, dan menghindari komentar jahat.
+        </p>
+        <button onclick="bukaModalKarya('Poster Etika Warganet Cilik', 'Amanda Valerie (Kelas 6)', 'Desain edukatif mengenai literasi digital sehat untuk anak usia sekolah dasar.', '')" class="w-full bg-slate-800 hover:bg-slate-700 text-purple-300 border border-slate-700 text-xs font-bold py-2 rounded-xl transition text-center">
+          Buka Poster Penuh →
+        </button>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- MODAL DETAIL KARYA -->
+  <div id="modal-karya" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="glass-card max-w-lg w-full rounded-3xl p-6 border border-sky-500/30 bg-slate-900">
+      <div class="flex justify-between items-start mb-4 border-b border-slate-800 pb-3">
+        <div>
+          <h3 id="modal-judul" class="font-title text-xl text-sky-300">Judul Karya</h3>
+          <p id="modal-pembuat" class="text-xs text-slate-400 mt-0.5">Nama Siswa</p>
+        </div>
+        <button onclick="tutupModalKarya()" class="text-slate-400 hover:text-white text-lg font-bold">✕</button>
+      </div>
+      <p id="modal-deskripsi" class="text-xs text-slate-300 leading-relaxed mb-6">Deskripsi detail proyek.</p>
+      <div class="flex justify-end gap-2">
+        <button onclick="tutupModalKarya()" class="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 text-xs font-bold hover:bg-slate-700 transition">
+          Tutup
+        </button>
+        <a id="modal-link" href="#" target="_blank" rel="noopener" class="px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold transition hidden">
+          Kunjungi Tautan Proyek ↗
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="text-center text-xs text-slate-500 border-t border-slate-800 pt-6">
+    © 2026 <strong>NalarSci Lab</strong> • Wadah Kreasi Komputasi & Karakter Pelajar
+  </footer>
+
+  <script>
+    function filterKarya(kategori) {
+      document.querySelectorAll('.btn-filter').forEach(btn => btn.classList.remove('active'));
+      event.target.classList.add('active');
+
+      document.querySelectorAll('.karya-card').forEach(card => {
+        if (kategori === 'semua' || card.dataset.cat === kategori) {
+          card.classList.remove('hidden');
+        } else {
+          card.classList.add('hidden');
+        }
+      });
+    }
+
+    function bukaModalKarya(judul, pembuat, deskripsi, link) {
+      document.getElementById('modal-judul').innerText = judul;
+      document.getElementById('modal-pembuat').innerText = pembuat;
+      document.getElementById('modal-deskripsi').innerText = deskripsi;
+
+      const linkBtn = document.getElementById('modal-link');
+      if (link && link.trim() !== '') {
+        linkBtn.href = link;
+        linkBtn.classList.remove('hidden');
+      } else {
+        linkBtn.classList.add('hidden');
+      }
+
+      document.getElementById('modal-karya').classList.remove('hidden');
+    }
+
+    function tutupModalKarya() {
+      document.getElementById('modal-karya').classList.add('hidden');
+    }
+  </script>
+</body>
+</html>
