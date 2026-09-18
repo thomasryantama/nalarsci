@@ -25,6 +25,11 @@
       border: 1px solid rgba(255, 255, 255, 0.1);
       transition: all 0.25s ease;
     }
+    .filter-btn.active {
+      background-color: #0d9488 !important;
+      color: #ffffff !important;
+      border-color: #2dd4bf !important;
+    }
   </style>
 </head>
 <body class="p-4 md:p-8 max-w-5xl mx-auto flex flex-col justify-between min-h-screen">
@@ -46,7 +51,7 @@
       </div>
       <h1 class="font-title text-3xl sm:text-4xl text-white mb-2">Portal Iuran & Presensi Siswa</h1>
       <p class="text-slate-300 text-xs sm:text-sm">
-        Pilih nama siswa di bawah untuk melihat rekapitulasi kehadiran, rincian biaya per pertemuan, dan status pembayaran terkini.
+        Pilih atau cari nama siswa di bawah untuk melihat rekapitulasi kehadiran, rincian biaya, dan status pelunasan.
       </p>
     </div>
   </header>
@@ -55,9 +60,26 @@
   <main class="flex-grow flex items-center justify-center mb-12">
     <div class="glass-card w-full max-w-3xl rounded-3xl p-6 md:p-8 border border-teal-500/30 shadow-2xl">
       
-      <!-- DROPDOWN PILIH SISWA -->
+      <!-- FILTER KELAS CEPAT -->
+      <div class="flex flex-wrap items-center gap-1.5 mb-4" id="bar-filter-kelas">
+        <span class="text-[11px] text-slate-400 mr-1 font-bold">Kelas:</span>
+        <button onclick="setFilterKelas('semua')" class="filter-btn active px-3 py-1 rounded-xl bg-slate-900 border border-teal-800 text-xs font-bold text-slate-300 transition">Semua</button>
+        <button onclick="setFilterKelas('1')" class="filter-btn px-3 py-1 rounded-xl bg-slate-900 border border-teal-800 text-xs font-bold text-slate-300 transition">Kelas 1</button>
+        <button onclick="setFilterKelas('2')" class="filter-btn px-3 py-1 rounded-xl bg-slate-900 border border-teal-800 text-xs font-bold text-slate-300 transition">Kelas 2</button>
+        <button onclick="setFilterKelas('3')" class="filter-btn px-3 py-1 rounded-xl bg-slate-900 border border-teal-800 text-xs font-bold text-slate-300 transition">Kelas 3</button>
+        <button onclick="setFilterKelas('4')" class="filter-btn px-3 py-1 rounded-xl bg-slate-900 border border-teal-800 text-xs font-bold text-slate-300 transition">Kelas 4</button>
+        <button onclick="setFilterKelas('5')" class="filter-btn px-3 py-1 rounded-xl bg-slate-900 border border-teal-800 text-xs font-bold text-slate-300 transition">Kelas 5</button>
+      </div>
+
+      <!-- KOTAK PENCARIAN NAMA SISWA -->
+      <div class="mb-4">
+        <label class="block text-slate-300 font-bold text-xs mb-1.5">Ketik Nama Siswa untuk Mencari Cepat:</label>
+        <input type="text" id="cari-nama-input" oninput="filterDropdownSiswa()" placeholder="Ketik nama siswa (misal: Alucio, Fransiska, Awis)..." class="w-full p-3 rounded-2xl bg-slate-950 border border-teal-700 text-white outline-none focus:border-teal-400 text-xs sm:text-sm">
+      </div>
+
+      <!-- DROPDOWN HASIL FILTER -->
       <div class="mb-6">
-        <label class="block text-slate-300 font-bold text-xs mb-2">Cari / Pilih Nama Siswa:</label>
+        <label class="block text-slate-400 font-bold text-[11px] mb-1">Pilih dari Daftar Siswa Tersaring:</label>
         <select id="pilih-siswa" onchange="tampilkanRincian()" class="w-full p-3.5 rounded-2xl bg-slate-950 border border-teal-700 text-white font-bold outline-none focus:border-teal-400 text-sm">
           <option value="">⏳ Mengambil daftar siswa dari server...</option>
         </select>
@@ -103,7 +125,7 @@
 
       <div id="box-placeholder" class="text-center py-8 text-slate-500 text-xs">
         <div class="text-3xl mb-2">🔍</div>
-        <p>Silakan pilih nama siswa di menu dropdown atas untuk menampilkan data.</p>
+        <p>Pilih nama siswa di atas untuk melihat status pembayaran.</p>
       </div>
 
     </div>
@@ -113,18 +135,16 @@
   <footer class="flex flex-col sm:flex-row justify-between items-center text-xs text-slate-500 border-t border-teal-950 pt-6 gap-3">
     <p>© 2026 <strong>NalarSci Lab</strong> • Manajemen Ekskul Koding Terpadu</p>
     
-    <!-- PINTU MASUK ADMIN RAHASIA -->
     <button onclick="bukaModalAdmin()" class="text-slate-600 hover:text-teal-400 text-[11px] font-mono transition flex items-center gap-1.5">
       🔒 Masuk Kas Admin
     </button>
   </footer>
 
-  <!-- MODAL CEKLIS CEPAT PEMBAYARAN (RAMAH OPERATOR AWAM) -->
+  <!-- MODAL CEKLIS CEPAT PEMBAYARAN (DENGAN SEARCH) -->
   <div id="modal-admin-kas" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
     <div class="glass-card max-w-2xl w-full rounded-3xl p-6 border border-teal-500/40 bg-slate-900 shadow-2xl flex flex-col max-h-[90vh]">
       
-      <!-- HEADER MODAL -->
-      <div class="flex justify-between items-center border-b border-teal-900/80 pb-3 mb-4">
+      <div class="flex justify-between items-center border-b border-teal-900/80 pb-3 mb-3">
         <div>
           <h3 class="font-title text-lg text-teal-300">Pencatatan Pembayaran Cepat (Ceklis)</h3>
           <p class="text-[11px] text-slate-400">Centang siswa yang membayar hari ini, lalu simpan sekaligus.</p>
@@ -132,8 +152,13 @@
         <button onclick="tutupModalAdmin()" class="text-slate-400 hover:text-white font-bold text-xl">✕</button>
       </div>
 
-      <!-- KONTROL ATAS: METODE, NOMINAL & PILIH SEMUA -->
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-slate-950/80 p-3.5 rounded-2xl border border-teal-900/60 text-xs mb-3">
+      <!-- SEARCH FILTER CEKLIS ADMIN -->
+      <div class="mb-3">
+        <input type="text" id="cari-admin-ceklis" oninput="filterCeklisAdmin()" placeholder="🔍 Cari nama siswa yang membayar..." class="w-full p-2.5 rounded-xl bg-slate-950 border border-teal-800 text-white text-xs outline-none focus:border-teal-400">
+      </div>
+
+      <!-- KONTROL ATAS -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 bg-slate-950/80 p-3 rounded-2xl border border-teal-900/60 text-xs mb-3">
         <div>
           <label class="block text-slate-400 font-bold mb-1">Metode Pembayaran</label>
           <select id="bulk-metode" class="w-full p-2 rounded-xl bg-slate-900 border border-teal-800 text-white font-bold outline-none focus:border-teal-400">
@@ -152,13 +177,13 @@
         </div>
       </div>
 
-      <!-- DAFTAR SISWA CEKLIS (HANYA YANG BELUM LUNAS) -->
+      <!-- DAFTAR SISWA CEKLIS -->
       <div class="overflow-y-auto flex-grow space-y-2 pr-1 my-2 divide-y divide-teal-950/60" id="list-ceklis-siswa">
-        <p class="p-6 text-center text-slate-500 text-xs">Memuat daftar siswa yang belum lunas...</p>
+        <p class="p-6 text-center text-slate-500 text-xs">Memuat daftar siswa...</p>
       </div>
 
-      <!-- FOOTER MODAL: PIN & SUBMIT -->
-      <div class="border-t border-teal-900/80 pt-4 mt-2 space-y-3">
+      <!-- FOOTER MODAL -->
+      <div class="border-t border-teal-900/80 pt-3 mt-1 space-y-3">
         <div class="flex flex-col sm:flex-row items-center gap-3">
           <div class="w-full sm:w-1/2">
             <input type="password" id="bulk-pin" placeholder="Ketik PIN Admin (2026)..." class="w-full p-2.5 rounded-xl bg-slate-950 border border-teal-800 text-white text-center font-mono tracking-widest text-xs outline-none focus:border-teal-400">
@@ -178,6 +203,7 @@
     const API_EKSKUL_URL = "https://script.google.com/macros/s/AKfycbycRk6Bzt-GeNoGb1y0HlpmYnucGYIOKtQ83anoZ2MueAuHJQKX4SGxBj9U4Exjlzry/exec";
 
     let dataSiswaList = [];
+    let filterKelasAktif = "semua";
     let allSelected = false;
 
     window.addEventListener('DOMContentLoaded', () => {
@@ -193,31 +219,64 @@
       document.getElementById('modal-admin-kas').classList.add('hidden');
     }
 
+    function setFilterKelas(kelas) {
+      filterKelasAktif = kelas;
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      event.target.classList.add('active');
+      filterDropdownSiswa();
+    }
+
     function muatDataServer() {
       fetch(`${API_EKSKUL_URL}?action=get_ringkasan`)
         .then(r => r.json())
         .then(res => {
           if (res.status === "success") {
             dataSiswaList = res.siswa;
-            isiDropdownSiswa();
+            filterDropdownSiswa();
           }
         })
         .catch(err => console.error(err));
     }
 
-    function isiDropdownSiswa() {
+    // Filter daftar dropdown berdasarkan teks cari & kelas
+    function filterDropdownSiswa() {
+      const keyword = (document.getElementById('cari-nama-input').value || "").toLowerCase().trim();
       const selectWali = document.getElementById('pilih-siswa');
-      let optionsHtml = '<option value="">-- Klik untuk Pilih Nama Siswa --</option>';
-      dataSiswaList.forEach(s => {
+
+      const hasil = dataSiswaList.filter(s => {
+        const cocokNama = s.nama.toLowerCase().includes(keyword);
+        const cocokKelas = filterKelasAktif === "semua" || s.kelas.includes(filterKelasAktif);
+        return cocokNama && cocokKelas;
+      });
+
+      if (hasil.length === 0) {
+        selectWali.innerHTML = '<option value="">-- Siswa tidak ditemukan --</option>';
+        return;
+      }
+
+      let optionsHtml = '<option value="">-- Klik untuk Pilih Siswa (' + hasil.length + ' Ditemukan) --</option>';
+      hasil.forEach(s => {
         optionsHtml += `<option value="${s.nama}">${s.nama} (${s.kelas})</option>`;
       });
+
       selectWali.innerHTML = optionsHtml;
     }
 
-    // Tampilkan daftar siswa belum lunas dalam bentuk checkbox
+    function filterCeklisAdmin() {
+      const keyword = (document.getElementById('cari-admin-ceklis').value || "").toLowerCase().trim();
+      const items = document.querySelectorAll('.label-ceklis-item');
+      items.forEach(el => {
+        const nama = el.dataset.nama.toLowerCase();
+        if (nama.includes(keyword)) {
+          el.classList.remove('hidden');
+        } else {
+          el.classList.add('hidden');
+        }
+      });
+    }
+
     function renderCeklisSiswa() {
       const container = document.getElementById('list-ceklis-siswa');
-      // Filter siswa yang masih punya tagihan (sisaTagihan > 0)
       const belumLunas = dataSiswaList.filter(s => s.sisaTagihan > 0);
 
       if (belumLunas.length === 0) {
@@ -226,8 +285,8 @@
         return;
       }
 
-      container.innerHTML = belumLunas.map((s, idx) => `
-        <label class="flex items-center justify-between p-3 rounded-xl bg-slate-950/60 hover:bg-teal-950/40 cursor-pointer transition border border-teal-900/40 text-xs">
+      container.innerHTML = belumLunas.map((s) => `
+        <label data-nama="${s.nama}" class="label-ceklis-item flex items-center justify-between p-3 rounded-xl bg-slate-950/60 hover:bg-teal-950/40 cursor-pointer transition border border-teal-900/40 text-xs">
           <div class="flex items-center gap-3">
             <input type="checkbox" value="${s.nama}" onchange="updateCountTerpilih()" class="item-ceklis w-4 h-4 rounded text-teal-600 bg-slate-900 border-teal-700 focus:ring-0 cursor-pointer">
             <div>
@@ -246,7 +305,8 @@
     }
 
     function toggleSelectAll() {
-      const checkboxes = document.querySelectorAll('.item-ceklis');
+      // Hanya centang yang sedang terlihat (tidak di-hide oleh search)
+      const checkboxes = document.querySelectorAll('.label-ceklis-item:not(.hidden) .item-ceklis');
       allSelected = !allSelected;
       checkboxes.forEach(cb => cb.checked = allSelected);
       document.getElementById('btn-select-all').innerText = allSelected ? "❌ Batal Centang" : "☑️ Centang Semua";
@@ -305,7 +365,7 @@
           alert("Sukses! " + res.message);
           tutupModalAdmin();
           document.getElementById('bulk-pin').value = "";
-          muatDataServer(); // Segarkan data tabel
+          muatDataServer();
         } else {
           alert("Gagal: " + res.message);
         }
