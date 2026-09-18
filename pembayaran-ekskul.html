@@ -60,7 +60,7 @@
   <main class="flex-grow flex items-center justify-center mb-12">
     <div class="glass-card w-full max-w-3xl rounded-3xl p-6 md:p-8 border border-teal-500/30 shadow-2xl">
       
-      <!-- FILTER KELAS CEPAT -->
+      <!-- FILTER KELAS CEPAT (LENGKAP 1 - 6) -->
       <div class="flex flex-wrap items-center gap-1.5 mb-4" id="bar-filter-kelas">
         <span class="text-[11px] text-slate-400 mr-1 font-bold">Kelas:</span>
         <button onclick="setFilterKelas('semua')" class="filter-btn active px-3 py-1 rounded-xl bg-slate-900 border border-teal-800 text-xs font-bold text-slate-300 transition">Semua</button>
@@ -69,6 +69,7 @@
         <button onclick="setFilterKelas('3')" class="filter-btn px-3 py-1 rounded-xl bg-slate-900 border border-teal-800 text-xs font-bold text-slate-300 transition">Kelas 3</button>
         <button onclick="setFilterKelas('4')" class="filter-btn px-3 py-1 rounded-xl bg-slate-900 border border-teal-800 text-xs font-bold text-slate-300 transition">Kelas 4</button>
         <button onclick="setFilterKelas('5')" class="filter-btn px-3 py-1 rounded-xl bg-slate-900 border border-teal-800 text-xs font-bold text-slate-300 transition">Kelas 5</button>
+        <button onclick="setFilterKelas('6')" class="filter-btn px-3 py-1 rounded-xl bg-slate-900 border border-teal-800 text-xs font-bold text-slate-300 transition">Kelas 6</button>
       </div>
 
       <!-- KOTAK PENCARIAN NAMA SISWA -->
@@ -238,7 +239,6 @@
         .catch(err => console.error(err));
     }
 
-    // Filter daftar dropdown berdasarkan teks cari & kelas
     function filterDropdownSiswa() {
       const keyword = (document.getElementById('cari-nama-input').value || "").toLowerCase().trim();
       const selectWali = document.getElementById('pilih-siswa');
@@ -305,7 +305,6 @@
     }
 
     function toggleSelectAll() {
-      // Hanya centang yang sedang terlihat (tidak di-hide oleh search)
       const checkboxes = document.querySelectorAll('.label-ceklis-item:not(.hidden) .item-ceklis');
       allSelected = !allSelected;
       checkboxes.forEach(cb => cb.checked = allSelected);
@@ -378,6 +377,19 @@
       });
     }
 
+    // Format tanggal ke gaya lokal (dd MMM yyyy)
+    function formatTglTampil(tglStr) {
+      if (!tglStr || tglStr === "-") return "-";
+      const parts = tglStr.toString().trim().split(/[-/]/);
+      if (parts.length === 3 && parts[0].length === 4) {
+        // Format YYYY-MM-DD
+        const bln = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"];
+        const idx = parseInt(parts[1], 10) - 1;
+        return `${parseInt(parts[2], 10)} ${bln[idx] || parts[1]} ${parts[0]}`;
+      }
+      return tglStr;
+    }
+
     function tampilkanRincian() {
       const namaPilihan = document.getElementById('pilih-siswa').value;
       const box = document.getElementById('box-rincian');
@@ -444,7 +456,7 @@
       } else {
         listPresensi.innerHTML = siswa.riwayatPresensi.map(r => `
           <div class="flex justify-between items-center p-2.5 rounded-xl bg-slate-950/70 border border-teal-900/40">
-            <span class="text-slate-300 font-mono">${r.tanggal}</span>
+            <span class="text-slate-300 font-mono">${formatTglTampil(r.tanggal)}</span>
             <span class="text-teal-400 font-bold">${r.status}</span>
           </div>
         `).join('');
