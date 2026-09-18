@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Portal Transparansi Iuran Ekskul Koding — NalarSci Lab</title>
+  <title>Portal Iuran & Presensi Ekskul Koding — NalarSci Lab</title>
   <meta name="description" content="Portal transparansi presensi latihan dan rincian iuran kegiatan ekskul koding siswa.">
 
   <link rel="icon" type="image/png" href="favicon.png">
@@ -19,21 +19,17 @@
     }
     .font-title { font-family: 'Fredoka', sans-serif; }
     .glass-card {
-      background: rgba(255, 255, 255, 0.04);
-      backdrop-filter: blur(14px);
-      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
       transition: all 0.25s ease;
-    }
-    .tab-nav.active {
-      background-color: #0d9488 !important;
-      color: #ffffff !important;
-      border-color: #2dd4bf !important;
-      box-shadow: 0 4px 14px rgba(13, 148, 136, 0.4);
     }
   </style>
 </head>
 <body class="p-4 md:p-8 max-w-5xl mx-auto flex flex-col justify-between min-h-screen">
 
+  <!-- HEADER -->
   <header class="mb-8">
     <div class="flex justify-between items-center border-b border-teal-900/60 pb-3 mb-6">
       <a href="index.html" class="text-teal-400 hover:text-teal-300 font-bold text-xs flex items-center gap-1 transition">
@@ -50,97 +46,107 @@
       </div>
       <h1 class="font-title text-3xl sm:text-4xl text-white mb-2">Portal Iuran & Presensi Siswa</h1>
       <p class="text-slate-300 text-xs sm:text-sm">
-        Cek jumlah kehadiran latihan anak, rincian biaya per sesi, dan konfirmasi pembayaran secara real-time.
+        Pilih nama siswa di bawah untuk melihat rekapitulasi kehadiran, rincian biaya per pertemuan, dan status pembayaran terkini.
       </p>
-    </div>
-
-    <!-- TAB PILIHAN -->
-    <div class="flex justify-center gap-2 mt-6">
-      <button onclick="bukaTab('wali')" id="tab-wali" class="tab-nav active px-5 py-2.5 rounded-xl bg-slate-900 border border-teal-800 text-xs font-bold text-slate-300 transition">
-        👨‍👩‍👦 Cek Tagihan Siswa (Wali Murid)
-      </button>
-      <button onclick="bukaTab('admin')" id="tab-admin" class="tab-nav px-5 py-2.5 rounded-xl bg-slate-900 border border-teal-800 text-xs font-bold text-slate-300 hover:bg-slate-800 transition">
-        🔐 Catat Kas Masuk (Admin)
-      </button>
     </div>
   </header>
 
-  <!-- PANEL 1: CEK DATA SISWA UNTUK WALI MURID -->
-  <section id="panel-wali" class="space-y-6 flex-grow mb-12">
-    <div class="glass-card max-w-xl mx-auto rounded-3xl p-6 md:p-8 border border-teal-500/30 shadow-2xl">
-      <div class="mb-5 border-b border-teal-900/60 pb-3">
-        <h2 class="font-title text-xl text-teal-300">Pilih Nama Siswa</h2>
-        <p class="text-xs text-slate-400 mt-1">Data ditarik langsung dari database presensi pengajar.</p>
+  <!-- AREA UTAMA DENGAN RASIO LEBAR & SIMETRIS -->
+  <main class="flex-grow flex items-center justify-center mb-12">
+    <div class="glass-card w-full max-w-3xl rounded-3xl p-6 md:p-8 border border-teal-500/30 shadow-2xl">
+      
+      <!-- DROPDOWN PILIH SISWA -->
+      <div class="mb-6">
+        <label class="block text-slate-300 font-bold text-xs mb-2">Cari / Pilih Nama Siswa:</label>
+        <select id="pilih-siswa" onchange="tampilkanRincian()" class="w-full p-3.5 rounded-2xl bg-slate-950 border border-teal-700 text-white font-bold outline-none focus:border-teal-400 text-sm">
+          <option value="">⏳ Mengambil daftar siswa dari server...</option>
+        </select>
       </div>
 
-      <div class="space-y-4 text-xs">
-        <div>
-          <label class="block text-slate-400 font-bold mb-1">Cari / Pilih Nama Anak</label>
-          <select id="pilih-siswa" onchange="tampilkanRincian()" class="w-full p-3 rounded-xl bg-slate-950 border border-teal-800 text-white font-bold outline-none focus:border-teal-400 text-sm">
-            <option value="">⏳ Mengambil daftar siswa dari server...</option>
-          </select>
-        </div>
-      </div>
-
-      <!-- KARTU RINCIAN HASIL -->
-      <div id="box-rincian" class="hidden mt-6 pt-6 border-t border-teal-900/60 space-y-4">
-        <div class="flex justify-between items-start">
+      <!-- KARTU RINCIAN (MUNCUL SETELAH NAMA DIPILIH) -->
+      <div id="box-rincian" class="hidden space-y-6 pt-4 border-t border-teal-900/60">
+        
+        <!-- HEADER SISWA & BADGE STATUS -->
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-slate-950/60 p-4 rounded-2xl border border-teal-900/60">
           <div>
-            <h3 class="font-title text-xl text-white" id="rincian-nama">-</h3>
-            <p class="text-xs text-teal-300 font-semibold" id="rincian-kelas">-</p>
+            <h2 class="font-title text-2xl text-white tracking-wide" id="rincian-nama">-</h2>
+            <p class="text-xs text-teal-300 font-semibold mt-0.5" id="rincian-kelas">-</p>
           </div>
-          <span class="text-xs font-black px-3 py-1 rounded-full" id="badge-status">-</span>
+          <span class="text-xs font-black px-4 py-1.5 rounded-full" id="badge-status">-</span>
         </div>
 
-        <div class="grid grid-cols-2 gap-3 text-center text-xs">
-          <div class="bg-slate-950/80 p-3.5 rounded-2xl border border-teal-900/60">
-            <p class="text-slate-400">Total Sesi Hadir</p>
+        <!-- GRID 3 KARTU INFORMASI UTAMA -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5 text-center text-xs">
+          <div class="bg-slate-950/80 p-4 rounded-2xl border border-teal-900/60">
+            <p class="text-slate-400 font-semibold">Total Sesi Hadir</p>
             <p class="font-title text-2xl text-teal-300 mt-1" id="rincian-hadir">0 Sesi</p>
-            <p class="text-[10px] text-slate-500 mt-0.5">Rp 50.000 / sesi</p>
+            <p class="text-[10px] text-slate-500 mt-0.5">Biaya Rp 50.000 / sesi</p>
           </div>
-          <div class="bg-slate-950/80 p-3.5 rounded-2xl border border-teal-900/60">
-            <p class="text-slate-400">Total Tagihan</p>
+
+          <div class="bg-slate-950/80 p-4 rounded-2xl border border-teal-900/60">
+            <p class="text-slate-400 font-semibold">Total Tagihan Sesi</p>
             <p class="font-title text-2xl text-amber-300 mt-1" id="rincian-tagihan">Rp 0</p>
-            <p class="text-[10px] text-slate-500 mt-0.5" id="rincian-bayar">Sudah bayar: Rp 0</p>
+            <p class="text-[10px] text-slate-500 mt-0.5" id="rincian-bayar">Tercatat bayar: Rp 0</p>
+          </div>
+
+          <div class="p-4 rounded-2xl border flex flex-col justify-center" id="box-selisih-card">
+            <p class="font-semibold text-slate-400" id="label-selisih">Sisa Tagihan</p>
+            <p class="font-title text-2xl font-bold mt-1" id="nominal-selisih">Rp 0</p>
+            <p class="text-[10px] text-slate-500 mt-0.5" id="sub-selisih">-</p>
           </div>
         </div>
 
-        <!-- SISA TAGIHAN / SALDO LEBIH -->
-        <div class="p-4 rounded-2xl bg-teal-950/60 border border-teal-800 text-xs flex justify-between items-center" id="box-selisih">
-          <span class="font-bold text-slate-300" id="label-selisih">Sisa yang Perlu Dibayar:</span>
-          <span class="font-title text-xl font-bold text-rose-400" id="nominal-selisih">Rp 0</span>
-        </div>
-
-        <!-- DAFTAR TANGGAL HADIR -->
+        <!-- RIWAYAT PRESENSI PERTEMUAN -->
         <div>
-          <p class="text-xs font-bold text-slate-400 mb-2">Riwayat Presensi Pertemuan:</p>
-          <div class="max-h-36 overflow-y-auto space-y-1.5 pr-1 text-xs" id="list-presensi">
-            <!-- Diisi dinamis -->
+          <h3 class="font-title text-sm text-slate-300 mb-2">Riwayat Pertemuan & Presensi:</h3>
+          <div class="max-h-48 overflow-y-auto space-y-2 pr-1 text-xs" id="list-presensi">
+            <!-- Diisi otomatis -->
           </div>
         </div>
-      </div>
-    </div>
-  </section>
 
-  <!-- PANEL 2: INPUT KAS MASUK OLEH ADMIN (DENGAN ANTI-DOUBLE SUBMIT) -->
-  <section id="panel-admin" class="hidden space-y-6 flex-grow mb-12">
-    <div class="glass-card max-w-md mx-auto rounded-3xl p-6 md:p-8 border border-teal-500/30 shadow-2xl">
-      <div class="mb-5 border-b border-teal-900/60 pb-3">
-        <h2 class="font-title text-xl text-teal-300">Pencatatan Kas Masuk</h2>
-        <p class="text-xs text-slate-400 mt-1">Hanya pengajar/admin yang berwenang mencatat pembayaran.</p>
+      </div>
+
+      <!-- KONDISI AWAL (BELUM MEMILIH SISWA) -->
+      <div id="box-placeholder" class="text-center py-8 text-slate-500 text-xs">
+        <div class="text-3xl mb-2">🔍</div>
+        <p>Silakan pilih nama siswa di menu dropdown atas untuk menampilkan data.</p>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- FOOTER DENGAN PINTU MASUK ADMIN RAHASIA -->
+  <footer class="flex flex-col sm:flex-row justify-between items-center text-xs text-slate-500 border-t border-teal-950 pt-6 gap-3">
+    <p>© 2026 <strong>NalarSci Lab</strong> • Manajemen Ekskul Koding & Komputasi</p>
+    
+    <!-- PINTU MASUK ADMIN AMAN & RAHASIA -->
+    <button onclick="toggleModalAdmin(true)" class="text-slate-600 hover:text-teal-400 text-[11px] font-mono transition flex items-center gap-1.5">
+      🔒 Masuk Kas Admin
+    </button>
+  </footer>
+
+  <!-- MODAL RAHASIA: CATAT KAS MASUK (KHUSUS PENGAJAR/ADMIN) -->
+  <div id="modal-admin-kas" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="glass-card max-w-md w-full rounded-3xl p-6 md:p-8 border border-teal-500/40 bg-slate-900 shadow-2xl">
+      <div class="flex justify-between items-center mb-4 border-b border-teal-900/80 pb-3">
+        <div class="flex items-center gap-2">
+          <span class="text-xl">💳</span>
+          <h3 class="font-title text-lg text-teal-300">Pencatatan Kas Masuk</h3>
+        </div>
+        <button onclick="toggleModalAdmin(false)" class="text-slate-400 hover:text-white font-bold text-xl">✕</button>
       </div>
 
       <form onsubmit="simpanPembayaran(event)" class="space-y-3.5 text-xs">
         <div>
           <label class="block text-slate-400 font-bold mb-1">Nama Siswa</label>
-          <select id="admin-nama" required class="w-full p-2.5 rounded-xl bg-slate-950 border border-teal-800 text-white font-bold outline-none focus:border-teal-400">
+          <select id="admin-nama" required class="w-full p-3 rounded-xl bg-slate-950 border border-teal-800 text-white font-bold outline-none focus:border-teal-400">
             <option value="">-- Pilih Nama Siswa --</option>
           </select>
         </div>
 
         <div>
           <label class="block text-slate-400 font-bold mb-1">Metode Pembayaran</label>
-          <select id="admin-metode" class="w-full p-2.5 rounded-xl bg-slate-950 border border-teal-800 text-white font-bold outline-none focus:border-teal-400">
+          <select id="admin-metode" class="w-full p-3 rounded-xl bg-slate-950 border border-teal-800 text-white font-bold outline-none focus:border-teal-400">
             <option value="Tunai / Cash">💵 Tunai / Cash Langsung</option>
             <option value="Transfer Bank">💳 Transfer Bank / QRIS</option>
           </select>
@@ -148,49 +154,33 @@
 
         <div>
           <label class="block text-slate-400 font-bold mb-1">Nominal Pembayaran (Rp)</label>
-          <input type="number" id="admin-nominal" required placeholder="Contoh: 50000 atau 100000" class="w-full p-2.5 rounded-xl bg-slate-950 border border-teal-800 text-white font-mono text-sm outline-none focus:border-teal-400">
+          <input type="number" id="admin-nominal" required placeholder="Misal: 50000 atau 100000" class="w-full p-3 rounded-xl bg-slate-950 border border-teal-800 text-white font-mono text-sm outline-none focus:border-teal-400">
         </div>
 
         <div>
           <label class="block text-slate-400 font-bold mb-1">PIN Otorisasi Admin</label>
-          <input type="password" id="admin-pin" required placeholder="Masukkan PIN 2026..." class="w-full p-2.5 rounded-xl bg-slate-950 border border-teal-800 text-white text-center font-mono tracking-widest outline-none focus:border-teal-400">
+          <input type="password" id="admin-pin" required placeholder="Masukkan PIN Rahasia..." class="w-full p-3 rounded-xl bg-slate-950 border border-teal-800 text-white text-center font-mono tracking-widest outline-none focus:border-teal-400 text-sm">
         </div>
 
-        <!-- TOMBOL ANTI-DOBEL KLIK -->
-        <button type="submit" id="btn-simpan-bayar" class="w-full bg-teal-600 hover:bg-teal-500 text-white font-title text-xs py-3.5 rounded-xl font-bold transition shadow-lg mt-2 flex items-center justify-center gap-2">
-          💾 Simpan Data Pembayaran
+        <button type="submit" id="btn-simpan-bayar" class="w-full bg-teal-600 hover:bg-teal-500 text-white font-title text-xs py-3.5 rounded-xl font-bold transition shadow-lg mt-3 flex items-center justify-center gap-2">
+          💾 Rekam Pembayaran ke Spreadsheet
         </button>
       </form>
     </div>
-  </section>
-
-  <footer class="text-center text-xs text-slate-500 border-t border-teal-950 pt-6">
-    © 2026 <strong>NalarSci Lab</strong> • Sistem Manajemen Ekskul Koding Terpadu
-  </footer>
+  </div>
 
   <script>
-    // ⚠️ GANTI DENGAN URL DEPLOYMENT APPS SCRIPT ANDA
-    const API_EKSKUL_URL = "https://script.google.com/macros/s/AKfycbxLFEmKCUlQ5tqCf7H1Z_MxhiZq9AhJW-QKYPBJ7eNP6R1mrYQ2am08DV1hKfimwOWGfw/exec";
+    // URL Deployment Web App Apps Script
+    const API_EKSKUL_URL = "https://script.google.com/macros/s/AKfycbwe93R1_RRKDkWUunA4nSyyRvOE_un4wCAFQwWQc1Dg/exec";
 
     let dataSiswaList = [];
 
-    // Ambil data begitu halaman selesai dibuka
     window.addEventListener('DOMContentLoaded', () => {
       muatDataServer();
     });
 
-    function bukaTab(tab) {
-      document.querySelectorAll('.tab-nav').forEach(b => b.classList.remove('active'));
-      document.getElementById('panel-wali').classList.add('hidden');
-      document.getElementById('panel-admin').classList.add('hidden');
-
-      if (tab === 'wali') {
-        document.getElementById('tab-wali').classList.add('active');
-        document.getElementById('panel-wali').classList.remove('hidden');
-      } else {
-        document.getElementById('tab-admin').classList.add('active');
-        document.getElementById('panel-admin').classList.remove('hidden');
-      }
+    function toggleModalAdmin(buka) {
+      document.getElementById('modal-admin-kas').classList.toggle('hidden', !buka);
     }
 
     function muatDataServer() {
@@ -200,13 +190,10 @@
           if (res.status === "success") {
             dataSiswaList = res.siswa;
             isiDropdownSiswa();
-          } else {
-            alert("Database kosong atau belum terisi.");
           }
         })
         .catch(err => {
           console.error(err);
-          alert("Gagal terhubung ke database: " + err);
         });
     }
 
@@ -214,7 +201,7 @@
       const selectWali = document.getElementById('pilih-siswa');
       const selectAdmin = document.getElementById('admin-nama');
 
-      let optionsHtml = '<option value="">-- Pilih Nama Siswa --</option>';
+      let optionsHtml = '<option value="">-- Klik untuk Pilih Nama Siswa --</option>';
       dataSiswaList.forEach(s => {
         optionsHtml += `<option value="${s.nama}">${s.nama} (${s.kelas})</option>`;
       });
@@ -226,59 +213,70 @@
     function tampilkanRincian() {
       const namaPilihan = document.getElementById('pilih-siswa').value;
       const box = document.getElementById('box-rincian');
+      const placeholder = document.getElementById('box-placeholder');
 
       if (!namaPilihan) {
         box.classList.add('hidden');
+        placeholder.classList.remove('hidden');
         return;
       }
 
       const siswa = dataSiswaList.find(s => s.nama === namaPilihan);
       if (!siswa) return;
 
+      placeholder.classList.add('hidden');
       box.classList.remove('hidden');
+
       document.getElementById('rincian-nama').innerText = siswa.nama;
-      document.getElementById('rincian-kelas').innerText = `Kelas: ${siswa.kelas} • Wali: ${siswa.ortu}`;
+      document.getElementById('rincian-kelas').innerText = `Kelas: ${siswa.kelas} • Nama Wali: ${siswa.ortu}`;
       document.getElementById('rincian-hadir').innerText = `${siswa.totalHadir} Sesi`;
       document.getElementById('rincian-tagihan').innerText = `Rp ${siswa.totalTagihan.toLocaleString('id-ID')}`;
-      document.getElementById('rincian-bayar').innerText = `Sudah bayar: Rp ${siswa.sudahBayar.toLocaleString('id-ID')}`;
+      document.getElementById('rincian-bayar').innerText = `Tercatat bayar: Rp ${siswa.sudahBayar.toLocaleString('id-ID')}`;
 
       const badge = document.getElementById('badge-status');
-      const boxSelisih = document.getElementById('box-selisih');
+      const boxSelisihCard = document.getElementById('box-selisih-card');
       const labelSelisih = document.getElementById('label-selisih');
       const nominalSelisih = document.getElementById('nominal-selisih');
+      const subSelisih = document.getElementById('sub-selisih');
 
       if (siswa.sisaTagihan === 0) {
-        badge.className = "text-xs font-black px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30";
+        badge.className = "text-xs font-black px-4 py-1.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30";
         badge.innerText = "✅ LUNAS";
 
         if (siswa.saldoLebih > 0) {
-          boxSelisih.className = "p-4 rounded-2xl bg-teal-900/40 border border-teal-500/30 text-xs flex justify-between items-center";
-          labelSelisih.innerText = "Kelebihan Saldo (Disimpan):";
-          nominalSelisih.className = "font-title text-xl font-bold text-teal-300";
+          boxSelisihCard.className = "p-4 rounded-2xl bg-teal-950/80 border border-teal-500/30 flex flex-col justify-center";
+          labelSelisih.innerText = "Saldo Lebih Tersimpan";
+          labelSelisih.className = "font-semibold text-teal-300";
+          nominalSelisih.className = "font-title text-2xl text-teal-300 mt-1";
           nominalSelisih.innerText = `Rp ${siswa.saldoLebih.toLocaleString('id-ID')}`;
+          subSelisih.innerText = "Dipotong otomatis di sesi berikutnya";
         } else {
-          boxSelisih.className = "p-4 rounded-2xl bg-slate-950/60 border border-slate-800 text-xs flex justify-between items-center";
-          labelSelisih.innerText = "Status Tagihan:";
-          nominalSelisih.className = "font-title text-base font-bold text-emerald-400";
-          nominalSelisih.innerText = "Semua Sesi Telah Lunas";
+          boxSelisihCard.className = "p-4 rounded-2xl bg-slate-950/80 border border-teal-900/60 flex flex-col justify-center";
+          labelSelisih.innerText = "Sisa Tagihan";
+          labelSelisih.className = "font-semibold text-slate-400";
+          nominalSelisih.className = "font-title text-2xl text-emerald-400 mt-1";
+          nominalSelisih.innerText = "Rp 0";
+          subSelisih.innerText = "Tidak ada tunggakan";
         }
       } else {
-        badge.className = "text-xs font-black px-3 py-1 rounded-full bg-rose-500/20 text-rose-400 border border-rose-500/30";
+        badge.className = "text-xs font-black px-4 py-1.5 rounded-full bg-rose-500/20 text-rose-400 border border-rose-500/30";
         badge.innerText = "⏳ BELUM LUNAS";
 
-        boxSelisih.className = "p-4 rounded-2xl bg-rose-950/40 border border-rose-500/30 text-xs flex justify-between items-center";
-        labelSelisih.innerText = "Sisa yang Perlu Dibayar:";
-        nominalSelisih.className = "font-title text-xl font-bold text-rose-400";
+        boxSelisihCard.className = "p-4 rounded-2xl bg-rose-950/40 border border-rose-500/30 flex flex-col justify-center";
+        labelSelisih.innerText = "Sisa yang Perlu Dibayar";
+        labelSelisih.className = "font-semibold text-rose-300";
+        nominalSelisih.className = "font-title text-2xl text-rose-400 mt-1";
         nominalSelisih.innerText = `Rp ${siswa.sisaTagihan.toLocaleString('id-ID')}`;
+        subSelisih.innerText = "Harap selesaikan sebelum sesi lanjut";
       }
 
       // Render Riwayat Presensi
       const listPresensi = document.getElementById('list-presensi');
       if (siswa.riwayatPresensi.length === 0) {
-        listPresensi.innerHTML = '<p class="text-slate-500 italic">Belum ada catatan presensi.</p>';
+        listPresensi.innerHTML = '<p class="text-slate-500 italic p-3 text-center bg-slate-950/40 rounded-xl">Belum ada riwayat pertemuan presensi.</p>';
       } else {
         listPresensi.innerHTML = siswa.riwayatPresensi.map(r => `
-          <div class="flex justify-between items-center p-2 rounded-xl bg-slate-950/70 border border-teal-900/40">
+          <div class="flex justify-between items-center p-2.5 rounded-xl bg-slate-950/70 border border-teal-900/40">
             <span class="text-slate-300 font-mono">${r.tanggal}</span>
             <span class="text-teal-400 font-bold">${r.status}</span>
           </div>
@@ -286,13 +284,9 @@
       }
     }
 
-    // FUNGSI CATAT DENGAN ANTI-DOUBLE SUBMIT
     function simpanPembayaran(e) {
       e.preventDefault();
-
       const btn = document.getElementById('btn-simpan-bayar');
-      
-      // KUNCI TOMBOL SEKETIKA (Mencegah Klik Dobel)
       btn.disabled = true;
       btn.innerText = "⏳ Mengunci transaksi & menyimpan...";
       btn.classList.add('opacity-50', 'cursor-not-allowed');
@@ -314,16 +308,15 @@
       })
       .then(r => r.json())
       .then(res => {
-        // Buka kembali tombol
         btn.disabled = false;
-        btn.innerText = "💾 Simpan Data Pembayaran";
+        btn.innerText = "💾 Rekam Pembayaran ke Spreadsheet";
         btn.classList.remove('opacity-50', 'cursor-not-allowed');
 
         if (res.status === "success") {
-          alert("Berhasil! " + res.message);
+          alert("Tercatat! " + res.message);
+          toggleModalAdmin(false);
           document.getElementById('admin-nominal').value = "";
           document.getElementById('admin-pin').value = "";
-          // Muat ulang data terbaru
           muatDataServer();
         } else {
           alert("Gagal: " + res.message);
@@ -331,9 +324,9 @@
       })
       .catch(err => {
         btn.disabled = false;
-        btn.innerText = "💾 Simpan Data Pembayaran";
+        btn.innerText = "💾 Rekam Pembayaran ke Spreadsheet";
         btn.classList.remove('opacity-50', 'cursor-not-allowed');
-        alert("Kesalahan jaringan: " + err);
+        alert("Kesalahan: " + err);
       });
     }
   </script>
