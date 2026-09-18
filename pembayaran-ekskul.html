@@ -4,7 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Portal Iuran & Presensi Ekskul Koding — NalarSci Lab</title>
-  <meta name="description" content="Portal transparansi presensi latihan dan rincian iuran kegiatan ekskul koding siswa.">
+  
+  <!-- CEGAH MESIN PENCARI MENGINDEKS HALAMAN PRIVAT -->
+  <meta name="robots" content="noindex, nofollow">
 
   <link rel="icon" type="image/png" href="favicon.png">
   <script src="https://cdn.tailwindcss.com"></script>
@@ -34,112 +36,141 @@
 </head>
 <body class="p-4 md:p-8 max-w-5xl mx-auto flex flex-col justify-between min-h-screen">
 
-  <!-- HEADER -->
-  <header class="mb-8">
-    <div class="flex justify-between items-center border-b border-teal-900/60 pb-3 mb-6">
-      <a href="index.html" class="text-teal-400 hover:text-teal-300 font-bold text-xs flex items-center gap-1 transition">
-        ← Beranda Lab
-      </a>
-      <span class="text-xs bg-teal-500/10 border border-teal-400/20 text-teal-300 px-3 py-1 rounded-full font-bold">
-        💻 Ekstrakurikuler Koding & Komputasi
-      </span>
-    </div>
-
-    <div class="text-center max-w-2xl mx-auto">
-      <div class="inline-flex items-center gap-2 bg-teal-500/10 border border-teal-400/20 text-teal-300 px-3.5 py-1 rounded-full text-xs font-black uppercase tracking-wider mb-2">
-        Transparansi Layanan & Wali Murid
+  <!-- ================= LAYAR PENGHADANG TOKEN (DEFAULT AKTIF) ================= -->
+  <div id="layar-terkunci" class="fixed inset-0 bg-[#041a18] z-50 flex items-center justify-center p-4">
+    <div class="glass-card max-w-md w-full rounded-3xl p-8 border border-teal-500/40 text-center shadow-2xl bg-slate-950/90">
+      <div class="w-16 h-16 bg-teal-500/10 border border-teal-500/30 rounded-2xl flex items-center justify-center mx-auto mb-4 text-3xl shadow-[0_0_20px_rgba(20,184,166,0.25)]">
+        🔒
       </div>
-      <h1 class="font-title text-3xl sm:text-4xl text-white mb-2">Portal Iuran & Presensi Siswa</h1>
-      <p class="text-slate-300 text-xs sm:text-sm">
-        Pilih atau cari nama siswa di bawah untuk melihat rekapitulasi kehadiran, rincian biaya, dan status pelunasan.
+      <h2 class="font-title text-2xl text-white mb-2">Akses Layanan Terbatas</h2>
+      <p class="text-xs text-slate-400 leading-relaxed mb-6">
+        Halaman transparansi ini bersifat privat khusus wali murid ekstrakurikuler koding. Harap gunakan tautan resmi yang telah dibagikan di grup kelas WhatsApp.
       </p>
+
+      <form onsubmit="verifikasiTokenManual(event)" class="space-y-3 text-xs">
+        <input type="password" id="input-token-manual" placeholder="Ketik token kunci akses..." class="w-full p-3.5 rounded-xl bg-slate-900 border border-teal-800 text-white text-center font-mono tracking-widest outline-none focus:border-teal-400">
+        <button type="submit" class="w-full bg-teal-600 hover:bg-teal-500 text-white font-title text-xs py-3.5 rounded-xl font-bold transition shadow-lg">
+          Buka Portal
+        </button>
+      </form>
+
+      <div class="mt-6 border-t border-teal-950 pt-4">
+        <a href="index.html" class="text-slate-500 hover:text-slate-300 text-xs transition">← Kembali ke Beranda Utama</a>
+      </div>
     </div>
-  </header>
+  </div>
 
-  <!-- AREA UTAMA CEK SISWA (UNTUK WALI MURID) -->
-  <main class="flex-grow flex items-center justify-center mb-12">
-    <div class="glass-card w-full max-w-3xl rounded-3xl p-6 md:p-8 border border-teal-500/30 shadow-2xl">
-      
-      <!-- FILTER KELAS CEPAT (LENGKAP 1 - 6) -->
-      <div class="flex flex-wrap items-center gap-1.5 mb-4" id="bar-filter-kelas">
-        <span class="text-[11px] text-slate-400 mr-1 font-bold">Kelas:</span>
-        <button onclick="setFilterKelas('semua')" class="filter-btn active px-3 py-1 rounded-xl bg-slate-900 border border-teal-800 text-xs font-bold text-slate-300 transition">Semua</button>
-        <button onclick="setFilterKelas('1')" class="filter-btn px-3 py-1 rounded-xl bg-slate-900 border border-teal-800 text-xs font-bold text-slate-300 transition">Kelas 1</button>
-        <button onclick="setFilterKelas('2')" class="filter-btn px-3 py-1 rounded-xl bg-slate-900 border border-teal-800 text-xs font-bold text-slate-300 transition">Kelas 2</button>
-        <button onclick="setFilterKelas('3')" class="filter-btn px-3 py-1 rounded-xl bg-slate-900 border border-teal-800 text-xs font-bold text-slate-300 transition">Kelas 3</button>
-        <button onclick="setFilterKelas('4')" class="filter-btn px-3 py-1 rounded-xl bg-slate-900 border border-teal-800 text-xs font-bold text-slate-300 transition">Kelas 4</button>
-        <button onclick="setFilterKelas('5')" class="filter-btn px-3 py-1 rounded-xl bg-slate-900 border border-teal-800 text-xs font-bold text-slate-300 transition">Kelas 5</button>
-        <button onclick="setFilterKelas('6')" class="filter-btn px-3 py-1 rounded-xl bg-slate-900 border border-teal-800 text-xs font-bold text-slate-300 transition">Kelas 6</button>
-      </div>
-
-      <!-- KOTAK PENCARIAN NAMA SISWA -->
-      <div class="mb-4">
-        <label class="block text-slate-300 font-bold text-xs mb-1.5">Ketik Nama Siswa untuk Mencari Cepat:</label>
-        <input type="text" id="cari-nama-input" oninput="filterDropdownSiswa()" placeholder="Ketik nama siswa (misal: Alucio, Fransiska, Awis)..." class="w-full p-3 rounded-2xl bg-slate-950 border border-teal-700 text-white outline-none focus:border-teal-400 text-xs sm:text-sm">
-      </div>
-
-      <!-- DROPDOWN HASIL FILTER -->
-      <div class="mb-6">
-        <label class="block text-slate-400 font-bold text-[11px] mb-1">Pilih dari Daftar Siswa Tersaring:</label>
-        <select id="pilih-siswa" onchange="tampilkanRincian()" class="w-full p-3.5 rounded-2xl bg-slate-950 border border-teal-700 text-white font-bold outline-none focus:border-teal-400 text-sm">
-          <option value="">⏳ Mengambil daftar siswa dari server...</option>
-        </select>
-      </div>
-
-      <!-- KARTU RINCIAN SISWA -->
-      <div id="box-rincian" class="hidden space-y-6 pt-4 border-t border-teal-900/60">
-        
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-slate-950/60 p-4 rounded-2xl border border-teal-900/60">
-          <div>
-            <h2 class="font-title text-2xl text-white tracking-wide" id="rincian-nama">-</h2>
-            <p class="text-xs text-teal-300 font-semibold mt-0.5" id="rincian-kelas">-</p>
-          </div>
-          <span class="text-xs font-black px-4 py-1.5 rounded-full" id="badge-status">-</span>
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5 text-center text-xs">
-          <div class="bg-slate-950/80 p-4 rounded-2xl border border-teal-900/60">
-            <p class="text-slate-400 font-semibold">Total Sesi Hadir</p>
-            <p class="font-title text-2xl text-teal-300 mt-1" id="rincian-hadir">0 Sesi</p>
-            <p class="text-[10px] text-slate-500 mt-0.5">Biaya Rp 50.000 / sesi</p>
-          </div>
-
-          <div class="bg-slate-950/80 p-4 rounded-2xl border border-teal-900/60">
-            <p class="text-slate-400 font-semibold">Total Tagihan Sesi</p>
-            <p class="font-title text-2xl text-amber-300 mt-1" id="rincian-tagihan">Rp 0</p>
-            <p class="text-[10px] text-slate-500 mt-0.5" id="rincian-bayar">Tercatat bayar: Rp 0</p>
-          </div>
-
-          <div class="p-4 rounded-2xl border flex flex-col justify-center" id="box-selisih-card">
-            <p class="font-semibold text-slate-400" id="label-selisih">Sisa Tagihan</p>
-            <p class="font-title text-2xl font-bold mt-1" id="nominal-selisih">Rp 0</p>
-            <p class="text-[10px] text-slate-500 mt-0.5" id="sub-selisih">-</p>
-          </div>
-        </div>
-
-        <div>
-          <h3 class="font-title text-sm text-slate-300 mb-2">Riwayat Pertemuan & Presensi:</h3>
-          <div class="max-h-48 overflow-y-auto space-y-2 pr-1 text-xs" id="list-presensi"></div>
-        </div>
-
-      </div>
-
-      <div id="box-placeholder" class="text-center py-8 text-slate-500 text-xs">
-        <div class="text-3xl mb-2">🔍</div>
-        <p>Pilih nama siswa di atas untuk melihat status pembayaran.</p>
-      </div>
-
-    </div>
-  </main>
-
-  <!-- FOOTER -->
-  <footer class="flex flex-col sm:flex-row justify-between items-center text-xs text-slate-500 border-t border-teal-950 pt-6 gap-3">
-    <p>© 2026 <strong>NalarSci Lab</strong> • Manajemen Ekskul Koding Terpadu</p>
+  <!-- ================= KONTEN UTAMA PORTAL ================= -->
+  <div id="konten-portal" class="hidden flex-col flex-grow justify-between">
     
-    <button onclick="bukaModalAdmin()" class="text-slate-600 hover:text-teal-400 text-[11px] font-mono transition flex items-center gap-1.5">
-      🔒 Masuk Kas Admin
-    </button>
-  </footer>
+    <!-- HEADER -->
+    <header class="mb-8">
+      <div class="flex justify-between items-center border-b border-teal-900/60 pb-3 mb-6">
+        <a href="index.html" class="text-teal-400 hover:text-teal-300 font-bold text-xs flex items-center gap-1 transition">
+          ← Beranda Lab
+        </a>
+        <span class="text-xs bg-teal-500/10 border border-teal-400/20 text-teal-300 px-3 py-1 rounded-full font-bold">
+          💻 Ekstrakurikuler Koding & Komputasi
+        </span>
+      </div>
+
+      <div class="text-center max-w-2xl mx-auto">
+        <div class="inline-flex items-center gap-2 bg-teal-500/10 border border-teal-400/20 text-teal-300 px-3.5 py-1 rounded-full text-xs font-black uppercase tracking-wider mb-2">
+          Transparansi Layanan & Wali Murid
+        </div>
+        <h1 class="font-title text-3xl sm:text-4xl text-white mb-2">Portal Iuran & Presensi Siswa</h1>
+        <p class="text-slate-300 text-xs sm:text-sm">
+          Pilih atau cari nama siswa di bawah untuk melihat rekapitulasi kehadiran, rincian biaya, dan status pelunasan.
+        </p>
+      </div>
+    </header>
+
+    <!-- AREA UTAMA CEK SISWA (UNTUK WALI MURID) -->
+    <main class="flex-grow flex items-center justify-center mb-12">
+      <div class="glass-card w-full max-w-3xl rounded-3xl p-6 md:p-8 border border-teal-500/30 shadow-2xl">
+        
+        <!-- FILTER KELAS CEPAT (LENGKAP 1 - 6) -->
+        <div class="flex flex-wrap items-center gap-1.5 mb-4" id="bar-filter-kelas">
+          <span class="text-[11px] text-slate-400 mr-1 font-bold">Kelas:</span>
+          <button onclick="setFilterKelas('semua')" class="filter-btn active px-3 py-1 rounded-xl bg-slate-900 border border-teal-800 text-xs font-bold text-slate-300 transition">Semua</button>
+          <button onclick="setFilterKelas('1')" class="filter-btn px-3 py-1 rounded-xl bg-slate-900 border border-teal-800 text-xs font-bold text-slate-300 transition">Kelas 1</button>
+          <button onclick="setFilterKelas('2')" class="filter-btn px-3 py-1 rounded-xl bg-slate-900 border border-teal-800 text-xs font-bold text-slate-300 transition">Kelas 2</button>
+          <button onclick="setFilterKelas('3')" class="filter-btn px-3 py-1 rounded-xl bg-slate-900 border border-teal-800 text-xs font-bold text-slate-300 transition">Kelas 3</button>
+          <button onclick="setFilterKelas('4')" class="filter-btn px-3 py-1 rounded-xl bg-slate-900 border border-teal-800 text-xs font-bold text-slate-300 transition">Kelas 4</button>
+          <button onclick="setFilterKelas('5')" class="filter-btn px-3 py-1 rounded-xl bg-slate-900 border border-teal-800 text-xs font-bold text-slate-300 transition">Kelas 5</button>
+          <button onclick="setFilterKelas('6')" class="filter-btn px-3 py-1 rounded-xl bg-slate-900 border border-teal-800 text-xs font-bold text-slate-300 transition">Kelas 6</button>
+        </div>
+
+        <!-- KOTAK PENCARIAN NAMA SISWA -->
+        <div class="mb-4">
+          <label class="block text-slate-300 font-bold text-xs mb-1.5">Ketik Nama Siswa untuk Mencari Cepat:</label>
+          <input type="text" id="cari-nama-input" oninput="filterDropdownSiswa()" placeholder="Ketik nama siswa (misal: Alucio, Fransiska, Awis)..." class="w-full p-3 rounded-2xl bg-slate-950 border border-teal-700 text-white outline-none focus:border-teal-400 text-xs sm:text-sm">
+        </div>
+
+        <!-- DROPDOWN HASIL FILTER -->
+        <div class="mb-6">
+          <label class="block text-slate-400 font-bold text-[11px] mb-1">Pilih dari Daftar Siswa Tersaring:</label>
+          <select id="pilih-siswa" onchange="tampilkanRincian()" class="w-full p-3.5 rounded-2xl bg-slate-950 border border-teal-700 text-white font-bold outline-none focus:border-teal-400 text-sm">
+            <option value="">⏳ Mengambil daftar siswa dari server...</option>
+          </select>
+        </div>
+
+        <!-- KARTU RINCIAN SISWA -->
+        <div id="box-rincian" class="hidden space-y-6 pt-4 border-t border-teal-900/60">
+          
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-slate-950/60 p-4 rounded-2xl border border-teal-900/60">
+            <div>
+              <h2 class="font-title text-2xl text-white tracking-wide" id="rincian-nama">-</h2>
+              <p class="text-xs text-teal-300 font-semibold mt-0.5" id="rincian-kelas">-</p>
+            </div>
+            <span class="text-xs font-black px-4 py-1.5 rounded-full" id="badge-status">-</span>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5 text-center text-xs">
+            <div class="bg-slate-950/80 p-4 rounded-2xl border border-teal-900/60">
+              <p class="text-slate-400 font-semibold">Total Sesi Hadir</p>
+              <p class="font-title text-2xl text-teal-300 mt-1" id="rincian-hadir">0 Sesi</p>
+              <p class="text-[10px] text-slate-500 mt-0.5">Biaya Rp 50.000 / sesi</p>
+            </div>
+
+            <div class="bg-slate-950/80 p-4 rounded-2xl border border-teal-900/60">
+              <p class="text-slate-400 font-semibold">Total Tagihan Sesi</p>
+              <p class="font-title text-2xl text-amber-300 mt-1" id="rincian-tagihan">Rp 0</p>
+              <p class="text-[10px] text-slate-500 mt-0.5" id="rincian-bayar">Tercatat bayar: Rp 0</p>
+            </div>
+
+            <div class="p-4 rounded-2xl border flex flex-col justify-center" id="box-selisih-card">
+              <p class="font-semibold text-slate-400" id="label-selisih">Sisa Tagihan</p>
+              <p class="font-title text-2xl font-bold mt-1" id="nominal-selisih">Rp 0</p>
+              <p class="text-[10px] text-slate-500 mt-0.5" id="sub-selisih">-</p>
+            </div>
+          </div>
+
+          <div>
+            <h3 class="font-title text-sm text-slate-300 mb-2">Riwayat Pertemuan & Presensi:</h3>
+            <div class="max-h-48 overflow-y-auto space-y-2 pr-1 text-xs" id="list-presensi"></div>
+          </div>
+
+        </div>
+
+        <div id="box-placeholder" class="text-center py-8 text-slate-500 text-xs">
+          <div class="text-3xl mb-2">🔍</div>
+          <p>Pilih nama siswa di atas untuk melihat status pembayaran.</p>
+        </div>
+
+      </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="flex flex-col sm:flex-row justify-between items-center text-xs text-slate-500 border-t border-teal-950 pt-6 gap-3">
+      <p>© 2026 <strong>NalarSci Lab</strong> • Manajemen Ekskul Koding Terpadu</p>
+      
+      <button onclick="bukaModalAdmin()" class="text-slate-600 hover:text-teal-400 text-[11px] font-mono transition flex items-center gap-1.5">
+        🔒 Masuk Kas Admin
+      </button>
+    </footer>
+
+  </div>
 
   <!-- MODAL CEKLIS CEPAT PEMBAYARAN (DENGAN SEARCH) -->
   <div id="modal-admin-kas" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
@@ -201,15 +232,51 @@
   </div>
 
   <script>
+    // ================= KONFIGURASI KUNCI TOKEN =================
+    const TOKEN_RAHASIA = "koding2026"; // Kunci URL parameter ?token=koding2026
     const API_EKSKUL_URL = "https://script.google.com/macros/s/AKfycbycRk6Bzt-GeNoGb1y0HlpmYnucGYIOKtQ83anoZ2MueAuHJQKX4SGxBj9U4Exjlzry/exec";
 
     let dataSiswaList = [];
     let filterKelasAktif = "semua";
     let allSelected = false;
 
+    // Periksa token begitu halaman dibuka
     window.addEventListener('DOMContentLoaded', () => {
-      muatDataServer();
+      cekOtorisasiToken();
     });
+
+    function cekOtorisasiToken() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const tokenUrl = urlParams.get('token');
+      const tokenSaved = sessionStorage.getItem('token_ekskul_auth');
+
+      if (tokenUrl === TOKEN_RAHASIA || tokenSaved === TOKEN_RAHASIA) {
+        sessionStorage.setItem('token_ekskul_auth', TOKEN_RAHASIA);
+        bukaAksesPortal();
+      } else {
+        document.getElementById('layar-terkunci').classList.remove('hidden');
+      }
+    }
+
+    function verifikasiTokenManual(e) {
+      e.preventDefault();
+      const input = document.getElementById('input-token-manual').value.trim();
+      if (input === TOKEN_RAHASIA) {
+        sessionStorage.setItem('token_ekskul_auth', TOKEN_RAHASIA);
+        bukaAksesPortal();
+      } else {
+        alert("Kunci token salah! Harap periksa kembali atau gunakan link dari grup WhatsApp.");
+        document.getElementById('input-token-manual').value = "";
+      }
+    }
+
+    function bukaAksesPortal() {
+      document.getElementById('layar-terkunci').classList.add('hidden');
+      const konten = document.getElementById('konten-portal');
+      konten.classList.remove('hidden');
+      konten.classList.add('flex');
+      muatDataServer();
+    }
 
     function bukaModalAdmin() {
       document.getElementById('modal-admin-kas').classList.remove('hidden');
@@ -377,12 +444,10 @@
       });
     }
 
-    // Format tanggal ke gaya lokal (dd MMM yyyy)
     function formatTglTampil(tglStr) {
       if (!tglStr || tglStr === "-") return "-";
       const parts = tglStr.toString().trim().split(/[-/]/);
       if (parts.length === 3 && parts[0].length === 4) {
-        // Format YYYY-MM-DD
         const bln = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"];
         const idx = parseInt(parts[1], 10) - 1;
         return `${parseInt(parts[2], 10)} ${bln[idx] || parts[1]} ${parts[0]}`;
