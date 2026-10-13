@@ -350,13 +350,6 @@
         if (json.kepsek && json.kepsek.nama) {
           KEPSEK_INFO = json.kepsek;
         }
-        if (json.jurnalMateri && json.jurnalMateri.length > 0) {
-          JURNAL_MATERI_DATA = json.jurnalMateri;
-        } else {
-          // Fallback cerdas berdasarkan tingkat jika offline
-          const tk = parseInt(document.getElementById("selTingkat").value) || 5;
-          JURNAL_MATERI_DATA = (tk <= 4) ? DEFAULT_JURNAL_FASE_B : DEFAULT_JURNAL_FASE_C;
-        }
         displayWaliInfo();
 
         renderTable();
@@ -786,15 +779,13 @@
     ];
 
 
-
     function formatTanggalRingkas(tgl) {
       if (!tgl) return "";
-      const str = tgl.toString().trim();
-      if (str.includes("T") && (str.includes("Z") || str.includes("+"))) {
-        const parts = str.split("T")[0].split("-");
-        if (parts.length === 3) {
-          return `${parts[2]}/${parts[1]}`; // DD/MM (contoh: 21/07)
-        }
+      let str = tgl.toString().trim();
+      if (str.includes("T")) {
+        let datePart = str.split("T")[0];
+        let p = datePart.split("-");
+        if (p.length === 3) return `${p[2]}/${p[1]}`;
       }
       return str;
     }
@@ -807,7 +798,7 @@
       const semester = document.getElementById("selSemester").value;
       const kkm = document.getElementById("inputKKM").value || 75;
       const infoWali = WALI_KELAS_DATA[rombel] || { nama: "................................." };
-      const namaKepsek = KEPSEK_INFO.nama || "Endah Larasati, S.Pd.";
+      let namaKepsek = (KEPSEK_INFO && KEPSEK_INFO.nama && KEPSEK_INFO.nama !== "-") ? KEPSEK_INFO.nama : "Endah Larasati, S.Pd.";
 
       let barisTabel = "";
       studentsData.forEach((s, idx) => {
@@ -843,22 +834,6 @@
           </tr>
         `;
       });
-
-      let thPertemuanHtml = "";
-      let agendaTextArr = [];
-      pertemuanList.forEach(p => {
-        const tglClean = formatTanggalRingkas(p.tgl);
-        thPertemuanHtml += `<th style="width: 38px; background: #134e4a;">P${p.no}<br><span class="th-sub">${tglClean}</span></th>`;
-        agendaTextArr.push(`<b>P${p.no} (${tglClean}):</b> ${p.topik} <i>[${p.elemen || 'Praktik'}]</i>`);
-      });
-      thPertemuanHtml += `
-        <th style="width: 35px; background: #1e40af;">H</th>
-        <th style="width: 30px; background: #b45309;">S</th>
-        <th style="width: 30px; background: #0369a1;">I</th>
-        <th style="width: 30px; background: #991b1b;">A</th>
-        <th style="width: 50px; background: #1e3a8a;">%</th>
-      `;
-      const agendaText = agendaTextArr.join(" &nbsp;•&nbsp; ");
 
       const win = window.open("", "_blank");
       win.document.write(`
@@ -955,9 +930,8 @@
       const tahun = document.getElementById("selTahun").value;
       const semester = document.getElementById("selSemester").value;
       const infoWali = WALI_KELAS_DATA[rombel] || { nama: "................................." };
-      const namaKepsek = KEPSEK_INFO.nama || "Endah Larasati, S.Pd.";
+      let namaKepsek = (KEPSEK_INFO && KEPSEK_INFO.nama && KEPSEK_INFO.nama !== "-") ? KEPSEK_INFO.nama : "Endah Larasati, S.Pd.";
 
-      // Mengambil Silabus Jurnal Dinamis dari Database Google Sheets (Sheet Jurnal_Materi)
       const tk = parseInt(document.getElementById("selTingkat").value) || 5;
       const pertemuanList = (JURNAL_MATERI_DATA && JURNAL_MATERI_DATA.length > 0) 
         ? JURNAL_MATERI_DATA 
@@ -969,13 +943,11 @@
       studentsData.forEach((s, idx) => {
         let st = s.absen || "H";
         
-        // Buat rekaman kehadiran per pertemuan (P1 s/d P8)
-        // Jika ada status izin/sakit pada sesi aktif, disematkan pada pertemuan terakhir (P8)
         let sSakit = st === "S" ? 1 : 0;
         let sIzin = st === "I" ? 1 : 0;
         let sAlpa = st === "A" ? 1 : 0;
-        let sHadir = 8 - (sSakit + sIzin + sAlpa);
-        let persen = Math.round((sHadir / 8) * 100);
+        let sHadir = totalPertemuan - (sSakit + sIzin + sAlpa);
+        let persen = Math.round((sHadir / totalPertemuan) * 100);
 
         let cellPertemuan = "";
         for (let p = 1; p <= totalPertemuan; p++) {
