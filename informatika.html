@@ -350,6 +350,13 @@
         if (json.kepsek && json.kepsek.nama) {
           KEPSEK_INFO = json.kepsek;
         }
+        if (json.jurnalMateri && json.jurnalMateri.length > 0) {
+          JURNAL_MATERI_DATA = json.jurnalMateri;
+        } else {
+          // Fallback cerdas berdasarkan tingkat jika offline
+          const tk = parseInt(document.getElementById("selTingkat").value) || 5;
+          JURNAL_MATERI_DATA = (tk <= 4) ? DEFAULT_JURNAL_FASE_B : DEFAULT_JURNAL_FASE_C;
+        }
         displayWaliInfo();
 
         renderTable();
@@ -754,6 +761,31 @@
     // ==================== FITUR CETAK MONEV DOKUMEN RESMI (LEGER & REKAP ABSEN SEMESTER/STS) ====================
     let KEPSEK_INFO = { nama: "Endah Larasati, S.Pd.", nip: "-" };
 
+    let JURNAL_MATERI_DATA = [];
+
+    const DEFAULT_JURNAL_FASE_B = [
+      { no: 1, tgl: "21/07", topik: "Pengenalan Lab & Keselamatan Kerja", elemen: "SK" },
+      { no: 2, tgl: "28/07", topik: "Perangkat Keras (Hardware) & Fungsinya", elemen: "SK" },
+      { no: 3, tgl: "04/08", topik: "Operasional Mouse & Mengetik Kata Sederhana", elemen: "TIK" },
+      { no: 4, tgl: "11/08", topik: "Aplikasi Gambar Digital Sederhana", elemen: "TIK" },
+      { no: 5, tgl: "18/08", topik: "Logika Berpikir Komputasional Sederhana", elemen: "BK" },
+      { no: 6, tgl: "25/08", topik: "Etika & Tertib Penggunaan Gawai Digital", elemen: "DSI" },
+      { no: 7, tgl: "01/09", topik: "Latihan Pola & Pengurutan Instruksi", elemen: "BK" },
+      { no: 8, tgl: "08/09", topik: "Review Capaian Pembelajaran & Gladi STS", elemen: "STS" }
+    ];
+
+    const DEFAULT_JURNAL_FASE_C = [
+      { no: 1, tgl: "21/07", topik: "Pengenalan Lab & Arsitektur Komputer", elemen: "SK" },
+      { no: 2, tgl: "28/07", topik: "Mekanisme Kerja Hardware & Sistem Operasi", elemen: "SK" },
+      { no: 3, tgl: "04/08", topik: "Antarmuka Scratch & Blok Logika", elemen: "AP" },
+      { no: 4, tgl: "11/08", topik: "Praktikum Scratch 1: Animasi & Gerak Sprite", elemen: "AP" },
+      { no: 5, tgl: "18/08", topik: "Praktikum Scratch 2: Kendali & Event Interaktif", elemen: "AP" },
+      { no: 6, tgl: "25/08", topik: "Etika Berinternet, Jejak Digital & Keamanan Data", elemen: "DSI" },
+      { no: 7, tgl: "01/09", topik: "Tantangan Berpikir Komputasional (Dekomposisi)", elemen: "BK" },
+      { no: 8, tgl: "08/09", topik: "Review Proyek Praktikum & Gladi STS CBT", elemen: "STS" }
+    ];
+
+
     function cetakLegerNilai() {
       if (studentsData.length === 0) return alert("Harap buka data kelas terlebih dahulu!");
 
@@ -798,6 +830,21 @@
           </tr>
         `;
       });
+
+      let thPertemuanHtml = "";
+      let agendaTextArr = [];
+      pertemuanList.forEach(p => {
+        thPertemuanHtml += `<th style="width: 38px; background: #134e4a;">P${p.no}<br><span class="th-sub">${p.tgl}</span></th>`;
+        agendaTextArr.push(`<b>P${p.no} (${p.tgl}):</b> ${p.topik} <i>[${p.elemen || 'Praktik'}]</i>`);
+      });
+      thPertemuanHtml += `
+        <th style="width: 35px; background: #1e40af;">H</th>
+        <th style="width: 30px; background: #b45309;">S</th>
+        <th style="width: 30px; background: #0369a1;">I</th>
+        <th style="width: 30px; background: #991b1b;">A</th>
+        <th style="width: 50px; background: #1e3a8a;">%</th>
+      `;
+      const agendaText = agendaTextArr.join(" &nbsp;•&nbsp; ");
 
       const win = window.open("", "_blank");
       win.document.write(`
@@ -896,17 +943,13 @@
       const infoWali = WALI_KELAS_DATA[rombel] || { nama: "................................." };
       const namaKepsek = KEPSEK_INFO.nama || "Endah Larasati, S.Pd.";
 
-      // Daftar 8 Pertemuan Pra-STS Informatika Semester Ganjil (Lengkap dengan Tanggal)
-      const pertemuanList = [
-        { no: 1, tgl: "21/07", topik: "Pengenalan Lab & Perangkat" },
-        { no: 2, tgl: "28/07", topik: "Sistem Komputer (Hardware)" },
-        { no: 3, tgl: "04/08", topik: "Logika Algoritma Dasar" },
-        { no: 4, tgl: "11/08", topik: "Praktikum Scratch 1 (Gerak)" },
-        { no: 5, tgl: "18/08", topik: "Praktikum Scratch 2 (Event)" },
-        { no: 6, tgl: "25/08", topik: "Etika Digital & Privasi" },
-        { no: 7, tgl: "01/09", topik: "Tantangan Berpikir Komputasi" },
-        { no: 8, tgl: "08/09", topik: "Review & Gladi STS" }
-      ];
+      // Mengambil Silabus Jurnal Dinamis dari Database Google Sheets (Sheet Jurnal_Materi)
+      const tk = parseInt(document.getElementById("selTingkat").value) || 5;
+      const pertemuanList = (JURNAL_MATERI_DATA && JURNAL_MATERI_DATA.length > 0) 
+        ? JURNAL_MATERI_DATA 
+        : ((tk <= 4) ? DEFAULT_JURNAL_FASE_B : DEFAULT_JURNAL_FASE_C);
+      
+      const totalPertemuan = pertemuanList.length;
 
       let barisTabel = "";
       studentsData.forEach((s, idx) => {
@@ -921,9 +964,9 @@
         let persen = Math.round((sHadir / 8) * 100);
 
         let cellPertemuan = "";
-        for (let p = 1; p <= 8; p++) {
+        for (let p = 1; p <= totalPertemuan; p++) {
           let statusP = "H";
-          if (p === 8 && st !== "H") statusP = st;
+          if (p === totalPertemuan && st !== "H") statusP = st;
           
           let colorP = statusP === "H" ? "#047857" : (statusP === "S" ? "#b45309" : (statusP === "I" ? "#0369a1" : "#b91c1c"));
           let bgP = statusP === "H" ? "" : "#fee2e2";
@@ -944,6 +987,21 @@
           </tr>
         `;
       });
+
+      let thPertemuanHtml = "";
+      let agendaTextArr = [];
+      pertemuanList.forEach(p => {
+        thPertemuanHtml += `<th style="width: 38px; background: #134e4a;">P${p.no}<br><span class="th-sub">${p.tgl}</span></th>`;
+        agendaTextArr.push(`<b>P${p.no} (${p.tgl}):</b> ${p.topik} <i>[${p.elemen || 'Praktik'}]</i>`);
+      });
+      thPertemuanHtml += `
+        <th style="width: 35px; background: #1e40af;">H</th>
+        <th style="width: 30px; background: #b45309;">S</th>
+        <th style="width: 30px; background: #0369a1;">I</th>
+        <th style="width: 30px; background: #991b1b;">A</th>
+        <th style="width: 50px; background: #1e3a8a;">%</th>
+      `;
+      const agendaText = agendaTextArr.join(" &nbsp;•&nbsp; ");
 
       const win = window.open("", "_blank");
       win.document.write(`
@@ -989,23 +1047,11 @@
                 <th rowspan="2" style="width: 25px;">No</th>
                 <th rowspan="2" style="width: 65px;">NIS</th>
                 <th rowspan="2">Nama Peserta Didik</th>
-                <th colspan="8" style="background-color: #115e59;">Rincian Pertemuan & Tanggal Praktikum</th>
+                <th colspan="${totalPertemuan}" style="background-color: #115e59;">Rincian Pertemuan & Tanggal Praktikum (Dinamis dari Spreadsheet)</th>
                 <th colspan="5" style="background-color: #1e3a8a;">Rekapitulasi STS</th>
               </tr>
               <tr>
-                <th style="width: 38px; background: #134e4a;">P1<br><span class="th-sub">21/07</span></th>
-                <th style="width: 38px; background: #134e4a;">P2<br><span class="th-sub">28/07</span></th>
-                <th style="width: 38px; background: #134e4a;">P3<br><span class="th-sub">04/08</span></th>
-                <th style="width: 38px; background: #134e4a;">P4<br><span class="th-sub">11/08</span></th>
-                <th style="width: 38px; background: #134e4a;">P5<br><span class="th-sub">18/08</span></th>
-                <th style="width: 38px; background: #134e4a;">P6<br><span class="th-sub">25/08</span></th>
-                <th style="width: 38px; background: #134e4a;">P7<br><span class="th-sub">01/09</span></th>
-                <th style="width: 38px; background: #134e4a;">P8<br><span class="th-sub">08/09</span></th>
-                <th style="width: 35px; background: #1e40af;">H</th>
-                <th style="width: 30px; background: #b45309;">S</th>
-                <th style="width: 30px; background: #0369a1;">I</th>
-                <th style="width: 30px; background: #991b1b;">A</th>
-                <th style="width: 50px; background: #1e3a8a;">%</th>
+                ${thPertemuanHtml}
               </tr>
             </thead>
             <tbody>
@@ -1014,8 +1060,8 @@
           </table>
 
           <div class="agenda-box">
-            <b>Jurnal Rincian Pertemuan Praktikum (Periode STS):</b> 
-            P1 (21/07): Pengenalan Lab & OS | P2 (28/07): Perangkat Keras Input-Output | P3 (04/08): Algoritma & Logika Urut | P4 (11/08): Praktikum Scratch Animasi 1 | P5 (18/08): Praktikum Scratch Kendali Event 2 | P6 (25/08): Etika Gawai & Keamanan Data | P7 (01/09): Pemecahan Masalah Komputasi | P8 (08/09): Review Evaluasi Tengah Semester (STS).
+            <b>Jurnal Rincian Pertemuan Praktikum (Periode STS - Terhubung Sheet Jurnal_Materi):</b><br>
+            ${agendaText}
           </div>
 
           <div class="footer-sign-grid">
@@ -1050,3 +1096,4 @@
 
   </script>
 </body>
+</html>
