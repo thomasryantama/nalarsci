@@ -121,6 +121,7 @@
           </button>
         </div>
         <div class="flex gap-2">
+          <button onclick="cetakLegerNilai()" class="px-3 py-1.5 bg-sky-700 hover:bg-sky-800 text-white text-xs font-bold rounded-lg flex items-center gap-1">🖨️ Cetak Leger Nilai</button>
           <button onclick="exportWaliKelas('STS')" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold rounded-lg">
             📑 Ekspor Raport STS
           </button>
@@ -165,6 +166,7 @@
           <button onclick="saveAttendance()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl">
             💾 Simpan Presensi
           </button>
+          <button onclick="cetakPresensiHarian()" class="px-4 py-2 bg-sky-700 hover:bg-sky-800 text-white text-xs font-bold rounded-xl flex items-center gap-1">🖨️ Cetak Presensi</button>
           <button onclick="generateWhatsAppReport()" class="px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold rounded-xl flex items-center gap-1">
             📲 Generate Laporan WA
           </button>
@@ -745,6 +747,235 @@
       link.click();
       document.body.removeChild(link);
     }
+
+    // ==================== FITUR CETAK MONEV DOKUMEN RESMI ====================
+    function cetakLegerNilai() {
+      if (studentsData.length === 0) return alert("Harap buka data kelas terlebih dahulu!");
+
+      const rombel = document.getElementById("selRombel").value;
+      const tahun = document.getElementById("selTahun").value;
+      const semester = document.getElementById("selSemester").value;
+      const kkm = document.getElementById("inputKKM").value || 75;
+      const infoWali = WALI_KELAS_DATA[rombel] || { nama: "................................." };
+
+      let barisTabel = "";
+      studentsData.forEach((s, idx) => {
+        const tpVals = [s.nilai.tp1, s.nilai.tp2, s.nilai.tp3, s.nilai.tp4]
+          .filter(v => v !== "" && v !== null && !isNaN(parseFloat(v)))
+          .map(v => parseFloat(v));
+        const sts = parseFloat(s.nilai.sts) || "";
+        const sas = parseFloat(s.nilai.sas) || "";
+        const rataFmt = tpVals.length > 0 ? Math.round(tpVals.reduce((a, b) => a + b, 0) / tpVals.length) : "";
+        
+        let na = "";
+        if (sts !== "" && sas !== "") na = Math.round((2 * rataFmt + sts + sas) / 4);
+        else if (sts !== "") na = Math.round((2 * rataFmt + sts) / 3);
+        else if (rataFmt !== "") na = rataFmt;
+
+        const statusStr = (na !== "" && na >= kkm) ? "Tuntas" : (na !== "" ? "Belum Tuntas" : "-");
+        const statusColor = (na !== "" && na < kkm) ? "color: #b91c1c; font-weight: bold;" : "";
+
+        barisTabel += `
+          <tr>
+            <td style="text-align: center;">${idx + 1}</td>
+            <td style="text-align: center; font-family: monospace;">${s.nis}</td>
+            <td><b>${s.nama}</b></td>
+            <td style="text-align: center;">${s.nilai.tp1 || "-"}</td>
+            <td style="text-align: center;">${s.nilai.tp2 || "-"}</td>
+            <td style="text-align: center;">${s.nilai.tp3 || "-"}</td>
+            <td style="text-align: center;">${s.nilai.tp4 || "-"}</td>
+            <td style="text-align: center; font-weight: bold;">${rataFmt || "-"}</td>
+            <td style="text-align: center; font-weight: bold; background: #fef3c7;">${sts || "-"}</td>
+            <td style="text-align: center; font-weight: bold; background: #e0e7ff;">${sas || "-"}</td>
+            <td style="text-align: center; font-weight: bold; ${statusColor}">${na || "-"}</td>
+            <td style="text-align: center; ${statusColor}">${statusStr}</td>
+          </tr>
+        `;
+      });
+
+      const win = window.open("", "_blank");
+      win.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>Leger Nilai Informatika - Kelas ${rombel}</title>
+          <style>
+            @page { size: A4 landscape; margin: 12mm; }
+            body { font-family: 'Calibri', 'Segoe UI', sans-serif; font-size: 11pt; color: #1e293b; margin: 0; padding: 10px; }
+            .header-kop { text-align: center; border-bottom: 3px double #0f172a; padding-bottom: 8px; margin-bottom: 12px; }
+            .header-kop h2 { margin: 0; font-size: 15pt; text-transform: uppercase; letter-spacing: 1px; color: #0f172a; }
+            .header-kop h3 { margin: 2px 0; font-size: 13pt; color: #1e40af; }
+            .header-kop p { margin: 2px 0; font-size: 9.5pt; color: #475569; }
+            .meta-grid { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 10pt; font-weight: 500; }
+            table { width: 100%; border-collapse: collapse; margin-top: 5px; font-size: 9.5pt; }
+            th, td { border: 1px solid #475569; padding: 4.5px 6px; }
+            th { background-color: #1e3a8a; color: #ffffff; text-align: center; font-weight: bold; }
+            .footer-sign { margin-top: 35px; display: flex; justify-content: space-between; page-break-inside: avoid; font-size: 10pt; }
+            .sign-box { text-align: center; width: 230px; }
+            @media print { .no-print { display: none; } }
+          </style>
+        </head>
+        <body>
+          <div class="no-print" style="margin-bottom: 15px; text-align: right;">
+            <button onclick="window.print()" style="padding: 8px 16px; background: #0284c7; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer;">🖨️ Cetak Dokumen / Simpan PDF</button>
+          </div>
+          <div class="header-kop">
+            <h2>SD METHODIST IMMANUEL BANDAR LAMPUNG</h2>
+            <h3>LEGER PENILAIAN CAPAIAN PEMBELAJARAN INFORMATIKA</h3>
+            <p>Jalan Gatot Subroto No. 34, Bandar Lampung • Akreditasi A</p>
+          </div>
+          <div class="meta-grid">
+            <div><b>Mata Pelajaran:</b> Informatika (Kurikulum Merdeka)<br><b>Tahun Ajaran:</b> ${tahun} | <b>Semester:</b> ${semester}</div>
+            <div style="text-align: right;"><b>Kelas / Rombel:</b> ${rombel}<br><b>Batas Tuntas KKTP/KKM:</b> ${kkm}</div>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th style="width: 25px;">No</th>
+                <th style="width: 65px;">NIS</th>
+                <th>Nama Peserta Didik</th>
+                <th style="width: 45px;">TP1</th>
+                <th style="width: 45px;">TP2</th>
+                <th style="width: 45px;">TP3</th>
+                <th style="width: 45px;">TP4</th>
+                <th style="width: 55px;">Rata Fmt</th>
+                <th style="width: 50px; background-color: #b45309;">STS</th>
+                <th style="width: 50px; background-color: #3730a3;">SAS</th>
+                <th style="width: 55px;">Nilai Akhir</th>
+                <th style="width: 75px;">Keterangan</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${barisTabel}
+            </tbody>
+          </table>
+          <div class="footer-sign">
+            <div class="sign-box">
+              Mengetahui,<br>Wali Kelas ${rombel}
+              <div style="height: 60px;"></div>
+              <b><u>${infoWali.nama}</u></b>
+            </div>
+            <div class="sign-box">
+              Bandar Lampung, 13 Oktober 2026<br>Guru Mata Pelajaran
+              <div style="height: 60px;"></div>
+              <b><u>Thomas Ryantama, M.Kom., Gr.</u></b>
+            </div>
+          </div>
+        </body>
+        </html>
+      `);
+      win.document.close();
+    }
+
+    function cetakPresensiHarian() {
+      if (studentsData.length === 0) return alert("Harap buka data kelas terlebih dahulu!");
+
+      const rombel = document.getElementById("selRombel").value;
+      const tahun = document.getElementById("selTahun").value;
+      const semester = document.getElementById("selSemester").value;
+      const tanggal = document.getElementById("absenTanggal").value;
+      const infoWali = WALI_KELAS_DATA[rombel] || { nama: "................................." };
+
+      let hadir = 0, sakit = 0, izin = 0, alpa = 0;
+      let barisTabel = "";
+
+      studentsData.forEach((s, idx) => {
+        let st = s.absen || "H";
+        if (st === "H") hadir++;
+        else if (st === "S") sakit++;
+        else if (st === "I") izin++;
+        else if (st === "A") alpa++;
+
+        let stBadge = st === "H" ? "HADIR" : (st === "S" ? "SAKIT" : (st === "I" ? "IZIN" : "ALPA"));
+        let stBg = st === "H" ? "" : "background: #fee2e2; font-weight: bold; color: #991b1b;";
+
+        barisTabel += `
+          <tr>
+            <td style="text-align: center;">${idx + 1}</td>
+            <td style="text-align: center; font-family: monospace;">${s.nis}</td>
+            <td><b>${s.nama}</b></td>
+            <td style="text-align: center; ${stBg}">${stBadge}</td>
+            <td>${s.catatan || "-"}</td>
+          </tr>
+        `;
+      });
+
+      const win = window.open("", "_blank");
+      win.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>Presensi Harian Informatika - Kelas ${rombel}</title>
+          <style>
+            @page { size: A4 portrait; margin: 15mm; }
+            body { font-family: 'Calibri', 'Segoe UI', sans-serif; font-size: 11pt; color: #1e293b; margin: 0; padding: 10px; }
+            .header-kop { text-align: center; border-bottom: 3px double #0f172a; padding-bottom: 8px; margin-bottom: 12px; }
+            .header-kop h2 { margin: 0; font-size: 15pt; text-transform: uppercase; color: #0f172a; }
+            .header-kop h3 { margin: 2px 0; font-size: 13pt; color: #0f766e; }
+            .header-kop p { margin: 2px 0; font-size: 9.5pt; color: #475569; }
+            .meta-grid { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 10pt; }
+            .stat-box { display: flex; gap: 12px; margin-bottom: 12px; font-size: 10pt; font-weight: bold; }
+            .stat-item { padding: 4px 10px; border-radius: 4px; border: 1px solid #cbd5e1; }
+            table { width: 100%; border-collapse: collapse; font-size: 10pt; }
+            th, td { border: 1px solid #475569; padding: 5px 8px; }
+            th { background-color: #0f766e; color: #ffffff; text-align: center; }
+            .footer-sign { margin-top: 35px; display: flex; justify-content: space-between; page-break-inside: avoid; font-size: 10pt; }
+            .sign-box { text-align: center; width: 220px; }
+            @media print { .no-print { display: none; } }
+          </style>
+        </head>
+        <body>
+          <div class="no-print" style="margin-bottom: 15px; text-align: right;">
+            <button onclick="window.print()" style="padding: 8px 16px; background: #0f766e; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer;">🖨️ Cetak Presensi / Simpan PDF</button>
+          </div>
+          <div class="header-kop">
+            <h2>SD METHODIST IMMANUEL BANDAR LAMPUNG</h2>
+            <h3>BERITA ACARA & PRESENSI HARIAN PRAKTIKUM INFORMATIKA</h3>
+            <p>Jalan Gatot Subroto No. 34, Bandar Lampung • Lab Komputer</p>
+          </div>
+          <div class="meta-grid">
+            <div><b>Mata Pelajaran:</b> Informatika<br><b>Hari / Tanggal:</b> ${tanggal}</div>
+            <div style="text-align: right;"><b>Kelas / Rombel:</b> ${rombel}<br><b>Semester:</b> ${semester} (${tahun})</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-item" style="background: #ecfdf5; color: #065f46;">Hadir: ${hadir}</div>
+            <div class="stat-item" style="background: #fffbeb; color: #92400e;">Sakit: ${sakit}</div>
+            <div class="stat-item" style="background: #f0f9ff; color: #0369a1;">Izin: ${izin}</div>
+            <div class="stat-item" style="background: #fef2f2; color: #991b1b;">Alpa: ${alpa}</div>
+            <div class="stat-item" style="background: #f8fafc;">Total: ${studentsData.length} Siswa</div>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th style="width: 30px;">No</th>
+                <th style="width: 80px;">NIS</th>
+                <th>Nama Peserta Didik</th>
+                <th style="width: 90px;">Status Kehadiran</th>
+                <th>Catatan Khusus / Keterangan</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${barisTabel}
+            </tbody>
+          </table>
+          <div class="footer-sign">
+            <div class="sign-box">
+              Mengetahui,<br>Wali Kelas ${rombel}
+              <div style="height: 60px;"></div>
+              <b><u>${infoWali.nama}</u></b>
+            </div>
+            <div class="sign-box">
+              Bandar Lampung, ${tanggal}<br>Guru Mata Pelajaran
+              <div style="height: 60px;"></div>
+              <b><u>Thomas Ryantama, M.Kom., Gr.</u></b>
+            </div>
+          </div>
+        </body>
+        </html>
+      `);
+      win.document.close();
+    }
+
   </script>
 </body>
 </html>
