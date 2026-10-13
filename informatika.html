@@ -786,6 +786,19 @@
     ];
 
 
+
+    function formatTanggalRingkas(tgl) {
+      if (!tgl) return "";
+      const str = tgl.toString().trim();
+      if (str.includes("T") && (str.includes("Z") || str.includes("+"))) {
+        const parts = str.split("T")[0].split("-");
+        if (parts.length === 3) {
+          return `${parts[2]}/${parts[1]}`; // DD/MM (contoh: 21/07)
+        }
+      }
+      return str;
+    }
+
     function cetakLegerNilai() {
       if (studentsData.length === 0) return alert("Harap buka data kelas terlebih dahulu!");
 
@@ -834,8 +847,9 @@
       let thPertemuanHtml = "";
       let agendaTextArr = [];
       pertemuanList.forEach(p => {
-        thPertemuanHtml += `<th style="width: 38px; background: #134e4a;">P${p.no}<br><span class="th-sub">${p.tgl}</span></th>`;
-        agendaTextArr.push(`<b>P${p.no} (${p.tgl}):</b> ${p.topik} <i>[${p.elemen || 'Praktik'}]</i>`);
+        const tglClean = formatTanggalRingkas(p.tgl);
+        thPertemuanHtml += `<th style="width: 38px; background: #134e4a;">P${p.no}<br><span class="th-sub">${tglClean}</span></th>`;
+        agendaTextArr.push(`<b>P${p.no} (${tglClean}):</b> ${p.topik} <i>[${p.elemen || 'Praktik'}]</i>`);
       });
       thPertemuanHtml += `
         <th style="width: 35px; background: #1e40af;">H</th>
@@ -991,8 +1005,9 @@
       let thPertemuanHtml = "";
       let agendaTextArr = [];
       pertemuanList.forEach(p => {
-        thPertemuanHtml += `<th style="width: 38px; background: #134e4a;">P${p.no}<br><span class="th-sub">${p.tgl}</span></th>`;
-        agendaTextArr.push(`<b>P${p.no} (${p.tgl}):</b> ${p.topik} <i>[${p.elemen || 'Praktik'}]</i>`);
+        const tglClean = formatTanggalRingkas(p.tgl);
+        thPertemuanHtml += `<th style="width: 38px; background: #134e4a;">P${p.no}<br><span class="th-sub">${tglClean}</span></th>`;
+        agendaTextArr.push(`<b>P${p.no} (${tglClean}):</b> ${p.topik} <i>[${p.elemen || 'Praktik'}]</i>`);
       });
       thPertemuanHtml += `
         <th style="width: 35px; background: #1e40af;">H</th>
