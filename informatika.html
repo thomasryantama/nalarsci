@@ -933,36 +933,7 @@
               <b><u>${namaKepsek}</u></b>
             </div>
           </div>
-        
-  <!-- Modal Edit Kop Surat & Kepala Sekolah -->
-  <div id="kopModal" class="hidden fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-    <div class="bg-white max-w-md w-full p-5 rounded-2xl shadow-xl space-y-4">
-      <div class="flex justify-between items-center border-b pb-2">
-        <h3 class="font-bold text-slate-800 text-sm">⚙️ Pengaturan Kop Dokumen & Kepala Sekolah</h3>
-        <button onclick="closeKopModal()" class="text-slate-400 hover:text-slate-600 text-lg">&times;</button>
-      </div>
-      <div class="space-y-3 text-xs">
-        <div>
-          <label class="font-bold text-slate-600">Nama Sekolah:</label>
-          <input type="text" id="cfgNamaSekolah" class="w-full mt-1 p-2 border rounded-lg outline-none font-semibold">
-        </div>
-        <div>
-          <label class="font-bold text-slate-600">Alamat & Sub-Kop:</label>
-          <input type="text" id="cfgAlamatSekolah" class="w-full mt-1 p-2 border rounded-lg outline-none font-semibold">
-        </div>
-        <div>
-          <label class="font-bold text-slate-600">Nama Kepala Sekolah:</label>
-          <input type="text" id="cfgNamaKepsek" class="w-full mt-1 p-2 border rounded-lg outline-none font-semibold">
-        </div>
-      </div>
-      <div class="flex justify-end gap-2 pt-2 border-t">
-        <button onclick="closeKopModal()" class="px-3 py-1.5 bg-slate-200 text-slate-700 text-xs font-semibold rounded-lg">Batal</button>
-        <button onclick="saveKopConfig()" class="px-4 py-1.5 bg-sky-800 text-white text-xs font-bold rounded-lg hover:bg-sky-900">Simpan Pengaturan</button>
-      </div>
-    </div>
-  </div>
-
-</body>
+        </body>
         </html>
       `);
       win.document.close();
@@ -1120,41 +1091,11 @@
               <b><u>${namaKepsek}</u></b>
             </div>
           </div>
-        
-  <!-- Modal Edit Kop Surat & Kepala Sekolah -->
-  <div id="kopModal" class="hidden fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-    <div class="bg-white max-w-md w-full p-5 rounded-2xl shadow-xl space-y-4">
-      <div class="flex justify-between items-center border-b pb-2">
-        <h3 class="font-bold text-slate-800 text-sm">⚙️ Pengaturan Kop Dokumen & Kepala Sekolah</h3>
-        <button onclick="closeKopModal()" class="text-slate-400 hover:text-slate-600 text-lg">&times;</button>
-      </div>
-      <div class="space-y-3 text-xs">
-        <div>
-          <label class="font-bold text-slate-600">Nama Sekolah:</label>
-          <input type="text" id="cfgNamaSekolah" class="w-full mt-1 p-2 border rounded-lg outline-none font-semibold">
-        </div>
-        <div>
-          <label class="font-bold text-slate-600">Alamat & Sub-Kop:</label>
-          <input type="text" id="cfgAlamatSekolah" class="w-full mt-1 p-2 border rounded-lg outline-none font-semibold">
-        </div>
-        <div>
-          <label class="font-bold text-slate-600">Nama Kepala Sekolah:</label>
-          <input type="text" id="cfgNamaKepsek" class="w-full mt-1 p-2 border rounded-lg outline-none font-semibold">
-        </div>
-      </div>
-      <div class="flex justify-end gap-2 pt-2 border-t">
-        <button onclick="closeKopModal()" class="px-3 py-1.5 bg-slate-200 text-slate-700 text-xs font-semibold rounded-lg">Batal</button>
-        <button onclick="saveKopConfig()" class="px-4 py-1.5 bg-sky-800 text-white text-xs font-bold rounded-lg hover:bg-sky-900">Simpan Pengaturan</button>
-      </div>
-    </div>
-  </div>
-
-</body>
+        </body>
         </html>
       `);
       win.document.close();
     }
-
 
     function openKopModal() {
       document.getElementById("cfgNamaSekolah").value = PROFIL_SEKOLAH.namaSekolah;
@@ -1186,6 +1127,7 @@
 
   </script>
 
+
   <!-- Modal Edit Kop Surat & Kepala Sekolah -->
   <div id="kopModal" class="hidden fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
     <div class="bg-white max-w-md w-full p-5 rounded-2xl shadow-xl space-y-4">
@@ -1213,6 +1155,7 @@
       </div>
     </div>
   </div>
+
 
 </body>
 </html>
