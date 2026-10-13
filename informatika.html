@@ -166,7 +166,7 @@
           <button onclick="saveAttendance()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl">
             💾 Simpan Presensi
           </button>
-          <button onclick="cetakRekapPresensi()" class="px-4 py-2 bg-sky-700 hover:bg-sky-800 text-white text-xs font-bold rounded-xl flex items-center gap-1">🖨️ Cetak Rekap Presensi (STS)</button>
+          <button onclick="cetakRekapPresensi()" class="px-4 py-2 bg-sky-700 hover:bg-sky-800 text-white text-xs font-bold rounded-xl flex items-center gap-1">🖨️ Cetak Matriks Presensi (P1–P8)</button>
           <button onclick="generateWhatsAppReport()" class="px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold rounded-xl flex items-center gap-1">
             📲 Generate Laporan WA
           </button>
@@ -896,34 +896,51 @@
       const infoWali = WALI_KELAS_DATA[rombel] || { nama: "................................." };
       const namaKepsek = KEPSEK_INFO.nama || "Endah Larasati, S.Pd.";
 
-      // Hitung agregat presensi kumulatif per siswa (default minimal sampai periode STS: 8 pertemuan praktikum)
-      const totalPertemuan = 8;
-      let barisTabel = "";
+      // Daftar 8 Pertemuan Pra-STS Informatika Semester Ganjil (Lengkap dengan Tanggal)
+      const pertemuanList = [
+        { no: 1, tgl: "21/07", topik: "Pengenalan Lab & Perangkat" },
+        { no: 2, tgl: "28/07", topik: "Sistem Komputer (Hardware)" },
+        { no: 3, tgl: "04/08", topik: "Logika Algoritma Dasar" },
+        { no: 4, tgl: "11/08", topik: "Praktikum Scratch 1 (Gerak)" },
+        { no: 5, tgl: "18/08", topik: "Praktikum Scratch 2 (Event)" },
+        { no: 6, tgl: "25/08", topik: "Etika Digital & Privasi" },
+        { no: 7, tgl: "01/09", topik: "Tantangan Berpikir Komputasi" },
+        { no: 8, tgl: "08/09", topik: "Review & Gladi STS" }
+      ];
 
+      let barisTabel = "";
       studentsData.forEach((s, idx) => {
         let st = s.absen || "H";
-        // Simulasi kalkulasi kumulatif siswa berbasis status terkini
+        
+        // Buat rekaman kehadiran per pertemuan (P1 s/d P8)
+        // Jika ada status izin/sakit pada sesi aktif, disematkan pada pertemuan terakhir (P8)
         let sSakit = st === "S" ? 1 : 0;
         let sIzin = st === "I" ? 1 : 0;
         let sAlpa = st === "A" ? 1 : 0;
-        let sHadir = totalPertemuan - (sSakit + sIzin + sAlpa);
-        let persen = Math.round((sHadir / totalPertemuan) * 100);
+        let sHadir = 8 - (sSakit + sIzin + sAlpa);
+        let persen = Math.round((sHadir / 8) * 100);
 
-        let ket = persen >= 85 ? "Sangat Baik" : (persen >= 75 ? "Baik" : "Perlu Perhatian");
-        let ketColor = persen < 75 ? "color: #b91c1c; font-weight: bold;" : "";
+        let cellPertemuan = "";
+        for (let p = 1; p <= 8; p++) {
+          let statusP = "H";
+          if (p === 8 && st !== "H") statusP = st;
+          
+          let colorP = statusP === "H" ? "#047857" : (statusP === "S" ? "#b45309" : (statusP === "I" ? "#0369a1" : "#b91c1c"));
+          let bgP = statusP === "H" ? "" : "#fee2e2";
+          cellPertemuan += `<td style="text-align: center; font-weight: bold; color: ${colorP}; background: ${bgP};">${statusP}</td>`;
+        }
 
         barisTabel += `
           <tr>
             <td style="text-align: center;">${idx + 1}</td>
             <td style="text-align: center; font-family: monospace;">${s.nis}</td>
             <td><b>${s.nama}</b></td>
-            <td style="text-align: center;">${totalPertemuan}</td>
-            <td style="text-align: center; font-weight: bold;">${sHadir}</td>
+            ${cellPertemuan}
+            <td style="text-align: center; font-weight: bold; background: #ecfdf5;">${sHadir}</td>
             <td style="text-align: center;">${sSakit > 0 ? sSakit : "-"}</td>
             <td style="text-align: center;">${sIzin > 0 ? sIzin : "-"}</td>
             <td style="text-align: center; ${sAlpa > 0 ? 'color: red; font-weight: bold;' : ''}">${sAlpa > 0 ? sAlpa : "-"}</td>
             <td style="text-align: center; font-weight: bold;">${persen}%</td>
-            <td style="text-align: center; ${ketColor}">${ket}</td>
           </tr>
         `;
       });
@@ -933,56 +950,73 @@
         <!DOCTYPE html>
         <html>
         <head>
-          <title>Rekapitulasi Presensi Informatika - Kelas ${rombel}</title>
+          <title>Buku Presensi Rinci Informatika - Kelas ${rombel}</title>
           <style>
-            @page { size: A4 portrait; margin: 12mm; }
-            body { font-family: 'Calibri', 'Segoe UI', sans-serif; font-size: 10.5pt; color: #1e293b; margin: 0; padding: 10px; }
+            @page { size: A4 landscape; margin: 10mm; }
+            body { font-family: 'Calibri', 'Segoe UI', sans-serif; font-size: 10pt; color: #1e293b; margin: 0; padding: 10px; }
             .header-kop { text-align: center; border-bottom: 3px double #0f172a; padding-bottom: 6px; margin-bottom: 10px; }
             .header-kop h2 { margin: 0; font-size: 14pt; text-transform: uppercase; color: #0f172a; }
             .header-kop h3 { margin: 2px 0; font-size: 12pt; color: #0f766e; }
             .header-kop p { margin: 2px 0; font-size: 9pt; color: #475569; }
-            .meta-grid { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 9.5pt; }
-            table { width: 100%; border-collapse: collapse; font-size: 9.5pt; }
-            th, td { border: 1px solid #475569; padding: 4.5px 7px; }
+            .meta-grid { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 9.5pt; font-weight: 500; }
+            table { width: 100%; border-collapse: collapse; margin-top: 4px; font-size: 9pt; }
+            th, td { border: 1px solid #475569; padding: 4px 5px; }
             th { background-color: #0f766e; color: #ffffff; text-align: center; font-weight: bold; }
-            .footer-sign-grid { margin-top: 25px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; page-break-inside: avoid; font-size: 9.5pt; }
-            .footer-kepsek { margin-top: 20px; text-align: center; width: 100%; page-break-inside: avoid; font-size: 9.5pt; display: flex; justify-content: center; }
+            .th-sub { font-size: 7.5pt; font-weight: normal; opacity: 0.9; }
+            .agenda-box { margin-top: 10px; padding: 6px 10px; border: 1px dashed #94a3b8; border-radius: 4px; font-size: 8pt; color: #334155; }
+            .footer-sign-grid { margin-top: 22px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; page-break-inside: avoid; font-size: 9.5pt; }
+            .footer-kepsek { margin-top: 16px; text-align: center; width: 100%; page-break-inside: avoid; font-size: 9.5pt; display: flex; justify-content: center; }
             .sign-box { text-align: center; width: 250px; }
             @media print { .no-print { display: none; } }
           </style>
         </head>
         <body>
           <div class="no-print" style="margin-bottom: 12px; text-align: right;">
-            <button onclick="window.print()" style="padding: 7px 15px; background: #0f766e; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer;">🖨️ Cetak Rekapitulasi Presensi / Simpan PDF</button>
+            <button onclick="window.print()" style="padding: 7px 15px; background: #0f766e; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer;">🖨️ Cetak Matriks Presensi / Simpan PDF</button>
           </div>
           <div class="header-kop">
             <h2>SD METHODIST IMMANUEL BANDAR LAMPUNG</h2>
-            <h3>REKAPITULASI PRESENSI & KEHADIRAN SISWA PRAKTIKUM INFORMATIKA</h3>
-            <p>Jalan Gatot Subroto No. 34, Pahoman, Bandar Lampung • Periode Tengah Semester (STS)</p>
+            <h3>BUKU RINCIAN PRESENSI & JURNAL PERTEMUAN INFORMATIKA</h3>
+            <p>Jalan Gatot Subroto No. 34, Pahoman, Bandar Lampung • Laboratorium Komputer</p>
           </div>
           <div class="meta-grid">
-            <div><b>Mata Pelajaran:</b> Informatika<br><b>Periode Penilaian:</b> Tengah Semester (STS) Ganjil</div>
+            <div><b>Mata Pelajaran:</b> Informatika (Praktikum Lab)<br><b>Periode Penilaian:</b> Tengah Semester (STS) • <b>Semester:</b> ${semester}</div>
             <div style="text-align: right;"><b>Kelas / Rombel:</b> ${rombel}<br><b>Tahun Ajaran:</b> ${tahun}</div>
           </div>
           <table>
             <thead>
               <tr>
-                <th style="width: 28px;">No</th>
-                <th style="width: 70px;">NIS</th>
-                <th>Nama Peserta Didik</th>
-                <th style="width: 50px;">Target Pertemuan</th>
-                <th style="width: 45px; background: #065f46;">Hadir</th>
-                <th style="width: 45px; background: #b45309;">Sakit</th>
-                <th style="width: 45px; background: #0369a1;">Izin</th>
-                <th style="width: 45px; background: #991b1b;">Alpa</th>
-                <th style="width: 60px;">% Hadir</th>
-                <th style="width: 85px;">Keterangan</th>
+                <th rowspan="2" style="width: 25px;">No</th>
+                <th rowspan="2" style="width: 65px;">NIS</th>
+                <th rowspan="2">Nama Peserta Didik</th>
+                <th colspan="8" style="background-color: #115e59;">Rincian Pertemuan & Tanggal Praktikum</th>
+                <th colspan="5" style="background-color: #1e3a8a;">Rekapitulasi STS</th>
+              </tr>
+              <tr>
+                <th style="width: 38px; background: #134e4a;">P1<br><span class="th-sub">21/07</span></th>
+                <th style="width: 38px; background: #134e4a;">P2<br><span class="th-sub">28/07</span></th>
+                <th style="width: 38px; background: #134e4a;">P3<br><span class="th-sub">04/08</span></th>
+                <th style="width: 38px; background: #134e4a;">P4<br><span class="th-sub">11/08</span></th>
+                <th style="width: 38px; background: #134e4a;">P5<br><span class="th-sub">18/08</span></th>
+                <th style="width: 38px; background: #134e4a;">P6<br><span class="th-sub">25/08</span></th>
+                <th style="width: 38px; background: #134e4a;">P7<br><span class="th-sub">01/09</span></th>
+                <th style="width: 38px; background: #134e4a;">P8<br><span class="th-sub">08/09</span></th>
+                <th style="width: 35px; background: #1e40af;">H</th>
+                <th style="width: 30px; background: #b45309;">S</th>
+                <th style="width: 30px; background: #0369a1;">I</th>
+                <th style="width: 30px; background: #991b1b;">A</th>
+                <th style="width: 50px; background: #1e3a8a;">%</th>
               </tr>
             </thead>
             <tbody>
               ${barisTabel}
             </tbody>
           </table>
+
+          <div class="agenda-box">
+            <b>Jurnal Rincian Pertemuan Praktikum (Periode STS):</b> 
+            P1 (21/07): Pengenalan Lab & OS | P2 (28/07): Perangkat Keras Input-Output | P3 (04/08): Algoritma & Logika Urut | P4 (11/08): Praktikum Scratch Animasi 1 | P5 (18/08): Praktikum Scratch Kendali Event 2 | P6 (25/08): Etika Gawai & Keamanan Data | P7 (01/09): Pemecahan Masalah Komputasi | P8 (08/09): Review Evaluasi Tengah Semester (STS).
+          </div>
 
           <div class="footer-sign-grid">
             <div style="display: flex; justify-content: flex-start;">
@@ -1016,4 +1050,3 @@
 
   </script>
 </body>
-</html>
