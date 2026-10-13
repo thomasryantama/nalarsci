@@ -24,6 +24,9 @@
         <button onclick="saveTokenToLocal()" class="px-3 py-1.5 bg-slate-800 text-white text-xs font-semibold rounded-lg hover:bg-slate-900">
           Simpan
         </button>
+        <button onclick="openKopModal()" class="px-3 py-1.5 bg-sky-700 hover:bg-sky-800 text-white text-xs font-semibold rounded-lg flex items-center gap-1 shadow-sm">
+          ⚙️ Atur Kop
+        </button>
       </div>
     </header>
 
@@ -252,6 +255,11 @@
 
     // Inisialisasi
     window.onload = () => {
+      // Muat kustomisasi Kop jika ada di browser
+      if (localStorage.getItem("CFG_NAMA_SEKOLAH")) PROFIL_SEKOLAH.namaSekolah = localStorage.getItem("CFG_NAMA_SEKOLAH");
+      if (localStorage.getItem("CFG_ALAMAT_SEKOLAH")) PROFIL_SEKOLAH.alamatSekolah = localStorage.getItem("CFG_ALAMAT_SEKOLAH");
+      if (localStorage.getItem("CFG_NAMA_KEPSEK")) KEPSEK_INFO.nama = localStorage.getItem("CFG_NAMA_KEPSEK");
+
       document.getElementById("authToken").value = localStorage.getItem("NALARSCI_GURU_TOKEN") || "";
       document.getElementById("absenTanggal").value = new Date().toISOString().split("T")[0];
       updateRombelOptions();
@@ -349,6 +357,10 @@
         }
         if (json.kepsek && json.kepsek.nama) {
           KEPSEK_INFO = json.kepsek;
+        }
+        if (json.profilSekolah) {
+          if (json.profilSekolah.namaSekolah) PROFIL_SEKOLAH.namaSekolah = json.profilSekolah.namaSekolah;
+          if (json.profilSekolah.alamatSekolah) PROFIL_SEKOLAH.alamatSekolah = json.profilSekolah.alamatSekolah;
         }
         displayWaliInfo();
 
@@ -753,6 +765,10 @@
 
     // ==================== FITUR CETAK MONEV DOKUMEN RESMI (LEGER & REKAP ABSEN SEMESTER/STS) ====================
     let KEPSEK_INFO = { nama: "Endah Larasati, S.Pd.", nip: "-" };
+    let PROFIL_SEKOLAH = {
+      namaSekolah: "SD METHODIST IMMANUEL BANDAR LAMPUNG",
+      alamatSekolah: "Jl. Dr. Susilo No. 6, Teluk Betung Utara, Bandar Lampung"
+    };
 
     let JURNAL_MATERI_DATA = [];
 
@@ -863,9 +879,9 @@
             <button onclick="window.print()" style="padding: 7px 15px; background: #0284c7; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer;">🖨️ Cetak Dokumen / Simpan PDF</button>
           </div>
           <div class="header-kop">
-            <h2>SD METHODIST IMMANUEL BANDAR LAMPUNG</h2>
+            <h2>${PROFIL_SEKOLAH.namaSekolah}</h2>
             <h3>LEGER PENILAIAN CAPAIAN PEMBELAJARAN INFORMATIKA</h3>
-            <p>Jalan Gatot Subroto No. 34, Pahoman, Bandar Lampung • Akreditasi A</p>
+            <p>${PROFIL_SEKOLAH.alamatSekolah}</p>
           </div>
           <div class="meta-grid">
             <div><b>Mata Pelajaran:</b> Informatika (Kurikulum Merdeka)<br><b>Tahun Ajaran:</b> ${tahun} | <b>Semester:</b> ${semester}</div>
@@ -917,7 +933,36 @@
               <b><u>${namaKepsek}</u></b>
             </div>
           </div>
-        </body>
+        
+  <!-- Modal Edit Kop Surat & Kepala Sekolah -->
+  <div id="kopModal" class="hidden fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white max-w-md w-full p-5 rounded-2xl shadow-xl space-y-4">
+      <div class="flex justify-between items-center border-b pb-2">
+        <h3 class="font-bold text-slate-800 text-sm">⚙️ Pengaturan Kop Dokumen & Kepala Sekolah</h3>
+        <button onclick="closeKopModal()" class="text-slate-400 hover:text-slate-600 text-lg">&times;</button>
+      </div>
+      <div class="space-y-3 text-xs">
+        <div>
+          <label class="font-bold text-slate-600">Nama Sekolah:</label>
+          <input type="text" id="cfgNamaSekolah" class="w-full mt-1 p-2 border rounded-lg outline-none font-semibold">
+        </div>
+        <div>
+          <label class="font-bold text-slate-600">Alamat & Sub-Kop:</label>
+          <input type="text" id="cfgAlamatSekolah" class="w-full mt-1 p-2 border rounded-lg outline-none font-semibold">
+        </div>
+        <div>
+          <label class="font-bold text-slate-600">Nama Kepala Sekolah:</label>
+          <input type="text" id="cfgNamaKepsek" class="w-full mt-1 p-2 border rounded-lg outline-none font-semibold">
+        </div>
+      </div>
+      <div class="flex justify-end gap-2 pt-2 border-t">
+        <button onclick="closeKopModal()" class="px-3 py-1.5 bg-slate-200 text-slate-700 text-xs font-semibold rounded-lg">Batal</button>
+        <button onclick="saveKopConfig()" class="px-4 py-1.5 bg-sky-800 text-white text-xs font-bold rounded-lg hover:bg-sky-900">Simpan Pengaturan</button>
+      </div>
+    </div>
+  </div>
+
+</body>
         </html>
       `);
       win.document.close();
@@ -1020,9 +1065,9 @@
             <button onclick="window.print()" style="padding: 7px 15px; background: #0f766e; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer;">🖨️ Cetak Matriks Presensi / Simpan PDF</button>
           </div>
           <div class="header-kop">
-            <h2>SD METHODIST IMMANUEL BANDAR LAMPUNG</h2>
+            <h2>${PROFIL_SEKOLAH.namaSekolah}</h2>
             <h3>BUKU RINCIAN PRESENSI & JURNAL PERTEMUAN INFORMATIKA</h3>
-            <p>Jalan Gatot Subroto No. 34, Pahoman, Bandar Lampung • Laboratorium Komputer</p>
+            <p>${PROFIL_SEKOLAH.alamatSekolah}</p>
           </div>
           <div class="meta-grid">
             <div><b>Mata Pelajaran:</b> Informatika (Praktikum Lab)<br><b>Periode Penilaian:</b> Tengah Semester (STS) • <b>Semester:</b> ${semester}</div>
@@ -1075,12 +1120,99 @@
               <b><u>${namaKepsek}</u></b>
             </div>
           </div>
-        </body>
+        
+  <!-- Modal Edit Kop Surat & Kepala Sekolah -->
+  <div id="kopModal" class="hidden fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white max-w-md w-full p-5 rounded-2xl shadow-xl space-y-4">
+      <div class="flex justify-between items-center border-b pb-2">
+        <h3 class="font-bold text-slate-800 text-sm">⚙️ Pengaturan Kop Dokumen & Kepala Sekolah</h3>
+        <button onclick="closeKopModal()" class="text-slate-400 hover:text-slate-600 text-lg">&times;</button>
+      </div>
+      <div class="space-y-3 text-xs">
+        <div>
+          <label class="font-bold text-slate-600">Nama Sekolah:</label>
+          <input type="text" id="cfgNamaSekolah" class="w-full mt-1 p-2 border rounded-lg outline-none font-semibold">
+        </div>
+        <div>
+          <label class="font-bold text-slate-600">Alamat & Sub-Kop:</label>
+          <input type="text" id="cfgAlamatSekolah" class="w-full mt-1 p-2 border rounded-lg outline-none font-semibold">
+        </div>
+        <div>
+          <label class="font-bold text-slate-600">Nama Kepala Sekolah:</label>
+          <input type="text" id="cfgNamaKepsek" class="w-full mt-1 p-2 border rounded-lg outline-none font-semibold">
+        </div>
+      </div>
+      <div class="flex justify-end gap-2 pt-2 border-t">
+        <button onclick="closeKopModal()" class="px-3 py-1.5 bg-slate-200 text-slate-700 text-xs font-semibold rounded-lg">Batal</button>
+        <button onclick="saveKopConfig()" class="px-4 py-1.5 bg-sky-800 text-white text-xs font-bold rounded-lg hover:bg-sky-900">Simpan Pengaturan</button>
+      </div>
+    </div>
+  </div>
+
+</body>
         </html>
       `);
       win.document.close();
     }
 
+
+    function openKopModal() {
+      document.getElementById("cfgNamaSekolah").value = PROFIL_SEKOLAH.namaSekolah;
+      document.getElementById("cfgAlamatSekolah").value = PROFIL_SEKOLAH.alamatSekolah;
+      document.getElementById("cfgNamaKepsek").value = KEPSEK_INFO.nama;
+      document.getElementById("kopModal").classList.remove("hidden");
+    }
+
+    function closeKopModal() {
+      document.getElementById("kopModal").classList.add("hidden");
+    }
+
+    function saveKopConfig() {
+      const namaS = document.getElementById("cfgNamaSekolah").value.trim();
+      const alamatS = document.getElementById("cfgAlamatSekolah").value.trim();
+      const namaK = document.getElementById("cfgNamaKepsek").value.trim();
+
+      if (namaS) PROFIL_SEKOLAH.namaSekolah = namaS;
+      if (alamatS) PROFIL_SEKOLAH.alamatSekolah = alamatS;
+      if (namaK) KEPSEK_INFO.nama = namaK;
+
+      localStorage.setItem("CFG_NAMA_SEKOLAH", PROFIL_SEKOLAH.namaSekolah);
+      localStorage.setItem("CFG_ALAMAT_SEKOLAH", PROFIL_SEKOLAH.alamatSekolah);
+      localStorage.setItem("CFG_NAMA_KEPSEK", KEPSEK_INFO.nama);
+
+      closeKopModal();
+      alert("Pengaturan Kop Surat & Kepala Sekolah berhasil disimpan!");
+    }
+
   </script>
+
+  <!-- Modal Edit Kop Surat & Kepala Sekolah -->
+  <div id="kopModal" class="hidden fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white max-w-md w-full p-5 rounded-2xl shadow-xl space-y-4">
+      <div class="flex justify-between items-center border-b pb-2">
+        <h3 class="font-bold text-slate-800 text-sm">⚙️ Pengaturan Kop Dokumen & Kepala Sekolah</h3>
+        <button onclick="closeKopModal()" class="text-slate-400 hover:text-slate-600 text-lg">&times;</button>
+      </div>
+      <div class="space-y-3 text-xs">
+        <div>
+          <label class="font-bold text-slate-600">Nama Sekolah:</label>
+          <input type="text" id="cfgNamaSekolah" class="w-full mt-1 p-2 border rounded-lg outline-none font-semibold">
+        </div>
+        <div>
+          <label class="font-bold text-slate-600">Alamat & Sub-Kop:</label>
+          <input type="text" id="cfgAlamatSekolah" class="w-full mt-1 p-2 border rounded-lg outline-none font-semibold">
+        </div>
+        <div>
+          <label class="font-bold text-slate-600">Nama Kepala Sekolah:</label>
+          <input type="text" id="cfgNamaKepsek" class="w-full mt-1 p-2 border rounded-lg outline-none font-semibold">
+        </div>
+      </div>
+      <div class="flex justify-end gap-2 pt-2 border-t">
+        <button onclick="closeKopModal()" class="px-3 py-1.5 bg-slate-200 text-slate-700 text-xs font-semibold rounded-lg">Batal</button>
+        <button onclick="saveKopConfig()" class="px-4 py-1.5 bg-sky-800 text-white text-xs font-bold rounded-lg hover:bg-sky-900">Simpan Pengaturan</button>
+      </div>
+    </div>
+  </div>
+
 </body>
 </html>
