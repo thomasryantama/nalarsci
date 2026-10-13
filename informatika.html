@@ -159,7 +159,7 @@
       <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 flex flex-wrap justify-between items-center gap-3">
         <div class="flex items-center gap-2">
           <label class="text-xs font-bold text-slate-500 uppercase">Tanggal:</label>
-          <input type="date" id="absenTanggal" class="p-1.5 text-xs border rounded-lg bg-slate-50 font-bold">
+          <input type="date" id="absenTanggal" onchange="onTanggalAbsenChange()" class="p-1.5 text-xs border rounded-lg bg-slate-50 font-bold cursor-pointer">
         </div>
         <div class="flex gap-2">
           <button onclick="saveAttendance()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl">
@@ -169,6 +169,12 @@
             📲 Generate Laporan WA
           </button>
         </div>
+      </div>
+
+            <!-- Banner Info Riwayat Presensi -->
+      <div id="absenStatusBanner" class="p-2.5 px-3 bg-sky-50 border border-sky-200 rounded-xl text-sky-900 text-xs flex justify-between items-center">
+        <span id="absenStatusText" class="font-medium">📅 Pilih tanggal untuk melihat riwayat atau mencatat presensi baru.</span>
+        <span id="absenBadge" class="text-[10px] px-2 py-0.5 rounded font-bold bg-slate-200 text-slate-700">Status</span>
       </div>
 
       <!-- Grid Siswa Absensi Cepat -->
@@ -299,21 +305,35 @@
 
       document.getElementById("nilaiTableBody").innerHTML = `<tr><td colspan="10" class="p-8 text-center text-sky-700 font-bold">Mengambil data dari Google Sheets...</td></tr>`;
 
+      const tanggal = document.getElementById("absenTanggal").value;
+
       try {
         const res = await fetch(GAS_URL, {
           method: "POST",
-          body: JSON.stringify({ action: "GET_CLASS_DATA", token, rombel, tahun, semester })
+          body: JSON.stringify({ action: "GET_CLASS_DATA", token, rombel, tahun, semester, tanggal })
         });
         const json = await res.json();
         if (json.status !== "success") return alert(json.message);
 
+        // Pertahankan riwayat absen yang dikirim dari Google Sheets!
         studentsData = json.students.map(s => ({
           ...s,
-          absen: "H",
-          catatan: ""
+          absen: s.absen || "H",
+          catatan: s.catatan || ""
         }));
 
+        updateAbsenBanner(json.adaRiwayatPresensi);
+
         if (json.kkm) document.getElementById("inputKKM").value = json.kkm;
+
+        // Ambil data wali kelas dinamis dari Google Sheets
+        if (json.allWali) {
+          Object.assign(WALI_KELAS_DATA, json.allWali);
+        }
+        if (json.wali && json.wali.nama) {
+          WALI_KELAS_DATA[rombel] = json.wali;
+        }
+        displayWaliInfo();
 
         renderTable();
         renderAbsenGrid();
@@ -497,6 +517,54 @@
     }
 
     // ==================== LOGIKA PRESENSI ====================
+
+    function updateAbsenBanner(adaRiwayat) {
+      const banner = document.getElementById("absenStatusText");
+      const badge = document.getElementById("absenBadge");
+      const tgl = document.getElementById("absenTanggal").value;
+      if (adaRiwayat) {
+        banner.innerHTML = `✅ <b>Riwayat Ditemukan:</b> Presensi tanggal <b>${tgl}</b> dimuat dari Database. Mengubah status akan memperbarui baris ini (tanpa duplikat).`;
+        badge.className = "text-[10px] px-2 py-0.5 rounded font-bold bg-emerald-100 text-emerald-800 border border-emerald-300";
+        badge.innerText = "Tersimpan";
+      } else {
+        banner.innerHTML = `ℹ️ <b>Presensi Baru:</b> Belum ada catatan presensi pada tanggal <b>${tgl}</b>. Seluruh siswa otomatis Hadir (H).`;
+        badge.className = "text-[10px] px-2 py-0.5 rounded font-bold bg-amber-100 text-amber-800 border border-amber-300";
+        badge.innerText = "Draf Baru";
+      }
+    }
+
+    async function onTanggalAbsenChange() {
+      const token = document.getElementById("authToken").value.trim();
+      const rombel = document.getElementById("selRombel").value;
+      const tanggal = document.getElementById("absenTanggal").value;
+
+      if (!token || studentsData.length === 0) return;
+
+      try {
+        const res = await fetch(GAS_URL, {
+          method: "POST",
+          body: JSON.stringify({ action: "GET_ATTENDANCE_BY_DATE", token, rombel, tanggal })
+        });
+        const json = await res.json();
+        if (json.status === "success") {
+          const map = json.mapPresensi || {};
+          studentsData.forEach(s => {
+            if (map[s.nis]) {
+              s.absen = map[s.nis].status || "H";
+              s.catatan = map[s.nis].catatan || "";
+            } else {
+              s.absen = "H";
+              s.catatan = "";
+            }
+          });
+          updateAbsenBanner(json.ditemukan);
+          renderAbsenGrid();
+        }
+      } catch (err) {
+        console.error("Gagal sinkron tanggal:", err);
+      }
+    }
+
     function renderAbsenGrid() {
       const grid = document.getElementById("absenGrid");
       grid.innerHTML = "";
