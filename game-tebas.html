@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Tebas Balon AI - Pedang Laser Tangan</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+  <style>
+    body { font-family: 'Nunito', sans-serif; background: #0f172a; color: white; overflow: hidden; user-select: none; }
+    .font-title { font-family: 'Fredoka', sans-serif; }
+    .mirror { transform: scaleX(-1); }
+  </style>
+</head>
+<body class="relative w-screen h-screen flex flex-col justify-between p-3 sm:p-5">
+
+  <video id="webcam" class="hidden" playsinline></video>
+  <canvas id="gameCanvas" class="absolute inset-0 w-full h-full object-cover z-0"></canvas>
+
+  <!-- HUD Atas -->
+  <header class="relative z-10 max-w-4xl mx-auto w-full flex justify-between items-center bg-slate-900/85 backdrop-blur-md px-5 py-2.5 rounded-2xl border border-emerald-400/30 shadow-xl">
+    <div class="flex items-center gap-2.5">
+      <span class="text-3xl">⚔️</span>
+      <div>
+        <h1 class="font-title text-base sm:text-lg text-emerald-300 leading-tight">Tebas Balon Laser AI</h1>
+        <p class="text-[10px] text-slate-400">Tebas di udara dengan telunjuk tanganmu • Karya: Thomas Ryantama</p>
+      </div>
+    </div>
+    <div class="flex items-center gap-3">
+      <div class="bg-slate-950/80 px-4 py-1.5 rounded-xl border border-slate-700 text-center">
+        <span class="text-[10px] text-amber-400 font-bold block uppercase">Waktu</span>
+        <span id="timeText" class="text-xl sm:text-2xl font-black text-rose-400 font-mono">30</span>
+      </div>
+      <div class="bg-slate-950/80 px-4 py-1.5 rounded-xl border border-slate-700 text-center">
+        <span class="text-[10px] text-emerald-400 font-bold block uppercase">Skor</span>
+        <span id="scoreText" class="text-xl sm:text-2xl font-black text-emerald-300 font-title">0</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Modal Mulai & Skor Akhir -->
+  <div id="gameModal" class="relative z-20 m-auto bg-slate-900/90 backdrop-blur-md border border-emerald-400/40 p-6 sm:p-8 rounded-3xl max-w-md w-full text-center shadow-2xl space-y-4">
+    <div id="modalIcon" class="text-6xl animate-bounce">🎈⚔️</div>
+    <h2 id="modalTitle" class="font-title text-2xl sm:text-3xl text-emerald-400">Tebas Balon Laser AI</h2>
+    <p id="modalDesc" class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+      Arahkan tangan ke kamera! Gerakkan telunjukmu di udara seperti <b>pedang laser</b> untuk memotong balon warna-warni yang melayang ke atas. Hindari memotong bom tengkorak (💣)!
+    </p>
+    <button onclick="startGame()" id="btnStart" class="w-full py-3.5 bg-emerald-600 hover:bg-emerald-500 text-white font-title text-base font-bold rounded-2xl shadow-xl transition transform hover:scale-105">
+      ⚔️ Mulai Menebas
+    </button>
+  </div>
+
+  <footer class="relative z-10 text-center pb-2">
+    <span id="trackerStatus" class="px-4 py-1.5 bg-slate-950/80 border border-slate-700 rounded-full text-xs font-bold text-slate-300 shadow">
+      📡 Mengaktifkan Sensor Tangan...
+    </span>
+  </footer>
+
+  <script>
+    const cv = document.getElementById('gameCanvas');
+    const ctx = cv.getContext('2d');
+    const vid = document.getElementById('webcam');
+
+    let score = 0;
+    let timeLeft = 30;
+    let timerInt = null;
+    let isPlaying = false;
+
+    let handTrail = []; // jejak pedang laser
+    let balloons = [];
+    let particles = [];
+
+    const EMOJIS = ['🎈', '🍉', '🍎', '🍊', '🍓', '💣'];
+
+    // Audio
+    let audioCtx = null;
+    function beep(f, t='sine', d=0.1, v=0.08) {
+      try {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+        o.type = t; o.frequency.value = f;
+        g.gain.setValueAtTime(v, audioCtx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + d);
+        o.connect(g); g.connect(audioCtx.destination);
+        o.start(); o.stop(audioCtx.currentTime + d);
+      } catch (e) {}
+    }
+
+    // MediaPipe Hands
+    const hands = new Hands({
+      locateFile: (f) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${f}`
+    });
+    hands.setOptions({ maxNumHands: 2, modelComplexity: 1, minDetectionConfidence: 0.5 });
+
+    let bladePos = null;
+    hands.onResults(res => {
+      if (res.multiHandLandmarks && res.multiHandLandmarks.length > 0) {
+        // Landmark 8 = Ujung jari telunjuk
+        const tip = res.multiHandLandmarks[0][8];
+        bladePos = { x: (1 - tip.x) * cv.width, y: tip.y * cv.height }; // mirror x
+        document.getElementById('trackerStatus').innerHTML = "✅ Pedang Laser Aktif! Kibaskan tanganmu.";
+        document.getElementById('trackerStatus').className = "px-4 py-1.5 bg-emerald-950/80 border border-emerald-500 rounded-full text-xs font-bold text-emerald-300 shadow";
+      } else {
+        bladePos = null;
+      }
+    });
+
+    const camera = new Camera(vid, {
+      onFrame: async () => { await hands.send({ image: vid }); },
+      width: 640, height: 480
+    });
+    camera.start();
+
+    function startGame() {
+      document.getElementById('gameModal').classList.add('hidden');
+      score = 0;
+      timeLeft = 30;
+      document.getElementById('scoreText').innerText = '0';
+      document.getElementById('timeText').innerText = '30';
+      balloons = [];
+      particles = [];
+      isPlaying = true;
+
+      if (timerInt) clearInterval(timerInt);
+      timerInt = setInterval(() => {
+        timeLeft--;
+        document.getElementById('timeText').innerText = timeLeft;
+        if (timeLeft <= 0) {
+          clearInterval(timerInt);
+          endGame();
+        }
+      }, 1000);
+    }
+
+    function endGame() {
+      isPlaying = false;
+      beep(400, 'triangle', 0.3, 0.15);
+      document.getElementById('modalIcon').innerText = "🏆";
+      document.getElementById('modalTitle').innerText = "Waktu Habis!";
+      document.getElementById('modalDesc').innerHTML = `Luar biasa! Kamu berhasil menebas dan mengumpulkan <b>${score} Poin</b>!`;
+      document.getElementById('btnStart').innerText = "🔄 Main Lagi";
+      document.getElementById('gameModal').classList.remove('hidden');
+    }
+
+    function loop() {
+      requestAnimationFrame(loop);
+      cv.width = window.innerWidth;
+      cv.height = window.innerHeight;
+      const W = cv.width, H = cv.height;
+
+      ctx.clearRect(0, 0, W, H);
+      ctx.fillStyle = '#090d16';
+      ctx.fillRect(0, 0, W, H);
+
+      // Jejak Pedang Laser
+      if (bladePos) {
+        handTrail.push({ x: bladePos.x, y: bladePos.y, age: 1.0 });
+      }
+      for (let i = handTrail.length - 1; i >= 0; i--) {
+        handTrail[i].age -= 0.08;
+        if (handTrail[i].age <= 0) handTrail.splice(i, 1);
+      }
+
+      if (handTrail.length > 2) {
+        ctx.beginPath();
+        ctx.moveTo(handTrail[0].x, handTrail[0].y);
+        for (let i = 1; i < handTrail.length; i++) {
+          ctx.lineTo(handTrail[i].x, handTrail[i].y);
+        }
+        ctx.strokeStyle = '#34d399';
+        ctx.lineWidth = 14;
+        ctx.lineCap = 'round';
+        ctx.shadowColor = '#10b981';
+        ctx.shadowBlur = 20;
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+      }
+
+      // Spawn Balon
+      if (isPlaying && Math.random() < 0.05 && balloons.length < 8) {
+        const isBomb = Math.random() < 0.2;
+        balloons.push({
+          x: Math.random() * (W - 140) + 70,
+          y: H + 40,
+          vx: (Math.random() - 0.5) * 2,
+          vy: -(Math.random() * 3 + 4),
+          icon: isBomb ? '💣' : EMOJIS[Math.floor(Math.random() * (EMOJIS.length - 1))],
+          isBomb: isBomb,
+          radius: 36
+        });
+      }
+
+      // Jalankan & Gambar Balon
+      for (let i = balloons.length - 1; i >= 0; i--) {
+        const b = balloons[i];
+        b.x += b.vx;
+        b.y += b.vy;
+
+        ctx.font = '54px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(b.icon, b.x, b.y);
+
+        // Cek Tebasan Pedang
+        if (bladePos) {
+          const dist = Math.hypot(b.x - bladePos.x, b.y - bladePos.y);
+          if (dist < b.radius + 20) {
+            // Tebas kena!
+            if (b.isBomb) {
+              score = Math.max(0, score - 5);
+              beep(120, 'sawtooth', 0.25, 0.2);
+              spawnParticles(b.x, b.y, '#ef4444');
+            } else {
+              score += 10;
+              beep(800 + Math.random() * 200, 'sine', 0.1, 0.12);
+              spawnParticles(b.x, b.y, '#34d399');
+            }
+            document.getElementById('scoreText').innerText = score;
+            balloons.splice(i, 1);
+            continue;
+          }
+        }
+
+        if (b.y < -50) balloons.splice(i, 1);
+      }
+
+      // Render Percikan Partikel
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.alpha -= 0.03;
+        ctx.fillStyle = p.color;
+        ctx.globalAlpha = Math.max(0, p.alpha);
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.globalAlpha = 1.0;
+        if (p.alpha <= 0) particles.splice(i, 1);
+      }
+    }
+
+    function spawnParticles(x, y, color) {
+      for (let i = 0; i < 15; i++) {
+        particles.push({
+          x, y,
+          vx: (Math.random() - 0.5) * 12,
+          vy: (Math.random() - 0.5) * 12,
+          size: Math.random() * 6 + 3,
+          color,
+          alpha: 1.0
+        });
+      }
+    }
+
+    loop();
+  </script>
+</body>
+</html>
