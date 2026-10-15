@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>NalarSci Lab — Ekosistem Belajar Sains, KKA & Inovasi Sekolah</title>
-  <meta name="description" content="Laboratorium sains komputasi interaktif, etalase prestasi juara, repositori materi aktif, dan pameran karya digital siswa.">
+  <meta name="description" content="Laboratorium sains komputasi interaktif, etalase prestasi juara, repositori materi aktif, arena catur, dan game edukasi gerak kamera siswa.">
 
   <!-- FAVICON & PWA ICONS -->
   <link rel="icon" type="image/png" href="favicon.png">
@@ -17,7 +17,7 @@
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://nalarsci.id/">
   <meta property="og:title" content="NalarSci Lab — Ekosistem Belajar Sains, KKA & Inovasi Sekolah">
-  <meta property="og:description" content="Laboratorium sains komputasi interaktif, etalase prestasi juara, repositori materi aktif, dan pameran karya digital siswa.">
+  <meta property="og:description" content="Laboratorium sains komputasi interaktif, etalase prestasi juara, repositori materi aktif, arena catur, dan game edukasi gerak kamera siswa.">
   <meta property="og:image" content="https://nalarsci.id/icon-192.png">
   <meta property="og:image:secure_url" content="https://nalarsci.id/icon-192.png">
   <meta property="og:image:type" content="image/png">
@@ -93,7 +93,7 @@
       </div>
       <h2 class="font-title text-3xl sm:text-4xl text-white mb-2">Pusat Layanan & Pembelajaran Interaktif</h2>
       <p class="text-slate-400 text-xs sm:text-sm">
-        Jelajahi laboratorium komputasi, pameran hasil karya siswa, catatan prestasi juara, dan fasilitas administrasi belajar digital.
+        Jelajahi laboratorium komputasi, pameran hasil karya siswa, catatan prestasi juara, arena duel catur, game gerak kamera, dan fasilitas belajar digital.
       </p>
     </div>
 
@@ -117,7 +117,37 @@
   <!-- GRID DAFTAR MODUL PUBLIK -->
   <main class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 flex-grow mb-12" id="modul-grid">
 
-    <!-- 1. GALERI KARYA SISWA -->
+    <!-- 1. KUIS GERAK KAMERA (AI POSE) -> BARU -->
+    <div class="modul-item glass-card rounded-3xl p-6 flex flex-col" data-cat="lab">
+      <div class="flex justify-between items-start mb-3">
+        <div class="text-4xl">🏃‍♂️</div>
+        <span class="bg-amber-500/20 text-amber-300 border border-amber-400/30 text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full">AI Motion</span>
+      </div>
+      <h3 class="font-title text-xl text-amber-300 mb-1">Kuis Gerak Kamera</h3>
+      <p class="text-xs text-slate-300 leading-relaxed mb-4 flex-grow">
+        Game interaktif seru berteknologi AI pose tracking! Jawab soal pengetahuan umum dengan melompat dan menggeser badan ke kiri atau kanan di depan webcam.
+      </p>
+      <a href="gerak.html" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-title text-xs py-2.5 rounded-xl text-center font-bold transition shadow-md flex items-center justify-center gap-1.5">
+        ⚡ Mainkan Game Gerak
+      </a>
+    </div>
+
+    <!-- 2. CATUR MABAR ONLINE & AI -> BARU -->
+    <div class="modul-item glass-card rounded-3xl p-6 flex flex-col" data-cat="lab">
+      <div class="flex justify-between items-start mb-3">
+        <div class="text-4xl">♟️</div>
+        <span class="bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full">Strategi P2P</span>
+      </div>
+      <h3 class="font-title text-xl text-emerald-300 mb-1">Catur Mabar & AI</h3>
+      <p class="text-xs text-slate-300 leading-relaxed mb-4 flex-grow">
+        Arena duel catur klasik interaktif: mabar antar teman beda laptop secara online (P2P real-time), main 1 perangkat lokal, atau asah logika lawan bot AI.
+      </p>
+      <a href="catur.html" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-title text-xs py-2.5 rounded-xl text-center font-bold transition shadow-md flex items-center justify-center gap-1.5">
+        ⚔️ Buka Papan Catur
+      </a>
+    </div>
+
+    <!-- 3. GALERI KARYA SISWA -->
     <div class="modul-item glass-card rounded-3xl p-6 flex flex-col" data-cat="lab">
       <div class="flex justify-between items-start mb-3">
         <div class="text-4xl">🎨</div>
@@ -132,7 +162,7 @@
       </a>
     </div>
 
-    <!-- 2. PAPAN PRESTASI SISWA -->
+    <!-- 4. PAPAN PRESTASI SISWA -->
     <div class="modul-item glass-card rounded-3xl p-6 flex flex-col" data-cat="prestasi">
       <div class="flex justify-between items-start mb-3">
         <div class="text-4xl">🏆</div>
@@ -147,7 +177,7 @@
       </a>
     </div>
 
-    <!-- 3. RUANG MATERI & REFLEKSI -->
+    <!-- 5. RUANG MATERI & REFLEKSI -->
     <div class="modul-item glass-card rounded-3xl p-6 flex flex-col" data-cat="lab">
       <div class="flex justify-between items-start mb-3">
         <div class="text-4xl">📚</div>
@@ -162,22 +192,37 @@
       </a>
     </div>
 
-    <!-- 4. DETEKTIF PEMILAH SAMPAH -->
+    <!-- 6. ARENA CCA ALKITAB (CBT INTERAKTIF) -->
+    <div class="modul-item glass-card rounded-3xl p-6 flex flex-col" data-cat="lab">
+      <div class="flex justify-between items-start mb-3">
+        <div class="text-4xl">📖</div>
+        <span class="bg-purple-500/20 text-purple-300 border border-purple-400/30 text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full">CBT Cerdas Cermat</span>
+      </div>
+      <h3 class="font-title text-xl text-purple-300 mb-1">Arena CCA Alkitab</h3>
+      <p class="text-xs text-slate-300 leading-relaxed mb-4 flex-grow">
+        Tantangan cerdas cermat Alkitab berbasis CBT dengan pengatur waktu kecepatan, evaluasi instan, dan papan peringkat juara.
+      </p>
+      <a href="cca-alkitab.html" class="w-full bg-purple-600 hover:bg-purple-500 text-white font-title text-xs py-2.5 rounded-xl text-center font-bold transition shadow-md flex items-center justify-center gap-1.5">
+        ⚔️ Masuk Arena CCA
+      </a>
+    </div>
+
+    <!-- 7. DETEKTIF PEMILAH SAMPAH -->
     <div class="modul-item glass-card rounded-3xl p-6 flex flex-col" data-cat="lab">
       <div class="flex justify-between items-start mb-3">
         <div class="text-4xl">♻️</div>
-        <span class="bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full">Edukasi Sains</span>
+        <span class="bg-teal-500/20 text-teal-300 border border-teal-400/30 text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full">Edukasi Sains</span>
       </div>
-      <h3 class="font-title text-xl text-emerald-300 mb-1">Detektif Sampah</h3>
+      <h3 class="font-title text-xl text-teal-300 mb-1">Detektif Sampah</h3>
       <p class="text-xs text-slate-300 leading-relaxed mb-4 flex-grow">
         Game edukasi interaktif memilah jenis sampah organik, anorganik, dan limbah B3 untuk mengasah kepedulian lingkungan.
       </p>
-      <a href="game-pilah.html" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-title text-xs py-2.5 rounded-xl text-center font-bold transition">
+      <a href="game-pilah.html" class="w-full bg-teal-600 hover:bg-teal-500 text-white font-title text-xs py-2.5 rounded-xl text-center font-bold transition">
         Mainkan Game
       </a>
     </div>
 
-    <!-- 5. GAME SIAGA BENCANA -->
+    <!-- 8. GAME SIAGA BENCANA -->
     <div class="modul-item glass-card rounded-3xl p-6 flex flex-col" data-cat="lab">
       <div class="flex justify-between items-start mb-3">
         <div class="text-4xl">🌋</div>
@@ -192,7 +237,7 @@
       </a>
     </div>
 
-    <!-- 6. MISI ROVER & KRIPTO -->
+    <!-- 9. MISI ROVER & KRIPTO -->
     <div class="modul-item glass-card rounded-3xl p-6 flex flex-col" data-cat="lab">
       <div class="flex justify-between items-start mb-3">
         <div class="text-4xl">🤖</div>
@@ -207,8 +252,7 @@
       </a>
     </div>
 
-   
-    <!-- 8. SUARA KITA (LAYANAN ASPIRASI) -->
+    <!-- 10. SUARA KITA (LAYANAN ASPIRASI) -->
     <div class="modul-item glass-card rounded-3xl p-6 flex flex-col" data-cat="wali">
       <div class="flex justify-between items-start mb-3">
         <div class="text-4xl">📬</div>
@@ -223,7 +267,7 @@
       </a>
     </div>
 
-    <!-- 9. PORTAL ASESMEN STS -->
+    <!-- 11. PORTAL ASESMEN STS -->
     <div class="modul-item glass-card rounded-3xl p-6 flex flex-col" data-cat="wali">
       <div class="flex justify-between items-start mb-3">
         <div class="text-4xl">📝</div>
@@ -239,22 +283,7 @@
     </div>
 
   </main>
-  <!-- MODUL ARENA CCA ALKITAB (CBT INTERAKTIF) -->
-    <div class="modul-item glass-card rounded-3xl p-6 flex flex-col" data-cat="lab">
-      <div class="flex justify-between items-start mb-3">
-        <div class="text-4xl">📖</div>
-        <span class="bg-indigo-500/20 text-indigo-300 border border-indigo-400/30 text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full">CBT Cerdas Cermat</span>
-      </div>
-      <h3 class="font-title text-xl text-indigo-300 mb-1">Arena CCA Alkitab</h3>
-      <p class="text-xs text-slate-300 leading-relaxed mb-4 flex-grow">
-        Tantangan cerdas cermat Alkitab berbasis CBT dengan pengatur waktu kecepatan, evaluasi instan, dan papan peringkat juara (leaderboard).
-      </p>
-      <a href="cca-alkitab.html" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-title text-xs py-2.5 rounded-xl text-center font-bold transition shadow-md flex items-center justify-center gap-1.5">
-        ⚔️ Masuk Arena CCA
-      </a>
-    </div>
 
-  
   <!-- FOOTER RESMI DENGAN KREDIT NAMA & PINTU MASUK ADMIN -->
   <footer class="border-t border-slate-800/80 pt-6 mt-8">
     <div class="flex flex-col sm:flex-row justify-between items-center text-xs text-slate-400 gap-3">
@@ -267,7 +296,7 @@
         </p>
       </div>
 
-      <!-- PINTU MASUK ADMIN AMAN -->
+      <!-- PINTU MASUK ADMIN AMAN (Tanpa mengekspos token/rahasia) -->
       <a href="admin.html" class="text-slate-600 hover:text-rose-400 text-[11px] font-mono transition flex items-center gap-1">
         🔒 Panel Kendali
       </a>
