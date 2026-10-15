@@ -1,540 +1,366 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>NalarSci Motion AI - Kuis Gerak Edufair 2026</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- MediaPipe Pose & Camera Utils CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js" crossorigin="anonymous"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
-  <style>
-    body { font-family: 'Nunito', sans-serif; }
-    .font-title { font-family: 'Fredoka', sans-serif; }
-    .mirror-camera { transform: scaleX(-1); }
-    @keyframes pulse-zone {
-      0%, 100% { transform: scale(1); box-shadow: 0 0 20px rgba(56, 189, 248, 0.4); }
-      50% { transform: scale(1.04); box-shadow: 0 0 35px rgba(56, 189, 248, 0.85); }
-    }
-    .zone-active { animation: pulse-zone 1.4s infinite ease-in-out; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kuis Gerak Ceria</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;800&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#241b4d;--sun:#ffc933;--coral:#ff5d73;--mint:#2ee6a6;--sky:#38bdf8}
+*{box-sizing:border-box;margin:0;user-select:none;-webkit-user-select:none}
+html,body{height:100%;overflow:hidden;background:var(--ink);color:#fff;font-family:'Baloo 2','Trebuchet MS',sans-serif}
+canvas{position:fixed;inset:0;width:100%;height:100%}
+#hud{position:fixed;inset:0;display:none;flex-direction:column;justify-content:space-between;padding:1.2vh 1.5vw;pointer-events:none}
+.top{display:flex;align-items:center;gap:1.5vw;background:rgba(36,27,77,.88);border-radius:2.5vh;padding:1vh 1.5vw;font-size:3vh;font-weight:800}
+.top .grow{flex:1}
+#bar{height:1.6vh;background:#ffffff33;border-radius:9px;overflow:hidden;margin-top:.8vh}
+#bar i{display:block;height:100%;width:100%;background:var(--mint);transition:background .3s}
+#tm{font-size:6vh;line-height:1;min-width:6vh;text-align:center;color:var(--sun)}
+#qt{margin:1.2vh auto 0;max-width:80vw;background:#fff;color:var(--ink);border-radius:4vh;padding:2vh 3vw;font-size:4.6vh;line-height:1.15;font-weight:800;text-align:center;box-shadow:0 1vh 0 var(--sun)}
+#op{display:grid;gap:2vw;width:100%}
+.opt{border-radius:4vh;padding:2.4vh 1.5vw;text-align:center;font-size:4.4vh;font-weight:800;line-height:1.1;position:relative;min-height:16vh;display:flex;flex-direction:column;justify-content:center;align-items:center;box-shadow:0 1vh 0 #0006;transition:transform .25s}
+.opt b{font-size:8vh;line-height:.9;display:block}
+.opt small{font-size:2.4vh;font-weight:500;opacity:.85}
+.opt .mk{position:absolute;top:-1.6vh;right:1vw;display:flex;gap:.4vw}
+.chip{padding:.2vh 1vw;border-radius:3vh;color:#111;font-size:2.6vh;font-weight:800;border:.4vh solid #fff}
+.win{transform:scale(1.06);outline:1vh solid #fff}
+.dim{opacity:.35}
+#fb{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%) scale(0);font-size:9vh;font-weight:800;text-align:center;padding:2vh 4vw;border-radius:5vh;background:var(--ink);border:.8vh solid var(--sun);z-index:20;transition:transform .35s cubic-bezier(.3,1.6,.5,1);max-width:90vw;line-height:1.1}
+#fb.on{transform:translate(-50%,-50%) scale(1)}
+.layer{position:fixed;inset:0;z-index:30;display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:2.2vh;padding:4vh 6vw;background:radial-gradient(circle at 50% 30%,#4a2fa0,var(--ink) 70%)}
+.layer.clear{background:linear-gradient(transparent,#241b4dcc 60%);justify-content:flex-end;pointer-events:none;padding-bottom:4vh}
+.layer h1{font-size:9vh;line-height:1;color:var(--sun);text-shadow:0 .8vh 0 #0005}
+.layer h2{font-size:5vh;line-height:1.1}
+.layer p{font-size:3.2vh;max-width:70vw;line-height:1.25;opacity:.95}
+.btn{pointer-events:auto;cursor:pointer;border:0;font:inherit;font-weight:800;font-size:5vh;color:var(--ink);background:var(--sun);border-radius:6vh;padding:1.4vh 5vw;box-shadow:0 1vh 0 #b8860b;transition:transform .1s}
+.btn:active{transform:translateY(.8vh);box-shadow:0 .2vh 0 #b8860b}
+.btn.alt{background:#fff;font-size:3vh;box-shadow:0 .8vh 0 #8888}
+.btn[disabled]{opacity:.4}
+.dude{font-size:14vh;animation:bob 1.4s ease-in-out infinite}
+@keyframes bob{50%{transform:translateY(-2vh) rotate(-6deg)}}
+@media (prefers-reduced-motion:reduce){.dude{animation:none}.opt,#fb{transition:none}}
+
+.brand-badge{font-size:2.2vh;font-weight:800;color:var(--sun);background:#241b4d;padding:.4vh 1.4vw;border-radius:2vh;border:.25vh solid #ffffff33;display:inline-flex;align-items:center;gap:.6vw}
+#confetti-cv{position:fixed;inset:0;pointer-events:none;z-index:45}
+</style>
 </head>
-<body class="bg-slate-950 text-white font-sans overflow-hidden select-none min-h-screen">
+<body>
+<video id="v" playsinline muted style="display:none"></video>
+<canvas id="cv"></canvas>
+<canvas id="confetti-cv"></canvas>
 
-  <!-- Confetti Canvas -->
-  <canvas id="confettiCanvas" class="fixed inset-0 pointer-events-none z-50"></canvas>
-
-  <!-- Container Utama -->
-  <div class="relative w-screen h-screen flex flex-col justify-between p-3 sm:p-5">
-
-    <!-- Video Element (Hidden feed) -->
-    <video id="inputVideo" class="hidden" playsinline></video>
-
-    <!-- Canvas Layar Penuh: Mirror Webcam + Avatar Tracker -->
-    <canvas id="gameCanvas" class="absolute inset-0 w-full h-full object-cover mirror-camera z-0"></canvas>
-
-    <!-- Overlay Gradien Lembut -->
-    <div class="absolute inset-0 bg-gradient-to-b from-slate-950/70 via-transparent to-slate-950/80 pointer-events-none z-10"></div>
-
-    <!-- UI GAMEPLAY OVERLAY (Z-20) -->
-    <div class="relative z-20 flex flex-col justify-between h-full pointer-events-none">
-
-      <!-- TOP BAR: BRANDING ELEGAN + SKOR + TIMER -->
-      <div class="flex flex-wrap justify-between items-center gap-3 bg-slate-900/85 backdrop-blur-md px-5 py-3 rounded-2xl border border-sky-400/30 max-w-5xl mx-auto w-full shadow-2xl">
-        <!-- Logo & Branding Pembuat -->
-        <div class="flex items-center gap-2.5">
-          <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-sky-400 to-indigo-600 flex items-center justify-center text-xl shadow-lg border border-white/20">
-            ⚡
-          </div>
-          <div>
-            <div class="flex items-center gap-1.5">
-              <span class="font-title text-base sm:text-lg text-white font-black tracking-wide">NALAR<span class="text-sky-400">SCI</span> MOTION AI</span>
-              <span class="bg-amber-400/20 text-amber-300 border border-amber-400/40 text-[9px] font-black uppercase px-2 py-0.5 rounded-full">Edufair 2026</span>
-            </div>
-            <p class="text-[10px] text-slate-400">Inovasi Lab Komputer • Karya: <b class="text-slate-200">Thomas Ryantama, M.Kom., Gr.</b></p>
-          </div>
-        </div>
-
-        <!-- Timer Hitung Mundur -->
-        <div class="flex items-center gap-3">
-          <div class="text-right">
-            <span class="text-[10px] uppercase font-bold text-slate-400 block">Sisa Waktu</span>
-            <span id="timerDisplay" class="text-2xl sm:text-3xl font-black text-rose-400 font-mono tracking-wider">5.0</span>
-          </div>
-          <!-- Skor -->
-          <div class="bg-slate-950/90 px-4 py-1.5 rounded-xl border border-slate-700 text-center">
-            <span class="text-[10px] uppercase font-bold text-amber-400 block" id="labelScore">Skor</span>
-            <span id="scoreDisplay" class="text-lg sm:text-xl font-black text-white">0</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- KOTAK SOAL UTAMA -->
-      <div id="questionBox" class="mx-auto w-full max-w-4xl bg-slate-900/90 backdrop-blur-md border-2 border-sky-400/60 rounded-3xl p-4 sm:p-5 text-center shadow-2xl mt-2 transition-all">
-        <div class="flex justify-center items-center gap-2 mb-1">
-          <span id="badgeBabak" class="text-[10px] font-black px-3 py-0.5 bg-sky-500 text-slate-950 rounded-full uppercase tracking-wider">
-            Babak 1: Sains & Luar Angkasa
-          </span>
-          <span id="questionNumDisplay" class="text-[11px] font-bold text-slate-400">Soal 1 / 3</span>
-        </div>
-        <h2 id="questionText" class="text-lg sm:text-2xl font-black text-white leading-relaxed">
-          Mengaktifkan kamera sensor tubuh... Harap izinkan akses webcam!
-        </h2>
-      </div>
-
-      <!-- KOTAK PILIHAN JAWABAN (KIRI vs KANAN) -->
-      <div class="grid grid-cols-2 gap-4 sm:gap-8 w-full max-w-5xl mx-auto mb-2 px-2">
-        <!-- OPSI A (KIRI) -->
-        <div id="boxLeft" class="bg-blue-950/80 backdrop-blur-md border-4 border-sky-400/60 rounded-3xl p-4 sm:p-6 flex flex-col items-center justify-center text-center shadow-2xl transition-all duration-300">
-          <div class="text-[11px] sm:text-xs font-black px-3 py-1 bg-sky-400 text-slate-950 rounded-full uppercase mb-2 shadow">
-            ⬅️ OPSI A (Lompat Kiri)
-          </div>
-          <div id="textLeft" class="text-base sm:text-2xl font-black text-white leading-tight">Pilihan A</div>
-        </div>
-
-        <!-- OPSI B (KANAN) -->
-        <div id="boxRight" class="bg-emerald-950/80 backdrop-blur-md border-4 border-emerald-400/60 rounded-3xl p-4 sm:p-6 flex flex-col items-center justify-center text-center shadow-2xl transition-all duration-300">
-          <div class="text-[11px] sm:text-xs font-black px-3 py-1 bg-emerald-400 text-slate-950 rounded-full uppercase mb-2 shadow">
-            OPSI B (Lompat Kanan) ➡️
-          </div>
-          <div id="textRight" class="text-base sm:text-2xl font-black text-white leading-tight">Pilihan B</div>
-        </div>
-      </div>
-
-      <!-- STATUS DETEKSI POSISI -->
-      <div class="text-center pb-2">
-        <span id="playerIndicator" class="px-5 py-2 bg-slate-950/85 backdrop-blur-md border border-white/20 rounded-full text-xs font-bold text-slate-200 shadow-xl">
-          📍 Posisi: Berdiri di Garis Tengah (Geser Badan ke Kiri atau Kanan)
-        </span>
-      </div>
-
-    </div>
-
-    <!-- MODAL MENU UTAMA / PILIH MODE / VICTORY CARD -->
-    <div id="mainModal" class="absolute inset-0 bg-slate-950/90 backdrop-blur-lg z-40 flex flex-col items-center justify-center p-4 text-center">
-      <div id="modalCard" class="glass-panel bg-slate-900/90 border border-sky-400/30 max-w-lg w-full p-6 sm:p-8 rounded-3xl shadow-2xl space-y-4">
-        
-        <!-- Header Modal -->
-        <div class="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-tr from-sky-400 to-indigo-600 flex items-center justify-center text-3xl shadow-lg border border-white/30 animate-bounce">
-          🏃‍♂️
-        </div>
-        <h1 class="font-title text-2xl sm:text-3xl font-black text-white">NalarSci Motion Game</h1>
-        <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
-          Game kuis gerak interaktif menggunakan kecerdasan buatan (*AI Pose Tracking*). Tanpa mouse atau keyboard—cukup geser atau lompatkan tubuhmu di depan kamera!
-        </p>
-
-        <!-- Pilihan Mode Bermain -->
-        <div class="grid grid-cols-2 gap-3 pt-2">
-          <button onclick="selectMode('solo')" class="p-4 bg-gradient-to-b from-sky-600 to-sky-800 hover:from-sky-500 hover:to-sky-700 rounded-2xl border border-sky-400/40 text-left shadow-lg pointer-events-auto transition transform hover:scale-105">
-            <span class="text-2xl block mb-1">👤</span>
-            <span class="font-title text-sm font-bold block text-white">1 Pemain (Solo)</span>
-            <span class="text-[10px] text-sky-200 block">Selesaikan 3 babak kuis & cetak rekor terbaik!</span>
-          </button>
-
-          <button onclick="selectMode('duel')" class="p-4 bg-gradient-to-b from-emerald-600 to-emerald-800 hover:from-emerald-500 hover:to-emerald-700 rounded-2xl border border-emerald-400/40 text-left shadow-lg pointer-events-auto transition transform hover:scale-105">
-            <span class="text-2xl block mb-1">👥</span>
-            <span class="font-title text-sm font-bold block text-white">2 Pemain (Duel)</span>
-            <span class="text-[10px] text-emerald-200 block">Tanding cepat 2 anak di depan kamera!</span>
-          </button>
-        </div>
-
-        <div class="pt-2 text-[11px] text-slate-400">
-          💡 Dibuat khusus untuk demonstrasi teknologi interaktif Edufair 2026.
-        </div>
-      </div>
-    </div>
-
+<div id="hud">
+  <div>
+    <div class="top"><span id="rl"></span><span class="brand-badge">⚡ NalarSci AI</span><span class="grow"></span><span id="st"></span><span class="grow"></span><span id="qn"></span><span id="tm">8</span></div>
+    <div id="bar"><i></i></div>
+    <div id="qt"></div>
   </div>
+  <div id="op"></div>
+</div>
+<div id="fb"></div>
 
-  <script>
-    // BANK SOAL EDUFAIR BERBABAK (PENGETAHUAN UMUM & INFORMATIKA)
-    const ROUNDS = [
-      {
-        name: "Babak 1: Sains & Alam",
-        questions: [
-          { q: "Planet terdekat dengan Matahari di tata surya adalah...", optA: "Merkurius", optB: "Mars", ans: "A" },
-          { q: "Hewan mamalia terbesar di bumi yang hidup di laut adalah...", optA: "Hiu Paus", optB: "Paus Biru", ans: "B" },
-          { q: "Gas yang dihirup manusia saat bernapas untuk metabolisme adalah...", optA: "Oksigen (O₂)", optB: "Karbon Dioksida (CO₂)", ans: "A" }
-        ]
-      },
-      {
-        name: "Babak 2: Geografi & Budaya",
-        questions: [
-          { q: "Candi Borobudur yang megah terletak di provinsi...", optA: "Jawa Tengah", optB: "Sumatera Barat", ans: "A" },
-          { q: "Gurun pasir terluas dan terpanas di dunia adalah...", optA: "Gurun Gobi", optB: "Gurun Sahara", ans: "B" },
-          { q: "Rumah adat khas Minangkabau beratap tanduk kerbau bernama...", optA: "Rumah Joglo", optB: "Rumah Gadang", ans: "B" }
-        ]
-      },
-      {
-        name: "Babak 3: Informatika & Digital",
-        questions: [
-          { q: "Perangkat keras yang bertindak sebagai otak pengolah komputer adalah...", optA: "CPU (Processor)", optB: "Monitor", ans: "A" },
-          { q: "Kombinasi keyboard untuk membatalkan perintah (Undo) adalah...", optA: "CTRL + Z", optB: "CTRL + P", ans: "A" },
-          { q: "Sikap yang paling bijak saat menggunakan internet adalah...", optA: "Menjaga kerahasiaan kata sandi", optB: "Menyebarkan identitas pribadi", ans: "A" }
-        ]
-      }
-    ];
+<!-- Layar awal -->
+<div class="layer" id="start" style="display:flex">
+  <div class="dude">🤸</div>
+  <h1>Kuis Gerak Ceria</h1><div class="brand-badge" style="font-size:2.8vh;margin-top:-1vh">⚡ NalarSci Motion AI • Karya: Thomas Ryantama, M.Kom., Gr. • Edufair 2026</div>
+  <p id="sm">Menyiapkan kamera dan kecerdasan buatan… mohon izinkan kamera.</p>
+  <div style="display:flex;gap:2vw"><button class="btn" id="go" disabled>Siap Main!</button><button class="btn alt" onclick="document.documentElement.requestFullscreen?.()">Layar penuh</button></div>
+</div>
 
-    let gameMode = 'solo'; // 'solo' atau 'duel'
-    let currentRound = 0;
-    let currentQ = 0;
-    let score = 0;
-    let scoreP1 = 0, scoreP2 = 0;
-    let timeLeft = 5.0;
-    let timerInt = null;
-    let isRunning = false;
+<!-- Lobi (kamera terlihat) -->
+<div class="layer clear" id="lobby">
+  <h2>Berdiri berjajar di depan kamera!</h2>
+  <p id="lc">Belum ada pemain terdeteksi</p>
+  <button class="btn" id="go1">Mulai Babak 1</button>
+</div>
 
-    // Koordinat Tracking Tubuh (Smoothed PID Filter)
-    let smoothedX1 = 0.5; // Pemain 1
-    let smoothedX2 = 0.5; // Pemain 2 (Untuk mode duel)
-    let choiceP1 = "CENTER";
-    let choiceP2 = "CENTER";
-    const SMOOTH_ALPHA = 0.3; // Koefisien filter kehalusan gerakan
+<!-- Layar pesan -->
+<div class="layer" id="msg"><div class="dude" id="me">🎉</div><h1 id="mt"></h1><p id="mp"></p><button class="btn" id="mb"></button></div>
 
-    const videoEl = document.getElementById('inputVideo');
-    const canvasEl = document.getElementById('gameCanvas');
-    const ctx = canvasEl.getContext('2d');
+<script type="module">
+import {FilesetResolver,PoseLandmarker,HandLandmarker} from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14";
+const $=id=>document.getElementById(id);
+const cv=$('cv'),ctx=cv.getContext('2d'),vid=$('v');
+const COL=['#ffc933','#ff5d73','#38bdf8','#a3e635','#c084fc','#fb923c'];
+const shuffle=a=>a.map(x=>[Math.random(),x]).sort((a,b)=>a[0]-b[0]).map(x=>x[1]);
 
-    // ==========================================
-    // SOUND ENGINE (WEB AUDIO API SYNTHESIZER)
-    // ==========================================
-    let audioCtx = null;
-    function getAudio() {
-      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      if (audioCtx.state === 'suspended') audioCtx.resume();
-      return audioCtx;
-    }
+/* ---------- Bank soal ---------- */
+// Babak 1: pilih A (kiri) atau B (kanan). Format: [soal, jawaban benar, jawaban salah]
+const B1=[
+["Siapa yang membuat bahtera besar saat air bah?","Nuh","Musa"],
+["Berapa jumlah murid Yesus?","12","7"],
+["Hewan manakah yang makan rumput (Herbivora)?","Sapi","Singa"],
+["Kita tinggal di planet...","Bumi","Mars"],
+["Yesus lahir di kota...","Betlehem","Yerusalem"],
+["Berapa hasil 2 + 3 × 2 ?","8","10"],
+["Siapa yang mengalahkan raksasa Goliat dengan ketapel?","Daud","Simson"],
+["Warna pelangi ada berapa macam?","7","5"],
+["Natal diperingati setiap tanggal...","25 Desember","17 Agustus"],
+["Sila pertama Pancasila adalah...","Ketuhanan Yang Maha Esa","Persatuan Indonesia"],
+["Siapa yang dimasukkan ke gua singa tetapi selamat?","Daniel","Petrus"],
+["Alat untuk melihat benda langit yang sangat jauh?","Teleskop","Mikroskop"],
+["Perangkat komputer untuk mengetik huruf dan angka?","Keyboard","Monitor"],
+["Tombol keyboard untuk membatalkan perintah (Undo)?","CTRL + Z","CTRL + P"],
+["Pulau terbesar di Indonesia yang memiliki fauna orangutan?","Kalimantan","Bali"],
+["Gas yang kita hirup saat bernapas adalah...","Oksigen (O₂)","Karbon Dioksida"],
+["Monumen Nasional (Monas) berada di kota...","Jakarta","Surabaya"],
+["Mata uang resmi negara Indonesia adalah...","Rupiah","Ringgit"],
+["Hewan tercepat di darat adalah...","Cheetah","Gajah"],
+["Air membeku menjadi es pada suhu...","0°C","100°C"]
+].map(([q,r,w])=>Math.random()<.5?{q,A:r,B:w,a:0}:{q,A:w,B:r,a:1});
+// Babak 2: 4 pilihan, jawab dengan 1-4 jari. Format: [soal, pilihan, indeks benar]
+const B2=[
+["Siapa nabi yang ditelan oleh ikan besar?",["Yunus","Daniel","Petrus","Paulus"],0],
+["Tuhan Yesus beristirahat pada hari ke...?",["Ke-3","Ke-5","Ke-7","Ke-10"],2],
+["Siapakah nama ibu dari Tuhan Yesus?",["Maria","Marta","Hawa","Sara"],0],
+["Berapa hasil perkalian dari 7 × 8 ?",["54","56","64","48"],1],
+["Siapa tokoh yang membelah Laut Teberau dengan tongkat?",["Daud","Elia","Yosua","Musa"],3],
+["Hewan manakah yang bertelur dan bisa terbang?",["Kucing","Burung","Paus","Sapi"],1],
+["Warna bendera kebangsaan Indonesia adalah...?",["Merah-Putih","Biru-Putih","Merah-Kuning","Hijau-Putih"],0],
+["Bagian tumbuhan yang menyerap air dari dalam tanah?",["Daun","Bunga","Akar","Buah"],2],
+["Perangkat keras yang menjadi otak pengolah komputer?",["CPU","Speaker","Mouse","Printer"],0],
+["Ibu kota negara Indonesia di masa depan adalah...?",["IKN Nusantara","Bandung","Medan","Surabaya"],0],
+["Planet terbesar di dalam tata surya kita adalah...?",["Mars","Jupiter","Venus","Merkurius"],1],
+["Berapa jumlah warna pada lampu lalu lintas jalan raya?",["2 Warna","3 Warna","4 Warna","5 Warna"],1]
+];
 
-    function playTone(freq, type, dur, vol = 0.08) {
-      try {
-        const c = getAudio();
-        const o = c.createOscillator();
-        const g = c.createGain();
-        o.type = type;
-        o.frequency.setValueAtTime(freq, c.currentTime);
-        g.gain.setValueAtTime(vol, c.currentTime);
-        g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + dur);
-        o.connect(g);
-        g.connect(c.destination);
-        o.start();
-        o.stop(c.currentTime + dur);
-      } catch (e) {}
-    }
+/* ---------- Status ---------- */
+let pose,hand,phase='load',round=1,players=[],fin=[],qs=[],qi=0,cur=null,tEnd=0,TM=8,pr=null,hr=null,lastT=-1,zs=[],ac;
+const beep=(f,d=.12,t='sine')=>{try{ac=ac||new AudioContext();const o=ac.createOscillator(),g=ac.createGain();o.type=t;o.frequency.value=f;g.gain.value=.15;o.connect(g);g.connect(ac.destination);o.start();o.stop(ac.currentTime+d)}catch(e){}};
+const jingle=(a)=>a.forEach((f,i)=>setTimeout(()=>beep(f,.15,'triangle'),i*130));
+const show=(id,on=true)=>$(id).style.display=on?'flex':'none';
+let fbT;const toast=(t,ms=1800)=>{const f=$('fb');f.innerHTML=t;f.classList.add('on');clearTimeout(fbT);fbT=setTimeout(()=>f.classList.remove('on'),ms)};
+const msg=(e,t,p,b,fn)=>{$('me').textContent=e;$('mt').textContent=t;$('mp').innerHTML=p;$('mb').textContent=b;$('mb').onclick=()=>{show('msg',false);fn()};show('msg')};
 
-    function sfxCorrect() {
-      [523, 659, 784, 1046].forEach((f, i) => setTimeout(() => playTone(f, 'sine', 0.15, 0.1), i * 70));
-    }
-    function sfxWrong() {
-      [220, 160, 100].forEach((f, i) => setTimeout(() => playTone(f, 'sawtooth', 0.2, 0.12), i * 90));
-    }
-    function sfxTick() { playTone(600, 'sine', 0.05, 0.04); }
-    function sfxCheer() {
-      const notes = [440, 554, 659, 880, 1108];
-      notes.forEach((f, i) => setTimeout(() => playTone(f, 'square', 0.25, 0.12), i * 100));
-    }
+/* ---------- Muat kamera + model ---------- */
+async function init(){
+  try{
+    const s=await navigator.mediaDevices.getUserMedia({video:{width:1280,height:720,facingMode:'user'},audio:false});
+    vid.srcObject=s;await vid.play();
+    const fs=await FilesetResolver.forVisionTasks("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm");
+    const M="https://storage.googleapis.com/mediapipe-models/";
+    pose=await PoseLandmarker.createFromOptions(fs,{baseOptions:{modelAssetPath:M+"pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task",delegate:"GPU"},runningMode:"VIDEO",numPoses:6});
+    hand=await HandLandmarker.createFromOptions(fs,{baseOptions:{modelAssetPath:M+"hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task",delegate:"GPU"},runningMode:"VIDEO",numHands:4});
+    $('sm').textContent="Babak 1: lompat ke kiri atau kanan. Babak 2: jawab dengan jari!";
+    $('go').disabled=false;phase='ready';
+  }catch(e){$('sm').textContent="Kamera belum bisa dipakai. Izinkan akses kamera di browser, lalu muat ulang halaman. ("+e.message+")"}
+}
+$('go').onclick=()=>{beep(660);show('start',false);toLobby()};
+init();
 
-    // ==========================================
-    // MEDIAPIPE POSE TRACKING
-    // ==========================================
-    const pose = new Pose({
-      locateFile: (f) => `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${f}`
+/* ---------- Lobi & Babak 1 ---------- */
+function toLobby(){round=1;players=[];fin=[];phase='lobby';show('lobby');$('hud').style.display='none'}
+$('go1').onclick=()=>{
+  const n=players.filter(p=>performance.now()-p.seen<1500).length;
+  if(!n){toast('Belum ada pemain terlihat 👀');return}
+  players=players.filter(p=>performance.now()-p.seen<1500);players.forEach((p,i)=>{p.id=i+1;p.alive=true});
+  show('lobby',false);beep(880);
+  if(players.length<=2){fin=players;msg('✋','Langsung Babak 2!',`Hanya ${players.length} pemain, jadi kalian langsung bertanding dengan jari.`,'Lanjut',intro2)}
+  else{qs=shuffle(B1);qi=0;TM=8;$('hud').style.display='flex';$('op').style.cssText='';round=1;countdown(nextQ1)}
+};
+function countdown(fn){phase='wait';let n=3;(function t(){if(n){toast(n,900);beep(500+n*80);n--;setTimeout(t,900)}else{toast('Mulai! 🚀',700);fn()}})()}
+
+function trackPose(r){
+  const now=performance.now();
+  const dets=(r.landmarks||[]).map(l=>({x:1-(l[11].x+l[12].x+l[23].x+l[24].x)/4,hx:1-l[0].x,hy:l[0].y}));
+  const used=new Set();
+  players.forEach(p=>{let b=-1,bd=.18;dets.forEach((d,i)=>{const dd=Math.abs(d.x-p.x);if(!used.has(i)&&dd<bd){bd=dd;b=i}});if(b>=0){used.add(b);Object.assign(p,dets[b],{seen:now})}});
+  if(phase==='lobby'){
+    dets.forEach((d,i)=>{if(!used.has(i)&&players.length<6)players.push({...d,id:0,seen:now,alive:true})});
+    players=players.filter(p=>now-p.seen<1500);players.forEach((p,i)=>p.id=i+1);
+  }
+}
+const side=x=>x<.45?0:x>.55?1:-1;
+
+function nextQ1(){
+  const alive=players.filter(p=>p.alive);
+  if(alive.length<=2||qi>=qs.length){
+    fin=alive.sort((a,b)=>Math.abs(a.x-.5)-Math.abs(b.x-.5)).slice(0,2).sort((a,b)=>a.x-b.x);
+    $('hud').style.display='none';jingle([523,659,784,1047]);
+    return msg('🏅','Babak 1 selesai!',`Pemain yang lolos: <b>${fin.map(p=>'P'+p.id).join(' dan ')}</b>. Selamat! Sekarang saatnya pakai jari.`,'Ke Babak 2',intro2);
+  }
+  cur=qs[qi++];phase='q';
+  $('rl').textContent='🏃 Babak 1';$('qn').textContent=`Soal ${qi}`;$('st').textContent=`👥 Bertahan: ${alive.length}`;
+  $('qt').textContent=cur.q;
+  $('op').style.gridTemplateColumns='1fr 1fr';
+  $('op').innerHTML=`<div class="opt" style="background:#1d7fd6"><b>A</b>${cur.A}<small>⬅️ lompat ke kiri</small></div><div class="opt" style="background:#12a874"><b>B</b>${cur.B}<small>lompat ke kanan ➡️</small></div>`;
+  TM=8;tEnd=performance.now()+TM*1000;
+}
+function eval1(){
+  phase='reveal';const now=performance.now();
+  const alive=players.filter(p=>p.alive);
+  const ok=alive.filter(p=>now-p.seen<1500&&side(p.x)===cur.a);
+  [...$('op').children].forEach((c,i)=>c.classList.add(i===cur.a?'win':'dim'));
+  const jawab='AB'[cur.a];
+  if(!ok.length){toast(`Semua salah! Jawabannya ${jawab}. Tidak ada yang gugur 😅`,2600);beep(200,.4,'sawtooth')}
+  else{
+    const out=alive.filter(p=>!ok.includes(p));out.forEach(p=>p.alive=false);
+    if(out.length){toast(`✅ Jawaban ${jawab}<br>Gugur: ${out.map(p=>'P'+p.id).join(', ')} 😢`,2600);beep(220,.4,'sawtooth')}
+    else{toast(`🎉 Hebat! Semua benar (${jawab})`,2600);jingle([523,659,784])}
+  }
+  setTimeout(nextQ1,3200);
+}
+
+/* ---------- Babak 2: jari ---------- */
+function intro2(){
+  round=2;phase='wait';$('hud').style.display='none';
+  const two=fin.length===2;
+  msg('🖐️','Babak 2: Pakai Jari!',`Angkat <b>1 jari = A</b>, <b>2 jari = B</b>, <b>3 jari = C</b>, <b>4 jari = D</b>. Tahan sampai terkunci.<br>${two?'P'+fin[0].id+' bermain di layar kiri, P'+fin[1].id+' di layar kanan.':'Angkat tanganmu di depan kamera.'}`,'Mulai!',()=>{
+    fin.forEach(p=>p.score=0);qs=shuffle(B2).slice(0,6);qi=0;TM=12;$('hud').style.display='flex';countdown(nextQ2)});
+}
+function nextQ2(){
+  if(qi>=qs.length)return end2();
+  const [q,o,a]=qs[qi++];cur={q,o,a};phase='q';
+  zs=fin.map(()=>({cur:0,prev:0,since:0,lock:false,ans:-1,t:0}));
+  $('rl').textContent='🖐️ Babak 2';$('qn').textContent=`Soal ${qi}/${qs.length}`;
+  $('qt').textContent=q;
+  $('op').style.gridTemplateColumns='repeat(4,1fr)';
+  const bg=['#1d7fd6','#12a874','#e08a00','#c0397f'];
+  $('op').innerHTML=o.map((t,i)=>`<div class="opt" style="background:${bg[i]}"><span class="mk" id="m${i}"></span><b>${'ABCD'[i]}</b>${t}<small>${i+1} jari</small></div>`).join('');
+  scoreboard();TM=12;tEnd=performance.now()+TM*1000;
+}
+const scoreboard=()=>$('st').innerHTML=fin.map(p=>`<span style="color:${COL[p.id-1]}">P${p.id}: ${p.score}⭐</span>`).join(' &nbsp; ');
+function fing(l){const d=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y),w=l[0];let n=0;[[8,6],[12,10],[16,14],[20,18]].forEach(([t,p])=>{if(d(l[t],w)>d(l[p],w)*1.05)n++});return n}
+function trackHands(r,now){
+  zs.forEach(z=>z.cur=0);
+  (r.landmarks||[]).forEach(l=>{
+    const wx=1-l[0].x,zi=fin.length===2?(wx>.5?1:0):0,z=zs[zi];if(!z||z.lock)return;
+    z.cur=fing(l);z.wx=wx*cv.width;z.wy=l[0].y*cv.height;
+  });
+  zs.forEach(z=>{
+    if(z.lock)return;
+    if(z.cur>0&&z.cur===z.prev){z.hold=now-z.since;if(z.hold>=900){z.lock=true;z.ans=z.cur-1;z.t=now;beep(880,.15)}}
+    else{z.since=now;z.hold=0}
+    z.prev=z.cur;
+  });
+  if(zs.every(z=>z.lock)&&phase==='q')tEnd=Math.min(tEnd,now+700);
+}
+function eval2(){
+  phase='reveal';const now=performance.now();let res=[];
+  zs.forEach((z,i)=>{
+    let ans=z.lock?z.ans:(z.cur>0?z.cur-1:-1),ok=ans===cur.a;
+    if(ok)fin[i].score+=10+(z.lock?Math.max(0,Math.ceil((tEnd-z.t)/1000)):0);
+    res.push(ok);
+  });
+  scoreboard();
+  [...$('op').children].forEach((c,i)=>c.classList.add(i===cur.a?'win':'dim'));
+  const r=fin.map((p,i)=>`P${p.id} ${res[i]?'✅':'❌'}`).join(' &nbsp; ');
+  toast(`Jawaban: ${'ABCD'[cur.a]}<br>${r}`,2600);res.some(x=>x)?jingle([523,659,784]):beep(200,.4,'sawtooth');
+  setTimeout(nextQ2,3200);
+}
+
+/* ---------- Confetti Cannon Engine ---------- */
+const ccv = $('confetti-cv'), cctx = ccv.getContext('2d');
+let cParts = [];
+function fireConfetti(){
+  ccv.width = innerWidth; ccv.height = innerHeight;
+  cParts = [];
+  const colors = ['#ffc933','#ff5d73','#38bdf8','#2ee6a6','#c084fc','#fb923c','#ffffff'];
+  for(let i=0; i<120; i++){
+    cParts.push({
+      x: innerWidth/2, y: innerHeight/2,
+      vx: (Math.random()-0.5)*24,
+      vy: (Math.random()-0.8)*22,
+      size: Math.random()*12 + 6,
+      color: colors[Math.floor(Math.random()*colors.length)],
+      rot: Math.random()*360,
+      rotSpeed: (Math.random()-0.5)*14,
+      alpha: 1
     });
+  }
+  animConfetti();
+}
+function animConfetti(){
+  if(!cParts.length) return;
+  cctx.clearRect(0,0,ccv.width,ccv.height);
+  cParts.forEach((p, idx)=>{
+    p.x += p.vx; p.y += p.vy; p.vy += 0.45;
+    p.rot += p.rotSpeed; p.alpha -= 0.012;
+    cctx.save();
+    cctx.globalAlpha = Math.max(0, p.alpha);
+    cctx.translate(p.x, p.y);
+    cctx.rotate(p.rot*Math.PI/180);
+    cctx.fillStyle = p.color;
+    cctx.fillRect(-p.size/2, -p.size/2, p.size, p.size);
+    cctx.restore();
+    if(p.alpha<=0) cParts.splice(idx,1);
+  });
+  if(cParts.length) requestAnimationFrame(animConfetti);
+  else cctx.clearRect(0,0,ccv.width,ccv.height);
+}
 
-    pose.setOptions({
-      modelComplexity: 1,
-      smoothLandmarks: true,
-      minDetectionConfidence: 0.5,
-      minTrackingConfidence: 0.5
+function end2(){
+  phase='end';$('hud').style.display='none';
+  jingle([523,659,784,1047,1319]);
+  fireConfetti();
+  const s=[...fin].sort((a,b)=>b.score-a.score);
+  let t,p;
+  if(fin.length===1){
+    t='Juara Edufair 2026! 🏆';
+    p=`Pemain P${fin[0].id} meraih <b>${fin[0].score} ⭐</b>!<br><span style="font-size:2.4vh;color:var(--mint);font-weight:800">⚡ NalarSci Motion AI • Karya: Thomas Ryantama, M.Kom., Gr.</span><br><small style="font-size:2vh;opacity:.8">SD Methodist Immanuel • nalarsci.id</small>`;
+  } else if(s[0].score===s[1].score){
+    t='Juara Bersama! 🤝';
+    p=`P${s[0].id} dan P${s[1].id} sama-sama meraih <b>${s[0].score} ⭐</b>!<br><span style="font-size:2.4vh;color:var(--mint);font-weight:800">⚡ NalarSci Motion AI • Karya: Thomas Ryantama, M.Kom., Gr.</span><br><small style="font-size:2vh;opacity:.8">SD Methodist Immanuel • nalarsci.id</small>`;
+  } else {
+    t=`P${s[0].id} Juara 1 Edufair! 🏆`;
+    p=`<b>P${s[0].id}: ${s[0].score} ⭐</b> &nbsp;•&nbsp; P${s[1].id}: ${s[1].score} ⭐<br><span style="font-size:2.4vh;color:var(--mint);font-weight:800">⚡ NalarSci Motion AI • Karya: Thomas Ryantama, M.Kom., Gr.</span><br><small style="font-size:2vh;opacity:.8">SD Methodist Immanuel • nalarsci.id</small>`;
+  }
+  msg('🏆',t,p,'Main Lagi 🔄',toLobby);
+}
+
+/* ---------- Loop gambar & deteksi ---------- */
+function loop(){
+  requestAnimationFrame(loop);
+  const W=cv.width=innerWidth,H=cv.height=innerHeight,now=performance.now();
+  if(vid.readyState>=2){
+    ctx.save();ctx.translate(W,0);ctx.scale(-1,1);ctx.drawImage(vid,0,0,W,H);ctx.restore();
+    ctx.fillStyle='rgba(36,27,77,.25)';ctx.fillRect(0,0,W,H);
+    if(vid.currentTime!==lastT&&pose&&phase!=='load'){
+      lastT=vid.currentTime;
+      if(round===1){pr=pose.detectForVideo(vid,now);trackPose(pr)}
+      else{hr=hand.detectForVideo(vid,now);if(phase==='q')trackHands(hr,now)}
+    }
+  }
+  // Zona
+  if(round===1&&(phase==='q'||phase==='reveal')){
+    ctx.fillStyle='rgba(29,127,214,.28)';ctx.fillRect(0,0,W*.45,H);
+    ctx.fillStyle='rgba(18,168,116,.28)';ctx.fillRect(W*.55,0,W*.45,H);
+    ctx.fillStyle='rgba(255,255,255,.12)';ctx.fillRect(W*.45,0,W*.1,H);
+    ctx.font=`800 ${H*.3}px 'Baloo 2'`;ctx.textAlign='center';ctx.fillStyle='rgba(255,255,255,.22)';
+    ctx.fillText('A',W*.225,H*.62);ctx.fillText('B',W*.775,H*.62);
+  }
+  if(round===2&&fin.length===2&&phase!=='load'){ctx.fillStyle='#fff6';ctx.fillRect(W/2-2,0,4,H)}
+  // Pemain babak 1
+  if(round===1)players.forEach(p=>{
+    if(now-p.seen>1500)return;
+    const x=p.hx*W,y=p.hy*H-H*.09,c=COL[p.id-1],live=p.alive;
+    ctx.beginPath();ctx.arc(x,y,H*.045,0,7);ctx.fillStyle=live?c:'#777';ctx.fill();ctx.lineWidth=5;ctx.strokeStyle='#fff';ctx.stroke();
+    ctx.fillStyle='#241b4d';ctx.font=`800 ${H*.045}px 'Baloo 2'`;ctx.textAlign='center';ctx.fillText(live?'P'+p.id:'❌',x,y+H*.016);
+    if(live&&phase==='q'){const s=side(p.x);ctx.fillStyle=s<0?'#fff':c;ctx.font=`800 ${H*.04}px 'Baloo 2'`;ctx.fillText(s<0?'?':'AB'[s],x,y-H*.06)}
+  });
+  // Lobi
+  if(phase==='lobby'){const n=players.length;$('lc').textContent=n?`Terdeteksi ${n} pemain. ${n>2?'Yang gugur akan tersaring sampai tersisa 2 pemain.':'Dengan 1–2 pemain, langsung ke Babak 2.'}`:'Belum ada pemain terdeteksi. Mundur sedikit supaya seluruh badan terlihat.'}
+  // Tangan babak 2
+  if(round===2&&hr&&(phase==='q'||phase==='reveal')){
+    (hr.landmarks||[]).forEach(l=>{
+      const wx=1-l[0].x,zi=fin.length===2?(wx>.5?1:0):0,z=zs[zi],c=COL[fin[zi]?fin[zi].id-1:0],x=wx*W,y=l[0].y*H;
+      const n=fing(l);ctx.beginPath();ctx.arc(x,y-H*.08,H*.06,0,7);ctx.fillStyle=c;ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=5;ctx.stroke();
+      ctx.fillStyle='#241b4d';ctx.font=`800 ${H*.07}px 'Baloo 2'`;ctx.textAlign='center';ctx.fillText(n?'ABCD'[n-1]:'–',x,y-H*.055);
+      if(z&&!z.lock&&z.hold){ctx.beginPath();ctx.arc(x,y-H*.08,H*.075,-Math.PI/2,-Math.PI/2+Math.PI*2*Math.min(1,z.hold/900));ctx.strokeStyle='#2ee6a6';ctx.lineWidth=10;ctx.stroke()}
     });
-
-    pose.onResults(onPoseResults);
-
-    const camera = new Camera(videoEl, {
-      onFrame: async () => { await pose.send({ image: videoEl }); },
-      width: 1280,
-      height: 720
-    });
-
-    camera.start().then(() => {
-      document.getElementById('questionText').innerText = "Kamera Siap! Silakan pilih mode bermain di menu.";
-    }).catch(err => {
-      document.getElementById('questionText').innerText = "Gagal memuat webcam: " + err;
-    });
-
-    function onPoseResults(results) {
-      canvasEl.width = window.innerWidth;
-      canvasEl.height = window.innerHeight;
-
-      ctx.save();
-      ctx.clearRect(0, 0, canvasEl.width, canvasEl.height);
-
-      // Gambar tangkapan kamera langsung di layar penuh
-      if (results.image) {
-        ctx.drawImage(results.image, 0, 0, canvasEl.width, canvasEl.height);
-      }
-
-      // Deteksi Pose Pemain
-      if (results.poseLandmarks && results.poseLandmarks[0]) {
-        const rawX = results.poseLandmarks[0].x;
-        smoothedX1 = smoothedX1 + (rawX - smoothedX1) * SMOOTH_ALPHA;
-
-        const posX = smoothedX1 * canvasEl.width;
-        const posY = results.poseLandmarks[0].y * canvasEl.height;
-
-        // Gambar Avatar Robot Pelacak di Atas Kepala
-        drawPlayerAvatar(posX, posY, choiceP1, "Pemain");
-
-        // Evaluasi Posisi Kiri / Kanan
-        if (smoothedX1 < 0.42) choiceP1 = "LEFT";
-        else if (smoothedX1 > 0.58) choiceP1 = "RIGHT";
-        else choiceP1 = "CENTER";
-
-        updateZoneHighlights();
-      }
-
-      ctx.restore();
-    }
-
-    function drawPlayerAvatar(x, y, choice, label) {
-      ctx.save();
-      // Lingkaran Cahaya Neon
-      ctx.beginPath();
-      ctx.arc(x, y, 32, 0, 2 * Math.PI);
-      ctx.fillStyle = (choice === "LEFT") ? "rgba(56, 189, 248, 0.85)" : ((choice === "RIGHT") ? "rgba(52, 211, 153, 0.85)" : "rgba(250, 204, 21, 0.85)");
-      ctx.fill();
-      ctx.lineWidth = 4;
-      ctx.strokeStyle = "#ffffff";
-      ctx.stroke();
-
-      // Ikon Robot di dalam avatar
-      ctx.font = "26px sans-serif";
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      ctx.fillText("🤖", x, y);
-
-      // Label Nama di atas kepala
-      ctx.font = "bold 13px 'Nunito', sans-serif";
-      ctx.fillStyle = "#ffffff";
-      ctx.strokeStyle = "#000000";
-      ctx.lineWidth = 3;
-      ctx.strokeText(label, x, y - 44);
-      ctx.fillText(label, x, y - 44);
-      ctx.restore();
-    }
-
-    function updateZoneHighlights() {
-      const boxLeft = document.getElementById("boxLeft");
-      const boxRight = document.getElementById("boxRight");
-      const ind = document.getElementById("playerIndicator");
-
-      if (choiceP1 === "LEFT") {
-        boxLeft.className = "bg-sky-500/95 border-4 border-white rounded-3xl p-4 sm:p-6 flex flex-col items-center justify-center text-center shadow-2xl scale-105 zone-active transition-all";
-        boxRight.className = "bg-emerald-950/40 border-4 border-white/20 rounded-3xl p-4 sm:p-6 flex flex-col items-center justify-center text-center opacity-40 transition-all";
-        ind.innerHTML = "📍 Pilihan: <span class='text-sky-300 font-black text-sm'>OPSI A (KIRI)</span>";
-      } else if (choiceP1 === "RIGHT") {
-        boxRight.className = "bg-emerald-500/95 border-4 border-white rounded-3xl p-4 sm:p-6 flex flex-col items-center justify-center text-center shadow-2xl scale-105 zone-active transition-all";
-        boxLeft.className = "bg-blue-950/40 border-4 border-white/20 rounded-3xl p-4 sm:p-6 flex flex-col items-center justify-center text-center opacity-40 transition-all";
-        ind.innerHTML = "📍 Pilihan: <span class='text-emerald-300 font-black text-sm'>OPSI B (KANAN)</span>";
-      } else {
-        boxLeft.className = "bg-blue-950/80 backdrop-blur-md border-4 border-sky-400/60 rounded-3xl p-4 sm:p-6 flex flex-col items-center justify-center text-center shadow-2xl transition-all";
-        boxRight.className = "bg-emerald-950/80 backdrop-blur-md border-4 border-emerald-400/60 rounded-3xl p-4 sm:p-6 flex flex-col items-center justify-center text-center shadow-2xl transition-all";
-        ind.innerHTML = "📍 Posisi: Berdiri di Tengah (Lompat ke Kiri atau Kanan untuk Menjawab)";
-      }
-    }
-
-    // ==========================================
-    // GAMEPLAY FLOW
-    // ==========================================
-    function selectMode(mode) {
-      gameMode = mode;
-      document.getElementById('mainModal').classList.add('hidden');
-      getAudio();
-      currentRound = 0;
-      currentQ = 0;
-      score = 0;
-      scoreP1 = 0;
-      scoreP2 = 0;
-      document.getElementById('scoreDisplay').innerText = "0";
-      loadQuestion();
-    }
-
-    function loadQuestion() {
-      const round = ROUNDS[currentRound];
-      const q = round.questions[currentQ];
-
-      document.getElementById('badgeBabak').innerText = round.name;
-      document.getElementById('questionNumDisplay').innerText = `Soal ${currentQ + 1} / ${round.questions.length}`;
-      document.getElementById('questionText').innerText = q.q;
-      document.getElementById('textLeft').innerText = q.optA;
-      document.getElementById('textRight').innerText = q.optB;
-
-      timeLeft = 5.0;
-      document.getElementById('timerDisplay').innerText = timeLeft.toFixed(1);
-
-      if (timerInt) clearInterval(timerInt);
-      timerInt = setInterval(() => {
-        timeLeft -= 0.1;
-        if (timeLeft <= 0) {
-          clearInterval(timerInt);
-          evaluateAnswer();
-        } else {
-          document.getElementById('timerDisplay').innerText = Math.max(0, timeLeft).toFixed(1);
-          if (timeLeft <= 2.0) sfxTick();
-        }
-      }, 100);
-    }
-
-    function evaluateAnswer() {
-      const round = ROUNDS[currentRound];
-      const q = round.questions[currentQ];
-      const correctAns = q.ans;
-      const playerAns = (choiceP1 === "LEFT") ? "A" : ((choiceP1 === "RIGHT") ? "B" : "NONE");
-
-      const questionBox = document.getElementById("questionBox");
-
-      if (playerAns === correctAns) {
-        score += 20;
-        document.getElementById('scoreDisplay').innerText = `${score}`;
-        sfxCorrect();
-        questionBox.className = "mx-auto w-full max-w-4xl bg-emerald-600/95 border-4 border-white rounded-3xl p-4 sm:p-5 text-center shadow-2xl mt-2 animate-bounce";
-        document.getElementById("questionText").innerText = `🎉 JAWABAN BENAR! (+20 Poin)`;
-      } else {
-        sfxWrong();
-        questionBox.className = "mx-auto w-full max-w-4xl bg-rose-600/95 border-4 border-white rounded-3xl p-4 sm:p-5 text-center shadow-2xl mt-2";
-        document.getElementById("questionText").innerText = `❌ SALAH! Jawaban yang tepat: Opsi ${correctAns}`;
-      }
-
-      setTimeout(() => {
-        questionBox.className = "mx-auto w-full max-w-4xl bg-slate-900/90 backdrop-blur-md border-2 border-sky-400/60 rounded-3xl p-4 sm:p-5 text-center shadow-2xl mt-2";
-        currentQ++;
-        if (currentQ < round.questions.length) {
-          loadQuestion();
-        } else {
-          currentRound++;
-          if (currentRound < ROUNDS.length) {
-            showRoundBreak();
-          } else {
-            showVictoryCard();
-          }
-        }
-      }, 2200);
-    }
-
-    function showRoundBreak() {
-      const modal = document.getElementById('mainModal');
-      const card = document.getElementById('modalCard');
-      modal.classList.remove('hidden');
-
-      card.innerHTML = `
-        <div class="text-6xl animate-pulse">🌟</div>
-        <h2 class="font-title text-2xl font-black text-amber-400">Babak Selesai!</h2>
-        <p class="text-base font-bold text-white">Skor Sementara: <span class="text-emerald-400 text-3xl">${score}</span> Poin</p>
-        <div class="p-3 bg-slate-950 border border-slate-700 rounded-2xl text-xs text-sky-300">
-          Bersiap memasuki babak berikutnya: <br>
-          <b class="text-white text-sm font-title">${ROUNDS[currentRound].name}</b>
-        </div>
-        <button onclick="continueRound()" class="w-full py-3 bg-sky-600 hover:bg-sky-500 text-white font-title text-base font-bold rounded-2xl shadow-xl pointer-events-auto transform hover:scale-105 transition">
-          Lanjut Babak Berikutnya ➡️
-        </button>
-      `;
-    }
-
-    function continueRound() {
-      document.getElementById('mainModal').classList.add('hidden');
-      currentQ = 0;
-      loadQuestion();
-    }
-
-    function showVictoryCard() {
-      sfxCheer();
-      fireConfetti();
-
-      const modal = document.getElementById('mainModal');
-      const card = document.getElementById('modalCard');
-      modal.classList.remove('hidden');
-
-      card.innerHTML = `
-        <div class="border-4 border-amber-400 rounded-3xl p-6 bg-slate-950/95 shadow-2xl text-center space-y-3 relative overflow-hidden">
-          <div class="absolute -top-10 -right-10 w-28 h-28 bg-amber-400/20 rounded-full blur-xl pointer-events-none"></div>
-          
-          <!-- Badge Header Edufair -->
-          <span class="inline-block px-3 py-1 bg-amber-400 text-slate-950 font-black text-[10px] rounded-full uppercase tracking-wider">
-            Sertifikat Juara Edufair 2026
-          </span>
-
-          <div class="text-5xl">🏆</div>
-          <h2 class="font-title text-2xl font-black text-white">SELAMAT JUARA!</h2>
-          <p class="text-xs text-slate-400">Telah Berhasil Menyelesaikan Misi Kuis Gerak AI</p>
-
-          <div class="p-3 bg-slate-900/90 border border-amber-400/40 rounded-2xl">
-            <span class="text-xs text-slate-400 block">Total Perolehan Skor:</span>
-            <span class="text-4xl font-black text-emerald-400 font-title">${score}</span> <span class="text-slate-400 font-bold">/ 180</span>
-          </div>
-
-          <div class="text-[10px] text-slate-400 border-t border-slate-800 pt-3">
-            Inovasi Karya: <b class="text-sky-300">Thomas Ryantama, M.Kom., Gr.</b><br>
-            SD Methodist Immanuel • <span class="text-amber-400">nalarsci.id</span>
-          </div>
-
-          <button onclick="location.reload()" class="w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-title text-sm font-bold rounded-2xl shadow-xl pointer-events-auto transform hover:scale-105 transition">
-            🔄 Main Lagi
-          </button>
-        </div>
-      `;
-    }
-
-    // ==========================================
-    // CONFETTI CANNON (NO LIBS)
-    // ==========================================
-    const confCanvas = document.getElementById('confettiCanvas');
-    const cCtx = confCanvas.getContext('2d');
-    let particles = [];
-
-    function fireConfetti() {
-      confCanvas.width = window.innerWidth;
-      confCanvas.height = window.innerHeight;
-      particles = [];
-      const colors = ['#38bdf8', '#34d399', '#facc15', '#f43f5e', '#a855f7'];
-      for (let i = 0; i < 90; i++) {
-        particles.push({
-          x: confCanvas.width / 2,
-          y: confCanvas.height / 2,
-          vx: (Math.random() - 0.5) * 20,
-          vy: (Math.random() - 0.8) * 20,
-          size: Math.random() * 8 + 4,
-          color: colors[Math.floor(Math.random() * colors.length)],
-          rot: Math.random() * 360,
-          rotSpeed: (Math.random() - 0.5) * 10,
-          alpha: 1
-        });
-      }
-      renderConfetti();
-    }
-
-    function renderConfetti() {
-      if (particles.length === 0) return;
-      cCtx.clearRect(0, 0, confCanvas.width, confCanvas.height);
-      particles.forEach((p, idx) => {
-        p.x += p.vx;
-        p.y += p.vy;
-        p.vy += 0.4;
-        p.rot += p.rotSpeed;
-        p.alpha -= 0.012;
-
-        cCtx.save();
-        cCtx.globalAlpha = Math.max(0, p.alpha);
-        cCtx.translate(p.x, p.y);
-        cCtx.rotate((p.rot * Math.PI) / 180);
-        cCtx.fillStyle = p.color;
-        cCtx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
-        cCtx.restore();
-
-        if (p.alpha <= 0) particles.splice(idx, 1);
-      });
-      if (particles.length > 0) requestAnimationFrame(renderConfetti);
-      else cCtx.clearRect(0, 0, confCanvas.width, confCanvas.height);
-    }
-  </script>
+    // Penanda pilihan di kartu
+    if(phase==='q')for(let i=0;i<4;i++){const m=$('m'+i);if(m)m.innerHTML=zs.map((z,k)=>{const a=z.lock?z.ans:z.cur-1;return a===i?`<span class="chip" style="background:${COL[fin[k].id-1]}">P${fin[k].id}${z.lock?' ✅':''}</span>`:''}).join('')}
+  }
+  // Pewaktu
+  if(phase==='q'){
+    const rem=Math.max(0,(tEnd-now)/1000);
+    $('tm').textContent=Math.ceil(rem);$('bar').firstElementChild.style.width=rem/TM*100+'%';
+    $('bar').firstElementChild.style.background=rem<3?'var(--coral)':'var(--mint)';
+    if(rem<=3&&Math.ceil(rem)!==loop.l){loop.l=Math.ceil(rem);if(rem>0)beep(440,.08)}
+    if(rem<=0)round===1?eval1():eval2();
+  }
+}
+loop();
+</script>
 </body>
 </html>
