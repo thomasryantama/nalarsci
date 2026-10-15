@@ -6,6 +6,7 @@
 <title>Duel Pintar AI: Matematika & Bahasa Inggris</title>
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Nunito:wght@700;900&display=swap" rel="stylesheet">
 <script src="https://cdn.tailwindcss.com"></script>
+<!-- MediaPipe Hands & Camera Utils -->
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
 <style>
@@ -28,19 +29,22 @@ html, body {
 /* Balon Tombol Udara (Air Targets) */
 .air-target {
   position: absolute;
-  width: 130px; height: 130px;
+  width: clamp(100px, 16vw, 140px);
+  height: clamp(100px, 16vw, 140px);
   border-radius: 50%;
   display: flex; flex-direction: column;
   align-items: center; justify-content: center;
   text-align: center; font-family: 'Baloo 2', cursive;
-  font-weight: 800; font-size: 26px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.5), inset 0 2px 6px rgba(255,255,255,0.6);
+  font-weight: 800; font-size: clamp(20px, 3.5vw, 30px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.6), inset 0 2px 6px rgba(255,255,255,0.7);
   border: 4px solid #ffffffcc;
   transition: transform 0.15s ease, background-color 0.2s;
   cursor: pointer; pointer-events: auto;
+  z-index: 25;
 }
-.air-target.touched {
-  transform: scale(1.18);
+.air-target:hover { transform: scale(1.08); }
+.air-target:active, .air-target.touched {
+  transform: scale(1.2) !important;
   border-color: #facc15 !important;
   box-shadow: 0 0 35px #facc15 !important;
 }
@@ -52,79 +56,94 @@ html, body {
 <video id="webcam" class="hidden" playsinline></video>
 <canvas id="gameCanvas" class="absolute inset-0 w-full h-full object-cover mirror-cam z-0"></canvas>
 
-<!-- Top Bar: Judul & Skor Duel -->
+<!-- Top Bar: Judul & Skor -->
 <header class="relative z-10 max-w-4xl mx-auto w-full flex justify-between items-center bg-slate-900/85 backdrop-blur-md px-5 py-2.5 rounded-2xl border border-sky-400/30 shadow-2xl">
-  <!-- Sisi Kiri: Pemain 1 -->
+  <!-- Sisi Kiri: P1 -->
   <div class="flex items-center gap-2">
     <div class="w-9 h-9 rounded-xl bg-sky-600 flex items-center justify-center font-bold text-white text-base shadow">P1</div>
     <div>
-      <span class="text-[11px] font-bold text-sky-300 block">Pemain Kiri</span>
-      <span id="scoreP1Text" class="font-fun text-2xl font-black text-amber-400">0 Poin</span>
+      <span class="text-[11px] font-bold text-sky-300 block" id="labelP1">Pemain 1</span>
+      <span id="scoreP1Text" class="font-fun text-xl sm:text-2xl font-black text-amber-400">0 Poin</span>
     </div>
   </div>
 
-  <!-- Tengah: Indikator Mode & Subjek -->
+  <!-- Tengah: Mode Info -->
   <div class="text-center">
     <div class="inline-flex items-center gap-1.5 px-3 py-0.5 bg-sky-500/20 border border-sky-400/40 rounded-full text-[10px] font-black uppercase text-sky-300">
-      <span id="subjectBadge">🔢 MATEMATIKA CEPAT</span>
+      <span id="subjectBadge">🔢 MATEMATIKA</span>
     </div>
-    <div class="text-xs text-slate-300 font-bold mt-0.5" id="roundInfoText">Ronde 1 (First to 3)</div>
+    <div class="text-xs text-slate-300 font-bold mt-0.5" id="roundInfoText">First to 3 Points</div>
   </div>
 
-  <!-- Sisi Kanan: Pemain 2 -->
+  <!-- Sisi Kanan: P2 -->
   <div class="flex items-center gap-2 text-right">
     <div>
-      <span class="text-[11px] font-bold text-emerald-300 block">Pemain Kanan</span>
-      <span id="scoreP2Text" class="font-fun text-2xl font-black text-amber-400">0 Poin</span>
+      <span class="text-[11px] font-bold text-emerald-300 block" id="labelP2">Pemain 2</span>
+      <span id="scoreP2Text" class="font-fun text-xl sm:text-2xl font-black text-amber-400">0 Poin</span>
     </div>
-    <div class="w-9 h-9 rounded-xl bg-emerald-600 flex items-center justify-center font-bold text-white text-base shadow">P2</div>
+    <div class="w-9 h-9 rounded-xl bg-emerald-600 flex items-center justify-center font-bold text-white text-base shadow" id="badgeP2">P2</div>
   </div>
 </header>
 
-<!-- Papan Pertanyaan Utama (Melayang di Tengah Layar) -->
+<!-- Papan Pertanyaan Utama -->
 <div id="questionBox" class="relative z-10 mx-auto w-full max-w-2xl bg-slate-900/90 backdrop-blur-md border-2 border-amber-400/80 rounded-3xl p-4 sm:p-5 text-center shadow-2xl mt-2 transition-all">
   <div class="text-[11px] font-black uppercase tracking-wider text-amber-400 mb-1" id="qSubjectTitle">SOAL HITUNG CEPAT</div>
   <h2 id="questionPrompt" class="font-fun text-3xl sm:text-4xl text-white font-black leading-tight">
     15 + 8 = ?
   </h2>
-  <p class="text-xs text-slate-300 mt-1 font-bold">Angkat tanganmu dan sentuh balon jawaban yang benar di udara!</p>
+  <p class="text-xs text-slate-300 mt-1 font-bold">Sentuh atau klik balon jawaban yang benar!</p>
 </div>
 
-<!-- Arena Balon Jawaban di Layar (2 Balon untuk Pemain 1, 2 Balon untuk Pemain 2) -->
-<div class="relative z-10 flex-grow w-full max-w-5xl mx-auto" id="targetsArea">
-  <!-- P1 Balon Kiri & Kanan (Bisa disentuh tangan kamera ATAU diklik mouse) -->
-  <div id="targetP1_L" onclick="onBalloonClick('P1', 'L', this)" class="air-target bg-sky-600/90" style="left: 8%; top: 38%;">23</div>
-  <div id="targetP1_R" onclick="onBalloonClick('P1', 'R', this)" class="air-target bg-indigo-600/90" style="left: 32%; top: 38%;">25</div>
+<!-- Arena Balon Jawaban di Layar -->
+<div class="relative z-20 flex-grow w-full max-w-5xl mx-auto" id="targetsArea">
+  <!-- Balon Sisi Kiri (P1 / Opsi A) -->
+  <div id="targetP1_L" onclick="onBalloonClick('P1', 'L', this)" class="air-target bg-sky-600/95" style="left: 10%; top: 38%;">23</div>
+  <div id="targetP1_R" onclick="onBalloonClick('P1', 'R', this)" class="air-target bg-indigo-600/95" style="left: 32%; top: 38%;">25</div>
 
-  <!-- P2 Balon Kiri & Kanan -->
-  <div id="targetP2_L" onclick="onBalloonClick('P2', 'L', this)" class="air-target bg-emerald-600/90" style="right: 32%; top: 38%;">23</div>
-  <div id="targetP2_R" onclick="onBalloonClick('P2', 'R', this)" class="air-target bg-teal-600/90" style="right: 8%; top: 38%;">25</div>
+  <!-- Balon Sisi Kanan (P2 / Opsi B) -->
+  <div id="targetP2_L" onclick="onBalloonClick('P2', 'L', this)" class="air-target bg-emerald-600/95" style="right: 32%; top: 38%;">23</div>
+  <div id="targetP2_R" onclick="onBalloonClick('P2', 'R', this)" class="air-target bg-teal-600/95" style="right: 10%; top: 38%;">25</div>
 </div>
 
-<!-- Footer Status Kamera & Garis Pembatas -->
+<!-- Footer Status Kamera -->
 <footer class="relative z-10 text-center pb-2">
   <span id="trackerStatus" class="px-5 py-2 bg-slate-950/85 backdrop-blur border border-white/20 rounded-full text-xs font-bold text-slate-200 shadow-xl">
-    👋 Menghubungkan kamera & sensor tangan AI...
+    📡 Sensor Kamera Aktif (Bisa juga diklik langsung dengan Mouse / Layar Sentuh)
   </span>
 </footer>
 
-<!-- Modal Mulai / Ganti Mata Pelajaran / Game Over -->
+<!-- Modal Mulai & Pilih Mode (TERJAMIN BISA DIKLIK) -->
 <div id="gameModal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-lg z-40 flex items-center justify-center p-4">
-  <div class="bg-slate-900/95 border-2 border-sky-400/40 max-w-md w-full p-6 rounded-3xl text-center shadow-2xl space-y-4">
-    <div class="text-5xl" id="modalEmoji">🤝⚡</div>
-    <h2 class="font-fun text-2xl sm:text-3xl font-black text-amber-400" id="modalTitle">Duel Pintar AI (2 Pemain)</h2>
+  <div class="bg-slate-900/95 border-2 border-sky-400/40 max-w-md w-full p-6 sm:p-7 rounded-3xl text-center shadow-2xl space-y-4">
+    <div class="text-5xl" id="modalEmoji">🎓⚡</div>
+    <h2 class="font-fun text-2xl sm:text-3xl font-black text-amber-400" id="modalTitle">Tantangan Pintar AI</h2>
     <p class="text-xs sm:text-sm text-slate-300 leading-relaxed" id="modalDesc">
-      Berdiri berdampingan di depan kamera! Jawab soal dengan <b>mengangkat tangan menyentuh balon di udara</b>. Siapa yang paling cepat menyentuh jawaban benar, dialah pemenangnya!
+      Pilih mata pelajaran & mode main! Anda bisa <b>bermain sendirian</b> untuk latihan, atau <b>duel 2 pemain</b> di panggung Edufair.
     </p>
 
-    <!-- Pilihan Mata Pelajaran -->
-    <div class="grid grid-cols-2 gap-3 pt-1">
-      <button onclick="startDuel('MATH')" class="p-3.5 bg-sky-600 hover:bg-sky-500 rounded-2xl font-fun font-bold text-sm text-white shadow-lg transition transform hover:scale-105">
-        🔢 Matematika Cepat<br><span class="text-[10px] text-sky-200 font-sans font-normal">+ / - / × Cepat</span>
-      </button>
-      <button onclick="startDuel('ENGLISH')" class="p-3.5 bg-emerald-600 hover:bg-emerald-500 rounded-2xl font-fun font-bold text-sm text-white shadow-lg transition transform hover:scale-105">
-        🇬🇧 Bahasa Inggris<br><span class="text-[10px] text-emerald-200 font-sans font-normal">Kosakata & Lawan Kata</span>
-      </button>
+    <!-- Tombol Mode Matematika -->
+    <div class="space-y-2 pt-1 text-left">
+      <div class="text-[11px] font-bold text-sky-400 uppercase tracking-wider">Pilih Mata Pelajaran:</div>
+      
+      <div class="grid grid-cols-2 gap-2.5">
+        <button type="button" onclick="window.setSubjectAndStart('MATH', 'solo')" class="p-3 bg-sky-600 hover:bg-sky-500 rounded-2xl font-fun font-bold text-sm text-white shadow-lg transition transform hover:scale-105 block text-center">
+          🔢 Matematika<br><span class="text-[10px] text-sky-200 font-sans font-normal">(1 Pemain Sendiri)</span>
+        </button>
+
+        <button type="button" onclick="window.setSubjectAndStart('MATH', 'duel')" class="p-3 bg-indigo-600 hover:bg-indigo-500 rounded-2xl font-fun font-bold text-sm text-white shadow-lg transition transform hover:scale-105 block text-center">
+          🔢 Matematika<br><span class="text-[10px] text-indigo-200 font-sans font-normal">(Duel 2 Pemain)</span>
+        </button>
+      </div>
+
+      <div class="grid grid-cols-2 gap-2.5 pt-1">
+        <button type="button" onclick="window.setSubjectAndStart('ENGLISH', 'solo')" class="p-3 bg-emerald-600 hover:bg-emerald-500 rounded-2xl font-fun font-bold text-sm text-white shadow-lg transition transform hover:scale-105 block text-center">
+          🇬🇧 B. Inggris<br><span class="text-[10px] text-emerald-200 font-sans font-normal">(1 Pemain Sendiri)</span>
+        </button>
+
+        <button type="button" onclick="window.setSubjectAndStart('ENGLISH', 'duel')" class="p-3 bg-teal-600 hover:bg-teal-500 rounded-2xl font-fun font-bold text-sm text-white shadow-lg transition transform hover:scale-105 block text-center">
+          🇬🇧 B. Inggris<br><span class="text-[10px] text-teal-200 font-sans font-normal">(Duel 2 Pemain)</span>
+        </button>
+      </div>
     </div>
 
     <div class="text-[10px] text-slate-400 pt-2 border-t border-slate-800">
@@ -134,7 +153,9 @@ html, body {
 </div>
 
 <script>
-(()=>{'use strict';
+// ==========================================
+// GAME STATE & GLOBALS (NO IIFE SCOPING BUGS)
+// ==========================================
 const cv = document.getElementById('gameCanvas');
 const ctx = cv.getContext('2d');
 const vid = document.getElementById('webcam');
@@ -147,12 +168,14 @@ window.addEventListener('resize', resize);
 resize();
 
 let subject = 'MATH';
+let playMode = 'solo'; // 'solo' atau 'duel'
 let scoreP1 = 0, scoreP2 = 0;
 let isPlaying = false;
 let currentQ = null;
 let cooldown = false;
+let handPositions = [];
 
-// Web Audio Synthesizer
+// Audio Synthesizer
 let audio = null;
 function sound(freq=600, dur=0.08, type='sine', vol=0.06) {
   try {
@@ -167,14 +190,12 @@ function sound(freq=600, dur=0.08, type='sine', vol=0.06) {
   } catch(e) {}
 }
 
-// ==========================================
-// BANK SOAL MATEMATIKA & BAHASA INGGRIS
-// ==========================================
+// Bank Soal
 function generateQuestion(subj) {
   if (subj === 'MATH') {
     const isPlus = Math.random() < 0.6;
     if (isPlus) {
-      const a = Math.floor(Math.random() * 18) + 4;
+      const a = Math.floor(Math.random() * 16) + 4;
       const b = Math.floor(Math.random() * 15) + 3;
       const correct = a + b;
       const wrong = correct + (Math.random() < 0.5 ? 2 : -2);
@@ -187,8 +208,8 @@ function generateQuestion(subj) {
         correctSide: isLeft ? 'L' : 'R'
       };
     } else {
-      const a = Math.floor(Math.random() * 20) + 12;
-      const b = Math.floor(Math.random() * 10) + 2;
+      const a = Math.floor(Math.random() * 20) + 10;
+      const b = Math.floor(Math.random() * 9) + 2;
       const correct = a - b;
       const wrong = correct + (Math.random() < 0.5 ? 3 : -3);
       const isLeft = Math.random() < 0.5;
@@ -201,16 +222,15 @@ function generateQuestion(subj) {
       };
     }
   } else {
-    // BAHASA INGGRIS: Terjemahan kata & Lawan Kata (Antonym)
     const ENG_POOL = [
       { q: "Apa bahasa Inggris dari 'KUCING'?", ok: "CAT", no: "COW" },
-      { q: "Lawan kata (Antonym) dari 'BIG' (Besar) adalah...", ok: "SMALL", no: "TALL" },
+      { q: "Lawan kata (Antonym) dari 'BIG' (Besar)?", ok: "SMALL", no: "TALL" },
       { q: "Apa bahasa Inggris dari warna 'KUNING'?", ok: "YELLOW", no: "GREEN" },
-      { q: "Lawan kata dari 'FAST' (Cepat) adalah...", ok: "SLOW", no: "QUICK" },
+      { q: "Lawan kata dari 'FAST' (Cepat)?", ok: "SLOW", no: "QUICK" },
       { q: "Apa bahasa Inggris dari 'BUKU'?", ok: "BOOK", no: "DESK" },
-      { q: "Lawan kata dari 'HOT' (Panas) adalah...", ok: "COLD", no: "WARM" },
-      { q: "Hewan yang hidup di air dan berenang adalah...", ok: "FISH", no: "BIRD" },
-      { q: "Lawan kata dari 'HAPPY' (Senang) adalah...", ok: "SAD", no: "ANGRY" }
+      { q: "Lawan kata dari 'HOT' (Panas)?", ok: "COLD", no: "WARM" },
+      { q: "Hewan air yang berenang?", ok: "FISH", no: "BIRD" },
+      { q: "Lawan kata dari 'HAPPY' (Senang)?", ok: "SAD", no: "ANGRY" }
     ];
     const pick = ENG_POOL[Math.floor(Math.random() * ENG_POOL.length)];
     const isLeft = Math.random() < 0.5;
@@ -229,13 +249,11 @@ function nextQuestion() {
   document.getElementById('qSubjectTitle').innerText = currentQ.title;
   document.getElementById('questionPrompt').innerText = currentQ.prompt;
 
-  // Set teks balon Pemain 1 & Pemain 2
   document.getElementById('targetP1_L').innerText = currentQ.optL;
   document.getElementById('targetP1_R').innerText = currentQ.optR;
   document.getElementById('targetP2_L').innerText = currentQ.optL;
   document.getElementById('targetP2_R').innerText = currentQ.optR;
 
-  // Reset kelas animasi
   ['targetP1_L','targetP1_R','targetP2_L','targetP2_R'].forEach(id => {
     document.getElementById(id).classList.remove('touched');
   });
@@ -243,52 +261,115 @@ function nextQuestion() {
   cooldown = false;
 }
 
-// ==========================================
-// MEDIAPIPE MULTI-HAND TRACKING
-// ==========================================
-let handPositions = [];
+// FUNGSI GLOBAL START DUEL / SOLO
+window.setSubjectAndStart = function(subj, mode) {
+  subject = subj;
+  playMode = mode;
+  modal.classList.add('hidden');
+  sound(520, 0.12, 'sine');
 
+  scoreP1 = 0; scoreP2 = 0;
+  document.getElementById('scoreP1Text').innerText = "0 Poin";
+  document.getElementById('scoreP2Text').innerText = "0 Poin";
+
+  if (mode === 'solo') {
+    document.getElementById('labelP1').innerText = "Skor Kamu";
+    document.getElementById('labelP2').innerText = "Target";
+    document.getElementById('scoreP2Text').innerText = "3 Poin";
+    document.getElementById('roundInfoText').innerText = "Mode Solo: Kumpulkan 3 Poin";
+  } else {
+    document.getElementById('labelP1').innerText = "Pemain Kiri";
+    document.getElementById('labelP2').innerText = "Pemain Kanan";
+    document.getElementById('roundInfoText').innerText = "Duel: First to 3 Points";
+  }
+
+  document.getElementById('subjectBadge').innerText = (subj === 'MATH') ? "🔢 MATEMATIKA" : "🇬🇧 B. INGGRIS";
+
+  isPlaying = true;
+  nextQuestion();
+};
+
+// KLIK MOUSE ATAU SENTUHAN LAYAR
+window.onBalloonClick = function(player, side, el) {
+  if (!isPlaying || !currentQ || cooldown) return;
+  handlePlayerAnswer(player, side, el);
+};
+
+function handlePlayerAnswer(player, side, element) {
+  cooldown = true;
+  element.classList.add('touched');
+
+  const isCorrect = (side === currentQ.correctSide);
+
+  if (isCorrect) {
+    sound(880, 0.15, 'sine', 0.1);
+    if (player === 'P1' || playMode === 'solo') {
+      scoreP1++;
+      document.getElementById('scoreP1Text').innerText = scoreP1 + " Poin";
+      document.getElementById('questionPrompt').innerHTML = `🎉 <b class="text-amber-300">BENAR! (+1 Poin)</b>`;
+    } else {
+      scoreP2++;
+      document.getElementById('scoreP2Text').innerText = scoreP2 + " Poin";
+      document.getElementById('questionPrompt').innerHTML = `🎉 <b class="text-emerald-300">PEMAIN KANAN BENAR!</b>`;
+    }
+  } else {
+    sound(160, 0.25, 'sawtooth', 0.12);
+    document.getElementById('questionPrompt').innerHTML = `❌ <b class="text-rose-400">SALAH!</b> Jawaban: ${currentQ.correctSide === 'L' ? currentQ.optL : currentQ.optR}`;
+  }
+
+  if (scoreP1 >= 3 || (playMode === 'duel' && scoreP2 >= 3)) {
+    setTimeout(showVictory, 1300);
+  } else {
+    setTimeout(nextQuestion, 1500);
+  }
+}
+
+function showVictory() {
+  isPlaying = false;
+  fireConfetti();
+  sound(523, 0.2, 'square');
+  setTimeout(() => sound(659, 0.2, 'square'), 120);
+  setTimeout(() => sound(784, 0.3, 'square'), 240);
+
+  let title = "SELAMAT JUARA! 🏆";
+  let desc = `Luar biasa! Misi berhasil diselesaikan dengan skor sempurna <b>${scoreP1} Poin</b>.`;
+
+  if (playMode === 'duel') {
+    const winner = scoreP1 >= 3 ? "PEMAIN KIRI (P1)" : "PEMAIN KANAN (P2)";
+    title = `${winner} MENANG! 🏆`;
+    desc = `Duel berakhir dengan skor <b>${scoreP1} vs ${scoreP2}</b>. Kecepatan & ketepatan kalian hebat!`;
+  }
+
+  document.getElementById('modalEmoji').innerText = "🏆👑";
+  document.getElementById('modalTitle').innerText = title;
+  document.getElementById('modalDesc').innerHTML = desc;
+  modal.classList.remove('hidden');
+}
+
+// ==========================================
+// MEDIAPIPE CAMERA & HAND TRACKING
+// ==========================================
 function onHandResults(res) {
   handPositions = [];
   if (res.multiHandLandmarks && res.multiHandLandmarks.length > 0) {
-    statusEl.innerHTML = `✅ Terdeteksi ${res.multiHandLandmarks.length} Tangan! Sentuh balon untuk menjawab.`;
+    statusEl.innerHTML = `✅ Sensor Tangan Aktif (${res.multiHandLandmarks.length} Tangan). Sentuh atau klik balon!`;
     statusEl.className = "px-5 py-2 bg-emerald-950/85 border border-emerald-400 rounded-full text-xs font-bold text-emerald-300 shadow-xl";
 
     res.multiHandLandmarks.forEach(lm => {
-      // Ambil koordinat ujung jari telunjuk (landmark 8)
-      const tip = lm[8];
+      const tip = lm[8]; // Ujung telunjuk
       const screenX = (1 - tip.x) * W; // mirror X
       const screenY = tip.y * H;
       handPositions.push({ x: screenX, y: screenY });
     });
   } else {
-    statusEl.innerHTML = "👋 Berdiri berdampingan & tunjukkan tangan ke kamera!";
+    statusEl.innerHTML = "📡 Sensor Kamera Aktif (Bisa juga diklik langsung dengan Mouse / Layar Sentuh)";
     statusEl.className = "px-5 py-2 bg-slate-950/85 border border-white/20 rounded-full text-xs font-bold text-slate-200 shadow-xl";
   }
 
-  checkTargetCollisions();
+  checkAirCollisions();
 }
 
-const hands = new Hands({
-  locateFile: f => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${f}`
-});
-hands.setOptions({ maxNumHands: 4, modelComplexity: 1, minDetectionConfidence: 0.55 });
-hands.onResults(onHandResults);
-
-const cam = new Camera(vid, {
-  onFrame: async () => {
-    if (vid.readyState >= 2) {
-      try { await hands.send({ image: vid }); } catch(e) {}
-    }
-  },
-  width: 1280, height: 720
-});
-cam.start();
-
-// ==========================================
-// HIT DETECTION (AIR TOUCH)
-// ==========================================
-function checkTargetCollisions() {
+function checkAirCollisions() {
   if (!isPlaying || !currentQ || cooldown) return;
 
   const targetElements = [
@@ -305,8 +386,7 @@ function checkTargetCollisions() {
       const centerY = rect.top + rect.height / 2;
       const dist = Math.hypot(h.x - centerX, h.y - centerY);
 
-      // Jika jari berada di dalam radius balon (~65px)
-      if (dist < 70) {
+      if (dist < 65) {
         handlePlayerAnswer(t.player, t.side, t.el);
         return;
       }
@@ -314,74 +394,31 @@ function checkTargetCollisions() {
   }
 }
 
+// Inisialisasi Kamera dengan Fallback Ramah
+try {
+  const hands = new Hands({
+    locateFile: f => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${f}`
+  });
+  hands.setOptions({ maxNumHands: 4, modelComplexity: 1, minDetectionConfidence: 0.55 });
+  hands.onResults(onHandResults);
 
-function onBalloonClick(player, side, el) {
-  if (!isPlaying || !currentQ || cooldown) return;
-  handlePlayerAnswer(player, side, el);
+  const cam = new Camera(vid, {
+    onFrame: async () => {
+      if (vid.readyState >= 2) {
+        try { await hands.send({ image: vid }); } catch(e) {}
+      }
+    },
+    width: 640, height: 480
+  });
+  cam.start().catch(err => {
+    console.warn("Kamera tidak aktif:", err);
+    statusEl.innerText = "Mode Klik Aktif (Kamera dilewati)";
+  });
+} catch(e) {
+  console.warn("MediaPipe load error:", e);
 }
 
-function handlePlayerAnswer(player, side, element) {
-  cooldown = true;
-  element.classList.add('touched');
-
-  const isCorrect = (side === currentQ.correctSide);
-
-  if (isCorrect) {
-    sound(880, 0.15, 'sine', 0.1);
-    if (player === 'P1') {
-      scoreP1++;
-      document.getElementById('scoreP1Text').innerText = scoreP1 + " Poin";
-    } else {
-      scoreP2++;
-      document.getElementById('scoreP2Text').innerText = scoreP2 + " Poin";
-    }
-
-    document.getElementById('questionPrompt').innerHTML = `🎉 <b class="text-amber-300">${player === 'P1' ? 'PEMAIN KIRI' : 'PEMAIN KANAN'} BENAR!</b>`;
-  } else {
-    sound(160, 0.25, 'sawtooth', 0.12);
-    document.getElementById('questionPrompt').innerHTML = `❌ <b class="text-rose-400">${player === 'P1' ? 'PEMAIN KIRI' : 'PEMAIN KANAN'} SALAH!</b> Jawaban: ${currentQ.correctSide === 'L' ? currentQ.optL : currentQ.optR}`;
-  }
-
-  // Cek Kemenangan (First to 3 Points)
-  if (scoreP1 >= 3 || scoreP2 >= 3) {
-    setTimeout(showVictory, 1500);
-  } else {
-    setTimeout(nextQuestion, 1600);
-  }
-}
-
-function startDuel(subj) {
-  subject = subj;
-  document.getElementById('subjectBadge').innerText = (subj === 'MATH') ? "🔢 MATEMATIKA CEPAT" : "🇬🇧 ENGLISH CHALLENGE";
-  scoreP1 = 0; scoreP2 = 0;
-  document.getElementById('scoreP1Text').innerText = "0 Poin";
-  document.getElementById('scoreP2Text').innerText = "0 Poin";
-  modal.classList.add('hidden');
-  isPlaying = true;
-  nextQuestion();
-}
-
-function showVictory() {
-  isPlaying = false;
-  fireConfetti();
-  sound(523, 0.2, 'square');
-  setTimeout(() => sound(659, 0.2, 'square'), 120);
-  setTimeout(() => sound(784, 0.3, 'square'), 240);
-
-  const winner = scoreP1 >= 3 ? "PEMAIN KIRI (P1)" : "PEMAIN KANAN (P2)";
-
-  document.getElementById('modalEmoji').innerText = "🏆👑";
-  document.getElementById('modalTitle').innerText = `${winner} JUARA!`;
-  document.getElementById('modalDesc').innerHTML = `
-    Selamat! Duel dimenangkan dengan skor akhir <b>${scoreP1} vs ${scoreP2}</b>.<br>
-    Kalian berdua luar biasa dalam kecepatan berpikir dan refleks!
-  `;
-  modal.classList.remove('hidden');
-}
-
-// ==========================================
-// RENDER LOOP (MIRROR VIDEO & HAND VISUALS)
-// ==========================================
+// Render Loop
 function loop() {
   requestAnimationFrame(loop);
   ctx.save();
@@ -389,26 +426,31 @@ function loop() {
   ctx.scale(-1, 1);
   if (vid.readyState >= 2) {
     ctx.drawImage(vid, 0, 0, W, H);
+  } else {
+    ctx.fillStyle = '#0f172a';
+    ctx.fillRect(0, 0, W, H);
   }
   ctx.restore();
 
-  // Garis Pembatas Tengah Lapangan (Split Field Neon)
-  ctx.save();
-  ctx.strokeStyle = "rgba(56, 189, 248, 0.4)";
-  ctx.lineWidth = 3;
-  ctx.setLineDash([12, 10]);
-  ctx.beginPath();
-  ctx.moveTo(W / 2, 0);
-  ctx.lineTo(W / 2, H);
-  ctx.stroke();
-  ctx.restore();
+  // Garis Pembatas Tengah (Hanya di mode duel)
+  if (playMode === 'duel') {
+    ctx.save();
+    ctx.strokeStyle = "rgba(56, 189, 248, 0.4)";
+    ctx.lineWidth = 3;
+    ctx.setLineDash([12, 10]);
+    ctx.beginPath();
+    ctx.moveTo(W / 2, 0);
+    ctx.lineTo(W / 2, H);
+    ctx.stroke();
+    ctx.restore();
+  }
 
-  // Gambar Penanda Cahaya di Ujung Jari Anak
+  // Titik Cincin Cahaya di Ujung Jari
   for (let h of handPositions) {
     ctx.save();
     ctx.beginPath();
     ctx.arc(h.x, h.y, 22, 0, Math.PI * 2);
-    ctx.fillStyle = (h.x < W / 2) ? "rgba(2, 132, 199, 0.85)" : "rgba(16, 185, 129, 0.85)";
+    ctx.fillStyle = "rgba(56, 189, 248, 0.85)";
     ctx.fill();
     ctx.lineWidth = 3;
     ctx.strokeStyle = "#ffffff";
@@ -418,9 +460,7 @@ function loop() {
 }
 loop();
 
-// ==========================================
-// CONFETTI CANNON ENGINE (NO LIBS)
-// ==========================================
+// Confetti Engine
 const ccv = document.getElementById('confettiCv');
 const cctx = ccv.getContext('2d');
 let cParts = [];
@@ -462,7 +502,6 @@ function animConfetti() {
   if(cParts.length) requestAnimationFrame(animConfetti);
   else cctx.clearRect(0,0,ccv.width,ccv.height);
 }
-})();
 </script>
 </body>
 </html>
