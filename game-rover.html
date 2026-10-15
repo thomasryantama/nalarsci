@@ -1,303 +1,854 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Misi Penjelajah Rover - Logika & Algoritma</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <style>
-        body { font-family: 'Nunito', sans-serif; background: #0f172a; color: white; min-height: 100vh; }
-        .font-title { font-family: 'Fredoka', sans-serif; }
-        .grid-cell {
-            width: 50px; height: 50px; display: flex; align-items: center; justify-content: center;
-            background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1);
-            font-size: 1.5rem; border-radius: 12px; transition: all 0.2s;
-        }
-        @media (min-width: 640px) {
-            .grid-cell { width: 64px; height: 64px; font-size: 2rem; }
-        }
-        .glass { background: rgba(255, 255, 255, 0.07); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.15); }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Misi Penjelajah Rover - Petualangan Algoritma Antariksa</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: radial-gradient(circle at 50% 20%, #1e1b4b 0%, #0f172a 60%, #030712 100%);
+      color: #f8fafc;
+      min-height: 100vh;
+      touch-action: manipulation;
+    }
+    .font-title { font-family: 'Fredoka', sans-serif; }
+    
+    .glass-panel {
+      background: rgba(30, 41, 59, 0.7);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+    
+    .grid-cell {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(15, 23, 42, 0.65);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.4);
+    }
+    .grid-cell:hover {
+      border-color: rgba(56, 189, 248, 0.3);
+    }
+
+    /* Rover Robot Graphic */
+    .rover-bot {
+      transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+      filter: drop-shadow(0 4px 10px rgba(56, 189, 248, 0.7));
+    }
+
+    /* Highlight Step Execution */
+    .cmd-executing {
+      transform: scale(1.12);
+      border-color: #facc15 !important;
+      background: #854d0e !important;
+      color: #fef08a !important;
+      box-shadow: 0 0 15px rgba(250, 204, 21, 0.8) !important;
+    }
+
+    /* Pulse animation for target */
+    @keyframes pulse-energy {
+      0%, 100% { transform: scale(1); filter: drop-shadow(0 0 6px rgba(52, 211, 153, 0.8)); }
+      50% { transform: scale(1.15); filter: drop-shadow(0 0 14px rgba(16, 185, 129, 1)); }
+    }
+    .target-battery {
+      animation: pulse-energy 1.6s infinite ease-in-out;
+    }
+
+    @keyframes float-star {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-4px) rotate(8deg); }
+    }
+    .gem-star {
+      animation: float-star 2s infinite ease-in-out;
+      filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.9));
+    }
+
+    /* Custom Scrollbar for Command Palette */
+    ::-webkit-scrollbar { height: 6px; }
+    ::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.6); border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb { background: rgba(56, 189, 248, 0.4); border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(56, 189, 248, 0.8); }
+  </style>
 </head>
-<body class="flex flex-col min-h-screen p-4 md:p-6 justify-between">
+<body class="flex flex-col min-h-screen p-3 sm:p-5 justify-between select-none">
 
-    <!-- HEADER -->
-    <header class="text-center max-w-2xl mx-auto mb-4">
-        <div class="inline-flex items-center gap-2 bg-sky-500/10 border border-sky-400/20 text-sky-400 px-3 py-1 rounded-full text-xs font-black uppercase mb-2">
-            🤖 Computational Thinking • Algoritma Sekuensial
+  <!-- Confetti Canvas (Perayaan Juara) -->
+  <canvas id="confetti-canvas" class="fixed inset-0 pointer-events-none z-50"></canvas>
+
+  <!-- TOP BAR: JUDUL & KONTROL CEPAT -->
+  <header class="max-w-2xl mx-auto w-full mb-3">
+    <div class="glass-panel p-3.5 rounded-2xl flex flex-wrap justify-between items-center gap-3 shadow-xl">
+      <div class="flex items-center gap-2.5">
+        <span class="text-3xl">🚀</span>
+        <div>
+          <div class="flex items-center gap-1.5">
+            <h1 class="font-title text-lg sm:text-xl text-sky-300 leading-tight">Misi Penjelajah Rover</h1>
+            <span class="px-2 py-0.5 bg-sky-500/20 text-sky-300 border border-sky-400/30 text-[9px] font-black rounded-full uppercase">KKA Pro</span>
+          </div>
+          <p class="text-[11px] text-slate-400">Computational Thinking • Logika Sekuensial & Optimasi</p>
         </div>
-        <h1 class="font-title text-3xl md:text-4xl text-sky-300">Misi Penjelajah Rover</h1>
-        <p class="text-slate-300 text-sm mt-1">Susun urutan perintah balok kode untuk memandu rover mencapai target baterai!</p>
-    </header>
+      </div>
+      <div class="flex items-center gap-1.5">
+        <button onclick="openLevelSelect()" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-xl shadow transition flex items-center gap-1">
+          🗺️ Level <span id="hud-level-num">1</span>
+        </button>
+        <button onclick="toggleSpeed()" id="btn-speed" class="px-2.5 py-1.5 bg-slate-700 hover:bg-slate-600 text-amber-300 text-xs font-black rounded-xl border border-slate-600 transition" title="Kecepatan Gerak">
+          ⚡ 1x
+        </button>
+        <button onclick="toggleAudio()" id="btn-audio" class="p-2 bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs font-bold rounded-xl border border-slate-600 transition" title="Suara">
+          🔊
+        </button>
+      </div>
+    </div>
+  </header>
 
-    <!-- HUD / INFO -->
-    <div class="max-w-xl mx-auto w-full flex justify-between items-center bg-slate-800/80 px-5 py-3 rounded-2xl border border-slate-700 mb-4 shadow-lg">
-        <div class="font-bold text-sm text-sky-400">🏆 Level: <span id="current-level">1</span> / 3</div>
-        <div class="font-bold text-sm text-emerald-400">📦 Perintah: <span id="cmd-count">0</span>/10</div>
-        <button onclick="toggleMute()" id="btn-mute" class="text-lg bg-slate-700 hover:bg-slate-600 p-2 rounded-xl transition">🔊</button>
+  <!-- HUD STATUS MISI -->
+  <section class="max-w-2xl mx-auto w-full grid grid-cols-3 gap-2 text-center text-xs mb-3">
+    <div class="glass-panel py-2 px-3 rounded-xl border border-slate-700/80">
+      <span class="text-slate-400 block text-[10px] uppercase font-bold">Target Level</span>
+      <span id="hud-level-title" class="font-black text-sky-400 text-xs sm:text-sm truncate block">Dasar Menjelajah</span>
+    </div>
+    <div class="glass-panel py-2 px-3 rounded-xl border border-slate-700/80">
+      <span class="text-slate-400 block text-[10px] uppercase font-bold">Bintang Kristal</span>
+      <span id="hud-stars" class="font-black text-amber-400 text-xs sm:text-sm">⭐ 0 / 3</span>
+    </div>
+    <div class="glass-panel py-2 px-3 rounded-xl border border-slate-700/80">
+      <span class="text-slate-400 block text-[10px] uppercase font-bold">Batas Perintah</span>
+      <span id="hud-limit" class="font-black text-emerald-400 text-xs sm:text-sm">0 / 12</span>
+    </div>
+  </section>
+
+  <!-- ARENA UTAMA (GRID & BLOK KODE) -->
+  <main class="max-w-2xl mx-auto w-full flex flex-col items-center gap-4 flex-grow">
+
+    <!-- PAPAN GRID MISI -->
+    <div class="relative glass-panel p-3 sm:p-4 rounded-3xl shadow-2xl border-2 border-slate-700/80">
+      <div id="board-container" class="grid gap-1.5 sm:gap-2">
+        <!-- Grid dinamis di-render via JS -->
+      </div>
+      
+      <!-- Overlay Toast Pesan Cepat (No Browser Alerts!) -->
+      <div id="toast-message" class="hidden absolute top-4 left-1/2 -translate-x-1/2 px-4 py-2 bg-rose-600/95 text-white font-black text-xs sm:text-sm rounded-full shadow-2xl border border-white/30 backdrop-blur z-20 flex items-center gap-2 animate-bounce">
+        <span id="toast-icon">⚠️</span>
+        <span id="toast-text">Menabrak Rintangan!</span>
+      </div>
     </div>
 
-    <!-- MAIN GAME AREA -->
-    <main class="max-w-xl mx-auto w-full flex flex-col items-center gap-6 flex-grow">
-        
-        <!-- GRID BOARD -->
-        <div id="game-grid" class="grid grid-cols-5 gap-2 p-4 glass rounded-3xl shadow-2xl">
-            <!-- Rendered by JS -->
+    <!-- COMMAND QUEUE BUILDER (KOTAK ANTREAN KODE) -->
+    <div class="w-full glass-panel p-4 rounded-3xl shadow-xl flex flex-col gap-3">
+      
+      <div class="flex justify-between items-center text-xs">
+        <div class="flex items-center gap-1.5">
+          <span class="font-title text-slate-200 tracking-wider">Antrean Instruksi:</span>
+          <span class="text-[11px] text-slate-400">(Klik balok untuk menghapus)</span>
         </div>
-
-        <!-- COMMAND BUILDER (KODE PERINTAH) -->
-        <div class="w-full glass p-5 rounded-3xl shadow-xl flex flex-col gap-4">
-            <div class="flex justify-between items-center">
-                <span class="font-title text-sm text-slate-300 uppercase tracking-wider">Antrean Perintah Algoritma</span>
-                <button onclick="clearCommands()" class="text-xs text-rose-400 hover:text-rose-300 font-bold">🗑️ Hapus Semua</button>
-            </div>
-
-            <!-- QUEUE SLOT -->
-            <div id="command-queue" class="min-h-[70px] bg-slate-900/80 border-2 border-dashed border-slate-700 rounded-2xl p-3 flex items-center gap-2 overflow-x-auto">
-                <span class="text-slate-500 text-xs italic mx-auto">Klik tombol perintah di bawah untuk menyusun instruksi...</span>
-            </div>
-
-            <!-- BUTTON PALETTE -->
-            <div class="grid grid-cols-4 gap-2">
-                <button onclick="addCommand('FORWARD')" class="bg-sky-600 hover:bg-sky-500 active:scale-95 text-white font-bold py-3 rounded-xl shadow transition text-sm">⬆️ Maju</button>
-                <button onclick="addCommand('LEFT')" class="bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white font-bold py-3 rounded-xl shadow transition text-sm">⬅️ Kiri</button>
-                <button onclick="addCommand('RIGHT')" class="bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white font-bold py-3 rounded-xl shadow transition text-sm">➡️ Kanan</button>
-                <button onclick="runCode()" id="btn-run" class="bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-bold py-3 rounded-xl shadow transition text-sm flex items-center justify-center gap-1">▶️ Jalankan</button>
-            </div>
+        <div class="flex items-center gap-2">
+          <button onclick="undoCommand()" class="text-slate-400 hover:text-slate-200 font-bold transition">↩️ Undo</button>
+          <button onclick="clearCommands()" class="text-rose-400 hover:text-rose-300 font-bold transition">🗑️ Hapus Semua</button>
         </div>
+      </div>
 
-    </main>
+      <!-- TEMPAT DERETAN BALOK KODE -->
+      <div id="command-queue" class="min-h-[64px] bg-slate-950/80 border-2 border-dashed border-slate-700 rounded-2xl p-2.5 flex items-center gap-2 overflow-x-auto shadow-inner">
+        <span class="text-slate-500 text-xs italic mx-auto">Klik tombol perintah di bawah untuk memprogram rover...</span>
+      </div>
 
-    <!-- FOOTER -->
-    <footer class="mt-8 text-center text-xs text-slate-500 font-semibold">
-        NalarSci Lab • Dikelola oleh Thomas Ryantama, M.Kom., Gr.
-    </footer>
+      <!-- PALET TOMBOL PERINTAH & JALANKAN -->
+      <div class="grid grid-cols-4 gap-2 pt-1">
+        <button onclick="addCommand('FORWARD')" class="bg-gradient-to-b from-sky-500 to-sky-700 hover:from-sky-400 hover:to-sky-600 active:scale-95 text-white font-title font-bold py-2.5 sm:py-3 rounded-2xl shadow-lg border border-sky-400/30 transition flex flex-col items-center justify-center">
+          <span class="text-lg sm:text-xl">⬆️</span>
+          <span class="text-xs">Maju</span>
+        </button>
+        <button onclick="addCommand('LEFT')" class="bg-gradient-to-b from-indigo-500 to-indigo-700 hover:from-indigo-400 hover:to-indigo-600 active:scale-95 text-white font-title font-bold py-2.5 sm:py-3 rounded-2xl shadow-lg border border-indigo-400/30 transition flex flex-col items-center justify-center">
+          <span class="text-lg sm:text-xl">↺</span>
+          <span class="text-xs">Putar Kiri</span>
+        </button>
+        <button onclick="addCommand('RIGHT')" class="bg-gradient-to-b from-indigo-500 to-indigo-700 hover:from-indigo-400 hover:to-indigo-600 active:scale-95 text-white font-title font-bold py-2.5 sm:py-3 rounded-2xl shadow-lg border border-indigo-400/30 transition flex flex-col items-center justify-center">
+          <span class="text-lg sm:text-xl">↻</span>
+          <span class="text-xs">Putar Kanan</span>
+        </button>
+        <button onclick="runCode()" id="btn-run" class="bg-gradient-to-b from-emerald-500 to-emerald-700 hover:from-emerald-400 hover:to-emerald-600 active:scale-95 text-white font-title font-bold py-2.5 sm:py-3 rounded-2xl shadow-lg border border-emerald-400/30 transition flex flex-col items-center justify-center">
+          <span id="btn-run-icon" class="text-lg sm:text-xl">▶️</span>
+          <span id="btn-run-text" class="text-xs">Jalankan</span>
+        </button>
+      </div>
 
-    <!-- WIN / LEVEL COMPLETE MODAL -->
-    <div id="modal-win" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-        <div class="glass max-w-sm w-full rounded-3xl p-6 text-center border border-sky-400/30 shadow-2xl">
-            <div class="text-6xl mb-3">🎉</div>
-            <h2 class="font-title text-2xl text-emerald-400 mb-2">Misi Berhasil!</h2>
-            <p id="win-desc" class="text-slate-300 text-sm mb-6">Algoritma rover sukses mencapai target dengan sempurna.</p>
-            <button onclick="nextLevel()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-title text-lg py-3 rounded-xl shadow-lg transition">
-                Lanjut Level Berikutnya 🚀
-            </button>
-        </div>
     </div>
 
-    <!-- SCRIPT LOGIKA GAME -->
-    <script>
-        const levels = [
-            {
-                gridSize: 5,
-                start: { x: 0, y: 4, dir: 0 }, // 0: Up, 1: Right, 2: Down, 3: Left
-                target: { x: 4, y: 0 },
-                obstacles: [{ x: 2, y: 2 }, { x: 1, y: 1 }]
-            },
-            {
-                gridSize: 5,
-                start: { x: 0, y: 4, dir: 0 },
-                target: { x: 4, y: 4 },
-                obstacles: [{ x: 2, y: 4 }, { x: 2, y: 3 }, { x: 2, y: 2 }]
-            },
-            {
-                gridSize: 5,
-                start: { x: 4, y: 4, dir: 3 },
-                target: { x: 0, y: 0 },
-                obstacles: [{ x: 1, y: 4 }, { x: 3, y: 1 }, { x: 2, y: 2 }, { x: 0, y: 2 }]
+  </main>
+
+  <!-- MODAL LEVEL COMPLETE (KEMENANGAN) -->
+  <div id="modal-win" class="hidden fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 flex items-center justify-center p-4">
+    <div class="glass-panel max-w-sm w-full rounded-3xl p-6 text-center border-2 border-emerald-400/40 shadow-2xl space-y-4">
+      <div class="text-6xl animate-bounce">🏆</div>
+      <h2 class="font-title text-2xl text-emerald-400">Misi Berhasil!</h2>
+      <p id="win-desc" class="text-slate-300 text-xs sm:text-sm leading-relaxed">
+        Rover berhasil mencapai stasiun daya baterai dengan susunan kode algoritma yang tepat!
+      </p>
+
+      <!-- Bintang yang diraih -->
+      <div id="win-stars" class="text-3xl tracking-widest text-amber-400">⭐⭐⭐</div>
+
+      <div class="pt-2 flex flex-col gap-2">
+        <button onclick="nextLevel()" id="btn-next-level" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-title text-sm font-bold py-3 rounded-2xl shadow-lg transition">
+          Lanjut Level Berikutnya 🚀
+        </button>
+        <button onclick="retryLevel()" class="w-full bg-slate-700 hover:bg-slate-600 text-slate-300 font-bold text-xs py-2.5 rounded-2xl transition">
+          Ulangi Level Ini 🔄
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL PILIH LEVEL (LEVEL SELECTOR) -->
+  <div id="modal-levels" class="hidden fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 flex items-center justify-center p-4">
+    <div class="glass-panel max-w-md w-full rounded-3xl p-6 border border-slate-700 shadow-2xl space-y-4">
+      <div class="flex justify-between items-center border-b border-slate-700 pb-3">
+        <h3 class="font-title text-lg text-sky-300 flex items-center gap-2">🗺️ Pilih Misi Planet</h3>
+        <button onclick="closeLevelSelect()" class="text-slate-400 hover:text-white text-lg">&times;</button>
+      </div>
+      <div id="level-list-grid" class="grid grid-cols-2 sm:grid-cols-3 gap-2.5 max-h-72 overflow-y-auto p-1">
+        <!-- Diisi dinamis -->
+      </div>
+      <div class="text-center pt-2">
+        <button onclick="closeLevelSelect()" class="px-5 py-2 bg-slate-800 hover:bg-slate-700 text-xs font-bold rounded-xl text-slate-300">
+          Tutup
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER RESMI -->
+  <footer class="mt-4 text-center text-xs text-slate-500 font-medium">
+    NalarSci Lab • Inovasi Pembelajaran oleh <span class="text-slate-400 font-bold">Thomas Ryantama, M.Kom., Gr.</span>
+  </footer>
+
+  <script>
+    // ==========================================
+    // DATA 10 LEVEL TANTANGAN BERJENJANG (KKA)
+    // ==========================================
+    const LEVELS = [
+      {
+        id: 1,
+        title: "Langkah Perdana Rover",
+        theme: "Tanah Merah Mars",
+        gridSize: 5,
+        start: { x: 0, y: 4, dir: 0 }, // dir: 0=Atas, 1=Kanan, 2=Bawah, 3=Kiri
+        target: { x: 0, y: 0 },
+        obstacles: [],
+        stars: [{ x: 0, y: 2 }],
+        maxCmds: 6
+      },
+      {
+        id: 2,
+        title: "Belokan Pertama",
+        theme: "Lembah Batu",
+        gridSize: 5,
+        start: { x: 0, y: 4, dir: 0 },
+        target: { x: 4, y: 0 },
+        obstacles: [{ x: 2, y: 2 }],
+        stars: [{ x: 0, y: 0 }, { x: 2, y: 0 }],
+        maxCmds: 10
+      },
+      {
+        id: 3,
+        title: "Menembus Karang",
+        theme: "Bukit Karang",
+        gridSize: 5,
+        start: { x: 0, y: 4, dir: 1 },
+        target: { x: 4, y: 4 },
+        obstacles: [{ x: 2, y: 4 }, { x: 2, y: 3 }, { x: 2, y: 2 }],
+        stars: [{ x: 2, y: 1 }, { x: 3, y: 2 }],
+        maxCmds: 12
+      },
+      {
+        id: 4,
+        title: "Kawah Panas Magma",
+        theme: "Kawah Vulkanik",
+        gridSize: 5,
+        start: { x: 4, y: 4, dir: 3 },
+        target: { x: 0, y: 0 },
+        obstacles: [{ x: 2, y: 2 }, { x: 1, y: 3 }, { x: 3, y: 1 }, { x: 0, y: 2 }],
+        stars: [{ x: 2, y: 4 }, { x: 0, y: 4 }, { x: 2, y: 0 }],
+        maxCmds: 14
+      },
+      {
+        id: 5,
+        title: "Jalur Ular Berliku",
+        theme: "Gurun Pasir Debu",
+        gridSize: 6,
+        start: { x: 0, y: 5, dir: 0 },
+        target: { x: 5, y: 0 },
+        obstacles: [
+          { x: 1, y: 5 }, { x: 1, y: 4 }, { x: 1, y: 3 },
+          { x: 3, y: 2 }, { x: 3, y: 1 }, { x: 3, y: 0 },
+          { x: 4, y: 3 }
+        ],
+        stars: [{ x: 0, y: 2 }, { x: 2, y: 3 }, { x: 5, y: 3 }],
+        maxCmds: 18
+      },
+      {
+        id: 6,
+        title: "Labirin Kristal Es",
+        theme: "Dataran Es Kutub",
+        gridSize: 6,
+        start: { x: 0, y: 0, dir: 1 },
+        target: { x: 5, y: 5 },
+        obstacles: [
+          { x: 2, y: 0 }, { x: 2, y: 1 }, { x: 2, y: 2 },
+          { x: 4, y: 3 }, { x: 4, y: 4 }, { x: 4, y: 5 },
+          { x: 0, y: 4 }, { x: 1, y: 4 }
+        ],
+        stars: [{ x: 1, y: 2 }, { x: 3, y: 3 }, { x: 5, y: 1 }],
+        maxCmds: 20
+      },
+      {
+        id: 7,
+        title: "Celah Sempit Meteor",
+        theme: "Hujan Meteor",
+        gridSize: 6,
+        start: { x: 5, y: 0, dir: 2 },
+        target: { x: 0, y: 5 },
+        obstacles: [
+          { x: 4, y: 1 }, { x: 3, y: 2 }, { x: 2, y: 3 }, { x: 1, y: 4 },
+          { x: 5, y: 3 }, { x: 0, y: 2 }, { x: 2, y: 5 }
+        ],
+        stars: [{ x: 5, y: 1 }, { x: 2, y: 2 }, { x: 1, y: 5 }],
+        maxCmds: 20
+      },
+      {
+        id: 8,
+        title: "Jembatan Radar Kuantum",
+        theme: "Pangkalan Satelit",
+        gridSize: 7,
+        start: { x: 0, y: 6, dir: 0 },
+        target: { x: 6, y: 0 },
+        obstacles: [
+          { x: 1, y: 6 }, { x: 1, y: 5 }, { x: 1, y: 4 }, { x: 1, y: 3 },
+          { x: 3, y: 3 }, { x: 3, y: 2 }, { x: 3, y: 1 }, { x: 3, y: 0 },
+          { x: 5, y: 6 }, { x: 5, y: 5 }, { x: 5, y: 4 }, { x: 5, y: 3 }
+        ],
+        stars: [{ x: 2, y: 3 }, { x: 4, y: 2 }, { x: 6, y: 3 }],
+        maxCmds: 24
+      },
+      {
+        id: 9,
+        title: "Tantangan Spiral Antariksa",
+        theme: "Stasiun Luar Angkasa",
+        gridSize: 7,
+        start: { x: 3, y: 3, dir: 0 },
+        target: { x: 0, y: 0 },
+        obstacles: [
+          { x: 2, y: 2 }, { x: 3, y: 2 }, { x: 4, y: 2 },
+          { x: 4, y: 3 }, { x: 4, y: 4 },
+          { x: 3, y: 4 }, { x: 2, y: 4 },
+          { x: 2, y: 3 }, { x: 1, y: 1 }, { x: 5, y: 5 }
+        ],
+        stars: [{ x: 1, y: 3 }, { x: 5, y: 1 }, { x: 3, y: 5 }],
+        maxCmds: 26
+      },
+      {
+        id: 10,
+        title: "Grand Master Penjelajah Galaksi",
+        theme: "Pusat Energi Inti",
+        gridSize: 7,
+        start: { x: 0, y: 6, dir: 0 },
+        target: { x: 6, y: 6 },
+        obstacles: [
+          { x: 2, y: 6 }, { x: 2, y: 5 }, { x: 2, y: 4 }, { x: 2, y: 3 },
+          { x: 4, y: 0 }, { x: 4, y: 1 }, { x: 4, y: 2 }, { x: 4, y: 3 },
+          { x: 0, y: 2 }, { x: 6, y: 4 }
+        ],
+        stars: [{ x: 0, y: 0 }, { x: 6, y: 0 }, { x: 3, y: 3 }],
+        maxCmds: 28
+      }
+    ];
+
+    let currentLvlIdx = 0;
+    let rover = { x: 0, y: 0, dir: 0 };
+    let queue = [];
+    let isRunning = false;
+    let isMuted = false;
+    let playSpeed = 1; // 1 = Normal (380ms), 2 = Cepat (190ms)
+    let collectedStars = [];
+
+    // PROGRESS LOKAL (Bintang per level disimpan di browser)
+    let levelProgress = JSON.parse(localStorage.getItem('ROVER_PROGRESS') || '{}');
+
+    // ==========================================
+    // SOUND FX SYNTHESIZER (WEB AUDIO API)
+    // ==========================================
+    let audioCtx = null;
+    function getAudioCtx() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+      return audioCtx;
+    }
+
+    function playTone(freq, type, duration, vol = 0.08) {
+      if (isMuted) return;
+      try {
+        const ctx = getAudioCtx();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, ctx.currentTime);
+        gain.gain.setValueAtTime(vol, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + duration);
+      } catch (e) {}
+    }
+
+    function sfxClick() { playTone(550, 'sine', 0.06, 0.05); }
+    function sfxMove() { playTone(320, 'triangle', 0.12, 0.08); }
+    function sfxTurn() { playTone(460, 'sine', 0.1, 0.06); }
+    function sfxStar() {
+      [523, 659, 784, 1046].forEach((f, i) => setTimeout(() => playTone(f, 'sine', 0.15, 0.1), i * 60));
+    }
+    function sfxCrash() {
+      [220, 150, 80].forEach((f, i) => setTimeout(() => playTone(f, 'sawtooth', 0.2, 0.15), i * 90));
+    }
+    function sfxWin() {
+      const melody = [440, 554, 659, 880, 740, 880];
+      melody.forEach((f, i) => setTimeout(() => playTone(f, 'square', 0.2, 0.1), i * 110));
+    }
+
+    function toggleAudio() {
+      isMuted = !isMuted;
+      document.getElementById('btn-audio').innerText = isMuted ? '🔇' : '🔊';
+    }
+
+    function toggleSpeed() {
+      playSpeed = (playSpeed === 1) ? 2 : 1;
+      document.getElementById('btn-speed').innerText = `⚡ ${playSpeed}x`;
+      document.getElementById('btn-speed').className = (playSpeed === 2)
+        ? "px-2.5 py-1.5 bg-amber-500 text-slate-950 text-xs font-black rounded-xl shadow transition"
+        : "px-2.5 py-1.5 bg-slate-700 text-amber-300 text-xs font-black rounded-xl border border-slate-600 transition";
+    }
+
+    // ==========================================
+    // INITIALIZATION & GRID RENDERING
+    // ==========================================
+    function initLevel(lvlIdx) {
+      currentLvlIdx = lvlIdx;
+      const lvl = LEVELS[currentLvlIdx];
+      rover = { ...lvl.start };
+      queue = [];
+      isRunning = false;
+      collectedStars = [];
+
+      document.getElementById('hud-level-num').innerText = `${lvl.id}`;
+      document.getElementById('hud-level-title').innerText = lvl.title;
+      document.getElementById('hud-stars').innerText = `⭐ 0 / ${lvl.stars.length}`;
+      document.getElementById('hud-limit').innerText = `0 / ${lvl.maxCmds}`;
+      document.getElementById('modal-win').classList.add('hidden');
+      document.getElementById('btn-run').disabled = false;
+      document.getElementById('btn-run-icon').innerText = '▶️';
+      document.getElementById('btn-run-text').innerText = 'Jalankan';
+
+      renderBoard();
+      renderQueue();
+    }
+
+    function renderBoard() {
+      const lvl = LEVELS[currentLvlIdx];
+      const container = document.getElementById('board-container');
+      container.style.gridTemplateColumns = `repeat(${lvl.gridSize}, minmax(0, 1fr))`;
+      container.innerHTML = '';
+
+      // Tentukan dimensi kotak agar responsif
+      const cellSize = (lvl.gridSize >= 7) ? 'w-10 h-10 sm:w-12 sm:h-12 text-lg sm:text-xl' : 'w-12 h-12 sm:w-16 sm:h-16 text-xl sm:text-2xl';
+
+      for (let y = 0; y < lvl.gridSize; y++) {
+        for (let x = 0; x < lvl.gridSize; x++) {
+          const cell = document.createElement('div');
+          cell.className = `grid-cell ${cellSize}`;
+          cell.id = `cell-${x}-${y}`;
+
+          // Cek Target Baterai
+          if (lvl.target.x === x && lvl.target.y === y) {
+            cell.innerHTML = '<span class="target-battery">🔋</span>';
+            cell.style.background = 'rgba(16, 185, 129, 0.15)';
+            cell.style.borderColor = 'rgba(52, 211, 153, 0.4)';
+          }
+          // Cek Rintangan Batu/Lava
+          else if (lvl.obstacles.some(o => o.x === x && o.y === y)) {
+            cell.innerHTML = '🪨';
+            cell.style.background = 'rgba(239, 68, 68, 0.12)';
+            cell.style.borderColor = 'rgba(239, 68, 68, 0.3)';
+          }
+          // Cek Bintang Kristal
+          else if (lvl.stars.some(s => s.x === x && s.y === y)) {
+            const isTaken = collectedStars.some(s => s.x === x && s.y === y);
+            if (!isTaken) {
+              cell.innerHTML = '<span class="gem-star">⭐</span>';
             }
-        ];
+          }
 
-        let currentLvl = 0;
-        let rover = { ...levels[0].start };
-        let queue = [];
-        let isRunning = false;
-        let isMuted = false;
+          // Cek Posisi Rover Saat Ini
+          if (rover.x === x && rover.y === y) {
+            cell.innerHTML = renderRoverGraphic(rover.dir);
+            cell.style.background = 'rgba(56, 189, 248, 0.25)';
+            cell.style.borderColor = '#38bdf8';
+          }
 
-        // Audio Engine
-        let audioCtx;
-        function initAudio() {
-            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            if (audioCtx.state === 'suspended') audioCtx.resume();
+          container.appendChild(cell);
         }
-        function playTone(freq, type, duration, vol=0.05) {
-            if (isMuted || !audioCtx) return;
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.type = type; osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-            gain.gain.setValueAtTime(vol, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
-            osc.connect(gain); gain.connect(audioCtx.destination);
-            osc.start(); osc.stop(audioCtx.currentTime + duration);
-        }
-        function sfxClick() { playTone(500, 'sine', 0.08); }
-        function sfxMove() { playTone(300, 'triangle', 0.1); }
-        function sfxTurn() { playTone(450, 'sine', 0.1); }
-        function sfxWin() { [400, 600, 800, 1000].forEach((f, i) => setTimeout(() => playTone(f, 'square', 0.12), i * 90)); }
-        function sfxCrash() { [200, 140, 100].forEach((f, i) => setTimeout(() => playTone(f, 'sawtooth', 0.15), i * 100)); }
+      }
+    }
 
-        function toggleMute() {
-            isMuted = !isMuted;
-            document.getElementById('btn-mute').innerText = isMuted ? '🔇' : '🔊';
-        }
+    function renderRoverGraphic(dir) {
+      // Rotasi derajat: 0=0deg (Atas), 1=90deg (Kanan), 2=180deg (Bawah), 3=270deg (Kiri)
+      const degrees = dir * 90;
+      return `
+        <div class="rover-bot" style="transform: rotate(${degrees}deg);">
+          🤖
+        </div>
+      `;
+    }
 
-        function initLevel() {
-            const lvl = levels[currentLvl];
-            rover = { ...lvl.start };
-            queue = [];
-            isRunning = false;
-            document.getElementById('current-level').innerText = currentLvl + 1;
-            document.getElementById('modal-win').classList.add('hidden');
-            renderQueue();
-            renderGrid();
-        }
+    // ==========================================
+    // ANTREAN PERINTAH KODE (COMMAND QUEUE)
+    // ==========================================
+    const CMD_META = {
+      'FORWARD': { label: 'Maju', icon: '⬆️', color: 'bg-sky-700/80 border-sky-500 text-sky-200' },
+      'LEFT': { label: 'Kiri', icon: '↺', color: 'bg-indigo-700/80 border-indigo-500 text-indigo-200' },
+      'RIGHT': { label: 'Kanan', icon: '↻', color: 'bg-indigo-700/80 border-indigo-500 text-indigo-200' }
+    };
 
-        const dirIcons = ['⬆️', '➡️', '⬇️', '⬅️'];
+    function addCommand(cmd) {
+      if (isRunning) return;
+      const lvl = LEVELS[currentLvlIdx];
+      if (queue.length >= lvl.maxCmds) {
+        showToast('⚠️', `Batas maksimal ${lvl.maxCmds} balok perintah!`);
+        sfxCrash();
+        return;
+      }
+      sfxClick();
+      queue.push(cmd);
+      renderQueue();
+    }
 
-        function renderGrid() {
-            const lvl = levels[currentLvl];
-            const gridEl = document.getElementById('game-grid');
-            gridEl.innerHTML = '';
+    function removeCommand(idx) {
+      if (isRunning) return;
+      sfxClick();
+      queue.splice(idx, 1);
+      renderQueue();
+    }
 
-            for (let y = 0; y < lvl.gridSize; y++) {
-                for (let x = 0; x < lvl.gridSize; x++) {
-                    const cell = document.createElement('div');
-                    cell.className = 'grid-cell';
+    function undoCommand() {
+      if (isRunning || queue.length === 0) return;
+      sfxClick();
+      queue.pop();
+      renderQueue();
+    }
 
-                    // Cek Rover
-                    if (rover.x === x && rover.y === y) {
-                        cell.innerText = dirIcons[rover.dir];
-                        cell.style.background = 'rgba(56, 189, 248, 0.2)';
-                        cell.style.borderColor = '#38bdf8';
-                    } 
-                    // Cek Target
-                    else if (lvl.target.x === x && lvl.target.y === y) {
-                        cell.innerText = '🔋';
-                    } 
-                    // Cek Rintangan
-                    else if (lvl.obstacles.some(o => o.x === x && o.y === y)) {
-                        cell.innerText = '🪨';
-                    }
+    function clearCommands() {
+      if (isRunning) return;
+      sfxClick();
+      queue = [];
+      renderQueue();
+    }
 
-                    gridEl.appendChild(cell);
-                }
-            }
-        }
+    function renderQueue() {
+      const qEl = document.getElementById('command-queue');
+      const lvl = LEVELS[currentLvlIdx];
+      document.getElementById('hud-limit').innerText = `${queue.length} / ${lvl.maxCmds}`;
 
-        function addCommand(cmd) {
-            if (isRunning) return;
-            if (queue.length >= 10) {
-                alert('Maksimal 10 perintah dalam satu antrean!');
-                return;
-            }
-            sfxClick();
-            queue.push(cmd);
-            renderQueue();
-        }
+      if (queue.length === 0) {
+        qEl.innerHTML = `<span class="text-slate-500 text-xs italic mx-auto">Klik tombol perintah di bawah untuk memprogram rover...</span>`;
+        return;
+      }
 
-        function removeCommand(idx) {
-            if (isRunning) return;
-            sfxClick();
-            queue.splice(idx, 1);
-            renderQueue();
-        }
+      qEl.innerHTML = queue.map((c, i) => {
+        const meta = CMD_META[c];
+        return `
+          <div onclick="removeCommand(${i})" id="queue-item-${i}" 
+               class="flex-shrink-0 px-2.5 py-1.5 rounded-xl border ${meta.color} font-title text-xs font-bold flex items-center gap-1.5 cursor-pointer hover:border-rose-400 hover:scale-105 active:scale-95 transition shadow" 
+               title="Klik untuk menghapus">
+            <span>${meta.icon}</span>
+            <span>${meta.label}</span>
+            <span class="text-[10px] text-slate-400 ml-0.5">✕</span>
+          </div>
+        `;
+      }).join('');
+    }
 
-        function clearCommands() {
-            if (isRunning) return;
-            sfxClick();
-            queue = [];
-            renderQueue();
-        }
+    // ==========================================
+    // LOGIKA EKSEKUSI ALGORITMA (RUN ENGINE)
+    // ==========================================
+    async function runCode() {
+      if (isRunning || queue.length === 0) return;
+      isRunning = true;
+      getAudioCtx();
 
-        const cmdLabels = { 'FORWARD': '⬆️ Maju', 'LEFT': '⬅️ Kiri', 'RIGHT': '➡️ Kanan' };
+      document.getElementById('btn-run').disabled = true;
+      document.getElementById('btn-run-icon').innerText = '⏳';
+      document.getElementById('btn-run-text').innerText = 'Berjalan...';
 
-        function renderQueue() {
-            const qEl = document.getElementById('command-queue');
-            document.getElementById('cmd-count').innerText = queue.length;
-            if (queue.length === 0) {
-                qEl.innerHTML = `<span class="text-slate-500 text-xs italic mx-auto">Klik tombol perintah di bawah untuk menyusun instruksi...</span>`;
-                return;
-            }
-            qEl.innerHTML = queue.map((c, i) => `
-                <div onclick="removeCommand(${i})" class="bg-slate-800 border border-slate-600 px-3 py-2 rounded-xl text-xs font-bold text-sky-300 flex items-center gap-1 cursor-pointer hover:border-rose-400 transition flex-shrink-0" title="Klik untuk hapus">
-                    ${cmdLabels[c]} ✕
-                </div>
-            `).join('');
-        }
+      const lvl = LEVELS[currentLvlIdx];
+      let simRover = { ...lvl.start };
+      rover = { ...simRover };
+      collectedStars = [];
+      renderBoard();
 
-        async function runCode() {
-            if (isRunning || queue.length === 0) return;
-            initAudio();
-            isRunning = true;
-            document.getElementById('btn-run').disabled = true;
+      const stepDelay = (playSpeed === 2) ? 190 : 380;
 
-            const lvl = levels[currentLvl];
-            let simRover = { ...lvl.start };
-
-            for (let i = 0; i < queue.length; i++) {
-                const cmd = queue[i];
-                if (cmd === 'FORWARD') {
-                    if (simRover.dir === 0) simRover.y--;
-                    else if (simRover.dir === 1) simRover.x++;
-                    else if (simRover.dir === 2) simRover.y++;
-                    else if (simRover.dir === 3) simRover.x--;
-                    sfxMove();
-                } else if (cmd === 'LEFT') {
-                    simRover.dir = (simRover.dir + 3) % 4;
-                    sfxTurn();
-                } else if (cmd === 'RIGHT') {
-                    simRover.dir = (simRover.dir + 1) % 4;
-                    sfxTurn();
-                }
-
-                // Validasi batas grid atau menabrak rintangan
-                const hitWall = simRover.x < 0 || simRover.x >= lvl.gridSize || simRover.y < 0 || simRover.y >= lvl.gridSize;
-                const hitObstacle = lvl.obstacles.some(o => o.x === simRover.x && o.y === simRover.y);
-
-                rover = { ...simRover };
-                renderGrid();
-                await new Promise(r => setTimeout(r, 400));
-
-                if (hitWall || hitObstacle) {
-                    sfxCrash();
-                    alert(hitWall ? 'Rover menabrak dinding luar!' : 'Rover menabrak batu karang!');
-                    initLevel();
-                    document.getElementById('btn-run').disabled = false;
-                    return;
-                }
-            }
-
-            // Cek apakah sampai di target
-            if (rover.x === lvl.target.x && rover.y === lvl.target.y) {
-                sfxWin();
-                if (currentLvl < levels.length - 1) {
-                    document.getElementById('modal-win').classList.remove('hidden');
-                } else {
-                    document.getElementById('win-desc').innerText = 'Luar biasa! Kamu berhasil menamatkan seluruh Misi Penjelajah Rover!';
-                    document.getElementById('modal-win').classList.remove('hidden');
-                }
-            } else {
-                sfxCrash();
-                alert('Rover berhenti, tapi belum mencapai baterai target!');
-                initLevel();
-            }
-
-            document.getElementById('btn-run').disabled = false;
+      for (let i = 0; i < queue.length; i++) {
+        // Highlight Balok Kode yang Sedang Aktif
+        document.querySelectorAll('[id^="queue-item-"]').forEach(el => el.classList.remove('cmd-executing'));
+        const activeItem = document.getElementById(`queue-item-${i}`);
+        if (activeItem) {
+          activeItem.classList.add('cmd-executing');
+          activeItem.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
         }
 
-        function nextLevel() {
-            if (currentLvl < levels.length - 1) {
-                currentLvl++;
-                initLevel();
-            } else {
-                currentLvl = 0;
-                initLevel();
-            }
+        const cmd = queue[i];
+        if (cmd === 'FORWARD') {
+          if (simRover.dir === 0) simRover.y--;
+          else if (simRover.dir === 1) simRover.x++;
+          else if (simRover.dir === 2) simRover.y++;
+          else if (simRover.dir === 3) simRover.x--;
+          sfxMove();
+        } else if (cmd === 'LEFT') {
+          simRover.dir = (simRover.dir + 3) % 4;
+          sfxTurn();
+        } else if (cmd === 'RIGHT') {
+          simRover.dir = (simRover.dir + 1) % 4;
+          sfxTurn();
         }
 
-        // Load pertama kali
-        initLevel();
-    </script>
+        // Cek apakah menabrak dinding batas luar
+        const hitWall = simRover.x < 0 || simRover.x >= lvl.gridSize || simRover.y < 0 || simRover.y >= lvl.gridSize;
+        // Cek apakah menabrak rintangan batu
+        const hitObstacle = !hitWall && lvl.obstacles.some(o => o.x === simRover.x && o.y === simRover.y);
+
+        if (hitWall || hitObstacle) {
+          sfxCrash();
+          showToast('💥', hitWall ? 'Rover menabrak batas jurang luar!' : 'Rover menabrak karang terjal!');
+          resetToStartAfterFail();
+          return;
+        }
+
+        // Cek apakah mengambil Bintang Kristal
+        const starIdx = lvl.stars.findIndex(s => s.x === simRover.x && s.y === simRover.y);
+        if (starIdx !== -1 && !collectedStars.some(s => s.x === simRover.x && s.y === simRover.y)) {
+          collectedStars.push({ ...lvl.stars[starIdx] });
+          sfxStar();
+          document.getElementById('hud-stars').innerText = `⭐ ${collectedStars.length} / ${lvl.stars.length}`;
+        }
+
+        rover = { ...simRover };
+        renderBoard();
+        await new Promise(r => setTimeout(r, stepDelay));
+      }
+
+      // Selesai seluruh perintah, cek apakah tiba di Target Baterai
+      if (rover.x === lvl.target.x && rover.y === lvl.target.y) {
+        handleLevelVictory();
+      } else {
+        sfxCrash();
+        showToast('🔋', 'Rover kehabisan perintah sebelum mencapai Baterai!');
+        resetToStartAfterFail();
+      }
+    }
+
+    function resetToStartAfterFail() {
+      setTimeout(() => {
+        const lvl = LEVELS[currentLvlIdx];
+        rover = { ...lvl.start };
+        collectedStars = [];
+        document.getElementById('hud-stars').innerText = `⭐ 0 / ${lvl.stars.length}`;
+        renderBoard();
+        document.querySelectorAll('[id^="queue-item-"]').forEach(el => el.classList.remove('cmd-executing'));
+        document.getElementById('btn-run').disabled = false;
+        document.getElementById('btn-run-icon').innerText = '▶️';
+        document.getElementById('btn-run-text').innerText = 'Jalankan';
+        isRunning = false;
+      }, 1200);
+    }
+
+    function handleLevelVictory() {
+      sfxWin();
+      fireConfetti();
+
+      const lvl = LEVELS[currentLvlIdx];
+      const starCount = collectedStars.length;
+      let starStr = (starCount === 3) ? '⭐⭐⭐' : ((starCount === 2) ? '⭐⭐' : '⭐');
+      if (lvl.stars.length === 0) starStr = '⭐⭐⭐';
+
+      // Simpan bintang terbaik ke localStorage
+      const prevStars = levelProgress[lvl.id] || 0;
+      if (starCount > prevStars) {
+        levelProgress[lvl.id] = starCount;
+        localStorage.setItem('ROVER_PROGRESS', JSON.stringify(levelProgress));
+      }
+
+      document.getElementById('win-stars').innerText = starStr;
+      
+      if (currentLvlIdx < LEVELS.length - 1) {
+        document.getElementById('win-desc').innerText = `Luar biasa! Algoritma rover sukses mencapai target dengan ${queue.length} perintah dan mengumpulkan ${starCount} bintang!`;
+        document.getElementById('btn-next-level').innerText = 'Lanjut Level Berikutnya 🚀';
+      } else {
+        document.getElementById('win-desc').innerText = 'SELAMAT JUARA! Kamu telah menamatkan seluruh 10 Misi Penjelajah Rover Galaksi!';
+        document.getElementById('btn-next-level').innerText = 'Kembali ke Level 1 🔄';
+      }
+
+      document.getElementById('modal-win').classList.remove('hidden');
+      document.getElementById('btn-run').disabled = false;
+      document.getElementById('btn-run-icon').innerText = '▶️';
+      document.getElementById('btn-run-text').innerText = 'Jalankan';
+      isRunning = false;
+    }
+
+    function nextLevel() {
+      if (currentLvlIdx < LEVELS.length - 1) {
+        initLevel(currentLvlIdx + 1);
+      } else {
+        initLevel(0);
+      }
+    }
+
+    function retryLevel() {
+      initLevel(currentLvlIdx);
+    }
+
+    // ==========================================
+    // TOAST NOTIFIKASI RAMAH ANAK (NO ALERTS)
+    // ==========================================
+    let toastTimer = null;
+    function showToast(icon, text) {
+      const toast = document.getElementById('toast-message');
+      document.getElementById('toast-icon').innerText = icon;
+      document.getElementById('toast-text').innerText = text;
+      toast.classList.remove('hidden');
+
+      if (toastTimer) clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        toast.classList.add('hidden');
+      }, 2600);
+    }
+
+    // ==========================================
+    // MODAL LEVEL SELECTOR
+    // ==========================================
+    function openLevelSelect() {
+      if (isRunning) return;
+      const listEl = document.getElementById('level-list-grid');
+      listEl.innerHTML = '';
+
+      LEVELS.forEach((lvl, idx) => {
+        const btn = document.createElement('button');
+        const starsEarned = levelProgress[lvl.id] || 0;
+        const starIcons = starsEarned > 0 ? '⭐'.repeat(starsEarned) : '🔒 Belum';
+        const isCurrent = (idx === currentLvlIdx);
+
+        btn.className = `p-3 rounded-2xl border text-left transition flex flex-col justify-between ${
+          isCurrent 
+            ? 'bg-sky-900/80 border-sky-400 text-white shadow-lg' 
+            : 'bg-slate-900/80 border-slate-700 hover:border-slate-500 text-slate-300'
+        }`;
+
+        btn.innerHTML = `
+          <div class="flex justify-between items-center w-full">
+            <span class="font-title text-sm">Level ${lvl.id}</span>
+            <span class="text-[10px] text-amber-400 font-bold">${starIcons}</span>
+          </div>
+          <span class="text-[10px] text-slate-400 truncate block mt-1">${lvl.title}</span>
+        `;
+
+        btn.onclick = () => {
+          initLevel(idx);
+          closeLevelSelect();
+        };
+
+        listEl.appendChild(btn);
+      });
+
+      document.getElementById('modal-levels').classList.remove('hidden');
+    }
+
+    function closeLevelSelect() {
+      document.getElementById('modal-levels').classList.add('hidden');
+    }
+
+    // ==========================================
+    // CELEBRATION CONFETTI ENGINE (NO LIBS)
+    // ==========================================
+    const confettiCanvas = document.getElementById('confetti-canvas');
+    const cCtx = confettiCanvas.getContext('2d');
+    let confettiParticles = [];
+
+    function fireConfetti() {
+      confettiCanvas.width = window.innerWidth;
+      confettiCanvas.height = window.innerHeight;
+      confettiParticles = [];
+
+      const colors = ['#38bdf8', '#34d399', '#facc15', '#f43f5e', '#a855f7', '#fb923c'];
+      for (let i = 0; i < 90; i++) {
+        confettiParticles.push({
+          x: confettiCanvas.width / 2,
+          y: confettiCanvas.height / 2,
+          vx: (Math.random() - 0.5) * 18,
+          vy: (Math.random() - 0.8) * 18,
+          size: Math.random() * 8 + 4,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          rot: Math.random() * 360,
+          rotSpeed: (Math.random() - 0.5) * 12,
+          alpha: 1
+        });
+      }
+      renderConfetti();
+    }
+
+    function renderConfetti() {
+      if (confettiParticles.length === 0) return;
+      cCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+
+      confettiParticles.forEach((p, idx) => {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += 0.35; // gravitasi
+        p.rot += p.rotSpeed;
+        p.alpha -= 0.012;
+
+        cCtx.save();
+        cCtx.globalAlpha = Math.max(0, p.alpha);
+        cCtx.translate(p.x, p.y);
+        cCtx.rotate((p.rot * Math.PI) / 180);
+        cCtx.fillStyle = p.color;
+        cCtx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+        cCtx.restore();
+
+        if (p.alpha <= 0) confettiParticles.splice(idx, 1);
+      });
+
+      if (confettiParticles.length > 0) {
+        requestAnimationFrame(renderConfetti);
+      } else {
+        cCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+      }
+    }
+
+    // Inisialisasi awal saat halaman dibuka
+    window.onload = () => {
+      initLevel(0);
+    };
+  </script>
 </body>
 </html>
