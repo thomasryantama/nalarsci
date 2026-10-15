@@ -1,262 +1,46 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Tebas Balon AI - Pedang Laser Tangan</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
-  <style>
-    body { font-family: 'Nunito', sans-serif; background: #0f172a; color: white; overflow: hidden; user-select: none; }
-    .font-title { font-family: 'Fredoka', sans-serif; }
-    .mirror { transform: scaleX(-1); }
-  </style>
-</head>
-<body class="relative w-screen h-screen flex flex-col justify-between p-3 sm:p-5">
-
-  <video id="webcam" class="hidden" playsinline></video>
-  <canvas id="gameCanvas" class="absolute inset-0 w-full h-full object-cover z-0"></canvas>
-
-  <!-- HUD Atas -->
-  <header class="relative z-10 max-w-4xl mx-auto w-full flex justify-between items-center bg-slate-900/85 backdrop-blur-md px-5 py-2.5 rounded-2xl border border-emerald-400/30 shadow-xl">
-    <div class="flex items-center gap-2.5">
-      <span class="text-3xl">⚔️</span>
-      <div>
-        <h1 class="font-title text-base sm:text-lg text-emerald-300 leading-tight">Tebas Balon Laser AI</h1>
-        <p class="text-[10px] text-slate-400">Tebas di udara dengan telunjuk tanganmu • Karya: Thomas Ryantama</p>
-      </div>
-    </div>
-    <div class="flex items-center gap-3">
-      <div class="bg-slate-950/80 px-4 py-1.5 rounded-xl border border-slate-700 text-center">
-        <span class="text-[10px] text-amber-400 font-bold block uppercase">Waktu</span>
-        <span id="timeText" class="text-xl sm:text-2xl font-black text-rose-400 font-mono">30</span>
-      </div>
-      <div class="bg-slate-950/80 px-4 py-1.5 rounded-xl border border-slate-700 text-center">
-        <span class="text-[10px] text-emerald-400 font-bold block uppercase">Skor</span>
-        <span id="scoreText" class="text-xl sm:text-2xl font-black text-emerald-300 font-title">0</span>
-      </div>
-    </div>
-  </header>
-
-  <!-- Modal Mulai & Skor Akhir -->
-  <div id="gameModal" class="relative z-20 m-auto bg-slate-900/90 backdrop-blur-md border border-emerald-400/40 p-6 sm:p-8 rounded-3xl max-w-md w-full text-center shadow-2xl space-y-4">
-    <div id="modalIcon" class="text-6xl animate-bounce">🎈⚔️</div>
-    <h2 id="modalTitle" class="font-title text-2xl sm:text-3xl text-emerald-400">Tebas Balon Laser AI</h2>
-    <p id="modalDesc" class="text-xs sm:text-sm text-slate-300 leading-relaxed">
-      Arahkan tangan ke kamera! Gerakkan telunjukmu di udara seperti <b>pedang laser</b> untuk memotong balon warna-warni yang melayang ke atas. Hindari memotong bom tengkorak (💣)!
-    </p>
-    <button onclick="startGame()" id="btnStart" class="w-full py-3.5 bg-emerald-600 hover:bg-emerald-500 text-white font-title text-base font-bold rounded-2xl shadow-xl transition transform hover:scale-105">
-      ⚔️ Mulai Menebas
-    </button>
-  </div>
-
-  <footer class="relative z-10 text-center pb-2">
-    <span id="trackerStatus" class="px-4 py-1.5 bg-slate-950/80 border border-slate-700 rounded-full text-xs font-bold text-slate-300 shadow">
-      📡 Mengaktifkan Sensor Tangan...
-    </span>
-  </footer>
-
-  <script>
-    const cv = document.getElementById('gameCanvas');
-    const ctx = cv.getContext('2d');
-    const vid = document.getElementById('webcam');
-
-    let score = 0;
-    let timeLeft = 30;
-    let timerInt = null;
-    let isPlaying = false;
-
-    let handTrail = []; // jejak pedang laser
-    let balloons = [];
-    let particles = [];
-
-    const EMOJIS = ['🎈', '🍉', '🍎', '🍊', '🍓', '💣'];
-
-    // Audio
-    let audioCtx = null;
-    function beep(f, t='sine', d=0.1, v=0.08) {
-      try {
-        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        if (audioCtx.state === 'suspended') audioCtx.resume();
-        const o = audioCtx.createOscillator(), g = audioCtx.createGain();
-        o.type = t; o.frequency.value = f;
-        g.gain.setValueAtTime(v, audioCtx.currentTime);
-        g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + d);
-        o.connect(g); g.connect(audioCtx.destination);
-        o.start(); o.stop(audioCtx.currentTime + d);
-      } catch (e) {}
-    }
-
-    // MediaPipe Hands
-    const hands = new Hands({
-      locateFile: (f) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${f}`
-    });
-    hands.setOptions({ maxNumHands: 2, modelComplexity: 1, minDetectionConfidence: 0.5 });
-
-    let bladePos = null;
-    hands.onResults(res => {
-      if (res.multiHandLandmarks && res.multiHandLandmarks.length > 0) {
-        // Landmark 8 = Ujung jari telunjuk
-        const tip = res.multiHandLandmarks[0][8];
-        bladePos = { x: (1 - tip.x) * cv.width, y: tip.y * cv.height }; // mirror x
-        document.getElementById('trackerStatus').innerHTML = "✅ Pedang Laser Aktif! Kibaskan tanganmu.";
-        document.getElementById('trackerStatus').className = "px-4 py-1.5 bg-emerald-950/80 border border-emerald-500 rounded-full text-xs font-bold text-emerald-300 shadow";
-      } else {
-        bladePos = null;
-      }
-    });
-
-    const camera = new Camera(vid, {
-      onFrame: async () => { await hands.send({ image: vid }); },
-      width: 640, height: 480
-    });
-    camera.start();
-
-    function startGame() {
-      document.getElementById('gameModal').classList.add('hidden');
-      score = 0;
-      timeLeft = 30;
-      document.getElementById('scoreText').innerText = '0';
-      document.getElementById('timeText').innerText = '30';
-      balloons = [];
-      particles = [];
-      isPlaying = true;
-
-      if (timerInt) clearInterval(timerInt);
-      timerInt = setInterval(() => {
-        timeLeft--;
-        document.getElementById('timeText').innerText = timeLeft;
-        if (timeLeft <= 0) {
-          clearInterval(timerInt);
-          endGame();
-        }
-      }, 1000);
-    }
-
-    function endGame() {
-      isPlaying = false;
-      beep(400, 'triangle', 0.3, 0.15);
-      document.getElementById('modalIcon').innerText = "🏆";
-      document.getElementById('modalTitle').innerText = "Waktu Habis!";
-      document.getElementById('modalDesc').innerHTML = `Luar biasa! Kamu berhasil menebas dan mengumpulkan <b>${score} Poin</b>!`;
-      document.getElementById('btnStart').innerText = "🔄 Main Lagi";
-      document.getElementById('gameModal').classList.remove('hidden');
-    }
-
-    function loop() {
-      requestAnimationFrame(loop);
-      cv.width = window.innerWidth;
-      cv.height = window.innerHeight;
-      const W = cv.width, H = cv.height;
-
-      ctx.clearRect(0, 0, W, H);
-      ctx.fillStyle = '#090d16';
-      ctx.fillRect(0, 0, W, H);
-
-      // Jejak Pedang Laser
-      if (bladePos) {
-        handTrail.push({ x: bladePos.x, y: bladePos.y, age: 1.0 });
-      }
-      for (let i = handTrail.length - 1; i >= 0; i--) {
-        handTrail[i].age -= 0.08;
-        if (handTrail[i].age <= 0) handTrail.splice(i, 1);
-      }
-
-      if (handTrail.length > 2) {
-        ctx.beginPath();
-        ctx.moveTo(handTrail[0].x, handTrail[0].y);
-        for (let i = 1; i < handTrail.length; i++) {
-          ctx.lineTo(handTrail[i].x, handTrail[i].y);
-        }
-        ctx.strokeStyle = '#34d399';
-        ctx.lineWidth = 14;
-        ctx.lineCap = 'round';
-        ctx.shadowColor = '#10b981';
-        ctx.shadowBlur = 20;
-        ctx.stroke();
-        ctx.shadowBlur = 0;
-      }
-
-      // Spawn Balon
-      if (isPlaying && Math.random() < 0.05 && balloons.length < 8) {
-        const isBomb = Math.random() < 0.2;
-        balloons.push({
-          x: Math.random() * (W - 140) + 70,
-          y: H + 40,
-          vx: (Math.random() - 0.5) * 2,
-          vy: -(Math.random() * 3 + 4),
-          icon: isBomb ? '💣' : EMOJIS[Math.floor(Math.random() * (EMOJIS.length - 1))],
-          isBomb: isBomb,
-          radius: 36
-        });
-      }
-
-      // Jalankan & Gambar Balon
-      for (let i = balloons.length - 1; i >= 0; i--) {
-        const b = balloons[i];
-        b.x += b.vx;
-        b.y += b.vy;
-
-        ctx.font = '54px sans-serif';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(b.icon, b.x, b.y);
-
-        // Cek Tebasan Pedang
-        if (bladePos) {
-          const dist = Math.hypot(b.x - bladePos.x, b.y - bladePos.y);
-          if (dist < b.radius + 20) {
-            // Tebas kena!
-            if (b.isBomb) {
-              score = Math.max(0, score - 5);
-              beep(120, 'sawtooth', 0.25, 0.2);
-              spawnParticles(b.x, b.y, '#ef4444');
-            } else {
-              score += 10;
-              beep(800 + Math.random() * 200, 'sine', 0.1, 0.12);
-              spawnParticles(b.x, b.y, '#34d399');
-            }
-            document.getElementById('scoreText').innerText = score;
-            balloons.splice(i, 1);
-            continue;
-          }
-        }
-
-        if (b.y < -50) balloons.splice(i, 1);
-      }
-
-      // Render Percikan Partikel
-      for (let i = particles.length - 1; i >= 0; i--) {
-        const p = particles[i];
-        p.x += p.vx;
-        p.y += p.vy;
-        p.alpha -= 0.03;
-        ctx.fillStyle = p.color;
-        ctx.globalAlpha = Math.max(0, p.alpha);
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.globalAlpha = 1.0;
-        if (p.alpha <= 0) particles.splice(i, 1);
-      }
-    }
-
-    function spawnParticles(x, y, color) {
-      for (let i = 0; i < 15; i++) {
-        particles.push({
-          x, y,
-          vx: (Math.random() - 0.5) * 12,
-          vy: (Math.random() - 0.5) * 12,
-          size: Math.random() * 6 + 3,
-          color,
-          alpha: 1.0
-        });
-      }
-    }
-
-    loop();
-  </script>
-</body>
-</html>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Tebas Balon Laser AI — Enhanced</title>
+<style>
+:root{--bg:#07111f;--panel:rgba(9,20,38,.86);--mint:#5cf4c3;--pink:#ff638d;--gold:#ffd166}*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);color:#f8fafc;font-family:system-ui,-apple-system,Segoe UI,sans-serif;user-select:none}#gameCanvas{position:fixed;inset:0;width:100%;height:100%;z-index:0}#webcam{position:fixed;right:12px;bottom:64px;width:112px;height:84px;object-fit:cover;transform:scaleX(-1);border:2px solid #5cf4c377;border-radius:12px;opacity:.72;z-index:2;background:#111827}header{position:fixed;z-index:3;top:12px;left:50%;transform:translateX(-50%);width:min(900px,calc(100% - 24px));display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 14px;border:1px solid #5cf4c344;border-radius:18px;background:var(--panel);backdrop-filter:blur(12px);box-shadow:0 12px 40px #0004}.brand{display:flex;align-items:center;gap:10px}.brandIcon{font-size:30px}.title{font-weight:900;color:var(--mint);font-size:clamp(14px,2.8vw,21px);line-height:1.15}.sub{font-size:10px;color:#a9b8cc;margin-top:3px}.stats{display:flex;gap:8px}.stat{min-width:64px;text-align:center;background:#020817aa;border:1px solid #ffffff18;border-radius:12px;padding:5px 10px}.stat small{display:block;font-size:9px;letter-spacing:.1em;font-weight:900;color:var(--gold)}.stat strong{font-size:clamp(18px,3vw,26px);font-weight:950;font-variant-numeric:tabular-nums}.stat.score strong{color:var(--mint)}.stat.time strong{color:var(--pink)}#status{position:fixed;z-index:3;left:50%;bottom:14px;transform:translateX(-50%);max-width:calc(100% - 24px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;background:#020817dd;border:1px solid #ffffff20;border-radius:99px;padding:8px 14px;font-size:12px;font-weight:800;color:#cbd5e1}#modal{position:fixed;z-index:5;inset:0;display:grid;place-items:center;padding:18px;background:#02081755}#card{width:min(440px,100%);text-align:center;padding:28px 24px;border:1px solid #5cf4c366;border-radius:26px;background:rgba(7,17,31,.95);box-shadow:0 25px 100px #0008}#modalIcon{font-size:58px}h2{margin:8px 0;color:var(--mint);font-size:clamp(24px,5vw,34px)}#desc{color:#c4d0df;font-size:14px;line-height:1.55;margin:12px 0 20px}button{border:0;border-radius:15px;padding:14px 18px;width:100%;font:900 16px system-ui;background:linear-gradient(135deg,#10b981,#059669);color:white;cursor:pointer;box-shadow:0 8px 24px #05966944}button:disabled{opacity:.55;cursor:wait}#hint{font-size:11px;color:#94a3b8;margin-top:12px;line-height:1.45}.hidden{display:none!important}.pill{display:inline-block;border:1px solid #ffffff20;border-radius:8px;padding:2px 7px;margin:2px;color:#d9e5f2;background:#ffffff09}@media(max-width:520px){header{top:8px;padding:8px 9px}.brandIcon{font-size:23px}.sub{max-width:150px;font-size:9px}.stat{min-width:52px;padding:4px 7px}.stats{gap:5px}#webcam{width:84px;height:63px;bottom:58px;right:8px}#status{font-size:10px;bottom:9px;padding:7px 11px}}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+</head><body>
+<canvas id="gameCanvas"></canvas><video id="webcam" autoplay muted playsinline></video>
+<header><div class="brand"><div class="brandIcon">⚔️</div><div><div class="title">Tebas Balon Laser AI</div><div class="sub">Gerakkan telunjukmu untuk menebas • Thomas Ryantama</div></div></div><div class="stats"><div class="stat time"><small>WAKTU</small><strong id="timeText">45</strong></div><div class="stat score"><small>SKOR</small><strong id="scoreText">0</strong></div></div></header>
+<div id="status">📷 Menyiapkan sensor kamera…</div>
+<div id="modal"><div id="card"><div id="modalIcon">🎈⚔️</div><h2 id="modalTitle">Siap Menebas?</h2><div id="desc">Arahkan telunjuk ke kamera dan kibaskan seperti pedang laser. Tebas buah dan balon untuk mendapat poin, hindari bom!<br><br><span class="pill">🎈 Balon +10</span><span class="pill">🍉 Buah +15</span><span class="pill">💣 Bom −10</span></div><button id="startBtn">⚔️ Mulai Bermain</button><div id="hint">Izinkan akses kamera. Gunakan pencahayaan yang cukup dan posisikan tangan di depan kamera. Berjalan paling baik di HTTPS atau localhost.</div></div></div>
+<script>
+(()=>{'use strict';
+const canvas=document.getElementById('gameCanvas'),ctx=canvas.getContext('2d',{alpha:false}),video=document.getElementById('webcam');
+const statusEl=document.getElementById('status'),modal=document.getElementById('modal'),startBtn=document.getElementById('startBtn');
+let W=innerWidth,H=innerHeight,dpr=1,playing=false,score=0,timeLeft=45,lastFrame=0,spawnClock=0,hand=null,previousHand=null,trail=[],objects=[],particles=[],floating=[],timerId=null,cam=null,audio=null,lastHitAt=0,handReady=false;
+const targets=['🎈','🍉','🍎','🍊','🍓','🍍','⭐'];
+function resize(){dpr=Math.min(devicePixelRatio||1,2);W=innerWidth;H=innerHeight;canvas.width=Math.round(W*dpr);canvas.height=Math.round(H*dpr);canvas.style.width=W+'px';canvas.style.height=H+'px';ctx.setTransform(dpr,0,0,dpr,0,0)}addEventListener('resize',resize,{passive:true});resize();
+function setStatus(msg,good=false){statusEl.textContent=msg;statusEl.style.color=good?'#5cf4c3':'#cbd5e1';statusEl.style.borderColor=good?'#34d39966':'#ffffff20'}
+function sound(freq=600,duration=.09,type='sine',volume=.045){try{if(!audio)audio=new(window.AudioContext||window.webkitAudioContext)();if(audio.state==='suspended')audio.resume();const o=audio.createOscillator(),g=audio.createGain();o.type=type;o.frequency.setValueAtTime(freq,audio.currentTime);g.gain.setValueAtTime(volume,audio.currentTime);g.gain.exponentialRampToValueAtTime(.001,audio.currentTime+duration);o.connect(g);g.connect(audio.destination);o.start();o.stop(audio.currentTime+duration)}catch(e){}}
+function distToSegment(px,py,ax,ay,bx,by){const dx=bx-ax,dy=by-ay,l2=dx*dx+dy*dy;if(l2<.001)return Math.hypot(px-ax,py-ay);const t=Math.max(0,Math.min(1,((px-ax)*dx+(py-ay)*dy)/l2));return Math.hypot(px-(ax+t*dx),py-(ay+t*dy))}
+function handResults(results){const lm=results.multiHandLandmarks?.[0];if(lm){const tip=lm[8],x=(1-tip.x)*W,y=tip.y*H;const now=performance.now();if(!hand){hand={x,y,t:now};previousHand={x,y,t:now}}else{previousHand={...hand};const dt=Math.max(1,now-hand.t),rawSpeed=Math.hypot(x-hand.x,y-hand.y)/dt;const alpha=Math.min(.88,Math.max(.48,.48+rawSpeed*.18));hand={x:hand.x+(x-hand.x)*alpha,y:hand.y+(y-hand.y)*alpha,t:now};}
+handReady=true;setStatus('✋ Sensor aktif — gerakkan telunjuk untuk menebas!',true);
+if(playing){trail.push({x:hand.x,y:hand.y,t:now});if(trail.length>12)trail.shift()}
+}else{handReady=false;previousHand=null;setStatus('👋 Tunjukkan tangan ke kamera agar sensor mendeteksi telunjuk');if(!playing)hand=null;}}
+let hands=null;
+async function initCamera(){if(!navigator.mediaDevices?.getUserMedia){setStatus('Browser ini tidak mendukung akses kamera. Coba Chrome melalui HTTPS.');return}
+try{setStatus('📷 Meminta izin kamera…');hands=new Hands({locateFile:f=>`https://cdn.jsdelivr.net/npm/@mediapipe/hands/${f}`});hands.setOptions({maxNumHands:1,modelComplexity:0, minDetectionConfidence:.55,minTrackingConfidence:.55});hands.onResults(handResults);cam=new Camera(video,{onFrame:async()=>{if(hands&&video.readyState>=2){try{await hands.send({image:video})}catch(e){console.warn('Hand tracking:',e)}}},width:640,height:480});await cam.start();setStatus('✅ Kamera siap — tunjukkan telunjukmu!',true)}catch(err){console.error(err);setStatus('⚠️ Kamera gagal aktif. Izinkan akses kamera dan buka melalui HTTPS/localhost.');document.getElementById('hint').textContent='Jika kamera tidak terbuka, periksa izin kamera browser dan pastikan halaman menggunakan HTTPS atau localhost.';}}
+function startGame(){if(!handReady){setStatus('Tunjukkan tangan ke kamera dulu, lalu tekan Mulai.',false);return}score=0;timeLeft=45;spawnClock=0;objects=[];particles=[];floating=[];trail=[];playing=true;document.getElementById('scoreText').textContent='0';document.getElementById('timeText').textContent='45';document.getElementById('modalIcon').textContent='🎈⚔️';document.getElementById('modalTitle').textContent='Siap Menebas?';modal.classList.add('hidden');startBtn.disabled=false;if(timerId)clearInterval(timerId);timerId=setInterval(()=>{if(!playing)return;timeLeft--;document.getElementById('timeText').textContent=timeLeft;if(timeLeft<=0)endGame()},1000);sound(680,.12);}
+function endGame(){playing=false;clearInterval(timerId);timerId=null;sound(380,.25,'triangle',.08);document.getElementById('modalIcon').textContent='🏆';document.getElementById('modalTitle').textContent='Waktu Habis!';document.getElementById('desc').innerHTML=`Kamu mendapatkan <b style="color:#5cf4c3;font-size:24px">${score} poin</b>!<br><br>${score>=250?'Luar biasa! Refleksmu hebat!':score>=120?'Bagus! Coba pecahkan rekor berikutnya.':'Terus berlatih, gerakkan tangan lebih cepat dan akurat.'}`;startBtn.textContent='🔄 Main Lagi';modal.classList.remove('hidden')}
+startBtn.addEventListener('click',()=>{if(!handReady){initCamera();setStatus('Tunggu sensor mengenali tangan, lalu tekan Mulai.',false);return}startGame()});
+function spawn(){const bomb=Math.random()<.16,fruit=!bomb&&Math.random()<.42;const r=Math.max(25,Math.min(37,W*.045));objects.push({x:r+Math.random()*(W-r*2),y:H+r,vx:(Math.random()-.5)*100,vy:-(230+Math.random()*180)*(H<600?.8:1),r,bomb,fruit,icon:bomb?'💣':fruit?targets[1+Math.floor(Math.random()*(targets.length-1))]:'🎈',rot:(Math.random()-.5)*.04,angle:0,seed:Math.random()*6.28});}
+function burst(x,y,color,n=18){for(let i=0;i<n;i++){const a=Math.random()*Math.PI*2,s=70+Math.random()*360;particles.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,size:2+Math.random()*5,life:.45+Math.random()*.45,max:.9,color})}}
+function hit(o,index){if(o.bomb){score=Math.max(0,score-10);burst(o.x,o.y,'#ff4d6d',28);floating.push({x:o.x,y:o.y,text:'−10',color:'#ff638d',life:1});sound(130,.22,'sawtooth',.08)}else{const pts=o.fruit?15:10;score+=pts;burst(o.x,o.y,o.fruit?'#ffd166':'#5cf4c3',o.fruit?24:18);floating.push({x:o.x,y:o.y,text:'+'+pts,color:o.fruit?'#ffd166':'#5cf4c3',life:1});sound(o.fruit?900:720,.08,'sine',.05)}document.getElementById('scoreText').textContent=score;objects.splice(index,1)}
+function drawBackground(dt){ctx.fillStyle='#07111f';ctx.fillRect(0,0,W,H);const g=ctx.createRadialGradient(W*.5,H*.42,10,W*.5,H*.42,Math.max(W,H)*.75);g.addColorStop(0,'#11233b');g.addColorStop(1,'#050a13');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);ctx.save();ctx.globalAlpha=.18;ctx.strokeStyle='#5cf4c3';ctx.lineWidth=1;const grid=54;for(let x=(performance.now()*.008)%grid;x<W;x+=grid){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke()}for(let y=(performance.now()*.006)%grid;y<H;y+=grid){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke()}ctx.restore()}
+function drawHand(){const now=performance.now();trail=trail.filter(p=>now-p.t<230);if(trail.length>1){ctx.save();for(let i=1;i<trail.length;i++){const a=trail[i-1],b=trail[i],alpha=Math.max(0,1-(now-b.t)/230);ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.lineCap='round';ctx.lineWidth=4+alpha*13;ctx.strokeStyle=`rgba(92,244,195,${alpha*.9})`;ctx.shadowColor='#5cf4c3';ctx.shadowBlur=18;ctx.stroke()}ctx.restore()}if(hand){ctx.save();ctx.beginPath();ctx.arc(hand.x,hand.y,12,0,Math.PI*2);ctx.fillStyle='#eafff8';ctx.shadowColor='#5cf4c3';ctx.shadowBlur=24;ctx.fill();ctx.beginPath();ctx.arc(hand.x,hand.y,20,0,Math.PI*2);ctx.strokeStyle='#5cf4c3aa';ctx.lineWidth=2;ctx.stroke();ctx.restore()}}
+function frame(ts){requestAnimationFrame(frame);const dt=Math.min(.035,(ts-(lastFrame||ts))/1000);lastFrame=ts;drawBackground(dt);if(playing){spawnClock+=dt;const interval=Math.max(.26,.62-score/1800);while(spawnClock>=interval&&objects.length<13){spawnClock-=interval;spawn()}for(let i=objects.length-1;i>=0;i--){const o=objects[i];o.x+=o.vx*dt;o.y+=o.vy*dt;o.angle+=o.rot*dt*60;if(o.x<o.r||o.x>W-o.r)o.vx*=-1;ctx.save();ctx.translate(o.x,o.y);ctx.rotate(Math.sin(o.angle)*.12);ctx.font=`${o.r*1.55}px system-ui,Apple Color Emoji,Segoe UI Emoji`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.shadowColor=o.bomb?'#ff4d6d':'#5cf4c3';ctx.shadowBlur=13;ctx.fillText(o.icon,0,0);ctx.restore();if(hand&&previousHand){const d=distToSegment(o.x,o.y,previousHand.x,previousHand.y,hand.x,hand.y);const speed=Math.hypot(hand.x-previousHand.x,hand.y-previousHand.y);if(d<o.r*.72+Math.min(26,speed*.18)&&ts-lastHitAt>40){lastHitAt=ts;hit(o,i);continue}}if(o.y<-o.r*2)objects.splice(i,1)}}
+for(let i=particles.length-1;i>=0;i--){const p=particles[i];p.life-=dt;p.x+=p.vx*dt;p.y+=p.vy*dt;p.vx*=Math.pow(.12,dt);p.vy=p.vy*Math.pow(.2,dt)+150*dt;ctx.globalAlpha=Math.max(0,p.life/p.max);ctx.fillStyle=p.color;ctx.beginPath();ctx.arc(p.x,p.y,p.size,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;if(p.life<=0)particles.splice(i,1)}
+for(let i=floating.length-1;i>=0;i--){const f=floating[i];f.life-=dt;f.y-=55*dt;ctx.globalAlpha=Math.max(0,f.life);ctx.fillStyle=f.color;ctx.font='900 25px system-ui';ctx.textAlign='center';ctx.fillText(f.text,f.x,f.y);ctx.globalAlpha=1;if(f.life<=0)floating.splice(i,1)}drawHand();}
+requestAnimationFrame(frame);initCamera();
+})();
+</script></body></html>
