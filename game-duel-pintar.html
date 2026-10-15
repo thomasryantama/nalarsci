@@ -37,7 +37,7 @@ html, body {
   box-shadow: 0 10px 25px rgba(0,0,0,0.5), inset 0 2px 6px rgba(255,255,255,0.6);
   border: 4px solid #ffffffcc;
   transition: transform 0.15s ease, background-color 0.2s;
-  pointer-events: none;
+  cursor: pointer; pointer-events: auto;
 }
 .air-target.touched {
   transform: scale(1.18);
@@ -91,14 +91,14 @@ html, body {
 </div>
 
 <!-- Arena Balon Jawaban di Layar (2 Balon untuk Pemain 1, 2 Balon untuk Pemain 2) -->
-<div class="relative z-10 flex-grow w-full max-w-5xl mx-auto pointer-events-none" id="targetsArea">
-  <!-- P1 Balon Kiri & Kanan -->
-  <div id="targetP1_L" class="air-target bg-sky-600/90" style="left: 8%; top: 38%;">23</div>
-  <div id="targetP1_R" class="air-target bg-indigo-600/90" style="left: 32%; top: 38%;">25</div>
+<div class="relative z-10 flex-grow w-full max-w-5xl mx-auto" id="targetsArea">
+  <!-- P1 Balon Kiri & Kanan (Bisa disentuh tangan kamera ATAU diklik mouse) -->
+  <div id="targetP1_L" onclick="onBalloonClick('P1', 'L', this)" class="air-target bg-sky-600/90" style="left: 8%; top: 38%;">23</div>
+  <div id="targetP1_R" onclick="onBalloonClick('P1', 'R', this)" class="air-target bg-indigo-600/90" style="left: 32%; top: 38%;">25</div>
 
   <!-- P2 Balon Kiri & Kanan -->
-  <div id="targetP2_L" class="air-target bg-emerald-600/90" style="right: 32%; top: 38%;">23</div>
-  <div id="targetP2_R" class="air-target bg-teal-600/90" style="right: 8%; top: 38%;">25</div>
+  <div id="targetP2_L" onclick="onBalloonClick('P2', 'L', this)" class="air-target bg-emerald-600/90" style="right: 32%; top: 38%;">23</div>
+  <div id="targetP2_R" onclick="onBalloonClick('P2', 'R', this)" class="air-target bg-teal-600/90" style="right: 8%; top: 38%;">25</div>
 </div>
 
 <!-- Footer Status Kamera & Garis Pembatas -->
@@ -312,6 +312,12 @@ function checkTargetCollisions() {
       }
     }
   }
+}
+
+
+function onBalloonClick(player, side, el) {
+  if (!isPlaying || !currentQ || cooldown) return;
+  handlePlayerAnswer(player, side, el);
 }
 
 function handlePlayerAnswer(player, side, element) {
