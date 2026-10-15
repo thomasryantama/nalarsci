@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Flappy Astronot - Kontrol Gerak Kepala</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js" crossorigin="anonymous"></script>
+  <style>
+    body { font-family: 'Nunito', sans-serif; background: #0b0f19; color: white; overflow: hidden; user-select: none; }
+    .font-title { font-family: 'Fredoka', sans-serif; }
+    .mirror { transform: scaleX(-1); }
+  </style>
+</head>
+<body class="relative w-screen h-screen flex flex-col justify-between p-3 sm:p-5">
+
+  <video id="webcam" class="hidden" playsinline></video>
+  <canvas id="gameCanvas" class="absolute inset-0 w-full h-full object-cover z-0"></canvas>
+
+  <!-- HUD Atas -->
+  <header class="relative z-10 max-w-4xl mx-auto w-full flex justify-between items-center bg-slate-900/80 backdrop-blur-md px-5 py-2.5 rounded-2xl border border-sky-400/30 shadow-xl">
+    <div class="flex items-center gap-2.5">
+      <span class="text-3xl">🚀</span>
+      <div>
+        <h1 class="font-title text-base sm:text-lg text-sky-300 leading-tight">Flappy Astronot AI</h1>
+        <p class="text-[10px] text-slate-400">Gerakkan kepala naik-turun untuk terbang • Karya: Thomas Ryantama</p>
+      </div>
+    </div>
+    <div class="flex items-center gap-3">
+      <div class="bg-slate-950/80 px-4 py-1.5 rounded-xl border border-slate-700 text-center">
+        <span class="text-[10px] text-amber-400 font-bold block uppercase">Skor</span>
+        <span id="scoreText" class="text-xl sm:text-2xl font-black text-white font-title">0</span>
+      </div>
+      <div class="bg-slate-950/80 px-4 py-1.5 rounded-xl border border-slate-700 text-center">
+        <span class="text-[10px] text-emerald-400 font-bold block uppercase">Terbaik</span>
+        <span id="bestText" class="text-xl sm:text-2xl font-black text-emerald-400 font-title">0</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Layar Mulai / Game Over Modal -->
+  <div id="gameModal" class="relative z-20 m-auto bg-slate-900/90 backdrop-blur-md border border-sky-400/40 p-6 sm:p-8 rounded-3xl max-w-md w-full text-center shadow-2xl space-y-4">
+    <div id="modalIcon" class="text-6xl animate-bounce">🧑‍🚀</div>
+    <h2 id="modalTitle" class="font-title text-2xl sm:text-3xl text-amber-400">Flappy Astronot AI</h2>
+    <p id="modalDesc" class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+      Kamera mendeteksi kepalamu! <b>Tegakkan kepala atau jinjit</b> untuk terbang ke atas, dan <b>tunduk/jongkok sedikit</b> untuk meluncur ke bawah melewati pipa laser antariksa.
+    </p>
+    <div class="p-3 bg-slate-950 rounded-2xl border border-slate-800 text-[11px] text-sky-300">
+      💡 Pastikan kepala dan leher terlihat jelas di depan webcam.
+    </div>
+    <button onclick="startGame()" id="btnStart" class="w-full py-3.5 bg-emerald-600 hover:bg-emerald-500 text-white font-title text-base font-bold rounded-2xl shadow-xl transition transform hover:scale-105">
+      🚀 Mulai Terbang
+    </button>
+  </div>
+
+  <!-- Indikator Tracking Kepala -->
+  <footer class="relative z-10 text-center pb-2">
+    <span id="trackerStatus" class="px-4 py-1.5 bg-slate-950/80 border border-slate-700 rounded-full text-xs font-bold text-slate-300 shadow">
+      📡 Mengaktifkan Sensor Kamera...
+    </span>
+  </footer>
+
+  <script>
+    const cv = document.getElementById('gameCanvas');
+    const ctx = cv.getContext('2d');
+    const vid = document.getElementById('webcam');
+
+    let birdY = 0.5; // 0 (atas) sampai 1 (bawah)
+    let targetBirdY = 0.5;
+    let score = 0;
+    let bestScore = localStorage.getItem('FLAPPY_BEST') || 0;
+    document.getElementById('bestText').innerText = bestScore;
+
+    let gameState = 'ready'; // 'ready', 'playing', 'gameover'
+    let pipes = [];
+    let pipeSpeed = 3.5;
+    let pipeInterval = 120;
+    let frameCount = 0;
+
+    // Web Audio Synthesizer
+    let audioCtx = null;
+    function beep(f, t='sine', d=0.1, v=0.08) {
+      try {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+        o.type = t; o.frequency.value = f;
+        g.gain.setValueAtTime(v, audioCtx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + d);
+        o.connect(g); g.connect(audioCtx.destination);
+        o.start(); o.stop(audioCtx.currentTime + d);
+      } catch (e) {}
+    }
+
+    // MediaPipe Pose
+    const pose = new Pose({
+      locateFile: (f) => `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${f}`
+    });
+    pose.setOptions({ modelComplexity: 1, smoothLandmarks: true, minDetectionConfidence: 0.5 });
+    
+    let noseYRaw = 0.5;
+    pose.onResults(results => {
+      if (results.poseLandmarks && results.poseLandmarks[0]) {
+        // Landmark 0 adalah hidung
+        noseYRaw = results.poseLandmarks[0].y;
+        document.getElementById('trackerStatus').innerHTML = "✅ Kepala Terdeteksi! Gerakkan naik turun.";
+        document.getElementById('trackerStatus').className = "px-4 py-1.5 bg-emerald-950/80 border border-emerald-500 rounded-full text-xs font-bold text-emerald-300 shadow";
+      }
+    });
+
+    const camera = new Camera(vid, {
+      onFrame: async () => { await pose.send({ image: vid }); },
+      width: 640, height: 480
+    });
+    camera.start();
+
+    function startGame() {
+      document.getElementById('gameModal').classList.add('hidden');
+      score = 0;
+      document.getElementById('scoreText').innerText = '0';
+      pipes = [];
+      frameCount = 0;
+      gameState = 'playing';
+      birdY = 0.5;
+    }
+
+    function gameOver() {
+      gameState = 'gameover';
+      beep(150, 'sawtooth', 0.3, 0.15);
+      if (score > bestScore) {
+        bestScore = score;
+        localStorage.setItem('FLAPPY_BEST', bestScore);
+        document.getElementById('bestText').innerText = bestScore;
+      }
+      document.getElementById('modalIcon').innerText = "💥";
+      document.getElementById('modalTitle').innerText = "Menabrak Rintangan!";
+      document.getElementById('modalDesc').innerHTML = `Astronotmu berhasil mengumpulkan <b>${score} Poin</b>!<br>Rekor tertinggimu: <b>${bestScore} Poin</b>.`;
+      document.getElementById('btnStart').innerText = "🔄 Terbang Lagi";
+      document.getElementById('gameModal').classList.remove('hidden');
+    }
+
+    function loop() {
+      requestAnimationFrame(loop);
+      cv.width = window.innerWidth;
+      cv.height = window.innerHeight;
+      const W = cv.width, H = cv.height;
+
+      ctx.clearRect(0, 0, W, H);
+
+      // Gambar background luar angkasa
+      ctx.fillStyle = '#0f172a';
+      ctx.fillRect(0, 0, W, H);
+
+      // Bintang-bintang latar belakang
+      ctx.fillStyle = '#ffffff33';
+      for (let i = 0; i < 40; i++) {
+        const sx = ((i * 123 + frameCount * 0.5) % W);
+        const sy = ((i * 321) % H);
+        ctx.fillRect(sx, sy, 2, 2);
+      }
+
+      // PID filter pergerakan karakter mengikuti hidung
+      // Rentang hidung normal di webcam biasanya antara 0.25 (atas) sampai 0.65 (bawah)
+      const mappedY = (noseYRaw - 0.2) / 0.5; // skala diperlebar
+      const clampedY = Math.max(0.08, Math.min(0.92, mappedY));
+      targetBirdY = clampedY;
+      birdY += (targetBirdY - birdY) * 0.18; // smooth lerp
+
+      const birdScreenX = W * 0.25;
+      const birdScreenY = birdY * H;
+      const birdRadius = 26;
+
+      if (gameState === 'playing') {
+        frameCount++;
+
+        // Buat pipa rintangan baru
+        if (frameCount % pipeInterval === 0) {
+          const gapSize = H * 0.32; // celah lewat
+          const gapTop = Math.random() * (H - gapSize - 120) + 60;
+          pipes.push({
+            x: W,
+            top: gapTop,
+            bottom: gapTop + gapSize,
+            width: 70,
+            passed: false
+          });
+        }
+
+        // Jalankan pipa
+        for (let i = pipes.length - 1; i >= 0; i--) {
+          const p = pipes[i];
+          p.x -= pipeSpeed;
+
+          // Gambar Pipa Atas & Bawah (Laser Neon Futuristik)
+          ctx.fillStyle = '#0284c7';
+          ctx.fillRect(p.x, 0, p.width, p.top);
+          ctx.fillStyle = '#0369a1';
+          ctx.fillRect(p.x - 4, p.top - 20, p.width + 8, 20);
+
+          ctx.fillStyle = '#0284c7';
+          ctx.fillRect(p.x, p.bottom, p.width, H - p.bottom);
+          ctx.fillStyle = '#0369a1';
+          ctx.fillRect(p.x - 4, p.bottom, p.width + 8, 20);
+
+          // Cek Skor Masuk Celah
+          if (!p.passed && p.x + p.width < birdScreenX) {
+            p.passed = true;
+            score++;
+            document.getElementById('scoreText').innerText = score;
+            beep(880, 'sine', 0.1, 0.1);
+          }
+
+          // Cek Tabrakan Pipa
+          if (birdScreenX + birdRadius > p.x && birdScreenX - birdRadius < p.x + p.width) {
+            if (birdScreenY - birdRadius < p.top || birdScreenY + birdRadius > p.bottom) {
+              gameOver();
+            }
+          }
+
+          if (p.x + p.width < -10) pipes.splice(i, 1);
+        }
+      }
+
+      // Gambar Karakter Astronot Terbang
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(birdScreenX, birdScreenY, birdRadius + 6, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(56, 189, 248, 0.35)';
+      ctx.fill();
+
+      ctx.font = '36px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('🧑‍🚀', birdScreenX, birdScreenY);
+      ctx.restore();
+    }
+    loop();
+  </script>
+</body>
+</html>
