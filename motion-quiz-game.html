@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kuis Gerak Informatika - NalarSci</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- MediaPipe Pose & Camera Utils CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js" crossorigin="anonymous"></script>
+  <style>
+    /* Mirror video feed for natural selfie/mirror gameplay */
+    .mirror {
+      transform: scaleX(-1);
+    }
+  </style>
+</head>
+<body class="bg-slate-900 text-white font-sans overflow-hidden select-none">
+
+  <!-- Container Layar Penuh -->
+  <div class="relative w-screen h-screen flex flex-col justify-between p-4">
+
+    <!-- Video Element (Hidden, diproses ke canvas) -->
+    <video id="inputVideo" class="hidden" playsinline></video>
+
+    <!-- Canvas Utama (Background Kamera + Overlay Grafis Game) -->
+    <canvas id="gameCanvas" class="absolute inset-0 w-full h-full object-cover mirror z-0"></canvas>
+
+    <!-- Overlay UI Game (Di atas Canvas) -->
+    <div class="relative z-10 flex flex-col justify-between h-full pointer-events-none">
+
+      <!-- Header: Skor & Timer -->
+      <div class="flex justify-between items-center bg-slate-900/80 backdrop-blur-md px-6 py-3 rounded-2xl border border-slate-700 mx-auto w-full max-w-4xl shadow-xl">
+        <div class="flex items-center gap-3">
+          <span class="text-2xl">⚡</span>
+          <div>
+            <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">NalarSci Motion Game</div>
+            <div class="text-lg font-black text-amber-400" id="scoreDisplay">Skor: 0</div>
+          </div>
+        </div>
+
+        <!-- Timer Lingkaran / Bar -->
+        <div class="text-center">
+          <div class="text-[10px] uppercase font-bold text-slate-400">Pilih Sebelum Waktu Habis</div>
+          <div class="text-3xl font-black text-rose-500 font-mono tracking-widest" id="timerDisplay">5.0</div>
+        </div>
+
+        <div class="text-right">
+          <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Soal</div>
+          <div class="text-lg font-black text-sky-400" id="questionNumDisplay">1 / 5</div>
+        </div>
+      </div>
+
+      <!-- Kotak Soal Utama (Melayang di Tengah Atas) -->
+      <div id="questionBox" class="mx-auto w-full max-w-3xl bg-slate-950/90 backdrop-blur-lg border-2 border-sky-500 rounded-3xl p-5 text-center shadow-2xl mt-4">
+        <span class="text-xs font-bold text-sky-400 uppercase tracking-widest">Pertanyaan Informatika</span>
+        <h2 id="questionText" class="text-xl md:text-2xl font-black text-white mt-1 leading-snug">
+          Memuat kamera dan pustaka AI... Mohon izinkan akses webcam!
+        </h2>
+      </div>
+
+      <!-- Kotak Opsi KIRI vs KANAN -->
+      <div class="grid grid-cols-2 gap-8 w-full max-w-5xl mx-auto mb-6 px-4">
+        
+        <!-- OPSI KIRI (A) -->
+        <div id="boxLeft" class="bg-gradient-to-br from-blue-900/80 to-sky-950/90 border-4 border-sky-400/50 rounded-3xl p-6 flex flex-col items-center justify-center text-center shadow-2xl transition-all duration-300">
+          <div class="text-sm font-black px-3 py-1 bg-sky-500 text-slate-950 rounded-full uppercase mb-2">⬅️ OPSI A (Condong ke Kiri)</div>
+          <div id="textLeft" class="text-lg md:text-2xl font-black text-sky-100 leading-tight">Pilihan A</div>
+        </div>
+
+        <!-- OPSI KANAN (B) -->
+        <div id="boxRight" class="bg-gradient-to-br from-emerald-900/80 to-teal-950/90 border-4 border-emerald-400/50 rounded-3xl p-6 flex flex-col items-center justify-center text-center shadow-2xl transition-all duration-300">
+          <div class="text-sm font-black px-3 py-1 bg-emerald-500 text-slate-950 rounded-full uppercase mb-2">OPSI B (Condong ke Kanan) ➡️</div>
+          <div id="textRight" class="text-lg md:text-2xl font-black text-emerald-100 leading-tight">Pilihan B</div>
+        </div>
+
+      </div>
+
+      <!-- Indikator Posisi Pemain (Kiri - Tengah - Kanan) -->
+      <div class="text-center pb-2">
+        <span id="playerIndicator" class="px-4 py-1.5 bg-slate-950/80 border border-slate-700 rounded-full text-xs font-bold text-slate-300 shadow">
+          📍 Posisi Tubuh: Berdiri di Tengah
+        </span>
+      </div>
+
+    </div>
+
+    <!-- Layar Mulai / Selesai (Overlay Modal) -->
+    <div id="startModal" class="absolute inset-0 bg-slate-950/90 backdrop-blur-md z-30 flex flex-col items-center justify-center p-6 text-center">
+      <div class="max-w-lg space-y-4">
+        <div class="text-5xl">🎮🏃</div>
+        <h1 class="text-3xl font-black text-sky-400 tracking-tight">Kuis Gerak Informatika</h1>
+        <p class="text-sm text-slate-300 leading-relaxed">
+          Game berbasis kamera langsung di browser! Condongkan badan atau melompat ke <b>KIRI</b> untuk memilih Opsi A, atau ke <b>KANAN</b> untuk Opsi B sebelum waktu habis.
+        </p>
+        <div class="p-3 bg-slate-900 border border-slate-800 rounded-xl text-xs text-amber-300">
+          💡 <b>Tips:</b> Pastikan tubuh bagian atas terlihat jelas di kamera laptop dan ruangan cukup terang.
+        </div>
+        <button onclick="startGame()" id="btnStart" class="px-8 py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-black text-base rounded-2xl shadow-xl transition-all pointer-events-auto transform hover:scale-105">
+          🚀 Mulai Main Sekarang
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // Daftar Bank Soal Informatika Interaktif
+    const QUESTIONS = [
+      {
+        q: "Manakah perangkat yang berfungsi sebagai Output Device (Pengeluaran)?",
+        optA: "Monitor",
+        optB: "Keyboard",
+        ans: "A"
+      },
+      {
+        q: "Tombol kombinasi keyboard untuk membatalkan perintah terakhir (Undo) adalah...",
+        optA: "CTRL + Z",
+        optB: "CTRL + P",
+        ans: "A"
+      },
+      {
+        q: "Pada aplikasi Scratch, blok warna oranye 'When Green Flag Clicked' termasuk kategori...",
+        optA: "Motion (Gerak)",
+        optB: "Events (Kejadian)",
+        ans: "B"
+      },
+      {
+        q: "Perangkat yang bertindak sebagai otak pusat pengolah instruksi komputer adalah...",
+        optA: "CPU (Processor)",
+        optB: "Power Supply",
+        ans: "A"
+      },
+      {
+        q: "Sikap bijak saat menggunakan internet dan media sosial adalah...",
+        optA: "Menjaga kata sandi & privasi",
+        optB: "Membagikan data pribadi sembarangan",
+        ans: "A"
+      }
+    ];
+
+    let currentQIdx = 0;
+    let score = 0;
+    let timeLeft = 5.0;
+    let timerInterval = null;
+    let isGameRunning = false;
+    let playerChoice = "CENTER"; // "LEFT", "RIGHT", "CENTER"
+
+    // PID-Style Filter untuk memuluskan posisi X kepala/hidung (Mencegah Jitter)
+    let smoothedX = 0.5;
+    const SMOOTH_FACTOR = 0.25; // Lerp factor (Filter pelembut koordinat)
+
+    const videoElement = document.getElementById('inputVideo');
+    const canvasElement = document.getElementById('gameCanvas');
+    const canvasCtx = canvasElement.getContext('2d');
+
+    // Inisialisasi MediaPipe Pose Detection
+    const pose = new Pose({
+      locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`
+    });
+
+    pose.setOptions({
+      modelComplexity: 1,
+      smoothLandmarks: true,
+      minDetectionConfidence: 0.5,
+      minTrackingConfidence: 0.5
+    });
+
+    pose.onResults(onPoseResults);
+
+    // Aktifkan Kamera
+    const camera = new Camera(videoElement, {
+      onFrame: async () => {
+        await pose.send({ image: videoElement });
+      },
+      width: 1280,
+      height: 720
+    });
+
+    camera.start().then(() => {
+      document.getElementById('questionText').innerText = "Kamera Siap! Tekan Mulai untuk bermain.";
+    }).catch(err => {
+      document.getElementById('questionText').innerText = "Gagal mengakses webcam: " + err;
+    });
+
+    function onPoseResults(results) {
+      // Sesuaikan ukuran canvas dengan jendela browser
+      canvasElement.width = window.innerWidth;
+      canvasElement.height = window.innerHeight;
+
+      canvasCtx.save();
+      canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+
+      // Gambar tangkapan video webcam ke canvas sebagai latar
+      if (results.image) {
+        canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
+      }
+
+      // Deteksi Posisi Tubuh (Nose Landmark #0)
+      if (results.poseLandmarks && results.poseLandmarks[0]) {
+        const rawX = results.poseLandmarks[0].x; // 0.0 (kiri) s/d 1.0 (kanan)
+        
+        // Terapkan pelembut koordinat (Low-pass filter / PID smoothing)
+        smoothedX = smoothedX + (rawX - smoothedX) * SMOOTH_FACTOR;
+
+        // Visualisasikan titik kepala (Avatar tracker)
+        const trackerX = smoothedX * canvasElement.width;
+        const trackerY = results.poseLandmarks[0].y * canvasElement.height;
+
+        canvasCtx.beginPath();
+        canvasCtx.arc(trackerX, trackerY, 20, 0, 2 * Math.PI);
+        canvasCtx.fillStyle = "#38bdf8";
+        canvasCtx.fill();
+        canvasCtx.lineWidth = 4;
+        canvasCtx.strokeStyle = "#ffffff";
+        canvasCtx.stroke();
+
+        // Tentukan Pilihan Berdasarkan Posisi X (Ingat: video sudah dimirror)
+        // rawX < 0.4 = Kiri fisik pemain (Opsi A)
+        // rawX > 0.6 = Kanan fisik pemain (Opsi B)
+        // Catatan: Karena CSS menggunakan scaleX(-1) untuk tampilan cermin:
+        // Titik x < 0.4 di cermin terlihat di sisi kiri layar
+        if (smoothedX < 0.42) {
+          playerChoice = "LEFT";
+        } else if (smoothedX > 0.58) {
+          playerChoice = "RIGHT";
+        } else {
+          playerChoice = "CENTER";
+        }
+
+        updateChoiceUI();
+      }
+
+      canvasCtx.restore();
+    }
+
+    function updateChoiceUI() {
+      const boxLeft = document.getElementById("boxLeft");
+      const boxRight = document.getElementById("boxRight");
+      const ind = document.getElementById("playerIndicator");
+
+      if (playerChoice === "LEFT") {
+        boxLeft.className = "bg-sky-500/90 border-4 border-white rounded-3xl p-6 flex flex-col items-center justify-center text-center shadow-2xl scale-105 transition-all";
+        boxRight.className = "bg-slate-900/40 border-4 border-slate-700 rounded-3xl p-6 flex flex-col items-center justify-center text-center opacity-40 transition-all";
+        ind.innerHTML = "📍 Pilihan Kamu: <span class='text-sky-400 font-black'>OPSI A (KIRI)</span>";
+      } else if (playerChoice === "RIGHT") {
+        boxRight.className = "bg-emerald-500/90 border-4 border-white rounded-3xl p-6 flex flex-col items-center justify-center text-center shadow-2xl scale-105 transition-all";
+        boxLeft.className = "bg-slate-900/40 border-4 border-slate-700 rounded-3xl p-6 flex flex-col items-center justify-center text-center opacity-40 transition-all";
+        ind.innerHTML = "📍 Pilihan Kamu: <span class='text-emerald-400 font-black'>OPSI B (KANAN)</span>";
+      } else {
+        boxLeft.className = "bg-gradient-to-br from-blue-900/80 to-sky-950/90 border-4 border-sky-400/50 rounded-3xl p-6 flex flex-col items-center justify-center text-center shadow-2xl transition-all";
+        boxRight.className = "bg-gradient-to-br from-emerald-900/80 to-teal-950/90 border-4 border-emerald-400/50 rounded-3xl p-6 flex flex-col items-center justify-center text-center shadow-2xl transition-all";
+        ind.innerHTML = "📍 Posisi Tubuh: Berdiri di Tengah (Belum Memilih)";
+      }
+    }
+
+    function startGame() {
+      document.getElementById("startModal").classList.add("hidden");
+      currentQIdx = 0;
+      score = 0;
+      document.getElementById("scoreDisplay").innerText = "Skor: 0";
+      isGameRunning = true;
+      loadQuestion();
+    }
+
+    function loadQuestion() {
+      if (currentQIdx >= QUESTIONS.length) {
+        endGame();
+        return;
+      }
+
+      const q = QUESTIONS[currentQIdx];
+      document.getElementById("questionNumDisplay").innerText = `${currentQIdx + 1} / ${QUESTIONS.length}`;
+      document.getElementById("questionText").innerText = q.q;
+      document.getElementById("textLeft").innerText = q.optA;
+      document.getElementById("textRight").innerText = q.optB;
+
+      timeLeft = 5.0;
+      document.getElementById("timerDisplay").innerText = timeLeft.toFixed(1);
+
+      if (timerInterval) clearInterval(timerInterval);
+
+      timerInterval = setInterval(() => {
+        timeLeft -= 0.1;
+        if (timeLeft <= 0) {
+          clearInterval(timerInterval);
+          evalAnswer();
+        } else {
+          document.getElementById("timerDisplay").innerText = Math.max(0, timeLeft).toFixed(1);
+        }
+      }, 100);
+    }
+
+    function evalAnswer() {
+      const q = QUESTIONS[currentQIdx];
+      const correctAns = q.ans;
+      const playerAns = (playerChoice === "LEFT") ? "A" : ((playerChoice === "RIGHT") ? "B" : "NONE");
+
+      const questionBox = document.getElementById("questionBox");
+
+      if (playerAns === correctAns) {
+        score += 20;
+        document.getElementById("scoreDisplay").innerText = `Skor: ${score}`;
+        questionBox.className = "mx-auto w-full max-w-3xl bg-emerald-600/90 border-4 border-white rounded-3xl p-5 text-center shadow-2xl mt-4 animate-bounce";
+        document.getElementById("questionText").innerText = "🎉 BENAR! +20 Poin";
+      } else {
+        questionBox.className = "mx-auto w-full max-w-3xl bg-rose-600/90 border-4 border-white rounded-3xl p-5 text-center shadow-2xl mt-4";
+        document.getElementById("questionText").innerText = `❌ SALAH! Jawaban yang benar adalah Opsi ${correctAns}.`;
+      }
+
+      setTimeout(() => {
+        questionBox.className = "mx-auto w-full max-w-3xl bg-slate-950/90 backdrop-blur-lg border-2 border-sky-500 rounded-3xl p-5 text-center shadow-2xl mt-4";
+        currentQIdx++;
+        loadQuestion();
+      }, 2000);
+    }
+
+    function endGame() {
+      isGameRunning = false;
+      const modal = document.getElementById("startModal");
+      modal.classList.remove("hidden");
+      modal.innerHTML = `
+        <div class="max-w-lg space-y-4">
+          <div class="text-6xl">🏆</div>
+          <h1 class="text-3xl font-black text-amber-400">Permainan Selesai!</h1>
+          <p class="text-xl font-bold text-white">Skor Akhir Kamu: <span class="text-emerald-400 text-3xl font-black">${score}</span> / 100</p>
+          <p class="text-xs text-slate-400">Keren sekali! Praktikum gerak logika Informatika berhasil diselesaikan.</p>
+          <button onclick="startGame()" class="px-8 py-3 bg-sky-600 hover:bg-sky-500 text-white font-black text-base rounded-2xl shadow-xl pointer-events-auto transform hover:scale-105">
+            🔄 Main Lagi
+          </button>
+        </div>
+      `;
+    }
+  </script>
+</body>
+</html>
