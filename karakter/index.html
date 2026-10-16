@@ -2,293 +2,91 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Buku Karakter Building - Pembaca Digital</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Katalog Buku Karakter Building - SD Methodist Immanuel</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
-  <!-- Mozilla PDF.js CDN -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
   <style>
     body {
       font-family: 'Nunito', sans-serif;
-      background: #0f172a;
+      background: radial-gradient(circle at 50% 0%, #1e293b 0%, #0b0f19 80%);
       color: #f8fafc;
-      overflow: hidden;
-      touch-action: pan-y;
-      user-select: none;
+      min-height: 100vh;
     }
-    #canvas-container {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 100%;
-      width: 100%;
-      overflow: auto;
-      padding: 10px;
+    .font-title { font-family: 'Fredoka', sans-serif; }
+    .book-card {
+      background: rgba(255, 255, 255, 0.04);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
-    canvas {
-      box-shadow: 0 20px 40px rgba(0,0,0,0.6);
-      border-radius: 8px;
-      max-width: 100%;
-      height: auto;
-      background: white;
+    .book-card:hover {
+      transform: translateY(-6px);
+      border-color: rgba(56, 189, 248, 0.5);
+      box-shadow: 0 20px 35px -10px rgba(0, 0, 0, 0.7);
     }
-    /* Hide scrollbars but allow scrolling if zoomed */
-    #canvas-container::-webkit-scrollbar { display: none; }
-    #canvas-container { -ms-overflow-style: none; scrollbar-width: none; }
   </style>
 </head>
-<body class="flex flex-col h-screen w-screen justify-between">
+<body class="p-4 sm:p-8 flex flex-col justify-between max-w-6xl mx-auto min-h-screen">
 
-  <!-- TOP BAR: JUDUL & KONTROL CEPAT -->
-  <header class="bg-slate-900/95 border-b border-slate-800 px-4 py-2.5 flex items-center justify-between z-20 backdrop-blur">
-    <div class="flex items-center gap-2.5">
-      <span class="text-2xl">📖</span>
-      <div>
-        <h1 class="text-xs sm:text-sm font-black text-amber-400 leading-tight">Buku Pembiasaan Karakter</h1>
-        <p class="text-[10px] text-slate-400">Panduan Harian Wali Kelas • NalarSci Lab</p>
-      </div>
+  <!-- HEADER -->
+  <header class="text-center max-w-2xl mx-auto mb-8">
+    <div class="inline-flex items-center gap-2 bg-amber-500/10 border border-amber-400/20 text-amber-300 px-3.5 py-1 rounded-full text-xs font-black uppercase tracking-wider mb-3">
+      📖 Ekosistem Literasi & Budi Pekerti
     </div>
-
-    <!-- PENGATUR ZOOM & FULLSCREEN -->
-    <div class="flex items-center gap-1.5 sm:gap-2">
-      <button onclick="zoomOut()" class="p-1.5 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs font-bold text-slate-200 border border-slate-700" title="Perkecil">
-        🔍−
-      </button>
-      <button onclick="zoomReset()" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-[11px] font-bold text-slate-300 border border-slate-700" title="Pas Layar">
-        Fit
-      </button>
-      <button onclick="zoomIn()" class="p-1.5 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs font-bold text-slate-200 border border-slate-700" title="Perbesar">
-        🔍+
-      </button>
-      <button onclick="toggleFullscreen()" class="px-2.5 py-1 bg-sky-600 hover:bg-sky-500 rounded-lg text-[11px] font-bold text-white shadow" title="Layar Penuh TV">
-        ⛶ Layar TV
-      </button>
-    </div>
+    <h1 class="font-title text-3xl sm:text-4xl text-white mb-2">Rak Buku Pembiasaan Karakter</h1>
+    <p class="text-slate-400 text-xs sm:text-sm">
+      Pilih jenjang kelas atau buku panduan di bawah untuk membaca langsung di layar Smart TV atau perangkat Anda lembar per lembar.
+    </p>
   </header>
 
-  <!-- AREA BACA LEMBAR PER LEMBAR -->
-  <main class="relative flex-1 w-full overflow-hidden bg-slate-950 flex items-center justify-center" id="main-area">
-    
-    <!-- Loading Spinner -->
-    <div id="loading" class="absolute flex flex-col items-center gap-2 text-slate-400 text-xs">
-      <div class="w-8 h-8 border-4 border-amber-400 border-t-transparent rounded-full animate-spin"></div>
-      <span>Membuka halaman buku...</span>
-    </div>
+  <!-- GRID 12 BUKU -->
+  <main class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 flex-grow mb-10">
 
-    <div id="canvas-container">
-      <canvas id="pdf-canvas"></canvas>
-    </div>
+    <!-- BUKU 1 S/D 12 -->
+    <!-- Template JS Render agar mudah diatur -->
+    <script>
+      const books = [
+        { id: '1', title: 'Kelas 1 (Fase A)', sub: 'Semester 1', icon: '🌱', color: 'from-emerald-500/20 to-emerald-950/40', border: 'border-emerald-500/30', file: 'buku-1.pdf' },
+        { id: '2', title: 'Kelas 1 (Fase A)', sub: 'Semester 2', icon: '🌿', color: 'from-emerald-500/20 to-emerald-950/40', border: 'border-emerald-500/30', file: 'buku-2.pdf' },
+        { id: '3', title: 'Kelas 2 (Fase A)', sub: 'Semester 1', icon: '🌻', color: 'from-teal-500/20 to-teal-950/40', border: 'border-teal-500/30', file: 'buku-3.pdf' },
+        { id: '4', title: 'Kelas 2 (Fase A)', sub: 'Semester 2', icon: '🌼', color: 'from-teal-500/20 to-teal-950/40', border: 'border-teal-500/30', file: 'buku-4.pdf' },
+        { id: '5', title: 'Kelas 3 (Fase B)', sub: 'Semester 1', icon: '📘', color: 'from-sky-500/20 to-sky-950/40', border: 'border-sky-500/30', file: 'buku-5.pdf' },
+        { id: '6', title: 'Kelas 3 (Fase B)', sub: 'Semester 2', icon: '🌊', color: 'from-sky-500/20 to-sky-950/40', border: 'border-sky-500/30', file: 'buku-6.pdf' },
+        { id: '7', title: 'Kelas 4 (Fase B)', sub: 'Semester 1', icon: '🦅', color: 'from-blue-500/20 to-blue-950/40', border: 'border-blue-500/30', file: 'buku-7.pdf' },
+        { id: '8', title: 'Kelas 4 (Fase B)', sub: 'Semester 2', icon: '⭐', color: 'from-blue-500/20 to-blue-950/40', border: 'border-blue-500/30', file: 'buku-8.pdf' },
+        { id: '9', title: 'Kelas 5 (Fase C)', sub: 'Semester 1', icon: '🚀', color: 'from-indigo-500/20 to-indigo-950/40', border: 'border-indigo-500/30', file: 'buku-9.pdf' },
+        { id: '10', title: 'Kelas 5 (Fase C)', sub: 'Semester 2', icon: '🪐', color: 'from-indigo-500/20 to-indigo-950/40', border: 'border-indigo-500/30', file: 'buku-10.pdf' },
+        { id: '11', title: 'Kelas 6 (Fase C)', sub: 'Semester 1', icon: '🏆', color: 'from-amber-500/20 to-amber-950/40', border: 'border-amber-500/30', file: 'buku-11.pdf' },
+        { id: '12', title: 'Kelas 6 (Fase C)', sub: 'Semester 2', icon: '👑', color: 'from-amber-500/20 to-amber-950/40', border: 'border-amber-500/30', file: 'buku-12.pdf' },
+      ];
 
-    <!-- TOMBOL PANAH SAMPING BESAR (UNTUK DESKTOP / TV) -->
-    <button onclick="prevPage()" id="side-prev" class="hidden sm:flex absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-slate-900/80 hover:bg-slate-800 border border-slate-700 text-white rounded-full items-center justify-center text-xl shadow-2xl transition hover:scale-110">
-      ❮
-    </button>
-    <button onclick="nextPage()" id="side-next" class="hidden sm:flex absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-slate-900/80 hover:bg-slate-800 border border-slate-700 text-white rounded-full items-center justify-center text-xl shadow-2xl transition hover:scale-110">
-      ❯
-    </button>
+      document.write(books.map(b => `
+        <div class="book-card rounded-2xl p-4 sm:p-5 flex flex-col justify-between bg-gradient-to-br ${b.color} border ${b.border}">
+          <div>
+            <div class="flex justify-between items-start mb-2">
+              <span class="text-3xl sm:text-4xl">${b.icon}</span>
+              <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-slate-900/80 text-slate-300 border border-slate-700">
+                Buku #${b.id}
+              </span>
+            </div>
+            <h3 class="font-title text-base sm:text-lg text-white font-bold leading-tight mt-1">${b.title}</h3>
+            <p class="text-[11px] text-slate-300 font-semibold mb-4">${b.sub}</p>
+          </div>
+          <a href="baca.html?file=${b.file}&judul=${encodeURIComponent(b.title + ' - ' + b.sub)}" 
+             class="w-full py-2 bg-slate-900/90 hover:bg-sky-600 text-sky-300 hover:text-white border border-sky-400/30 hover:border-sky-400 font-title text-xs font-bold rounded-xl text-center shadow transition flex items-center justify-center gap-1.5">
+            📖 Buka Buku
+          </a>
+        </div>
+      `).join(''));
+    </script>
 
   </main>
 
-  <!-- BOTTOM BAR: NAVIGASI HALAMAN & LOMPAT NOMOR -->
-  <footer class="bg-slate-900/95 border-t border-slate-800 px-4 py-2 flex items-center justify-between z-20 backdrop-blur">
-    
-    <!-- Tombol Mundur -->
-    <button onclick="prevPage()" id="btn-prev" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 disabled:opacity-40 text-xs font-bold rounded-xl transition flex items-center gap-1.5 border border-slate-700">
-      <span>⬅️</span> <span class="hidden sm:inline">Sebelumnya</span>
-    </button>
-
-    <!-- Indikator & Input Halaman -->
-    <div class="flex items-center gap-2 text-xs font-bold">
-      <span class="text-slate-400">Hal.</span>
-      <input type="number" id="page-num" value="1" min="1" 
-             class="w-12 text-center bg-slate-950 border border-slate-700 text-amber-400 rounded-lg py-1 font-mono text-xs focus:border-amber-400 outline-none"
-             onchange="goToPage(this.value)">
-      <span class="text-slate-400">/ <span id="page-count" class="text-slate-200">...</span></span>
-    </div>
-
-    <!-- Tombol Maju -->
-    <button onclick="nextPage()" id="btn-next" class="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 disabled:opacity-40 text-xs font-bold rounded-xl transition flex items-center gap-1.5 shadow">
-      <span class="hidden sm:inline">Berikutnya</span> <span>➡️</span>
-    </button>
-
+  <!-- FOOTER -->
+  <footer class="border-t border-slate-800/80 pt-5 text-center text-xs text-slate-500">
+    SD Methodist Immanuel • Dikembangkan oleh <span class="text-slate-400 font-bold">Thomas Ryantama, M.Kom., Gr.</span> (nalarsci.id)
   </footer>
 
-  <script>
-    // Konfigurasi Worker PDF.js
-    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-
-    // NAMA FILE PDF ANDA (Pastikan berada di folder yang sama atau ganti URL ini)
-    const PDF_URL = 'buku-karakter.pdf';
-
-    let pdfDoc = null;
-    let pageNum = 1;
-    let pageRendering = false;
-    let pageNumPending = null;
-    let scale = 1.0;
-    let baseScale = 1.0;
-
-    const canvas = document.getElementById('pdf-canvas');
-    const ctx = canvas.getContext('2d');
-
-    // 1. Muat Dokumen PDF
-    pdfjsLib.getDocument(PDF_URL).promise.then(doc => {
-      pdfDoc = doc;
-      document.getElementById('page-count').innerText = doc.numPages;
-      document.getElementById('page-num').max = doc.numPages;
-      document.getElementById('loading').classList.add('hidden');
-      renderPage(pageNum);
-    }).catch(err => {
-      document.getElementById('loading').innerHTML = `
-        <div class="text-rose-400 font-bold">⚠️ Gagal memuat file PDF</div>
-        <p class="text-[11px] text-slate-400 text-center max-w-xs">Pastikan file <b>buku-karakter.pdf</b> sudah diunggah di folder yang sama.</p>
-      `;
-    });
-
-    // 2. Render Halaman ke Canvas
-    function renderPage(num) {
-      pageRendering = true;
-      document.getElementById('loading').classList.remove('hidden');
-
-      pdfDoc.getPage(num).then(page => {
-        // Hitung skala otomatis agar pas dengan tinggi/lebar layar area baca
-        const container = document.getElementById('canvas-container');
-        const viewportUnscaled = page.getViewport({ scale: 1.0 });
-
-        const availableWidth = container.clientWidth - 20;
-        const availableHeight = container.clientHeight - 20;
-
-        const scaleX = availableWidth / viewportUnscaled.width;
-        const scaleY = availableHeight / viewportUnscaled.height;
-        baseScale = Math.min(scaleX, scaleY);
-
-        const currentScale = baseScale * scale;
-        const viewport = page.getViewport({ scale: currentScale });
-
-        // Tingkatkan resolusi untuk layar retina / resolusi tinggi
-        const outputScale = window.devicePixelRatio || 1;
-        canvas.width = Math.floor(viewport.width * outputScale);
-        canvas.height = Math.floor(viewport.height * outputScale);
-        canvas.style.width = Math.floor(viewport.width) + "px";
-        canvas.style.height = Math.floor(viewport.height) + "px";
-
-        const transform = outputScale !== 1 ? [outputScale, 0, 0, outputScale, 0, 0] : null;
-
-        const renderContext = {
-          canvasContext: ctx,
-          transform: transform,
-          viewport: viewport
-        };
-
-        const renderTask = page.render(renderContext);
-
-        renderTask.promise.then(() => {
-          pageRendering = false;
-          document.getElementById('loading').classList.add('hidden');
-
-          if (pageNumPending !== null) {
-            renderPage(pageNumPending);
-            pageNumPending = null;
-          }
-        });
-      });
-
-      // Update angka navigasi
-      document.getElementById('page-num').value = num;
-      document.getElementById('btn-prev').disabled = (num <= 1);
-      document.getElementById('btn-next').disabled = (num >= pdfDoc.numPages);
-    }
-
-    function queueRenderPage(num) {
-      if (pageRendering) {
-        pageNumPending = num;
-      } else {
-        renderPage(num);
-      }
-    }
-
-    function prevPage() {
-      if (pageNum <= 1) return;
-      pageNum--;
-      queueRenderPage(pageNum);
-    }
-
-    function nextPage() {
-      if (pageNum >= pdfDoc.numPages) return;
-      pageNum++;
-      queueRenderPage(pageNum);
-    }
-
-    function goToPage(val) {
-      const p = parseInt(val);
-      if (p >= 1 && p <= pdfDoc.numPages) {
-        pageNum = p;
-        queueRenderPage(pageNum);
-      }
-    }
-
-    // Zoom Controls
-    function zoomIn() {
-      scale = Math.min(scale + 0.25, 2.5);
-      renderPage(pageNum);
-    }
-
-    function zoomOut() {
-      scale = Math.max(scale - 0.25, 0.75);
-      renderPage(pageNum);
-    }
-
-    function zoomReset() {
-      scale = 1.0;
-      renderPage(pageNum);
-    }
-
-    function toggleFullscreen() {
-      if (!document.fullscreenElement) {
-        document.documentElement.requestFullscreen();
-      } else {
-        document.exitFullscreen();
-      }
-    }
-
-    // Keyboard Shortcuts (Panah Kanan/Kiri untuk ganti halaman di laptop/TV)
-    window.addEventListener('keydown', e => {
-      if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') {
-        nextPage();
-      } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
-        prevPage();
-      }
-    });
-
-    // Touch Swipe untuk Layar HP (Geser Kiri/Kanan dengan jari)
-    let touchStartX = 0;
-    let touchEndX = 0;
-    const mainArea = document.getElementById('main-area');
-
-    mainArea.addEventListener('touchstart', e => {
-      touchStartX = e.changedTouches[0].screenX;
-    }, { passive: true });
-
-    mainArea.addEventListener('touchend', e => {
-      touchEndX = e.changedTouches[0].screenX;
-      handleSwipe();
-    }, { passive: true });
-
-    function handleSwipe() {
-      const swipeDistance = touchEndX - touchStartX;
-      if (Math.abs(swipeDistance) > 50) {
-        if (swipeDistance < 0) {
-          nextPage(); // Geser ke kiri -> Halaman berikutnya
-        } else {
-          prevPage(); // Geser ke kanan -> Halaman sebelumnya
-        }
-      }
-    }
-
-    // Resize Otomatis saat orientasi layar HP diputar
-    window.addEventListener('resize', () => {
-      if (pdfDoc) renderPage(pageNum);
-    });
-  </script>
 </body>
 </html>
