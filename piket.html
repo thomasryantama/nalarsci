@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pos Piket Gerbang — Surat Izin Masuk Kelas & Keterlambatan</title>
+  <meta name="robots" content="noindex, nofollow">
+
+  <link rel="icon" type="image/png" href="favicon.png">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: radial-gradient(circle at 50% 0%, #1e293b 0%, #0b0f19 90%);
+      color: #f8fafc;
+      min-height: 100vh;
+    }
+    .font-title { font-family: 'Fredoka', sans-serif; }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.04);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    @media print {
+      body { background: white !important; color: black !important; padding: 0 !important; }
+      header, #form-container, #riwayat-container, button, .no-print { display: none !important; }
+      .print-box { display: block !important; border: none !important; color: black !important; background: white !important; }
+      table { border-collapse: collapse !important; width: 100% !important; }
+      th, td { border: 1px solid #333 !important; color: black !important; padding: 4px 6px !important; }
+      .no-border-table td, .no-border-table th { border: none !important; }
+    }
+  </style>
+</head>
+<body class="p-3 sm:p-6 max-w-5xl mx-auto flex flex-col justify-between min-h-screen">
+
+  <!-- HEADER GURU PIKET -->
+  <header class="mb-6 no-print">
+    <div class="flex flex-wrap justify-between items-center gap-4 bg-slate-900/90 border border-slate-800 p-4 rounded-3xl backdrop-blur-md">
+      <div class="flex items-center gap-3">
+        <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-500 to-rose-500 flex items-center justify-center text-white text-xl shadow-lg">
+          <i class="fa-solid fa-person-walking-dashed-line-arrow-right"></i>
+        </div>
+        <div>
+          <h1 class="font-title text-xl text-white tracking-wide leading-tight">POS PIKET <span class="text-amber-400">GERBANG</span></h1>
+          <p class="text-[11px] text-slate-400">Pencatatan Keterlambatan & Surat Izin Masuk Kelas • SD Methodist Immanuel</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="text-xs bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 px-3 py-1.5 rounded-xl font-bold flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Mode Guru Piket
+        </span>
+      </div>
+    </div>
+  </header>
+
+  <!-- FORM CONTAINER UTAMA -->
+  <main class="space-y-6 flex-grow no-print">
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+      <!-- KOLOM KIRI: FORM CATAT CEPAT & CETAK SLIP -->
+      <div class="lg:col-span-2 glass-card rounded-3xl p-6 border border-slate-800 space-y-4" id="form-container">
+        <div class="border-b border-slate-800 pb-3 flex justify-between items-center">
+          <div>
+            <h2 class="font-title text-lg text-amber-300">Form Catat Siswa Terlambat</h2>
+            <p class="text-xs text-slate-400">Otomatis terhitung akumulasi bulanan dan terhubung ke spreadsheet kesiswaan.</p>
+          </div>
+          <span class="text-xs font-mono font-bold text-rose-400 bg-rose-950/40 border border-rose-800/40 px-2.5 py-1 rounded-lg">
+            Bel Masuk: 07.15 WIB
+          </span>
+        </div>
+
+        <form id="formPiket" onsubmit="handleSimpanDanCetak(event)" class="space-y-3.5 text-xs">
+          <div>
+            <label class="block font-bold text-slate-300 mb-1">Nama Lengkap Siswa:</label>
+            <input type="text" id="siswaNama" required placeholder="Ketik nama lengkap siswa..." class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-white font-bold outline-none focus:border-amber-400">
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block font-bold text-slate-300 mb-1">Kelas / Rombel:</label>
+              <select id="siswaKelas" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-white font-bold outline-none focus:border-amber-400">
+                <option value="Kelas 1A">Kelas 1A</option>
+                <option value="Kelas 1B">Kelas 1B</option>
+                <option value="Kelas 2A">Kelas 2A</option>
+                <option value="Kelas 2B">Kelas 2B</option>
+                <option value="Kelas 3A">Kelas 3A</option>
+                <option value="Kelas 3B">Kelas 3B</option>
+                <option value="Kelas 4A">Kelas 4A</option>
+                <option value="Kelas 4B">Kelas 4B</option>
+                <option value="Kelas 5A">Kelas 5A</option>
+                <option value="Kelas 5B">Kelas 5B</option>
+                <option value="Kelas 6A">Kelas 6A</option>
+                <option value="Kelas 6B">Kelas 6B</option>
+              </select>
+            </div>
+            <div>
+              <label class="block font-bold text-slate-300 mb-1">Tanggal Hari Ini:</label>
+              <input type="date" id="siswaTanggal" required class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-white outline-none focus:border-amber-400">
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <div class="flex justify-between items-center mb-1">
+                <label class="font-bold text-slate-300">Jam Tiba di Gerbang:</label>
+                <button type="button" onclick="setJamSekarang()" class="text-[10px] text-amber-400 hover:underline font-bold">
+                  ⏱️ Jam Sekarang
+                </button>
+              </div>
+              <input type="time" id="siswaJam" required class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-white font-mono font-bold outline-none focus:border-amber-400">
+            </div>
+            <div>
+              <label class="block font-bold text-slate-300 mb-1">Guru Piket yang Bertugas:</label>
+              <input type="text" id="guruPiket" required placeholder="Nama Guru Piket..." class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-white outline-none focus:border-amber-400">
+            </div>
+          </div>
+
+          <div>
+            <label class="block font-bold text-slate-300 mb-1">Alasan Terlambat:</label>
+            <select id="siswaAlasan" onchange="cekAlasanLainnya()" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-amber-300 font-bold outline-none focus:border-amber-400">
+              <option value="Bangun kesiangan">Bangun kesiangan</option>
+              <option value="Terjebak macet di perjalanan">Terjebak macet di perjalanan</option>
+              <option value="Kendaraan mogok / kendala transportasi">Kendaraan mogok / kendala transportasi</option>
+              <option value="Menunggu adik / anggota keluarga lain">Menunggu adik / anggota keluarga lain</option>
+              <option value="Hujan lebat / cuaca buruk">Hujan lebat / cuaca buruk</option>
+              <option value="Kurang enak badan (tetap berusaha masuk)">Kurang enak badan (tetap berusaha masuk)</option>
+              <option value="Lainnya">Lainnya (Tulis manual)</option>
+            </select>
+            <input type="text" id="alasanManual" placeholder="Tuliskan alasan spesifik..." class="hidden w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-white mt-2 outline-none focus:border-amber-400">
+          </div>
+
+          <div class="pt-2">
+            <button type="submit" id="btnSubmit" class="w-full py-3.5 bg-gradient-to-r from-amber-500 to-rose-500 hover:from-amber-400 hover:to-rose-400 text-slate-950 font-title font-bold text-sm rounded-2xl shadow-xl transition transform hover:scale-[1.01] flex items-center justify-center gap-2">
+              <i class="fa-solid fa-print"></i> Simpan & Cetak Surat Izin Masuk Kelas
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- KOLOM KANAN: PANTAUAN HARI INI -->
+      <div class="glass-card rounded-3xl p-6 border border-slate-800 space-y-4 flex flex-col justify-between" id="riwayat-container">
+        <div>
+          <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+            <h3 class="font-title text-base text-white">Log Piket Hari Ini</h3>
+            <span class="text-[10px] bg-slate-800 text-slate-300 px-2.5 py-1 rounded-full font-bold" id="badgeTotalHariIni">0 Siswa</span>
+          </div>
+          <div class="space-y-2 mt-3 max-h-80 overflow-y-auto pr-1" id="listHariIni">
+            <p class="text-xs text-slate-500 italic py-4 text-center">Belum ada siswa terlambat hari ini.</p>
+          </div>
+        </div>
+
+        <div class="p-3 bg-slate-950/60 rounded-2xl border border-slate-800/80 text-[11px] text-slate-400 space-y-1">
+          <p class="font-bold text-amber-300"><i class="fa-solid fa-circle-info"></i> Petunjuk Guru Piket:</p>
+          <p>1. Surat izin dicetak dan diberikan ke siswa untuk ditunjukkan ke Guru Mapel di kelas.</p>
+          <p>2. Potongan bawah surat wajib dibawa pulang dan ditandatangani orang tua untuk dikembalikan ke pos piket besok.</p>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- ================= LEMBAR CETAK SLIP RESMI (A5 / POTONG DUA) ================= -->
+  <div id="printArea" class="hidden print-box p-4 max-w-2xl mx-auto text-black bg-white">
+    <!-- SLIP BAGIAN 1: UNTUK GURU KELAS / MAPEL -->
+    <div class="border border-black p-4 mb-4 rounded">
+      <div class="border-b-2 border-black pb-2 mb-3 text-center">
+        <h3 class="text-xs font-bold uppercase tracking-wider">SD METHODIST IMMANUEL BANDAR LAMPUNG</h3>
+        <h2 class="text-sm font-black uppercase underline">SURAT IZIN MASUK KELAS (SISWA TERLAMBAT)</h2>
+        <p class="text-[9px] text-gray-700 italic">Diserahkan kepada Guru Pengajar di Kelas</p>
+      </div>
+
+      <table class="w-full text-xs no-border-table mb-3">
+        <tr>
+          <td style="width: 120px; padding: 2px 0 !important;">Hari / Tanggal</td>
+          <td style="padding: 2px 0 !important;">: <b id="prTgl">Rabu, 21 Oktober 2026</b></td>
+          <td style="width: 100px; padding: 2px 0 !important;">Jam Tiba</td>
+          <td style="padding: 2px 0 !important;">: <b id="prJam" class="font-mono text-sm">07.25 WIB</b></td>
+        </tr>
+        <tr>
+          <td style="padding: 2px 0 !important;">Nama Siswa</td>
+          <td style="padding: 2px 0 !important;">: <b id="prNama" class="text-sm uppercase">Bryan Christopher</b></td>
+          <td style="padding: 2px 0 !important;">Kelas</td>
+          <td style="padding: 2px 0 !important;">: <b id="prKelas">5A</b></td>
+        </tr>
+        <tr>
+          <td style="padding: 2px 0 !important;">Alasan Keterlambatan</td>
+          <td colspan="3" style="padding: 2px 0 !important;">: <span id="prAlasan">Bangun kesiangan</span></td>
+        </tr>
+        <tr>
+          <td style="padding: 2px 0 !important;">Catatan Keterlambatan</td>
+          <td colspan="3" style="padding: 2px 0 !important;">: <b id="prAkumulasi" class="text-red-700">Terlambat Ke-1 Bulan Ini</b></td>
+        </tr>
+      </table>
+
+      <p class="text-[10px] leading-tight text-gray-800 mb-3">
+        Peserta didik di atas telah melapor ke Pos Piket dan dipersilakan mengikuti kegiatan belajar di kelas setelah menyelesaikan pembiasaan kedisiplinan.
+      </p>
+
+      <div class="grid grid-cols-2 text-center text-xs">
+        <div>
+          <p class="text-[10px]">Guru Pengajar / Kelas,</p>
+          <div class="h-10"></div>
+          <p class="text-[10px] underline">( ........................................ )</p>
+        </div>
+        <div>
+          <p class="text-[10px]">Guru Piket Gerbang,</p>
+          <div class="h-10"></div>
+          <p class="text-[10px] underline font-bold" id="prGuruPiket">Ibu Maria, S.Pd.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- GARIS GUNTING PEMOTONG SLIP -->
+    <div class="border-b-2 border-dashed border-gray-500 my-4 text-center relative">
+      <span class="bg-white px-2 text-[9px] text-gray-500 absolute -top-2.5 left-1/2 -translate-x-1/2 font-mono">
+        ✂️ Gunting di sini — Bagian bawah dibawa pulang untuk ditandatangani orang tua
+      </span>
+    </div>
+
+    <!-- SLIP BAGIAN 2: UNTUK DIBAWA PULANG KE ORANG TUA -->
+    <div class="border border-black p-4 rounded bg-gray-50">
+      <div class="border-b-2 border-black pb-2 mb-3 text-center">
+        <h3 class="text-xs font-bold uppercase tracking-wider">SD METHODIST IMMANUEL BANDAR LAMPUNG</h3>
+        <h2 class="text-sm font-black uppercase underline">LEMBAR PEMBERITAHUAN KETERLAMBATAN SISWA</h2>
+        <p class="text-[9px] text-gray-700 italic">Wajib ditandatangani Orang Tua dan dikembalikan ke Pos Piket besok pagi</p>
+      </div>
+
+      <table class="w-full text-xs no-border-table mb-2">
+        <tr>
+          <td style="width: 120px; padding: 2px 0 !important;">Nama Siswa / Kelas</td>
+          <td style="padding: 2px 0 !important;">: <b id="prNama2">Bryan Christopher (5A)</b></td>
+          <td style="width: 100px; padding: 2px 0 !important;">Tiba di Sekolah</td>
+          <td style="padding: 2px 0 !important;">: <b id="prJam2">07.25 WIB</b></td>
+        </tr>
+        <tr>
+          <td style="padding: 2px 0 !important;">Tanggal Kejadian</td>
+          <td style="padding: 2px 0 !important;">: <span id="prTgl2">21 Oktober 2026</span></td>
+          <td style="padding: 2px 0 !important;">Status Bulan Ini</td>
+          <td style="padding: 2px 0 !important;">: <b id="prAkumulasi2" class="text-red-700">Terlambat Ke-1</b></td>
+        </tr>
+        <tr>
+          <td style="padding: 2px 0 !important;">Alasan Siswa</td>
+          <td colspan="3" style="padding: 2px 0 !important;">: <span id="prAlasan2">Bangun kesiangan</span></td>
+        </tr>
+      </table>
+
+      <p class="text-[10px] leading-tight text-gray-800 mb-3 bg-white p-2 border border-gray-300 rounded">
+        <b>Pemberitahuan kepada Orang Tua:</b> Batas toleransi kehadiran di sekolah adalah pukul <b>07.15 WIB</b>. Jika keterlambatan mencapai <b>3 kali</b>, sekolah akan menerbitkan Surat Peringatan (SP), dan jika mencapai <b>5 kali</b> akan diadakan konferensi kasus bersama Waka Kesiswaan. Mohon kerja sama Bapak/Ibu untuk mendampingi waktu berangkat ananda.
+      </p>
+
+      <div class="grid grid-cols-2 text-center text-xs">
+        <div>
+          <p class="text-[10px]">Tanda Tangan Orang Tua / Wali,</p>
+          <div class="h-10"></div>
+          <p class="text-[10px] underline font-bold">( .................................................... )</p>
+        </div>
+        <div>
+          <p class="text-[10px]">Mengetahui, Guru Piket,</p>
+          <div class="h-10"></div>
+          <p class="text-[10px] underline font-bold" id="prGuruPiket2">Ibu Maria, S.Pd.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="text-center text-xs text-slate-500 pt-6 border-t border-slate-800 no-print">
+    Sistem Absensi Piket Gerbang • Terkoneksi ke Database Kesiswaan SD Methodist Immanuel
+  </footer>
+
+  <!-- SCRIPT LOGIKA PIKET -->
+  <script>
+    const API_KESISWAAN_URL = "https://script.google.com/macros/s/AKfycbzYdXRIHIi1RGHWmb61__IRiR2DkdQYpjxj-xiEBiXAmSyyIRmCXLum6vJoAPQmWqcIDg/exec";
+    
+    // Kunci piket umum (tidak perlu master key kesiswaan rahasia)
+    const PIKET_ACCESS_KEY = "piket2026"; 
+
+    let logLokalHariIni = JSON.parse(localStorage.getItem("piket_hari_ini") || "[]");
+
+    function inisialisasi() {
+      document.getElementById('siswaTanggal').valueAsDate = new Date();
+      setJamSekarang();
+      renderLogHariIni();
+    }
+
+    function setJamSekarang() {
+      const now = new Date();
+      const jam = String(now.getHours()).padStart(2, '0');
+      const mnt = String(now.getMinutes()).padStart(2, '0');
+      document.getElementById('siswaJam').value = `${jam}:${mnt}`;
+    }
+
+    function cekAlasanLainnya() {
+      const sel = document.getElementById('siswaAlasan').value;
+      const inp = document.getElementById('alasanManual');
+      if (sel === 'Lainnya') {
+        inp.classList.remove('hidden');
+        inp.required = true;
+      } else {
+        inp.classList.add('hidden');
+        inp.required = false;
+      }
+    }
+
+    function handleSimpanDanCetak(e) {
+      e.preventDefault();
+      const nama = document.getElementById('siswaNama').value.trim();
+      const kelas = document.getElementById('siswaKelas').value;
+      const tgl = document.getElementById('siswaTanggal').value;
+      const jamVal = document.getElementById('siswaJam').value;
+      const jamFormat = jamVal ? `${jamVal.replace(':', '.')} WIB` : "07.20 WIB";
+      const guru = document.getElementById('guruPiket').value.trim();
+
+      let alasan = document.getElementById('siswaAlasan').value;
+      if (alasan === 'Lainnya') {
+        alasan = document.getElementById('alasanManual').value.trim() || "Lain-lain";
+      }
+
+      const btn = document.getElementById('btnSubmit');
+      btn.disabled = true;
+      btn.innerHTML = "⏳ Menghitung & Menyimpan ke Cloud...";
+
+      const payload = {
+        action: "tambah_terlambat",
+        key: PIKET_ACCESS_KEY,
+        data: {
+          tanggal: tgl,
+          nama: nama,
+          kelas: kelas,
+          jam: jamFormat,
+          alasan: alasan,
+          guru: guru
+        }
+      };
+
+      fetch(API_KESISWAAN_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify(payload)
+      })
+      .then(r => r.json())
+      .then(res => {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-print"></i> Simpan & Cetak Surat Izin Masuk Kelas';
+
+        let akumulasi = 1;
+        if (res.status === "success" && res.message) {
+          // Ambil angka akumulasi dari pesan server jika ada
+          const match = res.message.match(/\d+/);
+          if (match) akumulasi = parseInt(match[0]);
+        }
+
+        // Simpan ke log lokal hari ini
+        const itemLokal = { nama, kelas, jam: jamFormat, tgl, alasan, guru, akumulasi };
+        logLokalHariIni.unshift(itemLokal);
+        localStorage.setItem("piket_hari_ini", JSON.stringify(logLokalHariIni));
+        renderLogHariIni();
+
+        // Siapkan Slip Cetak
+        siapkanSlipCetak(itemLokal);
+        window.print();
+        document.getElementById('printArea').classList.add('hidden');
+
+        // Reset form nama
+        document.getElementById('siswaNama').value = "";
+        document.getElementById('siswaNama').focus();
+      })
+      .catch(err => {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-print"></i> Simpan & Cetak Surat Izin Masuk Kelas';
+        alert("Peringatan: Gagal kirim ke server (" + err + "), namun slip tetap dicetak.");
+        
+        const itemLokal = { nama, kelas, jam: jamFormat, tgl, alasan, guru, akumulasi: 1 };
+        siapkanSlipCetak(itemLokal);
+        window.print();
+        document.getElementById('printArea').classList.add('hidden');
+      });
+    }
+
+    function siapkanSlipCetak(d) {
+      const tglObj = new Date(d.tgl);
+      const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+      const tglLengkap = tglObj.toLocaleDateString('id-ID', options);
+
+      let statusAkumulasi = `Terlambat Ke-${d.akumulasi} Bulan Ini`;
+      if (d.akumulasi >= 5) statusAkumulasi += " (PERINGATAN KRISIS: PANGGILAN ORANG TUA)";
+      else if (d.akumulasi >= 3) statusAkumulasi += " (PERINGATAN: TERBIT SURAT PERINGATAN)";
+
+      // Slip Atas
+      document.getElementById('prTgl').innerText = tglLengkap;
+      document.getElementById('prJam').innerText = d.jam;
+      document.getElementById('prNama').innerText = d.nama;
+      document.getElementById('prKelas').innerText = d.kelas;
+      document.getElementById('prAlasan').innerText = d.alasan;
+      document.getElementById('prAkumulasi').innerText = statusAkumulasi;
+      document.getElementById('prGuruPiket').innerText = d.guru;
+
+      // Slip Bawah
+      document.getElementById('prNama2').innerText = `${d.nama} (${d.kelas})`;
+      document.getElementById('prJam2').innerText = d.jam;
+      document.getElementById('prTgl2').innerText = tglLengkap;
+      document.getElementById('prAkumulasi2').innerText = statusAkumulasi;
+      document.getElementById('prAlasan2').innerText = d.alasan;
+      document.getElementById('prGuruPiket2').innerText = d.guru;
+
+      document.getElementById('printArea').classList.remove('hidden');
+    }
+
+    function renderLogHariIni() {
+      const box = document.getElementById('listHariIni');
+      document.getElementById('badgeTotalHariIni').innerText = `${logLokalHariIni.length} Siswa`;
+
+      if (logLokalHariIni.length === 0) {
+        box.innerHTML = `<p class="text-xs text-slate-500 italic py-4 text-center">Belum ada siswa terlambat hari ini.</p>`;
+        return;
+      }
+
+      box.innerHTML = logLokalHariIni.map((item, idx) => `
+        <div class="p-2.5 bg-slate-950/70 border border-slate-800 rounded-xl flex items-center justify-between text-xs">
+          <div>
+            <div class="flex items-center gap-1.5">
+              <span class="font-bold text-white">${item.nama}</span>
+              <span class="text-[10px] text-amber-400 font-mono">(${item.kelas})</span>
+            </div>
+            <p class="text-[10px] text-slate-400 mt-0.5">Tiba: <b class="text-rose-400">${item.jam}</b> • Ke-${item.akumulasi || 1}</p>
+          </div>
+          <button onclick="cetakUlang(${idx})" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-[10px] font-bold border border-slate-700 transition" title="Cetak Ulang Slip">
+            🖨️ Cetak
+          </button>
+        </div>
+      `).join('');
+    }
+
+    function cetakUlang(idx) {
+      const d = logLokalHariIni[idx];
+      if (d) {
+        siapkanSlipCetak(d);
+        window.print();
+        document.getElementById('printArea').classList.add('hidden');
+      }
+    }
+
+    inisialisasi();
+  </script>
+</body>
+</html>
