@@ -120,6 +120,16 @@
           </div>
 
           <div>
+            <div class="flex justify-between items-center mb-1">
+              <label class="font-bold text-slate-300">Pesan Kasih / Catatan Persuasif untuk Orang Tua:</label>
+              <button type="button" onclick="resetPesanPersuasif()" class="text-[10px] text-amber-400 hover:underline">
+                ↺ Teks Standar Ramah
+              </button>
+            </div>
+            <textarea id="pesanOrtuPersuasif" rows="2" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-slate-200 outline-none focus:border-amber-400 text-xs leading-relaxed"></textarea>
+          </div>
+
+          <div>
             <label class="block font-bold text-slate-300 mb-1">Alasan Terlambat:</label>
             <select id="siswaAlasan" onchange="cekAlasanLainnya()" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-amber-300 font-bold outline-none focus:border-amber-400">
               <option value="Bangun kesiangan">Bangun kesiangan</option>
@@ -249,9 +259,10 @@
         </tr>
       </table>
 
-      <p class="text-[10px] leading-tight text-gray-800 mb-3 bg-white p-2 border border-gray-300 rounded">
-        <b>Pemberitahuan kepada Orang Tua:</b> Batas toleransi kehadiran di sekolah adalah pukul <b>07.15 WIB</b>. Jika keterlambatan mencapai <b>3 kali</b>, sekolah akan menerbitkan Surat Peringatan (SP), dan jika mencapai <b>5 kali</b> akan diadakan konferensi kasus bersama Waka Kesiswaan. Mohon kerja sama Bapak/Ibu untuk mendampingi waktu berangkat ananda.
-      </p>
+      <div class="text-[10px] leading-relaxed text-gray-800 mb-3 bg-white p-2.5 border border-gray-300 rounded shadow-sm">
+        <p class="font-bold text-gray-900 mb-0.5">🕊️ Salam Hangat & Kemitraan Sekolah-Keluarga:</p>
+        <p id="prPesanPersuasif">Bapak/Ibu yang terkasih, ketepatan waktu sebelum pukul 07.15 WIB merupakan salah satu pembiasaan karakter disiplin dan kesiapan belajar ananda di pagi hari. Kami mohon dukungan dan kerja sama Bapak/Ibu untuk bersama-sama mendampingi ananda agar dapat tiba tepat waktu. Terima kasih atas cinta dan pendampingan terbaik bagi ananda.</p>
+      </div>
 
       <div class="grid grid-cols-2 text-center text-xs">
         <div>
@@ -282,7 +293,15 @@
     let masterSiswaList = JSON.parse(localStorage.getItem("master_siswa_cache") || "[]");
     let logLokalHariIni = JSON.parse(localStorage.getItem("piket_hari_ini") || "[]");
 
+    
+    const PESAN_PERSUASIF_DEFAULT = "Bapak/Ibu yang terkasih, salam hangat dari sekolah. Ketepatan waktu sebelum pukul 07.15 WIB merupakan pembiasaan karakter disiplin dan kesiapan belajar ananda di pagi hari. Kami mohon bantuan Bapak/Ibu di rumah untuk bersama-sama mendampingi waktu istirahat dan keberangkatan ananda agar senantiasa bersemangat tiba di sekolah tepat waktu. Terima kasih atas kerja sama dan cinta yang tulus bagi ananda.";
+
+    function resetPesanPersuasif() {
+      document.getElementById('pesanOrtuPersuasif').value = PESAN_PERSUASIF_DEFAULT;
+    }
+
     function inisialisasi() {
+      resetPesanPersuasif();
       document.getElementById('siswaTanggal').valueAsDate = new Date();
       setJamSekarang();
       renderLogHariIni();
