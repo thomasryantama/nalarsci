@@ -50,6 +50,9 @@
         </div>
       </div>
       <div class="flex items-center gap-2">
+        <button onclick="muatMasterSiswaDariCloud()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold px-3 py-1.5 rounded-xl border border-slate-700 transition flex items-center gap-1.5" title="Sinkronkan Nama Siswa">
+          <i class="fa-solid fa-arrows-rotate text-emerald-400"></i> Sync Siswa
+        </button>
         <span class="text-xs bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 px-3 py-1.5 rounded-xl font-bold flex items-center gap-1.5">
           <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Mode Guru Piket
         </span>
@@ -67,7 +70,7 @@
         <div class="border-b border-slate-800 pb-3 flex justify-between items-center">
           <div>
             <h2 class="font-title text-lg text-amber-300">Form Catat Siswa Terlambat</h2>
-            <p class="text-xs text-slate-400">Otomatis terhitung akumulasi bulanan dan terhubung ke spreadsheet kesiswaan.</p>
+            <p class="text-xs text-slate-400">Ketik nama siswa, data dan kelas akan otomatis terdeteksi dari database sekolah.</p>
           </div>
           <span class="text-xs font-mono font-bold text-rose-400 bg-rose-950/40 border border-rose-800/40 px-2.5 py-1 rounded-lg">
             Bel Masuk: 07.15 WIB
@@ -75,28 +78,24 @@
         </div>
 
         <form id="formPiket" onsubmit="handleSimpanDanCetak(event)" class="space-y-3.5 text-xs">
-          <div>
-            <label class="block font-bold text-slate-300 mb-1">Nama Lengkap Siswa:</label>
-            <input type="text" id="siswaNama" required placeholder="Ketik nama lengkap siswa..." class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-white font-bold outline-none focus:border-amber-400">
+          <!-- INPUT NAMA DENGAN AUTOCOMPLETE & AUTO-FILL KELAS -->
+          <div class="relative">
+            <div class="flex justify-between items-center mb-1">
+              <label class="font-bold text-slate-300">Nama Siswa (Pilih dari Database):</label>
+              <span id="syncStatusText" class="text-[10px] text-emerald-400 font-semibold">● Database Siap</span>
+            </div>
+            <input type="text" id="siswaNama" list="listDatalistSiswa" oninput="onNamaSiswaDiinput()" required placeholder="Ketik 2-3 huruf nama siswa..." class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-white font-bold outline-none focus:border-amber-400 text-sm">
+            
+            <!-- DATALIST HTML5 UNTUK SUGGESTION NAMA -->
+            <datalist id="listDatalistSiswa">
+              <!-- Diisi otomatis oleh JavaScript dari Sheet "Data_Siswa" -->
+            </datalist>
           </div>
 
           <div class="grid grid-cols-2 gap-3">
             <div>
-              <label class="block font-bold text-slate-300 mb-1">Kelas / Rombel:</label>
-              <select id="siswaKelas" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-white font-bold outline-none focus:border-amber-400">
-                <option value="Kelas 1A">Kelas 1A</option>
-                <option value="Kelas 1B">Kelas 1B</option>
-                <option value="Kelas 2A">Kelas 2A</option>
-                <option value="Kelas 2B">Kelas 2B</option>
-                <option value="Kelas 3A">Kelas 3A</option>
-                <option value="Kelas 3B">Kelas 3B</option>
-                <option value="Kelas 4A">Kelas 4A</option>
-                <option value="Kelas 4B">Kelas 4B</option>
-                <option value="Kelas 5A">Kelas 5A</option>
-                <option value="Kelas 5B">Kelas 5B</option>
-                <option value="Kelas 6A">Kelas 6A</option>
-                <option value="Kelas 6B">Kelas 6B</option>
-              </select>
+              <label class="block font-bold text-slate-300 mb-1">Kelas (Otomatis Terisi):</label>
+              <input type="text" id="siswaKelas" required placeholder="Pilih nama di atas..." class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-amber-300 font-bold outline-none">
             </div>
             <div>
               <label class="block font-bold text-slate-300 mb-1">Tanggal Hari Ini:</label>
@@ -274,19 +273,68 @@
     Sistem Absensi Piket Gerbang • Terkoneksi ke Database Kesiswaan SD Methodist Immanuel
   </footer>
 
-  <!-- SCRIPT LOGIKA PIKET -->
+  <!-- SCRIPT LOGIKA PIKET DENGAN AUTOCOMPLETE MASTER SISWA -->
   <script>
     const API_KESISWAAN_URL = "https://script.google.com/macros/s/AKfycbzYdXRIHIi1RGHWmb61__IRiR2DkdQYpjxj-xiEBiXAmSyyIRmCXLum6vJoAPQmWqcIDg/exec";
-    
-    // Kunci piket umum (tidak perlu master key kesiswaan rahasia)
     const PIKET_ACCESS_KEY = "piket2026"; 
 
+    // Master Siswa Lokal (Diambil dari sheet "Data_Siswa")
+    let masterSiswaList = JSON.parse(localStorage.getItem("master_siswa_cache") || "[]");
     let logLokalHariIni = JSON.parse(localStorage.getItem("piket_hari_ini") || "[]");
 
     function inisialisasi() {
       document.getElementById('siswaTanggal').valueAsDate = new Date();
       setJamSekarang();
       renderLogHariIni();
+      renderDatalistSiswa();
+
+      // Ambil data terbaru dari cloud jika belum ada
+      if (masterSiswaList.length === 0) {
+        muatMasterSiswaDariCloud();
+      }
+    }
+
+    function muatMasterSiswaDariCloud() {
+      const statusText = document.getElementById('syncStatusText');
+      statusText.innerText = "⏳ Sinkronisasi...";
+      statusText.className = "text-[10px] text-amber-400 font-semibold";
+
+      fetch(API_KESISWAAN_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({ action: "ambil_master_siswa", key: PIKET_ACCESS_KEY })
+      })
+      .then(r => r.json())
+      .then(res => {
+        if (res.status === "success" && res.siswa) {
+          masterSiswaList = res.siswa;
+          localStorage.setItem("master_siswa_cache", JSON.stringify(masterSiswaList));
+          renderDatalistSiswa();
+          statusText.innerText = `● ${masterSiswaList.length} Siswa Siap`;
+          statusText.className = "text-[10px] text-emerald-400 font-semibold";
+        } else {
+          statusText.innerText = "● Gagal Sync";
+        }
+      })
+      .catch(err => {
+        statusText.innerText = "● Offline Cache";
+      });
+    }
+
+    function renderDatalistSiswa() {
+      const dl = document.getElementById('listDatalistSiswa');
+      dl.innerHTML = masterSiswaList.map(s => `
+        <option value="${s.nama}">${s.kelas ? '(' + s.kelas + ')' : ''}</option>
+      `).join('');
+    }
+
+    // Deteksi saat guru piket memilih / mengetik nama siswa
+    function onNamaSiswaDiinput() {
+      const val = document.getElementById('siswaNama').value.trim().toLowerCase();
+      const match = masterSiswaList.find(s => s.nama.toLowerCase() === val);
+      if (match && match.kelas) {
+        document.getElementById('siswaKelas').value = match.kelas;
+      }
     }
 
     function setJamSekarang() {
@@ -311,7 +359,7 @@
     function handleSimpanDanCetak(e) {
       e.preventDefault();
       const nama = document.getElementById('siswaNama').value.trim();
-      const kelas = document.getElementById('siswaKelas').value;
+      const kelas = document.getElementById('siswaKelas').value.trim();
       const tgl = document.getElementById('siswaTanggal').value;
       const jamVal = document.getElementById('siswaJam').value;
       const jamFormat = jamVal ? `${jamVal.replace(':', '.')} WIB` : "07.20 WIB";
@@ -324,7 +372,7 @@
 
       const btn = document.getElementById('btnSubmit');
       btn.disabled = true;
-      btn.innerHTML = "⏳ Menghitung & Menyimpan ke Cloud...";
+      btn.innerHTML = "⏳ Menghitung Akumulasi & Menyimpan...";
 
       const payload = {
         action: "tambah_terlambat",
@@ -351,30 +399,27 @@
 
         let akumulasi = 1;
         if (res.status === "success" && res.message) {
-          // Ambil angka akumulasi dari pesan server jika ada
           const match = res.message.match(/\d+/);
           if (match) akumulasi = parseInt(match[0]);
         }
 
-        // Simpan ke log lokal hari ini
         const itemLokal = { nama, kelas, jam: jamFormat, tgl, alasan, guru, akumulasi };
         logLokalHariIni.unshift(itemLokal);
         localStorage.setItem("piket_hari_ini", JSON.stringify(logLokalHariIni));
         renderLogHariIni();
 
-        // Siapkan Slip Cetak
         siapkanSlipCetak(itemLokal);
         window.print();
         document.getElementById('printArea').classList.add('hidden');
 
-        // Reset form nama
         document.getElementById('siswaNama').value = "";
+        document.getElementById('siswaKelas').value = "";
         document.getElementById('siswaNama').focus();
       })
       .catch(err => {
         btn.disabled = false;
         btn.innerHTML = '<i class="fa-solid fa-print"></i> Simpan & Cetak Surat Izin Masuk Kelas';
-        alert("Peringatan: Gagal kirim ke server (" + err + "), namun slip tetap dicetak.");
+        alert("Peringatan jaringan, slip tetap dicetak lokal.");
         
         const itemLokal = { nama, kelas, jam: jamFormat, tgl, alasan, guru, akumulasi: 1 };
         siapkanSlipCetak(itemLokal);
@@ -392,7 +437,6 @@
       if (d.akumulasi >= 5) statusAkumulasi += " (PERINGATAN KRISIS: PANGGILAN ORANG TUA)";
       else if (d.akumulasi >= 3) statusAkumulasi += " (PERINGATAN: TERBIT SURAT PERINGATAN)";
 
-      // Slip Atas
       document.getElementById('prTgl').innerText = tglLengkap;
       document.getElementById('prJam').innerText = d.jam;
       document.getElementById('prNama').innerText = d.nama;
@@ -401,7 +445,6 @@
       document.getElementById('prAkumulasi').innerText = statusAkumulasi;
       document.getElementById('prGuruPiket').innerText = d.guru;
 
-      // Slip Bawah
       document.getElementById('prNama2').innerText = `${d.nama} (${d.kelas})`;
       document.getElementById('prJam2').innerText = d.jam;
       document.getElementById('prTgl2').innerText = tglLengkap;
