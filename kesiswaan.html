@@ -420,7 +420,8 @@
       <form id="formKejadian" onsubmit="simpanKejadianKeCloud(event)" class="space-y-3">
         <div>
           <label class="block font-bold text-slate-300 mb-1">Nama Lengkap Siswa:</label>
-          <input type="text" id="inNama" required placeholder="Contoh: Jason Alexander" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-white outline-none focus:border-amber-400">
+          <input type="text" id="inNama" list="listDatalistSiswaKes" oninput="onNamaSiswaKesDiinput()" required placeholder="Ketik 2-3 huruf nama siswa..." class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-white outline-none focus:border-amber-400">
+          <datalist id="listDatalistSiswaKes"></datalist>
         </div>
 
         <div class="grid grid-cols-2 gap-3">
@@ -721,7 +722,34 @@
       });
     }
 
+    function 
+    // ================= INTEGRASI MASTER DATA SISWA =================
+    let masterSiswaList = [];
+
+    function updateDatalistKesiswaan(list) {
+      masterSiswaList = list || [];
+      const dl = document.getElementById('listDatalistSiswaKes');
+      if (dl) {
+        dl.innerHTML = masterSiswaList.map(s => `<option value="${s.nama}">${s.kelas ? '(' + s.kelas + ')' : ''}</option>`).join('');
+      }
+    }
+
+    function onNamaSiswaKesDiinput() {
+      const val = document.getElementById('inNama').value.trim().toLowerCase();
+      const match = masterSiswaList.find(s => s.nama.toLowerCase() === val);
+      if (match && match.kelas) {
+        const selectKelas = document.getElementById('inKelas');
+        for (let i = 0; i < selectKelas.options.length; i++) {
+          if (match.kelas.toLowerCase().includes(selectKelas.options[i].value.toLowerCase())) {
+            selectKelas.selectedIndex = i;
+            break;
+          }
+        }
+      }
+    }
+
     function bukaAksesPanel(data) {
+      if (data.masterSiswa) updateDatalistKesiswaan(data.masterSiswa);
       document.getElementById('gatekeeper').classList.add('hidden');
       document.getElementById('panel-utama').classList.remove('hidden');
       document.getElementById('panel-utama').classList.add('flex');
