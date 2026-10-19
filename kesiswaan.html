@@ -37,7 +37,8 @@
       header, #subtab-bar, footer, button, .no-print { display: none !important; }
       .print-box { display: block !important; border: none !important; color: black !important; background: white !important; }
       table { border-collapse: collapse !important; width: 100% !important; }
-      th, td { border: 1px solid #333 !important; color: black !important; padding: 8px !important; }
+      th, td { border: 1px solid #333 !important; color: black !important; padding: 6px 8px !important; }
+      .no-border-table td, .no-border-table th { border: none !important; }
     }
   </style>
 </head>
@@ -83,6 +84,9 @@
           </div>
         </div>
         <div class="flex items-center gap-2">
+          <button onclick="bukaModalPengaturanKop()" class="bg-slate-800 hover:bg-slate-700 text-amber-300 text-xs font-bold px-3 py-2 rounded-xl border border-slate-700 transition flex items-center gap-1.5" title="Atur Kop Surat & Pejabat">
+            <i class="fa-solid fa-gear"></i> Format Kop & Pejabat
+          </button>
           <button onclick="segarkanData()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold px-3 py-2 rounded-xl border border-slate-700 transition flex items-center gap-1.5" title="Muat Ulang Data">
             <i class="fa-solid fa-arrows-rotate text-emerald-400"></i> Refresh
           </button>
@@ -242,6 +246,167 @@
 
   </div>
 
+  <!-- ================= MODAL: PENGATURAN KOP SURAT & PEJABAT SEKOLAH ================= -->
+  <div id="modalPengaturanKop" class="fixed inset-0 bg-slate-950/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden no-print">
+    <div class="bg-slate-900 border border-slate-700 max-w-2xl w-full rounded-3xl p-6 text-xs space-y-4 shadow-2xl overflow-y-auto max-h-[92vh]">
+      <div class="flex justify-between items-center text-white border-b border-slate-800 pb-3">
+        <h3 class="font-title text-base font-bold text-amber-400 flex items-center gap-2">
+          <i class="fa-solid fa-file-pen"></i> Pengaturan Kop Surat & Pejabat Sekolah
+        </h3>
+        <button onclick="tutupModalPengaturanKop()" class="text-slate-400 hover:text-white text-base">✕</button>
+      </div>
+
+      <div class="space-y-3">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-slate-300 mb-1">Nama Yayasan:</label>
+            <input type="text" id="cfgYayasan" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-white outline-none focus:border-amber-400">
+          </div>
+          <div>
+            <label class="block font-bold text-slate-300 mb-1">Nama Satuan Pendidikan / Sekolah:</label>
+            <input type="text" id="cfgSekolah" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-white outline-none focus:border-amber-400">
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-300 mb-1">Alamat Lengkap Sekolah & Kontak:</label>
+          <input type="text" id="cfgAlamat" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-white outline-none focus:border-amber-400">
+        </div>
+
+        <div class="grid grid-cols-3 gap-3">
+          <div>
+            <label class="block font-bold text-slate-300 mb-1">NPSN & Akreditasi:</label>
+            <input type="text" id="cfgNpsn" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-white outline-none focus:border-amber-400">
+          </div>
+          <div>
+            <label class="block font-bold text-slate-300 mb-1">Email / Kontak:</label>
+            <input type="text" id="cfgKontak" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-white outline-none focus:border-amber-400">
+          </div>
+          <div>
+            <label class="block font-bold text-slate-300 mb-1">URL Logo Sekolah (Gambar):</label>
+            <input type="text" id="cfgLogoUrl" placeholder="https://..." class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-white outline-none focus:border-amber-400">
+          </div>
+        </div>
+
+        <div class="border-t border-slate-800 pt-3">
+          <h4 class="font-bold text-amber-400 text-xs mb-2">Penandatangan Resmi Surat:</h4>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block font-bold text-slate-300 mb-1">Nama Kepala Sekolah (+ Gelar/NIP):</label>
+              <input type="text" id="cfgKepsek" placeholder="Nama Kepala Sekolah..." class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-white outline-none focus:border-amber-400">
+            </div>
+            <div>
+              <label class="block font-bold text-slate-300 mb-1">Nama Waka Kesiswaan (+ Gelar):</label>
+              <input type="text" id="cfgWakasis" value="Thomas Ryantama, M.Kom., Gr." class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-white outline-none focus:border-amber-400">
+            </div>
+          </div>
+        </div>
+
+        <div class="border-t border-slate-800 pt-3">
+          <h4 class="font-bold text-emerald-400 text-xs mb-2">Daftar Wali Kelas Default (Bisa Diubah Kapan Saja):</h4>
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+            <div>
+              <label class="block text-[11px] text-slate-400 font-bold mb-0.5">Walas Kelas 1:</label>
+              <input type="text" id="walas1" placeholder="Wali Kelas 1" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-white">
+            </div>
+            <div>
+              <label class="block text-[11px] text-slate-400 font-bold mb-0.5">Walas Kelas 2:</label>
+              <input type="text" id="walas2" placeholder="Wali Kelas 2" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-white">
+            </div>
+            <div>
+              <label class="block text-[11px] text-slate-400 font-bold mb-0.5">Walas Kelas 3:</label>
+              <input type="text" id="walas3" placeholder="Wali Kelas 3" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-white">
+            </div>
+            <div>
+              <label class="block text-[11px] text-slate-400 font-bold mb-0.5">Walas Kelas 4:</label>
+              <input type="text" id="walas4" placeholder="Wali Kelas 4" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-white">
+            </div>
+            <div>
+              <label class="block text-[11px] text-slate-400 font-bold mb-0.5">Walas Kelas 5:</label>
+              <input type="text" id="walas5" placeholder="Wali Kelas 5" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-white">
+            </div>
+            <div>
+              <label class="block text-[11px] text-slate-400 font-bold mb-0.5">Walas Kelas 6:</label>
+              <input type="text" id="walas6" placeholder="Wali Kelas 6" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-white">
+            </div>
+          </div>
+        </div>
+
+        <button onclick="simpanPengaturanKop()" class="w-full py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-title font-bold text-xs rounded-xl transition shadow-lg mt-2">
+          💾 Simpan Pengaturan Format Surat
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MODAL: EDITOR & PRATINJAU SURAT SEBELUM CETAK ================= -->
+  <div id="modalEditorSurat" class="fixed inset-0 bg-slate-950/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden no-print">
+    <div class="bg-slate-900 border border-slate-700 max-w-xl w-full rounded-3xl p-6 text-xs space-y-4 shadow-2xl overflow-y-auto max-h-[92vh]">
+      <div class="flex justify-between items-center text-white border-b border-slate-800 pb-3">
+        <div>
+          <h3 class="font-title text-base font-bold text-amber-400" id="edSuratJudul">Sesuaikan Detail Surat Panggilan</h3>
+          <p class="text-[11px] text-slate-400" id="edSuratSub">Siswa: Jason Alexander (Kelas 5)</p>
+        </div>
+        <button onclick="tutupModalEditorSurat()" class="text-slate-400 hover:text-white text-base">✕</button>
+      </div>
+
+      <div class="space-y-3">
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-slate-300 mb-1">Nomor Surat Resmi:</label>
+            <input type="text" id="edNoSurat" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-white outline-none focus:border-amber-400">
+          </div>
+          <div>
+            <label class="block font-bold text-slate-300 mb-1">Tanggal Surat Terbit:</label>
+            <input type="text" id="edTglTerbit" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-white outline-none focus:border-amber-400">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-slate-300 mb-1">Hari & Tanggal Pertemuan:</label>
+            <input type="text" id="edHariTglPanggilan" placeholder="Contoh: Rabu, 21 Oktober 2026" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-amber-300 font-bold outline-none focus:border-amber-400">
+          </div>
+          <div>
+            <label class="block font-bold text-slate-300 mb-1">Waktu / Jam Pertemuan:</label>
+            <input type="text" id="edWaktuPanggilan" value="Pukul 08.00 WIB s/d Selesai" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-white outline-none focus:border-amber-400">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-slate-300 mb-1">Tempat Pertemuan:</label>
+            <input type="text" id="edTempat" value="Ruang Konseling / Waka Kesiswaan SD" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-white outline-none focus:border-amber-400">
+          </div>
+          <div>
+            <label class="block font-bold text-slate-300 mb-1">Nama Wali Kelas (Bisa Diedit):</label>
+            <input type="text" id="edWalas" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-white font-bold outline-none focus:border-amber-400">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-slate-300 mb-1">Nama Waka Kesiswaan:</label>
+            <input type="text" id="edWakasis" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-white outline-none focus:border-amber-400">
+          </div>
+          <div>
+            <label class="block font-bold text-slate-300 mb-1">Nama Kepala Sekolah:</label>
+            <input type="text" id="edKepsek" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-white outline-none focus:border-amber-400">
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-300 mb-1">Catatan / Perihal Khusus Pertemuan (Opsional):</label>
+          <textarea id="edAgendaKhusus" rows="2" placeholder="Tuliskan catatan tambahan jika ada..." class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-white outline-none focus:border-amber-400"></textarea>
+        </div>
+
+        <button onclick="eksekusiCetakSuratFinal()" class="w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-title font-bold text-xs rounded-xl transition shadow-lg flex items-center justify-center gap-2">
+          <i class="fa-solid fa-print"></i> Pratinjau & Cetak Dokumen (PDF)
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- ================= MODAL: INPUT CATATAN DISIPLIN / REKAP POIN ================= -->
   <div id="modalCatat" class="fixed inset-0 bg-slate-950/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden no-print">
     <div class="bg-slate-900 border border-slate-700 max-w-lg w-full rounded-3xl p-6 text-xs space-y-4 shadow-2xl overflow-y-auto max-h-[90vh]">
@@ -279,7 +444,6 @@
         <div>
           <label class="block font-bold text-slate-300 mb-1">Pilih Jenis Pelanggaran / Disiplin Positif:</label>
           <select id="inJenis" onchange="sesuaikanPoinOtomatis()" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-amber-300 font-bold outline-none focus:border-amber-400">
-            <!-- PELANGGARAN RINGAN -->
             <optgroup label="⚠️ Pelanggaran Ringan (-2 s.d. -5)">
               <option value="Atribut Seragam Tidak Lengkap" data-poin="-2">Atribut Seragam Tidak Lengkap (Kaos kaki/sepatu/dasi) [-2]</option>
               <option value="Terlambat Datang ke Sekolah (1-2x)" data-poin="-3">Terlambat Datang ke Sekolah (1-2 kali) [-3]</option>
@@ -287,7 +451,6 @@
               <option value="Tidak Membawa Buku Pelajaran / Perlengkapan" data-poin="-2">Tidak Membawa Buku Pelajaran / Perlengkapan [-2]</option>
               <option value="Membuat Gaduh Saat Doa / Belajar" data-poin="-3">Membuat Gaduh Saat Ibadah / KBM Berlangsung [-3]</option>
             </optgroup>
-            <!-- PELANGGARAN SEDANG -->
             <optgroup label="⚠️⚠️ Pelanggaran Sedang (-10 s.d. -15)">
               <option value="Terlambat Masuk Sekolah Lebih dari 3 Kali" data-poin="-10">Terlambat Berulang (>3 Kali) [-10]</option>
               <option value="Meninggalkan Sekolah Tanpa Izin (Bolos)" data-poin="-15">Meninggalkan Jam Sekolah Tanpa Izin (Bolos) [-15]</option>
@@ -295,14 +458,12 @@
               <option value="Merusak Fasilitas Sekolah / Alat Teman" data-poin="-10">Merusak Fasilitas Belajar / Buku Milik Teman [-10]</option>
               <option value="Berbohong / Keterangan Palsu" data-poin="-15">Berbohong / Memberikan Keterangan Palsu [-15]</option>
             </optgroup>
-            <!-- PELANGGARAN BERAT (PERMENDIKBUD 46/2023) -->
             <optgroup label="🚨 Pelanggaran Berat (-20 s.d. -30)">
               <option value="Perundungan (Bullying) Verbal / Menghina Teman" data-poin="-20">Perundungan Verbal (Mengejek fisik/orang tua) [-20]</option>
               <option value="Perundungan Fisik / Memukul Teman" data-poin="-25">Kekerasan Fisik / Berkelahi [-25]</option>
               <option value="Membawa Benda Tajam Berbahaya" data-poin="-30">Membawa Benda Tajam Berbahaya [-30]</option>
               <option value="Bersikap Kasar / Melawan Guru" data-poin="-25">Bersikap Tidak Sopan / Melawan Guru Terang-terangan [-25]</option>
             </optgroup>
-            <!-- DISIPLIN POSITIF / RESTITUSI -->
             <optgroup label="🌟 Disiplin Positif / Restitusi (+2 s.d. +5)">
               <option value="Jujur Mengakui Kesalahan & Memperbaiki Diri" data-poin="+3">Restitusi: Jujur & Bertanggung Jawab [+3]</option>
               <option value="Inisiatif Menolong & Menjaga Kebersihan" data-poin="+2">Inisiatif Kebersihan & Membantu Teman [+2]</option>
@@ -335,7 +496,7 @@
     </div>
   </div>
 
-  <!-- ================= MODAL: DETAIL SISWA, RIWAYAT, & CETAK SURAT ================= -->
+  <!-- ================= MODAL: DETAIL SISWA & PILIH DOKUMEN CETAK ================= -->
   <div id="modalDetail" class="fixed inset-0 bg-slate-950/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden no-print">
     <div class="bg-slate-900 border border-slate-700 max-w-2xl w-full rounded-3xl p-6 text-xs space-y-4 shadow-2xl overflow-y-auto max-h-[90vh]">
       <div class="flex justify-between items-start border-b border-slate-800 pb-3">
@@ -348,19 +509,19 @@
 
       <!-- Action Generator Surat -->
       <div class="p-3 bg-slate-950/80 rounded-2xl border border-slate-800 flex flex-wrap items-center justify-between gap-2">
-        <span class="font-bold text-amber-400 text-xs">Cetak Dokumen Resmi:</span>
+        <span class="font-bold text-amber-400 text-xs">Pilih Dokumen yang Akan Diterbitkan:</span>
         <div class="flex flex-wrap gap-1.5">
-          <button onclick="generateSuratPanggilan(1)" class="px-2.5 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-[11px] font-bold">
+          <button onclick="bukaEditorSurat(1)" class="px-2.5 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-[11px] font-bold">
             ✉️ Surat Panggilan I
           </button>
-          <button onclick="generateSuratPanggilan(2)" class="px-2.5 py-1.5 bg-orange-600 hover:bg-orange-500 text-white rounded-lg text-[11px] font-bold">
+          <button onclick="bukaEditorSurat(2)" class="px-2.5 py-1.5 bg-orange-600 hover:bg-orange-500 text-white rounded-lg text-[11px] font-bold">
             ✉️ Surat Panggilan II
           </button>
-          <button onclick="generateSuratPanggilan(3)" class="px-2.5 py-1.5 bg-rose-600 hover:bg-rose-500 text-white rounded-lg text-[11px] font-bold">
+          <button onclick="bukaEditorSurat(3)" class="px-2.5 py-1.5 bg-rose-600 hover:bg-rose-500 text-white rounded-lg text-[11px] font-bold">
             ✉️ Surat Panggilan III
           </button>
           <button onclick="generateKartuDisiplin()" class="px-2.5 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-[11px] font-bold">
-            🖨️ Lembar Kartu Disiplin
+            🖨️ Kartu Disiplin Siswa
           </button>
         </div>
       </div>
@@ -420,12 +581,8 @@
 
   <!-- ================= LEMBAR DOKUMEN CETAK RESMI (SURAT PANGGILAN & KARTU DISIPLIN) ================= -->
   <div id="printArea" class="hidden print-box p-8 max-w-3xl mx-auto text-black bg-white">
-    <div class="border-b-4 border-double border-black pb-3 mb-6 text-center">
-      <h2 class="text-lg font-bold uppercase tracking-wide">YAYASAN PENDIDIKAN METHODIST INDONESIA</h2>
-      <h1 class="text-xl font-black uppercase tracking-wider">SD METHODIST IMMANUEL BANDAR LAMPUNG</h1>
-      <p class="text-xs">Jl. Ikan Hiu No. 3, Teluk Betung Selatan, Kota Bandar Lampung • Telp: (0721) 481-xxx</p>
-      <p class="text-[10px] italic text-gray-600">NPSN: 10807xxx | Akreditasi A | Email: sdmethodist.immanuel@gmail.com</p>
-    </div>
+    <!-- KOP DINAMIS DENGAN LOGO & GARIS GANDA -->
+    <div id="printKopContainer"></div>
     <div id="printContent"></div>
   </div>
 
@@ -433,11 +590,102 @@
   <script>
     const API_KESISWAAN_URL = "https://script.google.com/macros/s/AKfycbzYdXRIHIi1RGHWmb61__IRiR2DkdQYpjxj-xiEBiXAmSyyIRmCXLum6vJoAPQmWqcIDg/exec";
 
+    // Konfigurasi Default Kop Surat & Pejabat Sekolah
+    const DEFAULT_CONFIG = {
+      yayasan: "YAYASAN PENDIDIKAN METHODIST INDONESIA",
+      sekolah: "SD METHODIST IMMANUEL BANDAR LAMPUNG",
+      alamat: "Jl. Ikan Hiu No. 3, Teluk Betung Selatan, Kota Bandar Lampung • Telp: (0721) 481-234",
+      npsn: "NPSN: 10807090 | Terakreditasi A",
+      kontak: "Email: sdmethodist.immanuel@gmail.com",
+      logoUrl: "https://upload.wikimedia.org/wikipedia/commons/9/9c/Logo_of_Ministry_of_Education_and_Culture_of_Republic_of_Indonesia.png", // Bisa diganti logo sekolah
+      kepsek: "Dra. Ester Simanjuntak, M.Pd.",
+      wakasis: "Thomas Ryantama, M.Kom., Gr.",
+      walas: {
+        "Kelas 1": "Ibu Ruth, S.Pd.",
+        "Kelas 2": "Ibu Maria, S.Pd.",
+        "Kelas 3": "Bpk. David, S.Kom.",
+        "Kelas 4": "Ibu Ratna, S.Pd.",
+        "Kelas 5": "Ibu Yohana, S.Pd.",
+        "Kelas 6": "Bpk. Jonathan, S.Pd."
+      }
+    };
+
+    let schoolConfig = JSON.parse(localStorage.getItem("e_disiplin_config")) || DEFAULT_CONFIG;
     let activeKey = sessionStorage.getItem("wakasis_key") || "";
     let dataKasusCloud = [];
     let dataTerlambatCloud = [];
     let studentsArray = [];
     let selectedStudent = null;
+    let currentTahapSurat = 1;
+
+    // ================= PENGATURAN KOP SURAT =================
+    function bukaModalPengaturanKop() {
+      document.getElementById('cfgYayasan').value = schoolConfig.yayasan || "";
+      document.getElementById('cfgSekolah').value = schoolConfig.sekolah || "";
+      document.getElementById('cfgAlamat').value = schoolConfig.alamat || "";
+      document.getElementById('cfgNpsn').value = schoolConfig.npsn || "";
+      document.getElementById('cfgKontak').value = schoolConfig.kontak || "";
+      document.getElementById('cfgLogoUrl').value = schoolConfig.logoUrl || "";
+      document.getElementById('cfgKepsek').value = schoolConfig.kepsek || "";
+      document.getElementById('cfgWakasis').value = schoolConfig.wakasis || "";
+
+      document.getElementById('walas1').value = (schoolConfig.walas && schoolConfig.walas["Kelas 1"]) || "";
+      document.getElementById('walas2').value = (schoolConfig.walas && schoolConfig.walas["Kelas 2"]) || "";
+      document.getElementById('walas3').value = (schoolConfig.walas && schoolConfig.walas["Kelas 3"]) || "";
+      document.getElementById('walas4').value = (schoolConfig.walas && schoolConfig.walas["Kelas 4"]) || "";
+      document.getElementById('walas5').value = (schoolConfig.walas && schoolConfig.walas["Kelas 5"]) || "";
+      document.getElementById('walas6').value = (schoolConfig.walas && schoolConfig.walas["Kelas 6"]) || "";
+
+      document.getElementById('modalPengaturanKop').classList.remove('hidden');
+    }
+
+    function tutupModalPengaturanKop() {
+      document.getElementById('modalPengaturanKop').classList.add('hidden');
+    }
+
+    function simpanPengaturanKop() {
+      schoolConfig.yayasan = document.getElementById('cfgYayasan').value.trim();
+      schoolConfig.sekolah = document.getElementById('cfgSekolah').value.trim();
+      schoolConfig.alamat = document.getElementById('cfgAlamat').value.trim();
+      schoolConfig.npsn = document.getElementById('cfgNpsn').value.trim();
+      schoolConfig.kontak = document.getElementById('cfgKontak').value.trim();
+      schoolConfig.logoUrl = document.getElementById('cfgLogoUrl').value.trim();
+      schoolConfig.kepsek = document.getElementById('cfgKepsek').value.trim();
+      schoolConfig.wakasis = document.getElementById('cfgWakasis').value.trim();
+
+      schoolConfig.walas = {
+        "Kelas 1": document.getElementById('walas1').value.trim(),
+        "Kelas 2": document.getElementById('walas2').value.trim(),
+        "Kelas 3": document.getElementById('walas3').value.trim(),
+        "Kelas 4": document.getElementById('walas4').value.trim(),
+        "Kelas 5": document.getElementById('walas5').value.trim(),
+        "Kelas 6": document.getElementById('walas6').value.trim()
+      };
+
+      localStorage.setItem("e_disiplin_config", JSON.stringify(schoolConfig));
+      alert("✅ Pengaturan Kop Surat, Pejabat & Wali Kelas berhasil disimpan!");
+      tutupModalPengaturanKop();
+    }
+
+    function generateHtmlKopResmi() {
+      return `
+        <div class="border-b-4 border-double border-black pb-3 mb-6">
+          <table class="w-full no-border-table">
+            <tr>
+              <td class="w-20 text-center align-middle" style="width: 80px; padding: 0 !important;">
+                <img src="${schoolConfig.logoUrl}" alt="Logo Sekolah" style="max-width: 75px; max-height: 75px; object-fit: contain; margin: 0 auto;" onerror="this.style.display='none'">
+              </td>
+              <td class="text-center align-middle" style="padding: 0 10px !important;">
+                <h3 class="text-sm font-bold uppercase tracking-wide leading-tight">${schoolConfig.yayasan}</h3>
+                <h1 class="text-lg font-black uppercase tracking-wider leading-tight mt-0.5">${schoolConfig.sekolah}</h1>
+                <p class="text-[11px] leading-tight mt-1 text-gray-800">${schoolConfig.alamat}</p>
+                <p class="text-[10px] leading-tight text-gray-700 italic mt-0.5">${schoolConfig.npsn} • ${schoolConfig.kontak}</p>
+              </td>
+            </tr>
+          </table>
+        </div>
+      `;
+    }
 
     // ================= AUTENTIKASI / LOGIN =================
     function verifikasiMasuk(e) {
@@ -450,10 +698,7 @@
       fetch(API_KESISWAAN_URL, {
         method: "POST",
         headers: { "Content-Type": "text/plain;charset=utf-8" },
-        body: JSON.stringify({
-          action: "login_dan_ambil_data",
-          key: input
-        })
+        body: JSON.stringify({ action: "login_dan_ambil_data", key: input })
       })
       .then(res => res.json())
       .then(res => {
@@ -518,7 +763,7 @@
             id: 's_' + encodeURIComponent(key),
             nama: item.nama.trim(),
             kelas: item.kelas || 'SD',
-            skor: 100, // Modal awal 100 Poin
+            skor: 100,
             riwayat: []
           };
         }
@@ -608,7 +853,7 @@
       }).join('');
     }
 
-    // ================= MODAL & INPUT KASUS KE CLOUD =================
+    // ================= INPUT KASUS KE CLOUD =================
     function bukaModalCatat() {
       document.getElementById('inTanggal').valueAsDate = new Date();
       sesuaikanPoinOtomatis();
@@ -670,7 +915,7 @@
       });
     }
 
-    // ================= MODAL DETAIL & GENERATOR SURAT RESMI =================
+    // ================= DETAIL SISWA =================
     function bukaDetailSiswa(id) {
       selectedStudent = studentsArray.find(s => s.id === id);
       if (!selectedStudent) return;
@@ -703,39 +948,94 @@
       document.getElementById('modalDetail').classList.add('hidden');
     }
 
-    function generateSuratPanggilan(tahap) {
+    // ================= EDITOR PREVIEW SURAT SEBELUM CETAK =================
+    function bukaEditorSurat(tahap) {
       if (!selectedStudent) return;
+      currentTahapSurat = tahap;
       const s = selectedStudent;
       const tglHariIni = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
-      const nomorSurat = `421.2 / ${tahap === 1 ? 'SP-I' : tahap === 2 ? 'SP-II' : 'SP-III'} / SD-MI / ${new Date().getFullYear()}`;
+      const tahapRomawi = tahap === 1 ? 'SP-I' : tahap === 2 ? 'SP-II' : 'SP-III';
+      const noSuratDef = `421.2 / ${tahapRomawi} / SD-MI / ${new Date().getFullYear()}`;
+
+      // Ambil nama walas default sesuai jenjang kelas
+      let walasDef = "";
+      if (schoolConfig.walas) {
+        for (const [k, v] of Object.entries(schoolConfig.walas)) {
+          if (s.kelas.toLowerCase().includes(k.toLowerCase())) {
+            walasDef = v;
+            break;
+          }
+        }
+      }
+      if (!walasDef) walasDef = "Ibu Maria, S.Pd.";
+
+      document.getElementById('edSuratJudul').innerText = `Sesuaikan Detail Surat Panggilan Orang Tua (${tahapRomawi})`;
+      document.getElementById('edSuratSub').innerText = `Siswa: ${s.nama} (${s.kelas}) • Sisa Skor: ${s.skor} Poin`;
+
+      document.getElementById('edNoSurat').value = noSuratDef;
+      document.getElementById('edTglTerbit').value = `Bandar Lampung, ${tglHariIni}`;
+      document.getElementById('edHariTglPanggilan').value = "Rabu, 21 Oktober 2026";
+      document.getElementById('edWaktuPanggilan').value = "Pukul 08.00 WIB s/d Selesai";
+      document.getElementById('edTempat').value = "Ruang Konseling / Waka Kesiswaan SD";
+      document.getElementById('edWalas').value = walasDef;
+      document.getElementById('edWakasis').value = schoolConfig.wakasis || "Thomas Ryantama, M.Kom., Gr.";
+      document.getElementById('edKepsek').value = schoolConfig.kepsek || "Dra. Ester Simanjuntak, M.Pd.";
+      document.getElementById('edAgendaKhusus').value = "";
+
+      document.getElementById('modalEditorSurat').classList.remove('hidden');
+    }
+
+    function tutupModalEditorSurat() {
+      document.getElementById('modalEditorSurat').classList.add('hidden');
+    }
+
+    function eksekusiCetakSuratFinal() {
+      if (!selectedStudent) return;
+      const s = selectedStudent;
+      const tahap = currentTahapSurat;
+      const noSurat = document.getElementById('edNoSurat').value;
+      const tglTerbit = document.getElementById('edTglTerbit').value;
+      const hariTgl = document.getElementById('edHariTglPanggilan').value;
+      const waktu = document.getElementById('edWaktuPanggilan').value;
+      const tempat = document.getElementById('edTempat').value;
+      const walas = document.getElementById('edWalas').value;
+      const wakasis = document.getElementById('edWakasis').value;
+      const kepsek = document.getElementById('edKepsek').value;
+      const agenda = document.getElementById('edAgendaKhusus').value.trim();
+
+      const agendaPesan = agenda ? `<p class="mt-2 text-xs italic"><b>Catatan Tambahan:</b> ${agenda}</p>` : "";
 
       const content = `
-        <div class="text-right text-xs mb-4">Bandar Lampung, ${tglHariIni}</div>
+        <div class="text-right text-xs mb-4">${tglTerbit}</div>
         <div class="text-xs mb-4">
-          <p>Nomor : ${nomorSurat}</p>
-          <p>Lampiran : 1 (Satu) Berkas Lembar Rekap Disiplin</p>
-          <p>Perihal : <b>SURAT PANGGILAN ORANG TUA / WALI MURID (${tahap === 1 ? 'KE-1' : tahap === 2 ? 'KE-2' : 'KE-3 (TERAKHIR)'})</b></p>
+          <table class="no-border-table">
+            <tr><td style="width: 80px; padding: 2px 0 !important;">Nomor</td><td style="padding: 2px 0 !important;">: ${noSurat}</td></tr>
+            <tr><td style="padding: 2px 0 !important;">Lampiran</td><td style="padding: 2px 0 !important;">: 1 (Satu) Berkas Lembar Rekap Disiplin</td></tr>
+            <tr><td style="padding: 2px 0 !important;">Perihal</td><td style="padding: 2px 0 !important;">: <b>SURAT PANGGILAN ORANG TUA / WALI MURID (${tahap === 1 ? 'KE-1' : tahap === 2 ? 'KE-2' : 'KE-3 (TERAKHIR)'})</b></td></tr>
+          </table>
         </div>
 
         <div class="text-xs mb-4">
           <p>Kepada Yth.</p>
-          <p><b>Bapak / Ibu Orang Tua / Wali dari: ${s.nama}</b></p>
-          <p>Peserta Didik ${s.kelas} SD Methodist Immanuel</p>
+          <p class="font-bold">Bapak / Ibu Orang Tua / Wali dari: ${s.nama}</p>
+          <p>Peserta Didik ${s.kelas} ${schoolConfig.sekolah}</p>
           <p>Di Tempat</p>
         </div>
 
         <div class="text-xs leading-relaxed space-y-3 text-justify">
           <p>Dengan hormat,</p>
-          <p>Sehubungan dengan pelaksanaan tata tertib dan pembinaan karakter peserta didik di lingkungan SD Methodist Immanuel Bandar Lampung, serta berdasarkan akumulasi catatan perilaku ananda dengan <b>Sisa Skor Disiplin: ${s.skor} Poin</b> (dari modal awal 100 poin), maka melalui surat ini pihak sekolah mengundang Bapak/Ibu untuk hadir pada:</p>
+          <p>Sehubungan dengan pelaksanaan tata tertib dan pembinaan karakter peserta didik di lingkungan ${schoolConfig.sekolah}, serta berdasarkan akumulasi catatan perilaku ananda dengan <b>Sisa Skor Disiplin: ${s.skor} Poin</b> (dari modal awal 100 poin), maka melalui surat ini pihak sekolah mengundang Bapak/Ibu untuk hadir pada:</p>
 
-          <div class="pl-6 space-y-1">
-            <p>Hari / Tanggal : ..............................................................</p>
-            <p>Waktu : Pukul 08.00 WIB s/d Selesai</p>
-            <p>Tempat : Ruang Konseling / Ruang Waka Kesiswaan SD Methodist Immanuel</p>
+          <div class="pl-6 space-y-1 my-2">
+            <p>Hari / Tanggal : <b>${hariTgl}</b></p>
+            <p>Waktu : ${waktu}</p>
+            <p>Tempat : ${tempat}</p>
             <p>Menemui : Tim Bimbingan Konseling / Waka Kesiswaan & Wali Kelas</p>
           </div>
 
-          <p>Agenda pertemuan ini adalah untuk berdialog dan menyelaraskan langkah pendampingan (restitusi positif) antara sekolah dan keluarga agar ananda dapat memperbaiki perilaku serta berkembang secara optimal.</p>
+          <p>Agenda pertemuan ini adalah untuk berdialog dan menyelaraskan langkah pendampingan (restitusi positif) antara pihak sekolah dan keluarga agar ananda dapat memperbaiki perilaku serta berkembang secara optimal.</p>
+
+          ${agendaPesan}
 
           <p>Mengingat pentingnya agenda ini demi masa depan belajar ananda, kami sangat mengharapkan kehadiran Bapak/Ibu tepat pada waktunya.</p>
 
@@ -747,25 +1047,28 @@
             <p>Mengetahui,</p>
             <p class="font-bold">Wali Kelas,</p>
             <div class="h-20"></div>
-            <p class="font-bold underline">( ........................................ )</p>
+            <p class="font-bold underline">${walas}</p>
           </div>
           <div>
             <p>Hormat kami,</p>
             <p class="font-bold">Waka Kesiswaan,</p>
             <div class="h-20"></div>
-            <p class="font-bold underline">Thomas Ryantama, M.Kom., Gr.</p>
+            <p class="font-bold underline">${wakasis}</p>
           </div>
         </div>
 
         <div class="mt-8 text-center text-xs">
           <p>Menyetujui,</p>
-          <p class="font-bold">Kepala SD Methodist Immanuel</p>
+          <p class="font-bold">Kepala Sekolah</p>
           <div class="h-16"></div>
-          <p class="font-bold underline">( .................................................... )</p>
+          <p class="font-bold underline">${kepsek}</p>
         </div>
       `;
 
+      document.getElementById('printKopContainer').innerHTML = generateHtmlKopResmi();
       document.getElementById('printContent').innerHTML = content;
+      
+      tutupModalEditorSurat();
       tutupModalDetail();
       document.getElementById('printArea').classList.remove('hidden');
       window.print();
@@ -776,6 +1079,18 @@
       if (!selectedStudent) return;
       const s = selectedStudent;
 
+      // Cari walas
+      let walasDef = "";
+      if (schoolConfig.walas) {
+        for (const [k, v] of Object.entries(schoolConfig.walas)) {
+          if (s.kelas.toLowerCase().includes(k.toLowerCase())) {
+            walasDef = v;
+            break;
+          }
+        }
+      }
+      if (!walasDef) walasDef = "Wali Kelas";
+
       const baris = s.riwayat.map((r, idx) => `
         <tr>
           <td class="p-2 border border-black text-center">${idx + 1}</td>
@@ -783,20 +1098,21 @@
           <td class="p-2 border border-black">${r.jenis}</td>
           <td class="p-2 border border-black text-center font-bold">${r.poin}</td>
           <td class="p-2 border border-black">${r.kronologi || '-'}</td>
-          <td class="p-2 border border-black text-center">${r.guru || 'Pak Thomas'}</td>
+          <td class="p-2 border border-black text-center">${r.guru || schoolConfig.wakasis}</td>
         </tr>
       `).join('');
 
       const content = `
         <div class="text-center mb-6">
           <h3 class="font-bold text-base underline uppercase">LEMBAR BUKU CATATAN KARAKTER & DISIPLIN SISWA</h3>
-          <p class="text-xs">Tahun Ajaran 2026/2027 • SD Methodist Immanuel Bandar Lampung</p>
+          <p class="text-xs">Tahun Ajaran 2026/2027 • ${schoolConfig.sekolah}</p>
         </div>
 
         <div class="grid grid-cols-2 text-xs mb-4 border border-black p-3">
           <div>
             <p>Nama Lengkap Siswa : <b>${s.nama}</b></p>
             <p>Kelas / Jenjang : <b>${s.kelas}</b></p>
+            <p>Wali Kelas : <b>${walasDef}</b></p>
           </div>
           <div class="text-right">
             <p>Modal Awal : <b>100 Poin</b></p>
@@ -829,11 +1145,12 @@
           <div>
             <p>Waka Kesiswaan SD,</p>
             <div class="h-20"></div>
-            <p class="font-bold underline">Thomas Ryantama, M.Kom., Gr.</p>
+            <p class="font-bold underline">${schoolConfig.wakasis || "Thomas Ryantama, M.Kom., Gr."}</p>
           </div>
         </div>
       `;
 
+      document.getElementById('printKopContainer').innerHTML = generateHtmlKopResmi();
       document.getElementById('printContent').innerHTML = content;
       tutupModalDetail();
       document.getElementById('printArea').classList.remove('hidden');
@@ -841,7 +1158,7 @@
       document.getElementById('printArea').classList.add('hidden');
     }
 
-    // ================= MODAL & LOGIKA KETERLAMBATAN GERBANG =================
+    // ================= KETERLAMBATAN GERBANG =================
     function toggleModalTerlambat(show) {
       document.getElementById('modal-terlambat').classList.toggle('hidden', !show);
       if (show) {
@@ -938,10 +1255,7 @@
       fetch(API_KESISWAAN_URL, {
         method: "POST",
         headers: { "Content-Type": "text/plain;charset=utf-8" },
-        body: JSON.stringify({
-          action: "login_dan_ambil_data",
-          key: activeKey
-        })
+        body: JSON.stringify({ action: "login_dan_ambil_data", key: activeKey })
       })
       .then(r => r.json())
       .then(res => {
