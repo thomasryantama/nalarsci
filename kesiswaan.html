@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Akses Terbatas: Kesiswaan, Disiplin & Konseling — SD Methodist Immanuel</title>
+  <title>Sistem Manajemen Kesiswaan & Disiplin Positif — SD Methodist Immanuel</title>
   <meta name="robots" content="noindex, nofollow">
-  
+
   <link rel="icon" type="image/png" href="favicon.png">
   <link rel="apple-touch-icon" href="icon-192.png">
   <script src="https://cdn.tailwindcss.com"></script>
@@ -15,7 +15,7 @@
   <style>
     body {
       font-family: 'Nunito', sans-serif;
-      background: radial-gradient(circle at 50% 0%, #1e293b 0%, #0b0f19 80%);
+      background: radial-gradient(circle at 50% 0%, #1e293b 0%, #0b0f19 85%);
       color: #f8fafc;
       min-height: 100vh;
     }
@@ -41,9 +41,9 @@
     }
   </style>
 </head>
-<body class="p-4 md:p-8 max-w-7xl mx-auto flex flex-col justify-between min-h-screen">
+<body class="p-3 sm:p-6 max-w-7xl mx-auto flex flex-col justify-between min-h-screen">
 
-  <!-- ================= GERBANG LOGIN (LOCKSCREEN) ================= -->
+  <!-- ================= GERBANG LOGIN (LOCKSCREEN KEAMANAN) ================= -->
   <div id="gatekeeper" class="fixed inset-0 bg-[#0b0f19] z-50 flex items-center justify-center p-4">
     <div class="glass-card max-w-md w-full rounded-3xl p-8 border border-emerald-500/30 text-center shadow-2xl">
       <div class="w-16 h-16 bg-emerald-500/10 border border-emerald-400/30 rounded-2xl flex items-center justify-center mx-auto mb-4 text-3xl">
@@ -51,7 +51,7 @@
       </div>
       <h2 class="font-title text-2xl text-white mb-1">Akses Khusus Wakasis & BK</h2>
       <p class="text-xs text-slate-400 mb-6 leading-relaxed">
-        Pusat kendali kedisiplinan, buku kasus, rekap poin karakter (modal 100), dan penerbitan Surat Panggilan Siswa.
+        Pusat data kedisiplinan siswa (modal 100 poin), catatan kasus, dan penerbitan Surat Panggilan resmi SD Methodist Immanuel.
       </p>
 
       <form onsubmit="verifikasiMasuk(event)" class="space-y-4 text-xs">
@@ -62,64 +62,57 @@
       </form>
 
       <div class="mt-6 border-t border-slate-800/80 pt-4">
-        <a href="index.html" class="text-slate-500 hover:text-slate-300 text-xs">← Kembali ke Beranda Publik</a>
+        <a href="internal.html" class="text-slate-500 hover:text-slate-300 text-xs">← Kembali ke Portal Internal</a>
       </div>
     </div>
   </div>
 
   <!-- ================= KONTEN UTAMA (TERBUKA SETELAH LOGIN) ================= -->
-  <div id="panel-rahasia" class="hidden flex-col flex-grow">
-    
-    <!-- HEADER -->
-    <header class="mb-8 no-print">
-      <div class="flex justify-between items-center border-b border-slate-800 pb-3 mb-6">
-        <a href="internal.html" class="text-sky-400 hover:text-sky-300 font-bold text-xs flex items-center gap-1 transition">
-          ← Kembali ke Portal Internal
-        </a>
+  <div id="panel-utama" class="hidden flex-col flex-grow">
+
+    <!-- NAVBAR / HEADER ATAS -->
+    <header class="mb-6 no-print">
+      <nav class="flex flex-wrap justify-between items-center gap-4 bg-slate-900/90 border border-slate-800 p-4 rounded-3xl mb-6 backdrop-blur-md">
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-500 flex items-center justify-center text-white text-xl shadow-lg">
+            <i class="fa-solid fa-scale-balanced"></i>
+          </div>
+          <div>
+            <h1 class="font-title text-xl text-white tracking-wide leading-tight">E-DISIPLIN <span class="text-emerald-400">& KESISWAAN</span></h1>
+            <p class="text-[11px] text-slate-400">Pusat Catatan Disiplin Positif & Log Gerbang • SD Methodist Immanuel</p>
+          </div>
+        </div>
         <div class="flex items-center gap-2">
-          <span class="text-xs bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 px-3 py-1 rounded-full font-bold">
-            🔒 Sesi Terhubung: Google Spreadsheet Aktif
-          </span>
-          <button onclick="kunciSesi()" class="bg-rose-500/20 border border-rose-500/30 hover:bg-rose-600 text-rose-300 hover:text-white text-xs px-3 py-1 rounded-full transition font-bold">
-            Keluar Sesi
+          <button onclick="segarkanData()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold px-3 py-2 rounded-xl border border-slate-700 transition flex items-center gap-1.5" title="Muat Ulang Data">
+            <i class="fa-solid fa-arrows-rotate text-emerald-400"></i> Refresh
+          </button>
+          <button onclick="kunciSesi()" class="bg-rose-500/20 border border-rose-500/30 hover:bg-rose-600 text-rose-300 hover:text-white text-xs px-3.5 py-2 rounded-xl font-bold transition">
+            <i class="fa-solid fa-lock mr-1"></i> Kunci
           </button>
         </div>
-      </div>
+      </nav>
 
-      <div class="text-center max-w-2xl mx-auto">
-        <div class="inline-flex items-center gap-2 bg-emerald-500/10 border border-emerald-400/20 text-emerald-300 px-3.5 py-1 rounded-full text-xs font-black uppercase tracking-wider mb-2">
-          Sistem Manajemen Kedisiplinan & Restitusi Siswa
-        </div>
-        <h1 class="font-title text-3xl sm:text-4xl text-white mb-2">Pusat Disiplin & Kasus Siswa SD</h1>
-        <p class="text-slate-400 text-xs sm:text-sm">
-          Pencatatan pelanggaran modal 100 poin, pemantauan keterlambatan gerbang, dan generator Surat Panggilan Orang Tua resmi.
-        </p>
-      </div>
-
-      <!-- SUB-TAB KESISWAAN -->
-      <div class="flex flex-wrap justify-center gap-2 mt-6" id="subtab-bar">
-        <button onclick="bukaTab('poin')" id="tab-poin" class="subtab-btn active px-4 py-2 rounded-xl bg-slate-800 border border-slate-700 text-xs font-bold text-slate-300 transition">
-          ⚖️ Rekap Skor Poin (Modal 100)
+      <!-- SUB-TAB NAVIGASI -->
+      <div class="flex flex-wrap justify-center gap-2 mb-6" id="subtab-bar">
+        <button onclick="bukaTab('disiplin')" id="tab-disiplin" class="subtab-btn active px-4 py-2 rounded-xl bg-slate-800 border border-slate-700 text-xs font-bold text-slate-300 transition flex items-center gap-2">
+          <i class="fa-solid fa-user-shield"></i> Buku Disiplin & Skor Siswa (Modal 100)
         </button>
-        <button onclick="bukaTab('kasus')" id="tab-kasus" class="subtab-btn px-4 py-2 rounded-xl bg-slate-800 border border-slate-700 text-xs font-bold text-slate-300 hover:bg-slate-700 transition">
-          📖 Buku Catatan Kasus Lapangan
-        </button>
-        <button onclick="bukaTab('terlambat')" id="tab-terlambat" class="subtab-btn px-4 py-2 rounded-xl bg-slate-800 border border-slate-700 text-xs font-bold text-slate-300 hover:bg-slate-700 transition">
-          ⏰ Rekap Keterlambatan Gerbang (07.15)
+        <button onclick="bukaTab('terlambat')" id="tab-terlambat" class="subtab-btn px-4 py-2 rounded-xl bg-slate-800 border border-slate-700 text-xs font-bold text-slate-300 hover:bg-slate-700 transition flex items-center gap-2">
+          <i class="fa-solid fa-clock"></i> Absensi Keterlambatan Gerbang (07.15)
         </button>
       </div>
     </header>
 
-    <!-- ================= TAB 1: REKAP SKOR POIN (MODAL 100) & CETAK SURAT ================= -->
-    <section id="konten-poin" class="space-y-6 flex-grow mb-12 no-print">
-      
-      <!-- Metric Cards -->
+    <!-- ================= TAB 1: BUKU DISIPLIN SISWA (MODAL 100 POIN) ================= -->
+    <section id="konten-disiplin" class="space-y-6 flex-grow mb-12 no-print">
+
+      <!-- METRIK RINGKASAN STATUS KESISWAAN -->
       <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <div class="glass-card p-4 rounded-2xl border-l-4 border-emerald-500">
           <span class="text-xs text-slate-400 font-bold block">Prima / Tertib (&ge;85)</span>
           <div class="flex items-baseline gap-2 mt-1">
             <span class="text-2xl font-black text-emerald-400" id="statHijau">0</span>
-            <span class="text-[11px] text-slate-500">Siswa Aman</span>
+            <span class="text-[11px] text-slate-500">Siswa Tertib</span>
           </div>
         </div>
         <div class="glass-card p-4 rounded-2xl border-l-4 border-amber-500">
@@ -130,10 +123,10 @@
           </div>
         </div>
         <div class="glass-card p-4 rounded-2xl border-l-4 border-orange-500">
-          <span class="text-xs text-slate-400 font-bold block">Panggilan Ortu I/II (30-69)</span>
+          <span class="text-xs text-slate-400 font-bold block">Panggilan Ortu (30-69)</span>
           <div class="flex items-baseline gap-2 mt-1">
             <span class="text-2xl font-black text-orange-400" id="statOrange">0</span>
-            <span class="text-[11px] text-slate-500">Terbit SP-1 / SP-2</span>
+            <span class="text-[11px] text-slate-500">Terbit SP-1 & SP-2</span>
           </div>
         </div>
         <div class="glass-card p-4 rounded-2xl border-l-4 border-rose-500">
@@ -145,20 +138,30 @@
         </div>
       </div>
 
-      <!-- Action & Search Bar -->
-      <div class="glass-card rounded-3xl p-4 flex flex-col sm:flex-row justify-between items-center gap-3">
+      <!-- SEARCH & ACTION BAR -->
+      <div class="flex flex-col sm:flex-row justify-between items-center gap-3 bg-slate-900/60 p-3 rounded-2xl border border-slate-800">
         <div class="relative w-full sm:w-80">
           <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
-          <input type="text" id="cariPoinSiswa" onkeyup="filterTabelPoin()" placeholder="Cari nama siswa atau kelas..." class="w-full bg-slate-950 border border-slate-700 pl-9 pr-3 py-2 text-xs text-white rounded-xl outline-none focus:border-emerald-400">
+          <input type="text" id="cariSiswa" onkeyup="renderTabelDisiplin()" placeholder="Cari nama siswa atau kelas..." class="w-full bg-slate-950 border border-slate-700 pl-9 pr-3 py-2 text-xs text-white rounded-xl outline-none focus:border-emerald-400">
         </div>
+
         <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
-          <button onclick="toggleModalCatatPoin(true)" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-title text-xs px-4 py-2 rounded-xl font-bold shadow transition flex items-center gap-1.5">
-            <i class="fa-solid fa-plus-circle"></i> Input Catatan Skor Siswa
+          <select id="filterKelas" onchange="renderTabelDisiplin()" class="bg-slate-950 border border-slate-700 text-slate-300 text-xs font-bold rounded-xl px-3 py-2 outline-none">
+            <option value="semua">Semua Jenjang</option>
+            <option value="Kelas 1">Kelas 1</option>
+            <option value="Kelas 2">Kelas 2</option>
+            <option value="Kelas 3">Kelas 3</option>
+            <option value="Kelas 4">Kelas 4</option>
+            <option value="Kelas 5">Kelas 5</option>
+            <option value="Kelas 6">Kelas 6</option>
+          </select>
+          <button onclick="bukaModalCatat()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-title text-xs font-bold px-4 py-2 rounded-xl shadow transition flex items-center gap-1.5">
+            <i class="fa-solid fa-plus-circle"></i> Catat Kejadian / Apresiasi
           </button>
         </div>
       </div>
 
-      <!-- Tabel Skor Poin -->
+      <!-- TABEL DAFTAR SISWA & SKOR -->
       <div class="glass-card rounded-3xl overflow-hidden border border-slate-800">
         <div class="overflow-x-auto">
           <table class="w-full text-left text-xs text-slate-300">
@@ -167,54 +170,20 @@
                 <th class="p-3.5">Nama Siswa</th>
                 <th class="p-3.5">Kelas</th>
                 <th class="p-3.5 text-center">Sisa Skor (Modal 100)</th>
-                <th class="p-3.5">Status Tindak Lanjut</th>
-                <th class="p-3.5 text-center">Catatan</th>
+                <th class="p-3.5">Status & Tindak Lanjut</th>
+                <th class="p-3.5 text-center">Riwayat Kasus</th>
                 <th class="p-3.5 text-right">Aksi Surat & Rekap</th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-slate-800/60" id="body-poin">
-              <!-- Diisi otomatis dari gabungan data kasus -->
+            <tbody class="divide-y divide-slate-800/60" id="body-disiplin">
+              <!-- Diisi otomatis dari Google Sheets -->
             </tbody>
           </table>
         </div>
       </div>
     </section>
 
-    <!-- ================= TAB 2: BUKU KASUS LENGKAP ================= -->
-    <section id="konten-kasus" class="hidden space-y-6 flex-grow mb-12 no-print">
-      <div class="glass-card rounded-3xl p-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h2 class="font-title text-lg text-emerald-300">Log Penanganan Masalah & Tindak Lanjut</h2>
-          <p class="text-xs text-slate-400">Tersinkronisasi otomatis dengan Google Spreadsheet Kesiswaan sekolah.</p>
-        </div>
-        <button onclick="toggleModalKasus(true)" class="bg-emerald-600 hover:bg-emerald-500 text-white font-title text-xs px-4 py-2.5 rounded-xl font-bold shadow-lg transition flex-shrink-0">
-          + Catat Kasus Baru
-        </button>
-      </div>
-
-      <div class="glass-card rounded-3xl overflow-hidden border border-slate-800">
-        <div class="overflow-x-auto">
-          <table class="w-full text-left text-xs text-slate-300" id="tabel-kasus">
-            <thead class="bg-slate-900 text-slate-400 uppercase font-black text-[10px] border-b border-slate-800">
-              <tr>
-                <th class="p-3.5">Tanggal</th>
-                <th class="p-3.5">Nama & Kelas</th>
-                <th class="p-3.5">Deskripsi Masalah</th>
-                <th class="p-3.5">Tindakan / Solusi</th>
-                <th class="p-3.5">Poin</th>
-                <th class="p-3.5">PIC</th>
-                <th class="p-3.5">Status</th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-slate-800/60" id="body-kasus">
-              <!-- Diisi via API saat terotentikasi -->
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </section>
-
-    <!-- ================= TAB 3: REKAP KETERLAMBATAN ================= -->
+    <!-- ================= TAB 2: REKAP KETERLAMBATAN GERBANG ================= -->
     <section id="konten-terlambat" class="hidden space-y-6 flex-grow mb-12 no-print">
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
         <div class="glass-card rounded-2xl p-5 border border-slate-800">
@@ -259,7 +228,7 @@
               </tr>
             </thead>
             <tbody class="divide-y divide-slate-800/60" id="body-terlambat">
-              <!-- Diisi via API -->
+              <!-- Diisi via Google Sheets -->
             </tbody>
           </table>
         </div>
@@ -268,121 +237,188 @@
 
     <!-- FOOTER -->
     <footer class="text-center text-xs text-slate-500 border-t border-slate-800 pt-6 no-print">
-      © 2026 <strong>SD Methodist Immanuel</strong> • Sistem Manajemen Kesiswaan & Kedisiplinan Terenkripsi
+      © 2026 <strong>SD Methodist Immanuel</strong> • Sistem Manajemen Kesiswaan & Kedisiplinan Terintegrasi
     </footer>
 
   </div>
 
-  <!-- ================= MODAL: INPUT CATATAN DISIPLIN / POIN (LANGSUNG KE GOOGLE SHEETS) ================= -->
-  <div id="modal-catat-poin" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden no-print">
-    <div class="glass-card max-w-lg w-full rounded-3xl p-6 border border-amber-500/40 bg-slate-900 shadow-2xl overflow-y-auto max-h-[90vh]">
-      <div class="flex justify-between items-center mb-4 border-b border-slate-800 pb-3">
-        <h3 class="font-title text-xl text-amber-300 flex items-center gap-2">
-          <i class="fa-solid fa-pen-to-square"></i> Input Skor Pelanggaran / Restitusi
+  <!-- ================= MODAL: INPUT CATATAN DISIPLIN / REKAP POIN ================= -->
+  <div id="modalCatat" class="fixed inset-0 bg-slate-950/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden no-print">
+    <div class="bg-slate-900 border border-slate-700 max-w-lg w-full rounded-3xl p-6 text-xs space-y-4 shadow-2xl overflow-y-auto max-h-[90vh]">
+      <div class="flex justify-between items-center text-white border-b border-slate-800 pb-3">
+        <h3 class="font-title text-base font-bold text-amber-400 flex items-center gap-2">
+          <i class="fa-solid fa-pen-to-square"></i> Input Perilaku & Perubahan Skor
         </h3>
-        <button onclick="toggleModalCatatPoin(false)" class="text-slate-400 hover:text-white font-bold text-xl">✕</button>
+        <button onclick="tutupModalCatat()" class="text-slate-400 hover:text-white">✕</button>
       </div>
 
-      <form onsubmit="simpanCatatanPoin(event)" class="space-y-3 text-xs">
+      <form id="formKejadian" onsubmit="simpanKejadianKeCloud(event)" class="space-y-3">
+        <div>
+          <label class="block font-bold text-slate-300 mb-1">Nama Lengkap Siswa:</label>
+          <input type="text" id="inNama" required placeholder="Contoh: Jason Alexander" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-white outline-none focus:border-amber-400">
+        </div>
+
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block text-slate-400 font-bold mb-1">Nama Siswa</label>
-            <input type="text" id="poin-nama" required placeholder="Nama lengkap siswa..." class="w-full p-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white outline-none focus:border-amber-400">
+            <label class="block font-bold text-slate-300 mb-1">Kelas:</label>
+            <select id="inKelas" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-white outline-none focus:border-amber-400">
+              <option value="Kelas 1">Kelas 1</option>
+              <option value="Kelas 2">Kelas 2</option>
+              <option value="Kelas 3">Kelas 3</option>
+              <option value="Kelas 4">Kelas 4</option>
+              <option value="Kelas 5">Kelas 5</option>
+              <option value="Kelas 6">Kelas 6</option>
+            </select>
           </div>
           <div>
-            <label class="block text-slate-400 font-bold mb-1">Kelas</label>
-            <input type="text" id="poin-kelas" required placeholder="Contoh: 5A SD" class="w-full p-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white outline-none focus:border-amber-400">
+            <label class="block font-bold text-slate-300 mb-1">Tanggal Kejadian:</label>
+            <input type="date" id="inTanggal" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-white outline-none focus:border-amber-400">
           </div>
         </div>
 
         <div>
-          <label class="block text-slate-400 font-bold mb-1">Tanggal Kejadian</label>
-          <input type="date" id="poin-tanggal" required class="w-full p-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white outline-none focus:border-amber-400">
-        </div>
-
-        <div>
-          <label class="block text-slate-400 font-bold mb-1">Pilih Kategori Pelanggaran / Disiplin Positif:</label>
-          <select id="poin-jenis" onchange="updatePoinNilai()" class="w-full p-2.5 rounded-xl bg-slate-950 border border-slate-700 text-amber-300 font-bold outline-none focus:border-amber-400">
+          <label class="block font-bold text-slate-300 mb-1">Pilih Jenis Pelanggaran / Disiplin Positif:</label>
+          <select id="inJenis" onchange="sesuaikanPoinOtomatis()" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-amber-300 font-bold outline-none focus:border-amber-400">
+            <!-- PELANGGARAN RINGAN -->
             <optgroup label="⚠️ Pelanggaran Ringan (-2 s.d. -5)">
               <option value="Atribut Seragam Tidak Lengkap" data-poin="-2">Atribut Seragam Tidak Lengkap (Kaos kaki/sepatu/dasi) [-2]</option>
-              <option value="Terlambat Masuk Sekolah (1-2x)" data-poin="-3">Terlambat Masuk Sekolah (1-2x) [-3]</option>
+              <option value="Terlambat Datang ke Sekolah (1-2x)" data-poin="-3">Terlambat Datang ke Sekolah (1-2 kali) [-3]</option>
               <option value="Membuang Sampah Sembarangan" data-poin="-2">Membuang Sampah Sembarangan / Mengotori Kelas [-2]</option>
-              <option value="Membuat Gaduh Saat Doa / Belajar" data-poin="-3">Membuat Gaduh Saat Ibadah / KBM [-3]</option>
+              <option value="Tidak Membawa Buku Pelajaran / Perlengkapan" data-poin="-2">Tidak Membawa Buku Pelajaran / Perlengkapan [-2]</option>
+              <option value="Membuat Gaduh Saat Doa / Belajar" data-poin="-3">Membuat Gaduh Saat Ibadah / KBM Berlangsung [-3]</option>
             </optgroup>
+            <!-- PELANGGARAN SEDANG -->
             <optgroup label="⚠️⚠️ Pelanggaran Sedang (-10 s.d. -15)">
               <option value="Terlambat Masuk Sekolah Lebih dari 3 Kali" data-poin="-10">Terlambat Berulang (>3 Kali) [-10]</option>
-              <option value="Meninggalkan Jam Sekolah Tanpa Izin (Bolos)" data-poin="-15">Meninggalkan Jam Sekolah Tanpa Izin (Bolos) [-15]</option>
-              <option value="Membawa HP / Main Game Tanpa Izin" data-poin="-10">Membawa HP / Main Game Tanpa Izin Guru [-10]</option>
-              <option value="Merusak Fasilitas Belajar / Alat Teman" data-poin="-10">Merusak Fasilitas Belajar / Buku Teman [-10]</option>
+              <option value="Meninggalkan Sekolah Tanpa Izin (Bolos)" data-poin="-15">Meninggalkan Jam Sekolah Tanpa Izin (Bolos) [-15]</option>
+              <option value="Membawa HP / Main Game Tanpa Izin Guru" data-poin="-10">Membawa Gadget / HP Tanpa Instruksi Guru [-10]</option>
+              <option value="Merusak Fasilitas Sekolah / Alat Teman" data-poin="-10">Merusak Fasilitas Belajar / Buku Milik Teman [-10]</option>
+              <option value="Berbohong / Keterangan Palsu" data-poin="-15">Berbohong / Memberikan Keterangan Palsu [-15]</option>
             </optgroup>
+            <!-- PELANGGARAN BERAT (PERMENDIKBUD 46/2023) -->
             <optgroup label="🚨 Pelanggaran Berat (-20 s.d. -30)">
               <option value="Perundungan (Bullying) Verbal / Menghina Teman" data-poin="-20">Perundungan Verbal (Mengejek fisik/orang tua) [-20]</option>
-              <option value="Kekerasan Fisik / Berkelahi" data-poin="-25">Kekerasan Fisik / Berkelahi [-25]</option>
+              <option value="Perundungan Fisik / Memukul Teman" data-poin="-25">Kekerasan Fisik / Berkelahi [-25]</option>
               <option value="Membawa Benda Tajam Berbahaya" data-poin="-30">Membawa Benda Tajam Berbahaya [-30]</option>
-              <option value="Bersikap Kasar / Melawan Guru" data-poin="-25">Bersikap Kasar / Melawan Guru Terang-terangan [-25]</option>
+              <option value="Bersikap Kasar / Melawan Guru" data-poin="-25">Bersikap Tidak Sopan / Melawan Guru Terang-terangan [-25]</option>
             </optgroup>
+            <!-- DISIPLIN POSITIF / RESTITUSI -->
             <optgroup label="🌟 Disiplin Positif / Restitusi (+2 s.d. +5)">
               <option value="Jujur Mengakui Kesalahan & Memperbaiki Diri" data-poin="+3">Restitusi: Jujur & Bertanggung Jawab [+3]</option>
               <option value="Inisiatif Menolong & Menjaga Kebersihan" data-poin="+2">Inisiatif Kebersihan & Membantu Teman [+2]</option>
               <option value="Disiplin Waktu 1 Bulan Penuh" data-poin="+5">Disiplin Tepat Waktu 1 Bulan Penuh [+5]</option>
+              <option value="Teladan Sikap Budi Pekerti di Kelas" data-poin="+5">Teladan Budi Pekerti & Karakter [+5]</option>
             </optgroup>
           </select>
         </div>
 
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block text-slate-400 font-bold mb-1">Skor Poin</label>
-            <input type="number" id="poin-angka" required class="w-full p-2.5 rounded-xl bg-slate-950 border border-slate-700 text-amber-400 font-bold outline-none">
+            <label class="block font-bold text-slate-300 mb-1">Perubahan Poin:</label>
+            <input type="number" id="inPoinVal" required class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 font-bold text-amber-400 outline-none">
           </div>
           <div>
-            <label class="block text-slate-400 font-bold mb-1">Guru Pelapor / PIC</label>
-            <input type="text" id="poin-pic" required value="Pak Thomas (Wakasis)" class="w-full p-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white outline-none focus:border-amber-400">
+            <label class="block font-bold text-slate-300 mb-1">Guru Pelapor / PIC:</label>
+            <input type="text" id="inGuru" required value="Pak Thomas (Wakasis)" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-white outline-none focus:border-amber-400">
           </div>
         </div>
 
         <div>
-          <label class="block text-slate-400 font-bold mb-1">Kronologi Kejadian & Rencana Bimbingan (Restitusi)</label>
-          <textarea id="poin-kronologi" required rows="2" placeholder="Uraikan apa yang terjadi dan komitmen perbaikan siswa..." class="w-full p-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white outline-none focus:border-amber-400"></textarea>
+          <label class="block font-bold text-slate-300 mb-1">Kronologi Kejadian & Rencana Bimbingan (Restitusi):</label>
+          <textarea id="inKronologi" rows="3" required placeholder="Jelaskan apa yang terjadi dan komitmen perbaikan anak..." class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-white outline-none focus:border-amber-400"></textarea>
         </div>
 
-        <button type="submit" id="btn-simpan-poin" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-title text-xs py-3 rounded-xl font-bold transition shadow-lg mt-2">
-          💾 Simpan Catatan ke Google Sheets
+        <button type="submit" id="btn-simpan-kasus" class="w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-title font-bold text-xs rounded-xl transition shadow-lg flex items-center justify-center gap-1.5">
+          💾 Simpan ke Google Spreadsheet
         </button>
       </form>
     </div>
   </div>
 
-  <!-- ================= MODAL CETAK SURAT PANGGILAN & KARTU DISIPLIN ================= -->
-  <div id="modal-cetak-opsi" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden no-print">
-    <div class="glass-card max-w-md w-full rounded-3xl p-6 border border-emerald-500/40 bg-slate-900 shadow-2xl text-xs space-y-4">
-      <div class="flex justify-between items-center text-white border-b border-slate-800 pb-3">
-        <h3 class="font-title text-lg text-emerald-300" id="cetak-nama-siswa">Nama Siswa</h3>
-        <button onclick="toggleModalCetak(false)" class="text-slate-400 hover:text-white font-bold text-xl">✕</button>
+  <!-- ================= MODAL: DETAIL SISWA, RIWAYAT, & CETAK SURAT ================= -->
+  <div id="modalDetail" class="fixed inset-0 bg-slate-950/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden no-print">
+    <div class="bg-slate-900 border border-slate-700 max-w-2xl w-full rounded-3xl p-6 text-xs space-y-4 shadow-2xl overflow-y-auto max-h-[90vh]">
+      <div class="flex justify-between items-start border-b border-slate-800 pb-3">
+        <div>
+          <h3 class="font-title text-xl text-white font-bold" id="detNama">Nama Siswa</h3>
+          <p class="text-slate-400 text-xs" id="detKelas">Kelas 5 • Sisa Skor: 85 Poin</p>
+        </div>
+        <button onclick="tutupModalDetail()" class="text-slate-400 hover:text-white text-base">✕</button>
       </div>
-      <p class="text-slate-300">Pilih dokumen resmi yang ingin dicetak langsung atau disimpan ke format PDF:</p>
-      
+
+      <!-- Action Generator Surat -->
+      <div class="p-3 bg-slate-950/80 rounded-2xl border border-slate-800 flex flex-wrap items-center justify-between gap-2">
+        <span class="font-bold text-amber-400 text-xs">Cetak Dokumen Resmi:</span>
+        <div class="flex flex-wrap gap-1.5">
+          <button onclick="generateSuratPanggilan(1)" class="px-2.5 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-[11px] font-bold">
+            ✉️ Surat Panggilan I
+          </button>
+          <button onclick="generateSuratPanggilan(2)" class="px-2.5 py-1.5 bg-orange-600 hover:bg-orange-500 text-white rounded-lg text-[11px] font-bold">
+            ✉️ Surat Panggilan II
+          </button>
+          <button onclick="generateSuratPanggilan(3)" class="px-2.5 py-1.5 bg-rose-600 hover:bg-rose-500 text-white rounded-lg text-[11px] font-bold">
+            ✉️ Surat Panggilan III
+          </button>
+          <button onclick="generateKartuDisiplin()" class="px-2.5 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-[11px] font-bold">
+            🖨️ Lembar Kartu Disiplin
+          </button>
+        </div>
+      </div>
+
+      <!-- Tabel Riwayat Perilaku Siswa -->
       <div class="space-y-2">
-        <button onclick="generateSuratPanggilan(1)" class="w-full py-2.5 px-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl text-left flex items-center justify-between">
-          <span>✉️ Cetak Surat Panggilan Orang Tua I</span>
-          <span class="text-[10px] opacity-80">SP-I</span>
-        </button>
-        <button onclick="generateSuratPanggilan(2)" class="w-full py-2.5 px-3 bg-orange-600 hover:bg-orange-500 text-white font-bold rounded-xl text-left flex items-center justify-between">
-          <span>✉️ Cetak Surat Panggilan Orang Tua II</span>
-          <span class="text-[10px] opacity-80">SP-II</span>
-        </button>
-        <button onclick="generateSuratPanggilan(3)" class="w-full py-2.5 px-3 bg-rose-600 hover:bg-rose-500 text-white font-bold rounded-xl text-left flex items-center justify-between">
-          <span>✉️ Cetak Surat Panggilan Orang Tua III</span>
-          <span class="text-[10px] opacity-80">SP-III (Terakhir)</span>
-        </button>
-        <button onclick="generateKartuDisiplin()" class="w-full py-2.5 px-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-left flex items-center justify-between">
-          <span>🖨️ Cetak Lembar Kartu Disiplin Siswa</span>
-          <span class="text-[10px] opacity-80">Lampiran Riwayat</span>
-        </button>
+        <h4 class="font-bold text-slate-300 text-xs uppercase tracking-wider">Log Riwayat Pelanggaran & Apresiasi:</h4>
+        <div id="detRiwayatList" class="space-y-2 max-h-60 overflow-y-auto pr-1">
+          <!-- Diisi otomatis -->
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- ================= LEMBAR DOKUMEN CETAK RESMI ================= -->
+  <!-- ================= MODAL: INPUT KETERLAMBATAN GERBANG ================= -->
+  <div id="modal-terlambat" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden no-print">
+    <div class="glass-card max-w-md w-full rounded-3xl p-6 border border-amber-500/40 bg-slate-900 shadow-2xl text-xs space-y-3">
+      <div class="flex justify-between items-center mb-1 border-b border-slate-800 pb-3">
+        <h3 class="font-title text-xl text-amber-300">Catat Siswa Terlambat</h3>
+        <button onclick="toggleModalTerlambat(false)" class="text-slate-400 hover:text-white font-bold text-xl">✕</button>
+      </div>
+
+      <form onsubmit="simpanTerlambatKeCloud(event)" class="space-y-3">
+        <div>
+          <label class="block text-slate-400 font-bold mb-1">Nama Siswa</label>
+          <input type="text" id="terlambat-nama" required placeholder="Nama lengkap siswa..." class="w-full p-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white outline-none focus:border-amber-400">
+        </div>
+
+        <div>
+          <label class="block text-slate-400 font-bold mb-1">Kelas</label>
+          <input type="text" id="terlambat-kelas" required placeholder="Misal: 5B SD" class="w-full p-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white outline-none focus:border-amber-400">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <div class="flex justify-between items-center mb-1">
+              <label class="text-slate-400 font-bold">Jam Masuk</label>
+              <button type="button" onclick="setJamSekarang()" class="text-[10px] text-amber-400 hover:underline font-semibold">
+                ⏱️ Sekarang
+              </button>
+            </div>
+            <input type="time" id="terlambat-jam" required class="w-full p-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white outline-none focus:border-amber-400">
+          </div>
+
+          <div>
+            <label class="block text-slate-400 font-bold mb-1">Tanggal</label>
+            <input type="date" id="terlambat-tanggal" required class="w-full p-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white outline-none focus:border-amber-400">
+          </div>
+        </div>
+
+        <button type="submit" id="btn-simpan-terlambat" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-title text-xs py-3 rounded-xl font-bold transition shadow-lg mt-2">
+          💾 Simpan Log Keterlambatan
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= LEMBAR DOKUMEN CETAK RESMI (SURAT PANGGILAN & KARTU DISIPLIN) ================= -->
   <div id="printArea" class="hidden print-box p-8 max-w-3xl mx-auto text-black bg-white">
     <div class="border-b-4 border-double border-black pb-3 mb-6 text-center">
       <h2 class="text-lg font-bold uppercase tracking-wide">YAYASAN PENDIDIKAN METHODIST INDONESIA</h2>
@@ -393,21 +429,23 @@
     <div id="printContent"></div>
   </div>
 
-  <!-- SCRIPT TERINTEGRASI -->
+  <!-- JAVASCRIPT SISTEM TERPADU & PENGHUBUNG CLOUD -->
   <script>
     const API_KESISWAAN_URL = "https://script.google.com/macros/s/AKfycbzYdXRIHIi1RGHWmb61__IRiR2DkdQYpjxj-xiEBiXAmSyyIRmCXLum6vJoAPQmWqcIDg/exec";
 
     let activeKey = sessionStorage.getItem("wakasis_key") || "";
-    let globalKasus = [];
-    let globalTerlambat = [];
+    let dataKasusCloud = [];
+    let dataTerlambatCloud = [];
+    let studentsArray = [];
     let selectedStudent = null;
 
+    // ================= AUTENTIKASI / LOGIN =================
     function verifikasiMasuk(e) {
       e.preventDefault();
       const input = document.getElementById('auth-key').value.trim();
       const btn = document.getElementById('btn-auth');
       btn.disabled = true;
-      btn.innerHTML = "⏳ Memvalidasi Kunci ke Cloud...";
+      btn.innerHTML = "⏳ Memvalidasi Kunci...";
 
       fetch(API_KESISWAAN_URL, {
         method: "POST",
@@ -434,21 +472,20 @@
       .catch(err => {
         btn.disabled = false;
         btn.innerHTML = "🔓 Buka Enkripsi & Muat Database";
-        alert("Gagal terhubung ke Google Sheets: " + err);
+        alert("Gagal terhubung ke Google Spreadsheet: " + err);
       });
     }
 
     function bukaAksesPanel(data) {
       document.getElementById('gatekeeper').classList.add('hidden');
-      document.getElementById('panel-rahasia').classList.remove('hidden');
-      document.getElementById('panel-rahasia').classList.add('flex');
+      document.getElementById('panel-utama').classList.remove('hidden');
+      document.getElementById('panel-utama').classList.add('flex');
       
-      globalKasus = data.kasus || [];
-      globalTerlambat = data.terlambat || [];
+      dataKasusCloud = data.kasus || [];
+      dataTerlambatCloud = data.terlambat || [];
 
-      renderTabelKasus(globalKasus);
-      renderTabelTerlambat(globalTerlambat);
-      hitungDanRenderPoin();
+      prosesHitungPoinSiswa();
+      renderTabelTerlambat();
     }
 
     function kunciSesi() {
@@ -458,30 +495,27 @@
 
     function bukaTab(tab) {
       document.querySelectorAll('.subtab-btn').forEach(b => b.classList.remove('active'));
-      document.getElementById('konten-poin').classList.add('hidden');
-      document.getElementById('konten-kasus').classList.add('hidden');
+      document.getElementById('konten-disiplin').classList.add('hidden');
       document.getElementById('konten-terlambat').classList.add('hidden');
 
-      if (tab === 'poin') {
-        document.getElementById('tab-poin').classList.add('active');
-        document.getElementById('konten-poin').classList.remove('hidden');
-      } else if (tab === 'kasus') {
-        document.getElementById('tab-kasus').classList.add('active');
-        document.getElementById('konten-kasus').classList.remove('hidden');
+      if (tab === 'disiplin') {
+        document.getElementById('tab-disiplin').classList.add('active');
+        document.getElementById('konten-disiplin').classList.remove('hidden');
       } else if (tab === 'terlambat') {
         document.getElementById('tab-terlambat').classList.add('active');
         document.getElementById('konten-terlambat').classList.remove('hidden');
       }
     }
 
-    // ================= HITUNG SKOR MODAL 100 POIN SECARA DINAMIS =================
-    function hitungDanRenderPoin() {
+    // ================= PERHITUNGAN MODAL 100 POIN =================
+    function prosesHitungPoinSiswa() {
       const studentMap = {};
 
-      globalKasus.forEach(item => {
+      dataKasusCloud.forEach(item => {
         const key = item.nama.trim().toLowerCase();
         if (!studentMap[key]) {
           studentMap[key] = {
+            id: 's_' + encodeURIComponent(key),
             nama: item.nama.trim(),
             kelas: item.kelas || 'SD',
             skor: 100, // Modal awal 100 Poin
@@ -489,27 +523,35 @@
           };
         }
 
-        // Cari poin jika ada di item, default -5 jika belum tertulis
-        let poin = item.poin !== undefined ? parseInt(item.poin) : -5;
+        const poin = item.poin !== undefined ? parseInt(item.poin) : -5;
         studentMap[key].skor = Math.max(0, Math.min(100, studentMap[key].skor + poin));
         studentMap[key].riwayat.push({
           tanggal: item.tanggal,
-          masalah: item.masalah,
+          jenis: item.masalah,
           poin: poin,
-          solusi: item.solusi,
-          pic: item.pic
+          kronologi: item.solusi,
+          guru: item.pic || 'Pak Thomas'
         });
       });
 
-      window.studentsArray = Object.values(studentMap);
-      renderTabelPoin(window.studentsArray);
+      studentsArray = Object.values(studentMap);
+      renderTabelDisiplin();
     }
 
-    function renderTabelPoin(list) {
-      const tbody = document.getElementById('body-poin');
+    function renderTabelDisiplin() {
+      const tbody = document.getElementById('body-disiplin');
+      const keyword = document.getElementById('cariSiswa').value.toLowerCase();
+      const filterKls = document.getElementById('filterKelas').value;
+
       let cHijau = 0, cKuning = 0, cOrange = 0, cMerah = 0;
 
-      list.forEach(s => {
+      const filtered = studentsArray.filter(s => {
+        const matchKey = s.nama.toLowerCase().includes(keyword) || s.kelas.toLowerCase().includes(keyword);
+        const matchKls = (filterKls === 'semua' || s.kelas === filterKls);
+        return matchKey && matchKls;
+      });
+
+      studentsArray.forEach(s => {
         if (s.skor >= 85) cHijau++;
         else if (s.skor >= 70) cKuning++;
         else if (s.skor >= 30) cOrange++;
@@ -521,18 +563,24 @@
       document.getElementById('statOrange').innerText = cOrange;
       document.getElementById('statMerah').innerText = cMerah;
 
-      if (!list || list.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" class="p-6 text-center text-slate-500">Belum ada data catatan disiplin siswa.</td></tr>';
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-slate-500">Belum ada data catatan siswa ditemukan.</td></tr>`;
         return;
       }
 
-      tbody.innerHTML = list.map((s, idx) => {
-        let badge = '';
-        if (s.skor >= 85) badge = '<span class="px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-bold">🌟 Prima / Tertib</span>';
-        else if (s.skor >= 70) badge = '<span class="px-2.5 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[10px] font-bold">⚠️ Peringatan I (Bimbingan Walas)</span>';
-        else if (s.skor >= 50) badge = '<span class="px-2.5 py-1 rounded-full bg-orange-500/20 text-orange-300 border border-orange-500/30 text-[10px] font-bold">🚨 SP-1 (Panggilan Ortu I)</span>';
-        else if (s.skor >= 30) badge = '<span class="px-2.5 py-1 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/30 text-[10px] font-bold">🚨🚨 SP-2 (Panggilan Ortu II)</span>';
-        else badge = '<span class="px-2.5 py-1 rounded-full bg-red-600 text-white font-bold text-[10px] animate-pulse">🛑 SP-3 & Konferensi Kasus</span>';
+      tbody.innerHTML = filtered.map((s, idx) => {
+        let badgeStatus = '';
+        if (s.skor >= 85) {
+          badgeStatus = `<span class="px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-bold">🌟 Prima / Tertib</span>`;
+        } else if (s.skor >= 70) {
+          badgeStatus = `<span class="px-2.5 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[10px] font-bold">⚠️ Peringatan I (Bimbingan Walas)</span>`;
+        } else if (s.skor >= 50) {
+          badgeStatus = `<span class="px-2.5 py-1 rounded-full bg-orange-500/20 text-orange-300 border border-orange-500/30 text-[10px] font-bold">🚨 SP-1 (Panggilan Ortu I)</span>`;
+        } else if (s.skor >= 30) {
+          badgeStatus = `<span class="px-2.5 py-1 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/30 text-[10px] font-bold">🚨🚨 SP-2 (Panggilan Ortu II)</span>`;
+        } else {
+          badgeStatus = `<span class="px-2.5 py-1 rounded-full bg-red-600 text-white font-bold text-[10px] animate-pulse">🛑 SP-3 & Konferensi Kasus</span>`;
+        }
 
         return `
           <tr class="hover:bg-slate-800/40 transition">
@@ -543,14 +591,16 @@
               ${s.nama}
             </td>
             <td class="p-3.5 text-slate-300">${s.kelas}</td>
-            <td class="p-3.5 text-center font-black text-sm ${s.skor >= 85 ? 'text-emerald-400' : s.skor >= 70 ? 'text-amber-400' : s.skor >= 50 ? 'text-orange-400' : 'text-rose-500'}">
-              ${s.skor} / 100
+            <td class="p-3.5 text-center">
+              <span class="font-black text-sm ${s.skor >= 85 ? 'text-emerald-400' : s.skor >= 70 ? 'text-amber-400' : s.skor >= 50 ? 'text-orange-400' : 'text-rose-500'}">
+                ${s.skor}
+              </span> / 100
             </td>
-            <td class="p-3.5">${badge}</td>
+            <td class="p-3.5">${badgeStatus}</td>
             <td class="p-3.5 text-center text-slate-400 text-xs">${s.riwayat.length} Kasus</td>
             <td class="p-3.5 text-right">
-              <button onclick="pilihSiswaCetak(${idx})" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-amber-300 rounded-xl border border-slate-700 text-xs font-bold transition flex items-center gap-1.5 ml-auto">
-                <i class="fa-solid fa-print"></i> Cetak Dokumen
+              <button onclick="bukaDetailSiswa('${s.id}')" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-amber-300 rounded-xl border border-slate-700 text-[11px] font-bold transition">
+                <i class="fa-solid fa-folder-open"></i> Riwayat & Cetak SP
               </button>
             </td>
           </tr>
@@ -558,44 +608,39 @@
       }).join('');
     }
 
-    function filterTabelPoin() {
-      const q = document.getElementById('cariPoinSiswa').value.toLowerCase();
-      const filtered = (window.studentsArray || []).filter(s => s.nama.toLowerCase().includes(q) || s.kelas.toLowerCase().includes(q));
-      renderTabelPoin(filtered);
+    // ================= MODAL & INPUT KASUS KE CLOUD =================
+    function bukaModalCatat() {
+      document.getElementById('inTanggal').valueAsDate = new Date();
+      sesuaikanPoinOtomatis();
+      document.getElementById('modalCatat').classList.remove('hidden');
+    }
+    function tutupModalCatat() {
+      document.getElementById('modalCatat').classList.add('hidden');
     }
 
-    // ================= MODAL POIN / DISIPLIN =================
-    function toggleModalCatatPoin(show) {
-      document.getElementById('modal-catat-poin').classList.toggle('hidden', !show);
-      if (show) {
-        document.getElementById('poin-tanggal').valueAsDate = new Date();
-        updatePoinNilai();
-      }
+    function sesuaikanPoinOtomatis() {
+      const select = document.getElementById('inJenis');
+      const poin = select.options[select.selectedIndex].dataset.poin;
+      document.getElementById('inPoinVal').value = poin;
     }
 
-    function updatePoinNilai() {
-      const sel = document.getElementById('poin-jenis');
-      const val = sel.options[sel.selectedIndex].dataset.poin;
-      document.getElementById('poin-angka').value = val;
-    }
-
-    function simpanCatatanPoin(e) {
+    function simpanKejadianKeCloud(e) {
       e.preventDefault();
-      const btn = document.getElementById('btn-simpan-poin');
+      const btn = document.getElementById('btn-simpan-kasus');
       btn.disabled = true;
-      btn.innerHTML = "⏳ Mengirim ke Google Sheets...";
+      btn.innerHTML = "⏳ Menyimpan ke Google Spreadsheet...";
 
       const payload = {
         action: "tambah_kasus",
         key: activeKey,
         data: {
-          tanggal: document.getElementById('poin-tanggal').value,
-          nama: document.getElementById('poin-nama').value.trim(),
-          kelas: document.getElementById('poin-kelas').value.trim(),
-          masalah: document.getElementById('poin-jenis').value + ' — ' + document.getElementById('poin-kronologi').value.trim(),
-          solusi: "Restitusi Disiplin Positif (Skor: " + document.getElementById('poin-angka').value + " Poin)",
-          poin: parseInt(document.getElementById('poin-angka').value),
-          pic: document.getElementById('poin-pic').value.trim(),
+          tanggal: document.getElementById('inTanggal').value,
+          nama: document.getElementById('inNama').value.trim(),
+          kelas: document.getElementById('inKelas').value,
+          masalah: document.getElementById('inJenis').value,
+          solusi: document.getElementById('inKronologi').value.trim(),
+          poin: parseInt(document.getElementById('inPoinVal').value),
+          pic: document.getElementById('inGuru').value.trim(),
           status: "⏳ Proses Bimbingan"
         }
       };
@@ -605,35 +650,57 @@
         headers: { "Content-Type": "text/plain;charset=utf-8" },
         body: JSON.stringify(payload)
       })
-      .then(r => r.json())
+      .then(res => res.json())
       .then(res => {
         btn.disabled = false;
-        btn.innerHTML = "💾 Simpan Catatan ke Google Sheets";
+        btn.innerHTML = "💾 Simpan ke Google Spreadsheet";
         if (res.status === "success") {
-          alert("✅ Berhasil tersimpan di Google Sheets!");
-          toggleModalCatatPoin(false);
-          e.target.reset();
-          segarkanSemuaData();
+          alert("✅ Berhasil tersimpan di Google Spreadsheet!");
+          tutupModalCatat();
+          document.getElementById('formKejadian').reset();
+          segarkanData();
         } else {
           alert("Gagal: " + res.message);
         }
       })
       .catch(err => {
         btn.disabled = false;
-        btn.innerHTML = "💾 Simpan Catatan ke Google Sheets";
+        btn.innerHTML = "💾 Simpan ke Google Spreadsheet";
         alert("Kesalahan jaringan: " + err);
       });
     }
 
-    // ================= MODAL CETAK & GENERATOR SURAT =================
-    function pilihSiswaCetak(idx) {
-      selectedStudent = window.studentsArray[idx];
-      document.getElementById('cetak-nama-siswa').innerText = `${selectedStudent.nama} (${selectedStudent.kelas})`;
-      toggleModalCetak(true);
+    // ================= MODAL DETAIL & GENERATOR SURAT RESMI =================
+    function bukaDetailSiswa(id) {
+      selectedStudent = studentsArray.find(s => s.id === id);
+      if (!selectedStudent) return;
+
+      document.getElementById('detNama').innerText = selectedStudent.nama;
+      document.getElementById('detKelas').innerText = `${selectedStudent.kelas} • Sisa Skor: ${selectedStudent.skor} / 100 Poin`;
+
+      const list = document.getElementById('detRiwayatList');
+      if (selectedStudent.riwayat.length === 0) {
+        list.innerHTML = `<p class="text-slate-500 italic py-2">Belum ada catatan pelanggaran.</p>`;
+      } else {
+        list.innerHTML = selectedStudent.riwayat.map(k => `
+          <div class="p-3 bg-slate-950/70 border border-slate-800 rounded-xl flex justify-between items-start gap-2">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="font-bold text-white text-xs">${k.jenis}</span>
+                <span class="text-[10px] font-mono px-1.5 py-0.5 rounded font-black ${k.poin < 0 ? 'bg-rose-950 text-rose-400' : 'bg-emerald-950 text-emerald-400'}">${k.poin > 0 ? '+' + k.poin : k.poin}</span>
+              </div>
+              <p class="text-[11px] text-slate-300 mt-1">${k.kronologi}</p>
+              <p class="text-[10px] text-slate-500 mt-0.5"><i class="fa-solid fa-clock"></i> ${k.tanggal} • Pencatat: <b>${k.guru}</b></p>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      document.getElementById('modalDetail').classList.remove('hidden');
     }
 
-    function toggleModalCetak(show) {
-      document.getElementById('modal-cetak-opsi').classList.toggle('hidden', !show);
+    function tutupModalDetail() {
+      document.getElementById('modalDetail').classList.add('hidden');
     }
 
     function generateSuratPanggilan(tahap) {
@@ -647,7 +714,7 @@
         <div class="text-xs mb-4">
           <p>Nomor : ${nomorSurat}</p>
           <p>Lampiran : 1 (Satu) Berkas Lembar Rekap Disiplin</p>
-          <p>Perihal : <b>SURAT PANGGILAN ORANG TUA / WALI MURID (${tahap === 1 ? 'KE-1' : tahap === 2 ? 'KE-2' : 'KE-3'})</b></p>
+          <p>Perihal : <b>SURAT PANGGILAN ORANG TUA / WALI MURID (${tahap === 1 ? 'KE-1' : tahap === 2 ? 'KE-2' : 'KE-3 (TERAKHIR)'})</b></p>
         </div>
 
         <div class="text-xs mb-4">
@@ -659,16 +726,16 @@
 
         <div class="text-xs leading-relaxed space-y-3 text-justify">
           <p>Dengan hormat,</p>
-          <p>Sehubungan dengan pelaksanaan tata tertib dan pembiasaan karakter peserta didik di lingkungan SD Methodist Immanuel, serta berdasarkan catatan akumulasi perilaku ananda dengan <b>Sisa Skor Karakter: ${s.skor} Poin</b> (dari modal awal 100 poin), maka melalui surat ini pihak sekolah mengundang Bapak/Ibu untuk hadir pada:</p>
+          <p>Sehubungan dengan pelaksanaan tata tertib dan pembinaan karakter peserta didik di lingkungan SD Methodist Immanuel Bandar Lampung, serta berdasarkan akumulasi catatan perilaku ananda dengan <b>Sisa Skor Disiplin: ${s.skor} Poin</b> (dari modal awal 100 poin), maka melalui surat ini pihak sekolah mengundang Bapak/Ibu untuk hadir pada:</p>
 
           <div class="pl-6 space-y-1">
             <p>Hari / Tanggal : ..............................................................</p>
             <p>Waktu : Pukul 08.00 WIB s/d Selesai</p>
-            <p>Tempat : Ruang Konseling / Waka Kesiswaan SD Methodist Immanuel</p>
-            <p>Menemui : Tim Konseling / Waka Kesiswaan & Wali Kelas</p>
+            <p>Tempat : Ruang Konseling / Ruang Waka Kesiswaan SD Methodist Immanuel</p>
+            <p>Menemui : Tim Bimbingan Konseling / Waka Kesiswaan & Wali Kelas</p>
           </div>
 
-          <p>Agenda pertemuan ini adalah untuk berdialog dan menyelaraskan langkah pendampingan (restitusi positif) antara pihak sekolah dan keluarga agar ananda dapat memperbaiki perilaku serta belajar secara optimal.</p>
+          <p>Agenda pertemuan ini adalah untuk berdialog dan menyelaraskan langkah pendampingan (restitusi positif) antara sekolah dan keluarga agar ananda dapat memperbaiki perilaku serta berkembang secara optimal.</p>
 
           <p>Mengingat pentingnya agenda ini demi masa depan belajar ananda, kami sangat mengharapkan kehadiran Bapak/Ibu tepat pada waktunya.</p>
 
@@ -699,7 +766,7 @@
       `;
 
       document.getElementById('printContent').innerHTML = content;
-      toggleModalCetak(false);
+      tutupModalDetail();
       document.getElementById('printArea').classList.remove('hidden');
       window.print();
       document.getElementById('printArea').classList.add('hidden');
@@ -713,23 +780,23 @@
         <tr>
           <td class="p-2 border border-black text-center">${idx + 1}</td>
           <td class="p-2 border border-black text-center">${r.tanggal || '-'}</td>
-          <td class="p-2 border border-black">${r.masalah}</td>
+          <td class="p-2 border border-black">${r.jenis}</td>
           <td class="p-2 border border-black text-center font-bold">${r.poin}</td>
-          <td class="p-2 border border-black">${r.solusi || '-'}</td>
-          <td class="p-2 border border-black text-center">${r.pic || 'Pak Thomas'}</td>
+          <td class="p-2 border border-black">${r.kronologi || '-'}</td>
+          <td class="p-2 border border-black text-center">${r.guru || 'Pak Thomas'}</td>
         </tr>
       `).join('');
 
       const content = `
         <div class="text-center mb-6">
-          <h3 class="font-bold text-base underline uppercase">LEMBAR REKAPITULASI POIN & DISIPLIN SISWA</h3>
-          <p class="text-xs">SD Methodist Immanuel Bandar Lampung</p>
+          <h3 class="font-bold text-base underline uppercase">LEMBAR BUKU CATATAN KARAKTER & DISIPLIN SISWA</h3>
+          <p class="text-xs">Tahun Ajaran 2026/2027 • SD Methodist Immanuel Bandar Lampung</p>
         </div>
 
         <div class="grid grid-cols-2 text-xs mb-4 border border-black p-3">
           <div>
-            <p>Nama Siswa : <b>${s.nama}</b></p>
-            <p>Kelas : <b>${s.kelas}</b></p>
+            <p>Nama Lengkap Siswa : <b>${s.nama}</b></p>
+            <p>Kelas / Jenjang : <b>${s.kelas}</b></p>
           </div>
           <div class="text-right">
             <p>Modal Awal : <b>100 Poin</b></p>
@@ -742,10 +809,10 @@
             <tr>
               <th class="p-2 border border-black w-8">No</th>
               <th class="p-2 border border-black w-24">Tanggal</th>
-              <th class="p-2 border border-black">Kejadian / Bentuk Pelanggaran</th>
-              <th class="p-2 border border-black w-14">Poin</th>
-              <th class="p-2 border border-black">Tindakan Restitusi</th>
-              <th class="p-2 border border-black w-24">PIC</th>
+              <th class="p-2 border border-black">Bentuk Pelanggaran / Prestasi</th>
+              <th class="p-2 border border-black w-14">Skor</th>
+              <th class="p-2 border border-black">Kronologi & Bimbingan</th>
+              <th class="p-2 border border-black w-24">Pencatat</th>
             </tr>
           </thead>
           <tbody>
@@ -768,42 +835,85 @@
       `;
 
       document.getElementById('printContent').innerHTML = content;
-      toggleModalCetak(false);
+      tutupModalDetail();
       document.getElementById('printArea').classList.remove('hidden');
       window.print();
       document.getElementById('printArea').classList.add('hidden');
     }
 
-    // ================= FUNGSI RENDER TABEL LAIN =================
-    function renderTabelKasus(list) {
-      const tbody = document.getElementById('body-kasus');
-      if (!list || list.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="7" class="p-6 text-center text-slate-500">Belum ada catatan masalah siswa yang tersimpan.</td></tr>';
-        return;
+    // ================= MODAL & LOGIKA KETERLAMBATAN GERBANG =================
+    function toggleModalTerlambat(show) {
+      document.getElementById('modal-terlambat').classList.toggle('hidden', !show);
+      if (show) {
+        document.getElementById('terlambat-tanggal').valueAsDate = new Date();
+        setJamSekarang();
       }
-
-      tbody.innerHTML = list.map(item => `
-        <tr>
-          <td class="p-3.5 text-slate-400 font-mono">${item.tanggal || '-'}</td>
-          <td class="p-3.5 font-bold text-white">${item.nama} (${item.kelas})</td>
-          <td class="p-3.5 text-slate-300">${item.masalah}</td>
-          <td class="p-3.5 text-slate-300">${item.solusi}</td>
-          <td class="p-3.5 font-bold text-amber-400">${item.poin !== undefined ? item.poin : '-5'}</td>
-          <td class="p-3.5 text-sky-400 font-semibold">${item.pic}</td>
-          <td class="p-3.5"><span class="bg-emerald-500/20 text-emerald-400 font-bold px-2 py-0.5 rounded-full text-[10px]">${item.status || 'Tercatat'}</span></td>
-        </tr>
-      `).join('');
     }
 
-    function renderTabelTerlambat(list) {
+    function setJamSekarang() {
+      const now = new Date();
+      const jam = String(now.getHours()).padStart(2, '0');
+      const mnt = String(now.getMinutes()).padStart(2, '0');
+      document.getElementById('terlambat-jam').value = `${jam}:${mnt}`;
+    }
+
+    function simpanTerlambatKeCloud(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btn-simpan-terlambat');
+      btn.disabled = true;
+      btn.innerHTML = "⏳ Menghitung akumulasi...";
+
+      const jamInput = document.getElementById('terlambat-jam').value;
+      const jamDisplay = jamInput ? `${jamInput.replace(':', '.')} WIB` : "07.20 WIB";
+
+      const payload = {
+        action: "tambah_terlambat",
+        key: activeKey,
+        data: {
+          tanggal: document.getElementById('terlambat-tanggal').value,
+          nama: document.getElementById('terlambat-nama').value.trim(),
+          kelas: document.getElementById('terlambat-kelas').value.trim(),
+          jam: jamDisplay
+        }
+      };
+
+      fetch(API_KESISWAAN_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify(payload)
+      })
+      .then(res => res.json())
+      .then(res => {
+        btn.disabled = false;
+        btn.innerHTML = "💾 Simpan Log Keterlambatan";
+        if (res.status === "success") {
+          alert("Tercatat! " + res.message);
+          toggleModalTerlambat(false);
+          e.target.reset();
+          segarkanData();
+        } else {
+          alert("Gagal: " + res.message);
+        }
+      })
+      .catch(err => {
+        btn.disabled = false;
+        btn.innerHTML = "💾 Simpan Log Keterlambatan";
+        alert("Kesalahan jaringan: " + err);
+      });
+    }
+
+    function renderTabelTerlambat() {
       const tbody = document.getElementById('body-terlambat');
-      if (!list || list.length === 0) {
+      if (!dataTerlambatCloud || dataTerlambatCloud.length === 0) {
         tbody.innerHTML = '<tr><td colspan="6" class="p-6 text-center text-slate-500">Tidak ada data siswa terlambat.</td></tr>';
+        document.getElementById('stat-total-terlambat').innerText = "0 Siswa";
+        document.getElementById('stat-sp').innerText = "0 Siswa";
+        document.getElementById('stat-ortu').innerText = "0 Siswa";
         return;
       }
 
       let countSp = 0, countOrtu = 0;
-      tbody.innerHTML = list.map(item => {
+      tbody.innerHTML = dataTerlambatCloud.map(item => {
         if (item.akumulasi >= 5) countOrtu++;
         else if (item.akumulasi >= 3) countSp++;
 
@@ -819,12 +929,12 @@
         `;
       }).join('');
 
-      document.getElementById('stat-total-terlambat').innerText = list.length + " Siswa";
+      document.getElementById('stat-total-terlambat').innerText = dataTerlambatCloud.length + " Siswa";
       document.getElementById('stat-sp').innerText = countSp + " Siswa";
       document.getElementById('stat-ortu').innerText = countOrtu + " Siswa";
     }
 
-    function segarkanSemuaData() {
+    function segarkanData() {
       fetch(API_KESISWAAN_URL, {
         method: "POST",
         headers: { "Content-Type": "text/plain;charset=utf-8" },
@@ -836,11 +946,10 @@
       .then(r => r.json())
       .then(res => {
         if (res.status === "success") {
-          globalKasus = res.kasus || [];
-          globalTerlambat = res.terlambat || [];
-          renderTabelKasus(globalKasus);
-          renderTabelTerlambat(globalTerlambat);
-          hitungDanRenderPoin();
+          dataKasusCloud = res.kasus || [];
+          dataTerlambatCloud = res.terlambat || [];
+          prosesHitungPoinSiswa();
+          renderTabelTerlambat();
         }
       });
     }
