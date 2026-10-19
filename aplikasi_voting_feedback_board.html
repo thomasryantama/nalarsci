@@ -1,0 +1,1102 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NalarSci Vox — Voting Presensi & Sticky Feedback Board</title>
+  
+  <!-- Tailwind CSS & Google Fonts -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Nunito:wght@400;600;700;800;900&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
+  <!-- Chart.js CDN for Realtime Live Graphs -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: radial-gradient(circle at 50% 0%, #1e293b 0%, #0b0f19 85%);
+      color: #f8fafc;
+      min-height: 100vh;
+    }
+    .font-title { font-family: 'Fredoka', sans-serif; }
+    .font-hand { font-family: 'Caveat', cursive; }
+
+    /* Glass Effect & Transitions */
+    .glass-card {
+      background: rgba(255, 255, 255, 0.04);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      transition: all 0.25s ease;
+    }
+    .glass-card:hover {
+      border-color: rgba(56, 189, 248, 0.35);
+    }
+
+    /* Sticky Notes Styling */
+    .sticky-note {
+      position: relative;
+      transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
+      box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.4), 0 2px 6px rgba(0,0,0,0.2);
+    }
+    .sticky-note:hover {
+      transform: scale(1.04) rotate(0deg) !important;
+      z-index: 20;
+      box-shadow: 0 18px 30px -5px rgba(0, 0, 0, 0.6);
+    }
+    .pin-badge {
+      position: absolute;
+      top: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+    }
+
+    /* Tab Switcher */
+    .nav-tab-active {
+      background: #0284c7 !important;
+      color: #ffffff !important;
+      border-color: #38bdf8 !important;
+      box-shadow: 0 0 15px rgba(56, 189, 248, 0.4);
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.6); }
+    ::-webkit-scrollbar-thumb { background: rgba(56, 189, 248, 0.3); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(56, 189, 248, 0.6); }
+  </style>
+</head>
+<body class="p-3 sm:p-6 md:p-8 flex flex-col justify-between max-w-7xl mx-auto min-h-screen">
+
+  <!-- ======================================================== -->
+  <!-- NAVBAR UTAMA -->
+  <!-- ======================================================== -->
+  <header class="mb-6">
+    <div class="flex flex-wrap justify-between items-center gap-4 bg-slate-900/90 border border-slate-800 p-4 rounded-3xl backdrop-blur-md shadow-2xl">
+      <!-- Logo & Info Sesi -->
+      <div class="flex items-center gap-3">
+        <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-sky-600 to-indigo-600 flex items-center justify-center text-2xl shadow-lg border border-sky-400/40">
+          🗳️
+        </div>
+        <div>
+          <h1 class="font-title text-xl sm:text-2xl text-white tracking-wide leading-tight">
+            NALAR<span class="text-sky-400">VOX</span>
+          </h1>
+          <p class="text-[11px] text-slate-400 flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span id="activeSessionHeaderTitle">Sesi Aktif: Pemilihan Ketua Komite & Evaluasi</span>
+          </p>
+        </div>
+      </div>
+
+      <!-- Mode Selector Switcher (Peserta vs Layar TV / Proyektor) -->
+      <div class="flex flex-wrap items-center gap-2 bg-slate-950/80 p-1.5 rounded-2xl border border-slate-800">
+        <button id="btnTabVoter" onclick="switchMainTab('voter')" class="nav-tab-active px-3.5 py-2 rounded-xl text-xs font-bold text-slate-300 transition flex items-center gap-1.5">
+          <span>📱</span> <span>Bilik Pemilih & Kirim Saran</span>
+        </button>
+        <button id="btnTabDashboard" onclick="switchMainTab('dashboard')" class="px-3.5 py-2 rounded-xl text-xs font-bold text-slate-300 hover:text-white transition flex items-center gap-1.5">
+          <span>📊</span> <span>Layar Proyektor & Hasil Live</span>
+        </button>
+        <button onclick="openConfigModal()" class="p-2 rounded-xl text-xs font-bold bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition" title="Pengaturan Sesi">
+          ⚙️
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ======================================================== -->
+  <!-- TAB 1: MODE PESERTA / PEMILIH & INPUT FEEDBACK           -->
+  <!-- ======================================================== -->
+  <section id="sectionVoter" class="space-y-8 flex-grow">
+    
+    <!-- Sub-Tab Navigation (Pilih Voting atau Feedback) -->
+    <div class="flex justify-center">
+      <div class="inline-flex bg-slate-900/90 border border-slate-800 p-1.5 rounded-2xl gap-2 shadow-lg">
+        <button onclick="switchVoterSub('vote')" id="subBtnVote" class="nav-tab-active px-6 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2">
+          <span>🗳️</span> <span>Bilik Suara Rahasia</span>
+        </button>
+        <button onclick="switchVoterSub('feedback')" id="subBtnFeedback" class="px-6 py-2 rounded-xl text-xs font-bold text-slate-300 hover:text-white transition flex items-center gap-2">
+          <span>📝</span> <span>Tempel Sticky Note Saran</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- 1A. SUB-VIEW: BILIK SUARA RAHASIA (SECRET BALLOT) -->
+    <div id="voterSubVote" class="max-w-2xl mx-auto">
+      <div class="glass-card rounded-3xl p-6 sm:p-8 shadow-2xl relative overflow-hidden border border-sky-500/20">
+        
+        <div class="text-center mb-6">
+          <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-sky-500/10 border border-sky-400/30 rounded-full text-xs font-black uppercase text-sky-400 mb-2">
+            🔒 Pemilihan Langsung, Bebas & Rahasia (LUBER)
+          </span>
+          <h2 id="votingTitleDisplay" class="font-title text-2xl sm:text-3xl text-white font-bold">
+            Pemilihan Ketua & Program Unggulan
+          </h2>
+          <p class="text-xs text-slate-300 mt-1 max-w-md mx-auto">
+            Identitas nama Anda dicatat murni untuk <b>presensi kehadiran</b> agar tidak dobel suara. Pilihan calon Anda <b>terpisah & diacak 100% anonim</b>.
+          </p>
+        </div>
+
+        <form id="votingForm" onsubmit="handleCastVote(event)" class="space-y-6">
+          
+          <!-- Identitas Pemilih / Daftar Presensi -->
+          <div class="bg-slate-950/70 p-4 rounded-2xl border border-slate-800 space-y-3">
+            <label class="block text-xs font-black uppercase tracking-wider text-amber-400">
+              1. Pilih Nama / Identitas Anda (Untuk Presensi)
+            </label>
+            
+            <div id="voterIdentitySelectWrapper">
+              <select id="voterRosterSelect" required class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl p-3 text-sm focus:border-sky-400 outline-none">
+                <option value="">-- Pilih Nama Anda dari Daftar Hadir --</option>
+                <!-- Opsi Roster Peserta diisi via JS -->
+              </select>
+            </div>
+
+            <!-- Fallback Input Bebas Jika Mode Bebas Aktif -->
+            <div id="voterManualInputWrapper" class="hidden grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <input type="text" id="voterManualName" placeholder="Nama Lengkap Anda..." class="bg-slate-900 border border-slate-700 text-white rounded-xl p-3 text-sm focus:border-sky-400 outline-none">
+              <input type="text" id="voterManualUnit" placeholder="Kelas / Instansi / Unit..." class="bg-slate-900 border border-slate-700 text-white rounded-xl p-3 text-sm focus:border-sky-400 outline-none">
+            </div>
+
+            <p class="text-[11px] text-slate-400">
+              ℹ️ Setelah mengirim suara, nama Anda di papan hadir akan bertanda <span class="text-emerald-400 font-bold">"Sudah Memilih"</span>, namun tidak ada siapapun yang tahu siapa calon yang Anda pilih.
+            </p>
+          </div>
+
+          <!-- Pilihan Opsi / Calon Kandidat -->
+          <div class="space-y-3">
+            <label class="block text-xs font-black uppercase tracking-wider text-sky-400">
+              2. Tentukan Pilihan Suara Anda (Tersimpan Anonim)
+            </label>
+
+            <div id="candidatesListContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <!-- Opsi kandidat diisi via JS -->
+            </div>
+          </div>
+
+          <!-- Tombol Kirim Suara -->
+          <button type="submit" class="w-full py-3.5 bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white font-title text-sm font-bold rounded-2xl shadow-xl transition transform active:scale-95 flex items-center justify-center gap-2">
+            <span>🗳️</span> <span>Kirim Suara Rahasia Sekarang</span>
+          </button>
+        </form>
+
+        <!-- Notifikasi Sukses Memilih -->
+        <div id="voteSuccessBox" class="hidden text-center py-8 space-y-3">
+          <div class="text-5xl animate-bounce">🎉</div>
+          <h3 class="font-title text-2xl text-emerald-400 font-bold">Terima Kasih! Suara Berhasil Disimpan</h3>
+          <p class="text-xs text-slate-300 max-w-sm mx-auto">
+            Presensi kehadiran Anda telah diverifikasi dan pilihan suara telah dimasukkan ke kotak suara terenkripsi tanpa identitas.
+          </p>
+          <button onclick="resetVoterFormView()" class="px-5 py-2 bg-slate-800 hover:bg-slate-700 text-sky-400 text-xs font-bold rounded-xl border border-slate-700 transition">
+            Kembali ke Form Pemilih
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 1B. SUB-VIEW: STICKY NOTES FEEDBACK (PADLET STYLE FORM) -->
+    <div id="voterSubFeedback" class="max-w-2xl mx-auto hidden">
+      <div class="glass-card rounded-3xl p-6 sm:p-8 shadow-2xl relative border border-amber-500/20">
+        
+        <div class="text-center mb-6">
+          <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-500/10 border border-amber-400/30 rounded-full text-xs font-black uppercase text-amber-400 mb-2">
+            📌 Suara, Saran & Apresiasi
+          </span>
+          <h2 class="font-title text-2xl sm:text-3xl text-white font-bold">
+            Dinding Masukan & Refleksi Sesi
+          </h2>
+          <p class="text-xs text-slate-300 mt-1">
+            Tuliskan kritik membangun, ide segar, atau apresiasi Anda. Masukan akan langsung tampil di dinding proyektor dalam bentuk sticky notes interaktif!
+          </p>
+        </div>
+
+        <form id="feedbackForm" onsubmit="handlePostFeedback(event)" class="space-y-5">
+          
+          <!-- Rating Bintang -->
+          <div class="bg-slate-950/70 p-4 rounded-2xl border border-slate-800 text-center">
+            <label class="block text-xs font-bold text-slate-300 mb-2">
+              Seberapa Puas Anda dengan Sesi Acara Ini?
+            </label>
+            <div class="flex justify-center items-center gap-2 text-3xl" id="starRatingGroup">
+              <button type="button" onclick="setStarRating(1)" class="star-btn transition transform hover:scale-125 text-amber-400">★</button>
+              <button type="button" onclick="setStarRating(2)" class="star-btn transition transform hover:scale-125 text-amber-400">★</button>
+              <button type="button" onclick="setStarRating(3)" class="star-btn transition transform hover:scale-125 text-amber-400">★</button>
+              <button type="button" onclick="setStarRating(4)" class="star-btn transition transform hover:scale-125 text-amber-400">★</button>
+              <button type="button" onclick="setStarRating(5)" class="star-btn transition transform hover:scale-125 text-amber-400">★</button>
+            </div>
+            <input type="hidden" id="selectedStarValue" value="5">
+          </div>
+
+          <!-- Kategori Masukan -->
+          <div>
+            <label class="block text-xs font-bold text-slate-300 mb-2">Pilih Kategori Sticky Note:</label>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              <label class="flex items-center gap-2 p-2.5 bg-slate-900 border border-slate-800 rounded-xl cursor-pointer hover:border-amber-400 text-xs">
+                <input type="radio" name="fbCategory" value="apresiasi" checked class="accent-amber-400">
+                <span>🌟 Apresiasi</span>
+              </label>
+              <label class="flex items-center gap-2 p-2.5 bg-slate-900 border border-slate-800 rounded-xl cursor-pointer hover:border-sky-400 text-xs">
+                <input type="radio" name="fbCategory" value="saran" class="accent-sky-400">
+                <span>💡 Ide / Saran</span>
+              </label>
+              <label class="flex items-center gap-2 p-2.5 bg-slate-900 border border-slate-800 rounded-xl cursor-pointer hover:border-rose-400 text-xs">
+                <input type="radio" name="fbCategory" value="kritik" class="accent-rose-400">
+                <span>⚠️ Kritik</span>
+              </label>
+              <label class="flex items-center gap-2 p-2.5 bg-slate-900 border border-slate-800 rounded-xl cursor-pointer hover:border-purple-400 text-xs">
+                <input type="radio" name="fbCategory" value="pertanyaan" class="accent-purple-400">
+                <span>❓ Tanya</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Pilihan Warna Sticky Note -->
+          <div>
+            <label class="block text-xs font-bold text-slate-300 mb-2">Pilih Warna Sticky Note:</label>
+            <div class="flex items-center gap-3">
+              <label class="cursor-pointer">
+                <input type="radio" name="noteColor" value="bg-amber-200 text-slate-900" checked class="sr-only peer">
+                <div class="w-8 h-8 rounded-full bg-amber-200 peer-checked:ring-4 peer-checked:ring-amber-400 shadow-md"></div>
+              </label>
+              <label class="cursor-pointer">
+                <input type="radio" name="noteColor" value="bg-rose-200 text-slate-900" class="sr-only peer">
+                <div class="w-8 h-8 rounded-full bg-rose-200 peer-checked:ring-4 peer-checked:ring-rose-400 shadow-md"></div>
+              </label>
+              <label class="cursor-pointer">
+                <input type="radio" name="noteColor" value="bg-sky-200 text-slate-900" class="sr-only peer">
+                <div class="w-8 h-8 rounded-full bg-sky-200 peer-checked:ring-4 peer-checked:ring-sky-400 shadow-md"></div>
+              </label>
+              <label class="cursor-pointer">
+                <input type="radio" name="noteColor" value="bg-emerald-200 text-slate-900" class="sr-only peer">
+                <div class="w-8 h-8 rounded-full bg-emerald-200 peer-checked:ring-4 peer-checked:ring-emerald-400 shadow-md"></div>
+              </label>
+              <label class="cursor-pointer">
+                <input type="radio" name="noteColor" value="bg-purple-200 text-slate-900" class="sr-only peer">
+                <div class="w-8 h-8 rounded-full bg-purple-200 peer-checked:ring-4 peer-checked:ring-purple-400 shadow-md"></div>
+              </label>
+            </div>
+          </div>
+
+          <!-- Isi Pesan Masukan -->
+          <div>
+            <label class="block text-xs font-bold text-slate-300 mb-1">Pesan / Masukan Anda:</label>
+            <textarea id="fbContent" required rows="3" placeholder="Tuliskan masukan, kesan, refleksi, atau usulan Anda di sini..." class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl p-3 text-sm focus:border-amber-400 outline-none"></textarea>
+          </div>
+
+          <!-- Opsi Identitas Pengirim (Opsional / Anonim) -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <div>
+              <label class="block text-[11px] text-slate-400 mb-1">Nama Pengirim (Boleh dikosongkan):</label>
+              <input type="text" id="fbAuthor" placeholder="Anonim / Nama Anda" class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl p-2.5 text-xs focus:border-amber-400 outline-none">
+            </div>
+            <div>
+              <label class="block text-[11px] text-slate-400 mb-1">Kelas / Unit / Instansi:</label>
+              <input type="text" id="fbAffiliation" placeholder="SD Methodist / Umum" class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl p-2.5 text-xs focus:border-amber-400 outline-none">
+            </div>
+          </div>
+
+          <button type="submit" class="w-full py-3.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-title text-sm font-bold rounded-2xl shadow-xl transition transform active:scale-95 flex items-center justify-center gap-2">
+            <span>📌</span> <span>Tempelkan Sticky Note ke Dinding</span>
+          </button>
+        </form>
+
+        <div id="fbSuccessAlert" class="hidden mt-4 p-3 bg-emerald-900/60 border border-emerald-500 text-emerald-300 rounded-xl text-xs text-center font-bold">
+          ✨ Sticky Note Anda berhasil ditempelkan ke dinding! Buka Layar Proyektor untuk melihatnya.
+        </div>
+
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ======================================================== -->
+  <!-- TAB 2: MODE PROYEKTOR / DASHBOARD REALTIME               -->
+  <!-- ======================================================== -->
+  <section id="sectionDashboard" class="space-y-8 flex-grow hidden">
+
+    <!-- Header Ringkasan Cepat -->
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+      <div class="glass-card rounded-2xl p-4 border border-sky-500/20 text-center">
+        <span class="text-xs text-slate-400 block font-bold">Partisipasi Suara</span>
+        <span id="statVoterRatio" class="font-title text-2xl sm:text-3xl font-black text-sky-400">0 / 0</span>
+        <span id="statVoterPercent" class="text-[10px] text-slate-400 block">0% Memilih</span>
+      </div>
+      <div class="glass-card rounded-2xl p-4 border border-emerald-500/20 text-center">
+        <span class="text-xs text-slate-400 block font-bold">Total Masuk</span>
+        <span id="statTotalVotes" class="font-title text-2xl sm:text-3xl font-black text-emerald-400">0</span>
+        <span class="text-[10px] text-slate-400 block">Suara Terkumpul</span>
+      </div>
+      <div class="glass-card rounded-2xl p-4 border border-amber-500/20 text-center">
+        <span class="text-xs text-slate-400 block font-bold">Sticky Notes Masuk</span>
+        <span id="statTotalNotes" class="font-title text-2xl sm:text-3xl font-black text-amber-400">0</span>
+        <span class="text-[10px] text-slate-400 block">Catatan Terpasang</span>
+      </div>
+      <div class="glass-card rounded-2xl p-4 border border-purple-500/20 text-center">
+        <span class="text-xs text-slate-400 block font-bold">Rata-rata Rating</span>
+        <span id="statAvgRating" class="font-title text-2xl sm:text-3xl font-black text-purple-400">5.0 ★</span>
+        <span class="text-[10px] text-slate-400 block">Indeks Kepuasan</span>
+      </div>
+    </div>
+
+    <!-- AREA 1: GRAFIK VOTING & PRESENSI STATUS (SPLIT VIEW) -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      
+      <!-- Kolom Kiri & Tengah: Visual Grafik Chart.js -->
+      <div class="lg:col-span-2 glass-card rounded-3xl p-6 border border-sky-400/20 shadow-2xl flex flex-col justify-between">
+        <div class="flex flex-wrap justify-between items-center gap-2 mb-4">
+          <div>
+            <h3 class="font-title text-xl text-white font-bold flex items-center gap-2">
+              <span>📊</span> <span id="dashChartTitle">Hasil Perolehan Suara Terkini</span>
+            </h3>
+            <p class="text-xs text-slate-400">Diagram live interaktif diperbarui secara otomatis tanpa muat ulang.</p>
+          </div>
+          <div class="flex items-center gap-1.5 bg-slate-900 p-1 rounded-xl border border-slate-800 text-xs font-bold">
+            <button onclick="toggleChartType('bar')" id="btnChartBar" class="px-3 py-1 rounded-lg bg-sky-600 text-white">Batang</button>
+            <button onclick="toggleChartType('pie')" id="btnChartPie" class="px-3 py-1 rounded-lg text-slate-400 hover:text-white">Lingkaran</button>
+          </div>
+        </div>
+
+        <!-- Canvas Grafik Chart.js -->
+        <div class="relative w-full h-[280px] sm:h-[340px] flex items-center justify-center">
+          <canvas id="liveVoteChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Kolom Kanan: Log Audit Presensi (Siapa yang Sudah vs Belum) -->
+      <div class="glass-card rounded-3xl p-6 border border-slate-700 shadow-2xl flex flex-col">
+        <div class="flex justify-between items-center mb-3">
+          <h3 class="font-title text-base text-white font-bold flex items-center gap-1.5">
+            <span>📋</span> <span>Audit Presensi Pemilih</span>
+          </h3>
+          <span id="badgePendingCount" class="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/30">
+            0 Belum Memilih
+          </span>
+        </div>
+        <p class="text-[11px] text-slate-400 mb-3">
+          Memastikan seluruh peserta/perwakilan menggunakan hak suaranya. Pilihan tetap rahasia.
+        </p>
+
+        <!-- Daftar Scrollable Roster -->
+        <div class="overflow-y-auto max-h-[300px] pr-1 space-y-1.5 flex-grow" id="rosterAuditList">
+          <!-- Item status diisi via JS -->
+        </div>
+
+        <div class="pt-3 mt-3 border-t border-slate-800/80 flex justify-between items-center text-[11px] text-slate-400">
+          <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span> Sudah: <b id="lblAuditDone" class="text-emerald-400">0</b></span>
+          <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-rose-400"></span> Belum: <b id="lblAuditPending" class="text-rose-400">0</b></span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- AREA 2: DINDING STICKY NOTES INTERAKTIF (PADLET / MIRO WALL) -->
+    <div class="glass-card rounded-3xl p-6 sm:p-8 border border-amber-400/20 shadow-2xl">
+      <div class="flex flex-wrap justify-between items-center gap-4 mb-6">
+        <div>
+          <div class="inline-flex items-center gap-2 px-3 py-0.5 rounded-full bg-amber-500/10 border border-amber-400/30 text-amber-300 text-[10px] font-black uppercase mb-1">
+            📌 Dinding Aspirasi Interaktif
+          </div>
+          <h3 class="font-title text-2xl text-white font-bold">Sticky Notes Dinding Aspirasi & Apresiasi</h3>
+        </div>
+
+        <!-- Filter Sticky Notes -->
+        <div class="flex flex-wrap items-center gap-2" id="filterStickyBtns">
+          <button onclick="filterNotes('all')" class="note-filter-btn px-3 py-1.5 rounded-xl bg-amber-500 text-slate-950 text-xs font-bold transition">Semua</button>
+          <button onclick="filterNotes('apresiasi')" class="note-filter-btn px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold transition">🌟 Apresiasi</button>
+          <button onclick="filterNotes('saran')" class="note-filter-btn px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold transition">💡 Saran</button>
+          <button onclick="filterNotes('kritik')" class="note-filter-btn px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold transition">⚠️ Kritik</button>
+        </div>
+      </div>
+
+      <!-- Grid Sticky Notes Wall -->
+      <div id="stickyWallContainer" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 min-h-[220px]">
+        <!-- Sticky notes dirender via JS -->
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ======================================================== -->
+  <!-- MODAL: PENGATURAN SESI (ADMIN / MODERATOR)               -->
+  <!-- ======================================================== -->
+  <div id="configModal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-slate-900 border-2 border-sky-400/40 max-w-xl w-full p-6 rounded-3xl shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
+      
+      <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+        <h3 class="font-title text-xl text-white font-bold flex items-center gap-2">
+          <span>⚙️</span> <span>Pengaturan Sesi Voting & Roster</span>
+        </h3>
+        <button onclick="closeConfigModal()" class="text-slate-400 hover:text-white text-lg font-bold">✕</button>
+      </div>
+
+      <div class="space-y-4 text-xs">
+        <!-- Judul Sesi -->
+        <div>
+          <label class="block font-bold text-slate-300 mb-1">Judul Pemilihan / Sesi Rapat:</label>
+          <input type="text" id="cfgSessionTitle" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-white outline-none focus:border-sky-400">
+        </div>
+
+        <!-- Daftar Kandidat (Pisahkan dengan baris baru) -->
+        <div>
+          <label class="block font-bold text-slate-300 mb-1">Daftar Pilihan / Calon Kandidat (1 per baris):</label>
+          <textarea id="cfgCandidatesText" rows="4" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-white font-mono outline-none focus:border-sky-400"></textarea>
+        </div>
+
+        <!-- Daftar Roster Presensi (1 per baris) -->
+        <div>
+          <label class="block font-bold text-slate-300 mb-1">Daftar Nama Peserta Wajib Hadir / Pemilih (1 nama per baris):</label>
+          <textarea id="cfgRosterText" rows="5" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-white font-mono outline-none focus:border-sky-400"></textarea>
+          <span class="text-[10px] text-slate-400">Format: Nama Lengkap (Kelas/Instansi)</span>
+        </div>
+
+        <!-- Mode Presensi -->
+        <div class="flex items-center gap-2">
+          <input type="checkbox" id="cfgRequireRoster" class="w-4 h-4 accent-sky-500 rounded cursor-pointer">
+          <label for="cfgRequireRoster" class="text-slate-300 font-semibold cursor-pointer">
+            Wajibkan pemilih memilih nama dari daftar roster (Presensi Ketat).
+          </label>
+        </div>
+
+        <!-- Tombol Aksi Simpan & Reset Data -->
+        <div class="pt-3 border-t border-slate-800 flex flex-wrap justify-between gap-2">
+          <button onclick="resetAllDataConfirmation()" class="px-4 py-2 bg-rose-600/20 hover:bg-rose-600 text-rose-300 hover:text-white rounded-xl border border-rose-500/30 transition">
+            🗑️ Kosongkan Seluruh Data Suara
+          </button>
+          <button onclick="saveConfiguration()" class="px-6 py-2 bg-sky-600 hover:bg-sky-500 text-white font-bold rounded-xl shadow transition">
+            💾 Simpan Pengaturan
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="border-t border-slate-800/80 pt-5 mt-8 text-center text-xs text-slate-500">
+    NalarSci Vox • Sistem Pemilihan Suara Rahasia & Dinding Umpan Balik Realtime • Thomas Ryantama, M.Kom., Gr.
+  </footer>
+
+  <!-- ======================================================== -->
+  <!-- JAVASCRIPT STATE ENGINE & LOCAL STORAGE PERSISTENCE      -->
+  <!-- ======================================================== -->
+  <script>
+    // ----------------------------------------------------
+    // INITIAL DEFAULT STATE
+    // ----------------------------------------------------
+    const DEFAULT_CONFIG = {
+      title: "Pemilihan Program Unggulan & Evaluasi Sesi",
+      requireRoster: true,
+      candidates: [
+        { id: "c1", name: "Opsi A: Penguatan Robotika & Coding", votes: 0 },
+        { id: "c2", name: "Opsi B: Lab Bahasa & Public Speaking", votes: 0 },
+        { id: "c3", name: "Opsi C: Studio Multimedia & Podcast", votes: 0 },
+        { id: "c4", name: "Opsi D: Peningkatan Sarana Olahraga", votes: 0 }
+      ],
+      roster: [
+        "Ibu Maria (Koordinator Fase A)",
+        "Bpk. Yohanes (Koordinator Fase B)",
+        "Ibu Deborah (Koordinator Fase C)",
+        "Bpk. Samuel (Perwakilan Wali Murid K1)",
+        "Ibu Ester (Perwakilan Wali Murid K2)",
+        "Bpk. Daniel (Perwakilan Wali Murid K3)",
+        "Ibu Ruth (Perwakilan Wali Murid K4)",
+        "Bpk. Timotius (Perwakilan Wali Murid K5)",
+        "Ibu Hanna (Perwakilan Wali Murid K6)",
+        "Bpk. Lukas (Komite Sekolah)"
+      ]
+    };
+
+    let appState = {
+      title: DEFAULT_CONFIG.title,
+      requireRoster: true,
+      candidates: [...DEFAULT_CONFIG.candidates],
+      // Tabel Roster Presensi: { name: string, hasVoted: boolean, votedAt: string }
+      roster: DEFAULT_CONFIG.roster.map(name => ({ name, hasVoted: false, votedAt: null })),
+      // Tabel Suara Terkumpul (Decoupled: Tidak menyimpan identitas pemilih)
+      ballots: [],
+      // Tabel Feedback Sticky Notes: { id, text, author, affiliation, category, color, rating, likes, pinned, time }
+      feedback: [
+        {
+          id: 101,
+          text: "Sesi demonstrasi teknologi pembelajarannya sangat menginspirasi! Anak-anak pasti sangat antusias.",
+          author: "Ibu Deborah",
+          affiliation: "Fase C",
+          category: "apresiasi",
+          color: "bg-amber-200 text-slate-900",
+          rating: 5,
+          likes: 4,
+          pinned: true,
+          time: "10:15"
+        },
+        {
+          id: 102,
+          text: "Usul agar durasi sesi tanya jawab diperpanjang sedikit pada pertemuan berikutnya.",
+          author: "Bpk. Samuel",
+          affiliation: "Wali Murid K1",
+          category: "saran",
+          color: "bg-sky-200 text-slate-900",
+          rating: 4,
+          likes: 2,
+          pinned: false,
+          time: "10:22"
+        }
+      ]
+    };
+
+    // Muat data dari LocalStorage jika ada
+    const STORAGE_KEY = "nalarsci_vox_data_v1";
+    function loadSavedState() {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        try {
+          appState = JSON.parse(saved);
+        } catch (e) {
+          console.error("Gagal memuat state lokal:", e);
+        }
+      }
+    }
+    function persistState() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
+    }
+
+    // ----------------------------------------------------
+    // CHART.JS INITIALIZATION
+    // ----------------------------------------------------
+    let voteChartInstance = null;
+    let chartType = 'bar'; // 'bar' atau 'pie'
+
+    function initChart() {
+      const ctx = document.getElementById('liveVoteChart').getContext('2d');
+      const labels = appState.candidates.map(c => c.name);
+      const dataValues = appState.candidates.map(c => c.votes);
+
+      const backgroundColors = [
+        'rgba(56, 189, 248, 0.85)',
+        'rgba(16, 185, 129, 0.85)',
+        'rgba(245, 158, 11, 0.85)',
+        'rgba(168, 85, 247, 0.85)',
+        'rgba(244, 63, 94, 0.85)'
+      ];
+
+      voteChartInstance = new Chart(ctx, {
+        type: chartType,
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Jumlah Suara',
+            data: dataValues,
+            backgroundColor: backgroundColors,
+            borderColor: '#ffffff',
+            borderWidth: 1.5,
+            borderRadius: chartType === 'bar' ? 8 : 0
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: chartType === 'pie',
+              position: 'bottom',
+              labels: { color: '#cbd5e1', font: { family: 'Nunito', size: 12 } }
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  return ` ${context.parsed.y !== undefined ? context.parsed.y : context.raw} Suara`;
+                }
+              }
+            }
+          },
+          scales: chartType === 'bar' ? {
+            y: {
+              beginAtZero: true,
+              ticks: { precision: 0, color: '#94a3b8', font: { family: 'Nunito' } },
+              grid: { color: 'rgba(255, 255, 255, 0.08)' }
+            },
+            x: {
+              ticks: { color: '#cbd5e1', font: { family: 'Nunito', weight: 'bold' } },
+              grid: { display: false }
+            }
+          } : {}
+        }
+      });
+    }
+
+    function updateChartData() {
+      if (!voteChartInstance) return;
+      voteChartInstance.data.labels = appState.candidates.map(c => c.name);
+      voteChartInstance.data.datasets[0].data = appState.candidates.map(c => c.votes);
+      voteChartInstance.update();
+    }
+
+    function toggleChartType(type) {
+      chartType = type;
+      document.getElementById('btnChartBar').className = type === 'bar' ? 'px-3 py-1 rounded-lg bg-sky-600 text-white' : 'px-3 py-1 rounded-lg text-slate-400 hover:text-white';
+      document.getElementById('btnChartPie').className = type === 'pie' ? 'px-3 py-1 rounded-lg bg-sky-600 text-white' : 'px-3 py-1 rounded-lg text-slate-400 hover:text-white';
+      
+      if (voteChartInstance) {
+        voteChartInstance.destroy();
+      }
+      initChart();
+    }
+
+    // ----------------------------------------------------
+    // RENDERING LOGIC: BILIK PEMILIH
+    // ----------------------------------------------------
+    function renderVoterView() {
+      document.getElementById('votingTitleDisplay').innerText = appState.title;
+      document.getElementById('activeSessionHeaderTitle').innerText = "Sesi Aktif: " + appState.title;
+
+      // 1. Render Dropdown Roster Presensi
+      const rosterSelect = document.getElementById('voterRosterSelect');
+      const rosterWrapper = document.getElementById('voterIdentitySelectWrapper');
+      const manualWrapper = document.getElementById('voterManualInputWrapper');
+
+      if (appState.requireRoster) {
+        rosterWrapper.classList.remove('hidden');
+        manualWrapper.classList.add('hidden');
+        rosterSelect.required = true;
+
+        rosterSelect.innerHTML = `<option value="">-- Pilih Nama Anda dari Daftar Hadir --</option>` +
+          appState.roster.map(r => {
+            const disabledAttr = r.hasVoted ? 'disabled class="text-slate-600 bg-slate-950"' : '';
+            const statusLabel = r.hasVoted ? ' (Sudah Memilih)' : '';
+            return `<option value="${r.name}" ${disabledAttr}>${r.name}${statusLabel}</option>`;
+          }).join('');
+      } else {
+        rosterWrapper.classList.add('hidden');
+        manualWrapper.classList.remove('hidden');
+        rosterSelect.required = false;
+      }
+
+      // 2. Render Pilihan Calon / Opsi Suara
+      const candidatesContainer = document.getElementById('candidatesListContainer');
+      candidatesContainer.innerHTML = appState.candidates.map((cand, idx) => `
+        <label class="relative flex items-center gap-3 p-4 bg-slate-900/90 border border-slate-700 rounded-2xl cursor-pointer hover:border-sky-400 transition hover:bg-slate-800/80">
+          <input type="radio" name="selectedCandidate" value="${cand.id}" required class="w-5 h-5 accent-sky-400">
+          <div>
+            <span class="text-xs font-bold text-sky-400 block">Pilihan #${idx + 1}</span>
+            <span class="text-sm font-bold text-white">${cand.name}</span>
+          </div>
+        </label>
+      `).join('');
+    }
+
+    // ----------------------------------------------------
+    // ACTION: HANDLE CAST VOTE (SECRET BALLOT WITH AUDIT)
+    // ----------------------------------------------------
+    function handleCastVote(e) {
+      e.preventDefault();
+
+      let voterName = "";
+      if (appState.requireRoster) {
+        voterName = document.getElementById('voterRosterSelect').value;
+        if (!voterName) {
+          alert("Silakan pilih nama Anda dari daftar hadir terlebih dahulu.");
+          return;
+        }
+      } else {
+        voterName = document.getElementById('voterManualName').value.trim() || "Peserta Mandiri";
+      }
+
+      const selectedRadio = document.querySelector('input[name="selectedCandidate"]:checked');
+      if (!selectedRadio) {
+        alert("Pilih salah satu calon/opsi terlebih dahulu.");
+        return;
+      }
+      const candidateId = selectedRadio.value;
+
+      // 1. Catat Presensi Kehadiran (Daftar Hadir Terverifikasi)
+      if (appState.requireRoster) {
+        const rosterItem = appState.roster.find(r => r.name === voterName);
+        if (rosterItem) {
+          if (rosterItem.hasVoted) {
+            alert("Nama Anda sudah tercatat pernah memberikan suara.");
+            return;
+          }
+          rosterItem.hasVoted = true;
+          rosterItem.votedAt = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
+      } else {
+        // Mode Bebas: Tambahkan ke roster audit
+        appState.roster.push({
+          name: voterName,
+          hasVoted: true,
+          votedAt: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        });
+      }
+
+      // 2. Tambah Suara ke Kandidat (Tersimpan Terpisah / Decoupled)
+      const cand = appState.candidates.find(c => c.id === candidateId);
+      if (cand) {
+        cand.votes = (cand.votes || 0) + 1;
+      }
+
+      // 3. Simpan Rekam Jejak Ballot Tanpa Identitas
+      appState.ballots.push({
+        candidateId: candidateId,
+        timestamp: Date.now()
+      });
+
+      // Simpan & Perbarui Tampilan
+      persistState();
+      updateDashboardStats();
+      updateChartData();
+
+      // Tampilkan Tampilan Sukses
+      document.getElementById('votingForm').classList.add('hidden');
+      document.getElementById('voteSuccessBox').classList.remove('hidden');
+    }
+
+    function resetVoterFormView() {
+      document.getElementById('votingForm').reset();
+      document.getElementById('votingForm').classList.remove('hidden');
+      document.getElementById('voteSuccessBox').classList.add('hidden');
+      renderVoterView();
+    }
+
+    // ----------------------------------------------------
+    // RENDERING LOGIC: DASHBOARD & AUDIT PRESENSI
+    // ----------------------------------------------------
+    function updateDashboardStats() {
+      const totalEligible = appState.roster.length;
+      const totalVoted = appState.roster.filter(r => r.hasVoted).length;
+      const pendingCount = Math.max(0, totalEligible - totalVoted);
+      const totalBallots = appState.candidates.reduce((sum, c) => sum + (c.votes || 0), 0);
+
+      document.getElementById('statVoterRatio').innerText = `${totalVoted} / ${totalEligible}`;
+      const percent = totalEligible > 0 ? Math.round((totalVoted / totalEligible) * 100) : 0;
+      document.getElementById('statVoterPercent').innerText = `${percent}% Partisipasi`;
+
+      document.getElementById('statTotalVotes').innerText = totalBallots;
+      document.getElementById('statTotalNotes').innerText = appState.feedback.length;
+
+      // Hitung Rata-rata Rating
+      if (appState.feedback.length > 0) {
+        const sumRating = appState.feedback.reduce((sum, n) => sum + (n.rating || 5), 0);
+        const avg = (sumRating / appState.feedback.length).toFixed(1);
+        document.getElementById('statAvgRating').innerText = `${avg} ★`;
+      } else {
+        document.getElementById('statAvgRating').innerText = "5.0 ★";
+      }
+
+      document.getElementById('badgePendingCount').innerText = `${pendingCount} Belum Memilih`;
+      document.getElementById('lblAuditDone').innerText = totalVoted;
+      document.getElementById('lblAuditPending').innerText = pendingCount;
+
+      // Render Roster Audit List
+      const auditContainer = document.getElementById('rosterAuditList');
+      auditContainer.innerHTML = appState.roster.map(r => {
+        if (r.hasVoted) {
+          return `
+            <div class="flex items-center justify-between p-2 rounded-xl bg-emerald-950/40 border border-emerald-500/20 text-xs">
+              <span class="font-bold text-slate-200 truncate max-w-[160px]">${r.name}</span>
+              <span class="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full flex items-center gap-1">
+                ✓ Sudah (${r.votedAt || 'Voted'})
+              </span>
+            </div>
+          `;
+        } else {
+          return `
+            <div class="flex items-center justify-between p-2 rounded-xl bg-slate-900/60 border border-slate-800 text-xs">
+              <span class="text-slate-400 truncate max-w-[160px]">${r.name}</span>
+              <span class="text-[10px] font-bold text-rose-400 bg-rose-500/10 px-2 py-0.5 rounded-full">
+                Menunggu...
+              </span>
+            </div>
+          `;
+        }
+      }).join('');
+    }
+
+    // ----------------------------------------------------
+    // STICKY NOTES FEEDBACK ENGINE
+    // ----------------------------------------------------
+    let currentFilterCategory = 'all';
+
+    function setStarRating(val) {
+      document.getElementById('selectedStarValue').value = val;
+      const stars = document.querySelectorAll('.star-btn');
+      stars.forEach((btn, idx) => {
+        btn.classList.toggle('text-amber-400', idx < val);
+        btn.classList.toggle('text-slate-600', idx >= val);
+      });
+    }
+
+    function handlePostFeedback(e) {
+      e.preventDefault();
+      const content = document.getElementById('fbContent').value.trim();
+      if (!content) return;
+
+      const author = document.getElementById('fbAuthor').value.trim() || "Anonim";
+      const affiliation = document.getElementById('fbAffiliation').value.trim() || "Umum";
+      const category = document.querySelector('input[name="fbCategory"]:checked').value;
+      const color = document.querySelector('input[name="noteColor"]:checked').value;
+      const rating = parseInt(document.getElementById('selectedStarValue').value) || 5;
+
+      const newNote = {
+        id: Date.now(),
+        text: content,
+        author: author,
+        affiliation: affiliation,
+        category: category,
+        color: color,
+        rating: rating,
+        likes: 0,
+        pinned: false,
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      };
+
+      appState.feedback.unshift(newNote);
+      persistState();
+
+      // Reset form
+      document.getElementById('fbContent').value = "";
+      const alertBox = document.getElementById('fbSuccessAlert');
+      alertBox.classList.remove('hidden');
+      setTimeout(() => alertBox.classList.add('hidden'), 3500);
+
+      renderStickyWall();
+      updateDashboardStats();
+    }
+
+    // Variasi rotasi alami ala sticky notes di papan tulis
+    const TILT_ANGLES = [-2, 1.5, -1, 2, -1.5, 1, -2.5, 2.5];
+
+    function renderStickyWall() {
+      const container = document.getElementById('stickyWallContainer');
+      const filtered = currentFilterCategory === 'all' 
+        ? appState.feedback 
+        : appState.feedback.filter(n => n.category === currentFilterCategory);
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="col-span-full py-12 text-center text-slate-500 text-xs">
+            Belum ada catatan sticky note untuk kategori ini. Jadilah yang pertama memberikan masukan!
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = filtered.map((note, index) => {
+        const tilt = note.pinned ? 0 : TILT_ANGLES[index % TILT_ANGLES.length];
+        const pinColor = note.pinned ? 'bg-rose-500' : 'bg-slate-400';
+        
+        let catBadge = '';
+        if (note.category === 'apresiasi') catBadge = '<span class="text-[9px] font-black uppercase px-2 py-0.5 rounded-full bg-amber-900/20 text-amber-900">🌟 Apresiasi</span>';
+        else if (note.category === 'saran') catBadge = '<span class="text-[9px] font-black uppercase px-2 py-0.5 rounded-full bg-sky-900/20 text-sky-900">💡 Ide / Saran</span>';
+        else if (note.category === 'kritik') catBadge = '<span class="text-[9px] font-black uppercase px-2 py-0.5 rounded-full bg-rose-900/20 text-rose-900">⚠️ Kritik</span>';
+        else catBadge = '<span class="text-[9px] font-black uppercase px-2 py-0.5 rounded-full bg-purple-900/20 text-purple-900">❓ Tanya</span>';
+
+        const starsStr = '★'.repeat(note.rating) + '☆'.repeat(5 - note.rating);
+
+        return `
+          <div class="sticky-note p-4 rounded-xl ${note.color} flex flex-col justify-between min-h-[170px]" 
+               style="transform: rotate(${tilt}deg);">
+            
+            <div class="pin-badge ${pinColor}"></div>
+
+            <div>
+              <div class="flex justify-between items-center mb-1.5 pt-1">
+                ${catBadge}
+                <span class="text-[10px] font-bold text-amber-600">${starsStr}</span>
+              </div>
+              <p class="font-hand text-xl leading-snug break-words mb-3 font-bold">
+                "${note.text}"
+              </p>
+            </div>
+
+            <div class="pt-2 border-t border-black/10 flex items-center justify-between text-[11px] font-bold">
+              <div>
+                <span class="block text-slate-800 leading-none">${note.author}</span>
+                <span class="text-[9px] text-slate-600 font-normal">${note.affiliation} • ${note.time}</span>
+              </div>
+
+              <!-- Interaksi: Like & Pin -->
+              <div class="flex items-center gap-1.5">
+                <button onclick="likeNote(${note.id})" class="p-1 px-1.5 rounded-lg bg-black/10 hover:bg-black/20 text-slate-800 flex items-center gap-1 transition">
+                  <span>❤️</span> <span>${note.likes || 0}</span>
+                </button>
+                <button onclick="togglePinNote(${note.id})" class="p-1 rounded-lg bg-black/10 hover:bg-black/20 text-slate-800 transition" title="Pin ke Atas">
+                  📌
+                </button>
+                <button onclick="deleteNote(${note.id})" class="p-1 rounded-lg bg-rose-500/20 hover:bg-rose-500 text-rose-900 hover:text-white transition" title="Hapus Note">
+                  🗑️
+                </button>
+              </div>
+            </div>
+
+          </div>
+        `;
+      }).join('');
+    }
+
+    function filterNotes(cat) {
+      currentFilterCategory = cat;
+      document.querySelectorAll('.note-filter-btn').forEach(btn => {
+        btn.classList.remove('bg-amber-500', 'text-slate-950');
+        btn.classList.add('bg-slate-800', 'text-slate-300');
+      });
+      event.target.classList.add('bg-amber-500', 'text-slate-950');
+      event.target.classList.remove('bg-slate-800', 'text-slate-300');
+      renderStickyWall();
+    }
+
+    function likeNote(id) {
+      const note = appState.feedback.find(n => n.id === id);
+      if (note) {
+        note.likes = (note.likes || 0) + 1;
+        persistState();
+        renderStickyWall();
+      }
+    }
+
+    function togglePinNote(id) {
+      const note = appState.feedback.find(n => n.id === id);
+      if (note) {
+        note.pinned = !note.pinned;
+        // Urutkan: Pinned selalu paling depan
+        appState.feedback.sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0));
+        persistState();
+        renderStickyWall();
+      }
+    }
+
+    function deleteNote(id) {
+      appState.feedback = appState.feedback.filter(n => n.id !== id);
+      persistState();
+      renderStickyWall();
+      updateDashboardStats();
+    }
+
+    // ----------------------------------------------------
+    // TAB SWITCHING LOGIC
+    // ----------------------------------------------------
+    function switchMainTab(mode) {
+      const tabVoter = document.getElementById('btnTabVoter');
+      const tabDash = document.getElementById('btnTabDashboard');
+      const secVoter = document.getElementById('sectionVoter');
+      const secDash = document.getElementById('sectionDashboard');
+
+      if (mode === 'voter') {
+        tabVoter.classList.add('nav-tab-active');
+        tabDash.classList.remove('nav-tab-active');
+        secVoter.classList.remove('hidden');
+        secDash.classList.add('hidden');
+        renderVoterView();
+      } else {
+        tabDash.classList.add('nav-tab-active');
+        tabVoter.classList.remove('nav-tab-active');
+        secDash.classList.remove('hidden');
+        secVoter.classList.add('hidden');
+        
+        updateDashboardStats();
+        renderStickyWall();
+        setTimeout(() => {
+          if (!voteChartInstance) initChart();
+          else updateChartData();
+        }, 100);
+      }
+    }
+
+    function switchVoterSub(sub) {
+      const subBtnVote = document.getElementById('subBtnVote');
+      const subBtnFeedback = document.getElementById('subBtnFeedback');
+      const subVote = document.getElementById('voterSubVote');
+      const subFeedback = document.getElementById('voterSubFeedback');
+
+      if (sub === 'vote') {
+        subBtnVote.classList.add('nav-tab-active');
+        subBtnFeedback.classList.remove('nav-tab-active');
+        subVote.classList.remove('hidden');
+        subFeedback.classList.add('hidden');
+      } else {
+        subBtnFeedback.classList.add('nav-tab-active');
+        subBtnVote.classList.remove('nav-tab-active');
+        subFeedback.classList.remove('hidden');
+        subVote.classList.add('hidden');
+      }
+    }
+
+    // ----------------------------------------------------
+    // CONFIGURATION MODAL (SESSION SETUP)
+    // ----------------------------------------------------
+    function openConfigModal() {
+      document.getElementById('cfgSessionTitle').value = appState.title;
+      document.getElementById('cfgCandidatesText').value = appState.candidates.map(c => c.name).join('\n');
+      document.getElementById('cfgRosterText').value = appState.roster.map(r => r.name).join('\n');
+      document.getElementById('cfgRequireRoster').checked = appState.requireRoster;
+      document.getElementById('configModal').classList.remove('hidden');
+    }
+
+    function closeConfigModal() {
+      document.getElementById('configModal').classList.add('hidden');
+    }
+
+    function saveConfiguration() {
+      const newTitle = document.getElementById('cfgSessionTitle').value.trim() || "Pemilihan Sesi";
+      const candLines = document.getElementById('cfgCandidatesText').value.split('\n').map(l => l.trim()).filter(l => l);
+      const rosterLines = document.getElementById('cfgRosterText').value.split('\n').map(l => l.trim()).filter(l => l);
+      const requireRoster = document.getElementById('cfgRequireRoster').checked;
+
+      appState.title = newTitle;
+      appState.requireRoster = requireRoster;
+
+      // Pertahankan perolehan suara calon jika namanya masih sama
+      const oldCandMap = new Map(appState.candidates.map(c => [c.name, c.votes]));
+      appState.candidates = candLines.map((name, idx) => ({
+        id: "cand_" + idx,
+        name: name,
+        votes: oldCandMap.get(name) || 0
+      }));
+
+      // Pertahankan status pemilih jika namanya masih ada di roster
+      const oldRosterMap = new Map(appState.roster.map(r => [r.name, r]));
+      appState.roster = rosterLines.map(name => {
+        const exist = oldRosterMap.get(name);
+        return exist ? exist : { name, hasVoted: false, votedAt: null };
+      });
+
+      persistState();
+      closeConfigModal();
+
+      renderVoterView();
+      updateDashboardStats();
+      updateChartData();
+    }
+
+    function resetAllDataConfirmation() {
+      if (confirm("Apakah Anda yakin ingin MENGOSONGKAN seluruh suara dan presensi? Tindakan ini tidak dapat dibatalkan.")) {
+        appState.candidates.forEach(c => c.votes = 0);
+        appState.roster.forEach(r => { r.hasVoted = false; r.votedAt = null; });
+        appState.ballots = [];
+        appState.feedback = [];
+        persistState();
+        closeConfigModal();
+
+        renderVoterView();
+        updateDashboardStats();
+        updateChartData();
+        renderStickyWall();
+        alert("Semua data suara dan sticky notes telah dibersihkan.");
+      }
+    }
+
+    // ----------------------------------------------------
+    // INITIAL BOOTSTRAP
+    // ----------------------------------------------------
+    window.addEventListener('DOMContentLoaded', () => {
+      loadSavedState();
+      renderVoterView();
+      updateDashboardStats();
+      renderStickyWall();
+    });
+  </script>
+</body>
+</html>

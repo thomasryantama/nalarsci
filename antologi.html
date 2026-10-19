@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Genta Aksara — Antologi & Ruang Karya Siswa</title>
+  <meta name="description" content="Kompilasi karya tulis kreatif, cerpen, puisi, esai sains, dan refleksi inspiratif siswa lintas tahun ajaran.">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Lora:ital,wght@0,400;0,600;1,400&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: radial-gradient(circle at 50% 0%, #1e293b 0%, #0b0f19 80%);
+      color: #f8fafc;
+      min-height: 100vh;
+    }
+    .font-title { font-family: 'Fredoka', sans-serif; }
+    .font-serif-prose { font-family: 'Lora', serif; }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.04);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .glass-card:hover {
+      transform: translateY(-5px);
+      border-color: rgba(245, 158, 11, 0.4);
+      box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.7);
+    }
+    .modal-backdrop {
+      background: rgba(2, 6, 23, 0.85);
+      backdrop-filter: blur(8px);
+    }
+  </style>
+</head>
+<body class="p-4 sm:p-8 flex flex-col justify-between max-w-6xl mx-auto min-h-screen">
+
+  <!-- NAVBAR ATAS -->
+  <header class="mb-8">
+    <nav class="flex flex-wrap justify-between items-center gap-4 bg-slate-900/85 border border-slate-800 p-4 rounded-2xl mb-8 backdrop-blur-md">
+      <div class="flex items-center gap-3">
+        <a href="index.html" class="flex items-center gap-3 group">
+          <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-amber-500 to-rose-500 flex items-center justify-center text-2xl shadow-[0_0_15px_rgba(245,158,11,0.3)]">
+            ✍️
+          </div>
+          <div>
+            <h1 class="font-title text-xl text-white tracking-wide leading-tight group-hover:text-amber-400 transition">
+              GENTA<span class="text-amber-400">AKSARA</span>
+            </h1>
+            <p class="text-[11px] text-slate-400">Antologi & Ruang Kreasi Literasi Siswa</p>
+          </div>
+        </a>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <button onclick="openSubmitModal()" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-title text-xs font-bold px-4 py-2 rounded-xl shadow-lg transition flex items-center gap-1.5 transform hover:scale-105">
+          ✏️ Kirim Tulisan
+        </button>
+        <button onclick="toggleAdminPanel()" id="btnAdmin" class="bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold px-3.5 py-2 rounded-xl border border-slate-700 transition">
+          🛡️ Kurasi Guru
+        </button>
+      </div>
+    </nav>
+
+    <!-- BANNER HERO -->
+    <div class="text-center max-w-2xl mx-auto mb-8">
+      <div class="inline-flex items-center gap-2 bg-amber-500/10 border border-amber-400/20 text-amber-300 px-3.5 py-1 rounded-full text-xs font-black uppercase tracking-wider mb-3">
+        📚 Rekam Jejak Pikiran, Cerita & Imajinasi
+      </div>
+      <h2 class="font-title text-3xl sm:text-4xl text-white mb-2">Panggung Kata & Karya Siswa</h2>
+      <p class="text-slate-400 text-xs sm:text-sm">
+        Arsip dinamis karya sastra, esai sains komputasi, dan tulisan reflektif siswa SD Methodist Immanuel lintas angkatan dan tahun ajaran.
+      </p>
+    </div>
+
+    <!-- FILTER BAR DINAMIS (TAHUN AJARAN & KATEGORI) -->
+    <div class="bg-slate-900/60 border border-slate-800/80 p-3 rounded-2xl flex flex-wrap items-center justify-between gap-3">
+      <!-- Pilihan Kategori -->
+      <div class="flex flex-wrap gap-1.5" id="categoryFilters">
+        <button onclick="filterCategory('semua')" class="cat-btn px-3 py-1.5 rounded-xl bg-amber-500 text-slate-950 font-bold text-xs transition" data-cat="semua">
+          🌟 Semua Karya
+        </button>
+        <button onclick="filterCategory('cerpen')" class="cat-btn px-3 py-1.5 rounded-xl bg-slate-800 text-slate-300 hover:bg-slate-700 font-bold text-xs transition" data-cat="cerpen">
+          📖 Cerpen
+        </button>
+        <button onclick="filterCategory('puisi')" class="cat-btn px-3 py-1.5 rounded-xl bg-slate-800 text-slate-300 hover:bg-slate-700 font-bold text-xs transition" data-cat="puisi">
+          🎭 Puisi
+        </button>
+        <button onclick="filterCategory('sains')" class="cat-btn px-3 py-1.5 rounded-xl bg-slate-800 text-slate-300 hover:bg-slate-700 font-bold text-xs transition" data-cat="sains">
+          🔬 Esai Sains
+        </button>
+        <button onclick="filterCategory('refleksi')" class="cat-btn px-3 py-1.5 rounded-xl bg-slate-800 text-slate-300 hover:bg-slate-700 font-bold text-xs transition" data-cat="refleksi">
+          💡 Refleksi & Karakter
+        </button>
+      </div>
+
+      <!-- Filter Tahun Ajaran Dinamis -->
+      <div class="flex items-center gap-2">
+        <label for="selectYear" class="text-xs font-bold text-slate-400">📅 Edisi:</label>
+        <select id="selectYear" onchange="renderPosts()" class="bg-slate-950 border border-slate-700 text-amber-400 rounded-xl px-3 py-1.5 text-xs font-bold outline-none focus:border-amber-400">
+          <option value="semua">Semua Tahun</option>
+          <option value="2026/2027" selected>2026/2027 (Tahun Ini)</option>
+          <option value="2025/2026">2025/2026</option>
+          <option value="2024/2025">2024/2025</option>
+        </select>
+      </div>
+    </div>
+  </header>
+
+  <!-- PANEL KURASI GURU (MODERASI TERSEMBUNYI) -->
+  <section id="adminPanel" class="hidden mb-8 p-5 rounded-3xl bg-amber-950/20 border-2 border-amber-500/40">
+    <div class="flex justify-between items-center mb-3">
+      <div class="flex items-center gap-2">
+        <span class="text-xl">🛡️</span>
+        <h3 class="font-title text-lg text-amber-300 font-bold">Ruang Kurasi Tulisan (Guru / Editor)</h3>
+      </div>
+      <button onclick="toggleAdminPanel()" class="text-xs text-slate-400 hover:text-white">✕ Tutup</button>
+    </div>
+    <p class="text-xs text-slate-300 mb-4">Setiap tulisan siswa yang baru masuk harus disetujui guru agar aman, rapi, dan sesuai standar sekolah sebelum tayang publik.</p>
+    <div id="pendingList" class="space-y-3">
+      <!-- Diisi otomatis oleh JS -->
+    </div>
+  </section>
+
+  <!-- GRID ARTIKEL / KARYA TULIS -->
+  <main class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 flex-grow mb-12" id="postsGrid">
+    <!-- Diisi otomatis oleh JS -->
+  </main>
+
+  <!-- MODAL BACA LENGKAP KARYA (READER VIEW) -->
+  <div id="readModal" class="modal-backdrop fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-slate-900 border border-slate-700 max-w-2xl w-full max-h-[88vh] rounded-3xl p-6 sm:p-8 flex flex-col justify-between shadow-2xl overflow-y-auto">
+      <div>
+        <div class="flex justify-between items-start gap-3 mb-4">
+          <div class="flex items-center gap-3">
+            <img id="readAuthorImg" src="" alt="Foto Penulis" class="w-12 h-12 rounded-full object-cover border-2 border-amber-400/60 shadow">
+            <div>
+              <h4 id="readAuthorName" class="font-bold text-white text-sm">Nama Siswa</h4>
+              <p id="readAuthorMeta" class="text-xs text-slate-400">Kelas 5A • 2026/2027</p>
+            </div>
+          </div>
+          <button onclick="closeReadModal()" class="w-8 h-8 rounded-full bg-slate-800 text-slate-300 hover:text-white flex items-center justify-center text-sm font-bold">✕</button>
+        </div>
+
+        <span id="readCategoryBadge" class="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-500/20 text-amber-300 border border-amber-400/30 mb-2">
+          CERPEN
+        </span>
+        <h2 id="readTitle" class="font-title text-2xl sm:text-3xl text-amber-400 mb-4 leading-tight">
+          Judul Karya Siswa
+        </h2>
+
+        <div id="readBody" class="font-serif-prose text-slate-200 text-sm sm:text-base leading-relaxed whitespace-pre-line border-t border-slate-800 pt-4">
+          Isi tulisan siswa...
+        </div>
+      </div>
+
+      <div class="flex items-center justify-between border-t border-slate-800 pt-4 mt-6">
+        <button id="btnLike" onclick="likePost(currentReadingId)" class="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-slate-800 hover:bg-rose-900/40 text-rose-300 border border-rose-500/30 text-xs font-bold transition">
+          ❤️ Beri Apresiasi (<span id="readLikesCount">0</span>)
+        </button>
+        <span class="text-[11px] text-slate-400">SD Methodist Immanuel • Antologi Digital</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL KIRIM TULISAN OLEH SISWA -->
+  <div id="submitModal" class="modal-backdrop fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-slate-900 border border-slate-700 max-w-lg w-full max-h-[90vh] rounded-3xl p-6 shadow-2xl overflow-y-auto">
+      <div class="flex justify-between items-center mb-4">
+        <div class="flex items-center gap-2">
+          <span class="text-2xl">✍️</span>
+          <h3 class="font-title text-xl text-amber-400 font-bold">Kirim Tulisan Karyamu</h3>
+        </div>
+        <button onclick="closeSubmitModal()" class="text-slate-400 hover:text-white text-sm">✕</button>
+      </div>
+
+      <form id="postForm" onsubmit="handlePostSubmit(event)" class="space-y-3.5 text-xs">
+        <div>
+          <label class="block font-bold text-slate-300 mb-1">Nama Lengkap Kamu:</label>
+          <input type="text" id="inputName" required placeholder="Contoh: Chelsea Olivia" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-white outline-none focus:border-amber-400">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-slate-300 mb-1">Kelas:</label>
+            <input type="text" id="inputClass" required placeholder="Contoh: 5A atau 6B" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-white outline-none focus:border-amber-400">
+          </div>
+          <div>
+            <label class="block font-bold text-slate-300 mb-1">Tahun Ajaran:</label>
+            <select id="inputYear" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-white outline-none focus:border-amber-400">
+              <option value="2026/2027">2026/2027</option>
+              <option value="2025/2026">2025/2026</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-slate-300 mb-1">Kategori Karya:</label>
+            <select id="inputCategory" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-white outline-none focus:border-amber-400">
+              <option value="cerpen">📖 Cerpen</option>
+              <option value="puisi">🎭 Puisi</option>
+              <option value="sains">🔬 Esai Sains</option>
+              <option value="refleksi">💡 Refleksi & Karakter</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-bold text-slate-300 mb-1">Pilih Avatar / Foto Profil:</label>
+            <select id="inputAvatar" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-white outline-none focus:border-amber-400">
+              <option value="https://images.unsplash.com/photo-1544717305-2782549b5136?w=150&auto=format&fit=crop&q=80">👧 Siswi 1 (Ceria)</option>
+              <option value="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=150&auto=format&fit=crop&q=80">👦 Siswa 1 (Kacamata)</option>
+              <option value="https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150&auto=format&fit=crop&q=80">👧 Siswi 2 (Senyum)</option>
+              <option value="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80">👦 Siswa 2 (Semangat)</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-300 mb-1">Judul Tulisan:</label>
+          <input type="text" id="inputTitle" required placeholder="Contoh: Petualangan Menjelajah Nebula Mars" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-white outline-none focus:border-amber-400">
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-300 mb-1">Isi Tulisan / Naskah Kamu:</label>
+          <textarea id="inputBody" rows="6" required placeholder="Tuliskan cerita, bait puisi, atau gagasan ilmiahmu di sini..." class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-white outline-none focus:border-amber-400"></textarea>
+        </div>
+
+        <button type="submit" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-title font-bold py-3 rounded-xl transition shadow-lg text-sm">
+          🚀 Kirim Tulisan ke Redaksi
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="border-t border-slate-800/80 pt-6 mt-8 text-center text-xs text-slate-500">
+    Genta Aksara • Wadah Publikasi Karya Siswa SD Methodist Immanuel • Dikembangkan oleh <span class="text-amber-400 font-bold">Thomas Ryantama, M.Kom., Gr.</span>
+  </footer>
+
+  <script>
+    // ==========================================
+    // DATA DEFAULT & LOCAL STORAGE REPOSITORY
+    // ==========================================
+    const DEFAULT_POSTS = [
+      {
+        id: '1',
+        title: 'Misteri Robot Rover di Lembah Merah',
+        category: 'cerpen',
+        year: '2026/2027',
+        author: 'Jelita Nathania',
+        grade: 'Kelas 5A',
+        avatar: 'https://images.unsplash.com/photo-1544717305-2782549b5136?w=150&auto=format&fit=crop&q=80',
+        date: '14 Okt 2026',
+        likes: 18,
+        approved: true,
+        body: `Di sebuah stasiun luar angkasa kecil bernama Alpha-3, hiduplah sebuah robot rover penjelajah bernama Robi. Tidak seperti robot tambang lainnya yang bertubuh kaku dan berbodi baja abu-abu kusam, Robi memiliki sensor warna oranye terang yang selalu berkedip riang.
+
+Suatu hari, sinyal kompas navigasinya mendeteksi frekuensi ganjil dari balik lembah batuan kristal. Semua kru lab melarang Robi pergi karena badai debu magnetik sedang mendekat. Namun, Robi tahu bahwa di sana ada batuan purba yang menyimpan cadangan air beku untuk koloni tanaman hidroponik mereka.
+
+Dengan roda beralur tebalnya, ia menembus badai gurun es. Pelajaran yang selalu Robi ingat dari guru kodingnya adalah: "Keberanian bukanlah ketiadaan rasa takut, melainkan tekad untuk terus melangkah demi kebaikan bersama."`
+      },
+      {
+        id: '2',
+        title: 'Bisikan Bintang di Balik Jendela Kelas',
+        category: 'puisi',
+        year: '2026/2027',
+        author: 'Michael Sean',
+        grade: 'Kelas 6B',
+        avatar: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=150&auto=format&fit=crop&q=80',
+        date: '12 Okt 2026',
+        likes: 24,
+        approved: true,
+        body: `Di antara lembar rumus dan ketukan jam dinding,
+Mataku singgah pada langit temaram yang hening.
+Bintang-bintang merajut titik cahaya tak berujung,
+Mengajak pikiranku terbang melayang melambung.
+
+Di papan tulis guru kami menuliskan cita,
+Di dalam dada kami menyalakan pelita.
+Wahai bintang penunjuk jalan di angkasa,
+Saksikan langkah kami menembus cakrawala semesta.`
+      },
+      {
+        id: '3',
+        title: 'Mengapa AI Butuh Logika Manusia?',
+        category: 'sains',
+        year: '2025/2026',
+        author: 'David Timothy',
+        grade: 'Kelas 6A (Alumni)',
+        avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80',
+        date: '28 Mei 2026',
+        likes: 31,
+        approved: true,
+        body: `Saat kami belajar koding dan kecerdasan buatan (AI) di lab sekolah, banyak teman mengira komputer bisa berpikir sendiri seperti manusia. Namun kenyataannya, AI hanyalah sekumpulan instruksi matematika dan statistik yang sangat cepat.
+
+Tanpa hati nurani, etika kejujuran, dan empati dari pembuatnya, teknologi sehebat apa pun bisa salah arah. Itulah mengapa nilai budi pekerti dan integritas karakter jauh lebih tinggi daripada sekadar kecepatan menghafal algoritma.`
+      }
+    ];
+
+    let posts = JSON.parse(localStorage.getItem('genta_aksara_posts')) || DEFAULT_POSTS;
+    let selectedCategory = 'semua';
+    let currentReadingId = null;
+
+    function savePosts() {
+      localStorage.setItem('genta_aksara_posts', JSON.stringify(posts));
+    }
+
+    // ==========================================
+    // RENDER ARTIKEL PUBLIK
+    // ==========================================
+    function renderPosts() {
+      const grid = document.getElementById('postsGrid');
+      const selectedYear = document.getElementById('selectYear').value;
+
+      const filtered = posts.filter(p => {
+        const matchApproval = p.approved === true;
+        const matchCat = (selectedCategory === 'semua' || p.category === selectedCategory);
+        const matchYear = (selectedYear === 'semua' || p.year === selectedYear);
+        return matchApproval && matchCat && matchYear;
+      });
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `
+          <div class="col-span-full py-16 text-center text-slate-500">
+            <span class="text-4xl block mb-2">📜</span>
+            <p class="font-bold text-sm">Belum ada karya tulis untuk kategori atau edisi ini.</p>
+            <p class="text-xs">Jadilah yang pertama mengirimkan naskah tulisan!</p>
+          </div>
+        `;
+        return;
+      }
+
+      grid.innerHTML = filtered.map(p => {
+        const catBadge = {
+          'cerpen': 'bg-amber-500/20 text-amber-300 border-amber-400/30',
+          'puisi': 'bg-rose-500/20 text-rose-300 border-rose-400/30',
+          'sains': 'bg-sky-500/20 text-sky-300 border-sky-400/30',
+          'refleksi': 'bg-emerald-500/20 text-emerald-300 border-emerald-400/30'
+        }[p.category] || 'bg-slate-700 text-slate-300 border-slate-600';
+
+        const snippet = p.body.length > 130 ? p.body.substring(0, 130) + '...' : p.body;
+
+        return `
+          <article class="glass-card rounded-3xl p-6 flex flex-col justify-between" onclick="openReadModal('${p.id}')">
+            <div>
+              <div class="flex items-center justify-between gap-2 mb-3">
+                <span class="text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full border ${catBadge}">
+                  ${p.category}
+                </span>
+                <span class="text-[11px] font-bold text-slate-400">${p.year}</span>
+              </div>
+
+              <h3 class="font-title text-xl text-white font-bold leading-snug mb-2 hover:text-amber-300 transition cursor-pointer">
+                ${p.title}
+              </h3>
+
+              <p class="font-serif-prose text-xs text-slate-300 leading-relaxed mb-4">
+                "${snippet}"
+              </p>
+            </div>
+
+            <div class="border-t border-slate-800/80 pt-4 flex items-center justify-between">
+              <div class="flex items-center gap-2.5">
+                <img src="${p.avatar}" alt="${p.author}" class="w-9 h-9 rounded-full object-cover border border-amber-400/40">
+                <div>
+                  <h4 class="text-xs font-bold text-slate-200 leading-tight">${p.author}</h4>
+                  <p class="text-[10px] text-slate-400">${p.grade}</p>
+                </div>
+              </div>
+
+              <div class="flex items-center gap-1 text-xs text-rose-400 font-bold">
+                <span>❤️</span> <span>${p.likes}</span>
+              </div>
+            </div>
+          </article>
+        `;
+      }).join('');
+    }
+
+    // ==========================================
+    // FILTER KATEGORI
+    // ==========================================
+    function filterCategory(cat) {
+      selectedCategory = cat;
+      document.querySelectorAll('.cat-btn').forEach(btn => {
+        if (btn.dataset.cat === cat) {
+          btn.className = "cat-btn px-3 py-1.5 rounded-xl bg-amber-500 text-slate-950 font-bold text-xs transition";
+        } else {
+          btn.className = "cat-btn px-3 py-1.5 rounded-xl bg-slate-800 text-slate-300 hover:bg-slate-700 font-bold text-xs transition";
+        }
+      });
+      renderPosts();
+    }
+
+    // ==========================================
+    // MODAL BACA LENGKAP
+    // ==========================================
+    function openReadModal(id) {
+      const p = posts.find(item => item.id === id);
+      if (!p) return;
+      currentReadingId = id;
+
+      document.getElementById('readTitle').innerText = p.title;
+      document.getElementById('readCategoryBadge').innerText = p.category;
+      document.getElementById('readAuthorName').innerText = p.author;
+      document.getElementById('readAuthorMeta').innerText = `${p.grade} • Edisi ${p.year} • ${p.date}`;
+      document.getElementById('readAuthorImg').src = p.avatar;
+      document.getElementById('readBody').innerText = p.body;
+      document.getElementById('readLikesCount').innerText = p.likes;
+
+      document.getElementById('readModal').classList.remove('hidden');
+    }
+
+    function closeReadModal() {
+      document.getElementById('readModal').classList.add('hidden');
+      currentReadingId = null;
+    }
+
+    function likePost(id) {
+      const p = posts.find(item => item.id === id);
+      if (p) {
+        p.likes++;
+        savePosts();
+        document.getElementById('readLikesCount').innerText = p.likes;
+        renderPosts();
+      }
+    }
+
+    // ==========================================
+    // MODAL KIRIM TULISAN SISWA
+    // ==========================================
+    function openSubmitModal() {
+      document.getElementById('submitModal').classList.remove('hidden');
+    }
+    function closeSubmitModal() {
+      document.getElementById('submitModal').classList.add('hidden');
+    }
+
+    function handlePostSubmit(e) {
+      e.preventDefault();
+      const newPost = {
+        id: Date.now().toString(),
+        title: document.getElementById('inputTitle').value,
+        category: document.getElementById('inputCategory').value,
+        year: document.getElementById('inputYear').value,
+        author: document.getElementById('inputName').value,
+        grade: document.getElementById('inputClass').value,
+        avatar: document.getElementById('inputAvatar').value,
+        date: new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }),
+        likes: 0,
+        approved: false, // Menunggu kurasi guru
+        body: document.getElementById('inputBody').value
+      };
+
+      posts.unshift(newPost);
+      savePosts();
+
+      alert("🎉 Naskah tulisanmu berhasil terkirim ke Meja Redaksi Guru! Tulisanmu akan tampil di antologi setelah dikurasi.");
+      document.getElementById('postForm').reset();
+      closeSubmitModal();
+      renderAdminPanel();
+    }
+
+    // ==========================================
+    // KURASI & MODERASI GURU
+    // ==========================================
+    function toggleAdminPanel() {
+      const panel = document.getElementById('adminPanel');
+      panel.classList.toggle('hidden');
+      renderAdminPanel();
+    }
+
+    function renderAdminPanel() {
+      const pending = posts.filter(p => !p.approved);
+      const list = document.getElementById('pendingList');
+
+      if (pending.length === 0) {
+        list.innerHTML = `<p class="text-xs text-slate-400 italic">Tidak ada naskah baru yang menunggu persetujuan.</p>`;
+        return;
+      }
+
+      list.innerHTML = pending.map(p => `
+        <div class="bg-slate-900/90 border border-slate-700 p-3 rounded-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-bold text-amber-400">[${p.category.toUpperCase()}]</span>
+              <h4 class="text-xs font-bold text-white">${p.title}</h4>
+            </div>
+            <p class="text-[11px] text-slate-400 mt-0.5">Penulis: <b>${p.author}</b> (${p.grade}) • Edisi ${p.year}</p>
+          </div>
+          <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+            <button onclick="approvePost('${p.id}')" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold shadow">
+              ✅ Terbitkan
+            </button>
+            <button onclick="deletePost('${p.id}')" class="px-3 py-1.5 bg-rose-600 hover:bg-rose-500 text-white rounded-xl text-xs font-bold shadow">
+              🗑️ Tolak
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function approvePost(id) {
+      const p = posts.find(item => item.id === id);
+      if (p) {
+        p.approved = true;
+        savePosts();
+        renderAdminPanel();
+        renderPosts();
+      }
+    }
+
+    function deletePost(id) {
+      if (confirm("Yakin ingin menghapus naskah ini?")) {
+        posts = posts.filter(item => item.id !== id);
+        savePosts();
+        renderAdminPanel();
+        renderPosts();
+      }
+    }
+
+    // Inisialisasi awal
+    renderPosts();
+  </script>
+</body>
+</html>

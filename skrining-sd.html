@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Instrumen Skrining Kesiapan Masuk SD & Kemitraan Orang Tua</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: radial-gradient(circle at 50% 0%, #1e293b 0%, #0b0f19 80%);
+      color: #f8fafc;
+      min-height: 100vh;
+    }
+    .font-title { font-family: 'Fredoka', sans-serif; }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.04);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    @media print {
+      body { background: white !important; color: black !important; }
+      .no-print { display: none !important; }
+      .print-box { border: 1px solid #ccc !important; color: black !important; background: white !important; }
+    }
+  </style>
+</head>
+<body class="p-4 sm:p-8 max-w-4xl mx-auto flex flex-col justify-between min-h-screen">
+
+  <!-- HEADER -->
+  <header class="text-center mb-8 no-print">
+    <div class="inline-flex items-center gap-2 bg-emerald-500/10 border border-emerald-400/20 text-emerald-300 px-3.5 py-1 rounded-full text-xs font-black uppercase tracking-wider mb-3">
+      🌱 Transisi PAUD ke SD yang Menyenangkan
+    </div>
+    <h1 class="font-title text-3xl sm:text-4xl text-white mb-2">Asesmen Kesiapan Belajar Siswa & Kemitraan Orang Tua</h1>
+    <p class="text-slate-400 text-xs sm:text-sm max-w-2xl mx-auto">
+      Instrumen observasi holistik non-calistung sesuai panduan Kemendikbudristek untuk memetakan kesiapan kemandirian anak serta keselarasan pengasuhan orang tua.
+    </p>
+  </header>
+
+  <!-- FORM CONTAINER -->
+  <main class="space-y-8 flex-grow">
+
+    <!-- DATA CALON SISWA & ORANG TUA -->
+    <div class="glass-card rounded-3xl p-6 sm:p-8 space-y-4">
+      <h3 class="font-title text-xl text-amber-400 flex items-center gap-2">
+        <span>📋</span> Identitas Calon Siswa & Wali
+      </h3>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs font-bold">
+        <div>
+          <label class="block text-slate-300 mb-1">Nama Lengkap Calon Siswa:</label>
+          <input type="text" id="studentName" placeholder="Contoh: Samuel Jonathan" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-white outline-none focus:border-amber-400">
+        </div>
+        <div>
+          <label class="block text-slate-300 mb-1">Usia Saat Masuk (Tahun / Bulan):</label>
+          <input type="text" id="studentAge" placeholder="Contoh: 6 Tahun 8 Bulan" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-white outline-none focus:border-amber-400">
+        </div>
+        <div>
+          <label class="block text-slate-300 mb-1">Nama Orang Tua / Wali:</label>
+          <input type="text" id="parentName" placeholder="Contoh: Ibu Maria / Bpk. David" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-white outline-none focus:border-amber-400">
+        </div>
+        <div>
+          <label class="block text-slate-300 mb-1">Nama Asal TK / PAUD:</label>
+          <input type="text" id="schoolOrigin" placeholder="Contoh: TK Methodist Immanuel" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-white outline-none focus:border-amber-400">
+        </div>
+      </div>
+    </div>
+
+    <!-- BAGIAN 1: ASESMEN ANAK (6 FONDASI PERKEMBANGAN) -->
+    <div class="glass-card rounded-3xl p-6 sm:p-8 space-y-6">
+      <div class="border-b border-slate-800 pb-3">
+        <span class="text-xs font-bold text-sky-400 uppercase tracking-wider block">Bagian 1</span>
+        <h3 class="font-title text-2xl text-white">Observasi Kesiapan Fondasi Anak</h3>
+        <p class="text-xs text-slate-400 mt-1">
+          Bukan tes calistung tertulis. Berikan skor berdasarkan pengamatan perilaku, kemandirian, dan interaksi anak (1 = Perlu Latihan, 2 = Kadang-kadang, 3 = Sudah Mandiri/Konsisten).
+        </p>
+      </div>
+
+      <div class="space-y-4" id="childQuestions">
+        <!-- Diisi dinamis via JavaScript -->
+      </div>
+    </div>
+
+    <!-- BAGIAN 2: SKRINING KEMITRAAN & KOMITMEN ORANG TUA -->
+    <div class="glass-card rounded-3xl p-6 sm:p-8 space-y-6">
+      <div class="border-b border-slate-800 pb-3">
+        <span class="text-xs font-bold text-amber-400 uppercase tracking-wider block">Bagian 2</span>
+        <h3 class="font-title text-2xl text-white">Keselarasan Pola Asuh & Komitmen Orang Tua</h3>
+        <p class="text-xs text-slate-400 mt-1">
+          Kesiapan anak di sekolah berakar dari konsistensi rumah. Berikan jawaban yang paling mencerminkan kondisi sehari-hari di rumah (1 = Belum Siap / Jarang, 2 = Cukup, 3 = Sangat Siap & Komitmen).
+        </p>
+      </div>
+
+      <div class="space-y-4" id="parentQuestions">
+        <!-- Diisi dinamis via JavaScript -->
+      </div>
+    </div>
+
+    <!-- TOMBOL HITUNG HASIL -->
+    <div class="text-center no-print">
+      <button onclick="calculateReadiness()" class="px-8 py-3.5 bg-gradient-to-r from-amber-500 to-emerald-500 hover:from-amber-400 hover:to-emerald-400 text-slate-950 font-title text-base font-bold rounded-2xl shadow-xl transition transform hover:scale-105">
+        📊 Analisis & Tampilkan Lembar Rekomendasi
+      </button>
+    </div>
+
+    <!-- HASIL REKOMENDASI (POP-UP / HASIL ANALISIS) -->
+    <div id="resultBox" class="hidden glass-card rounded-3xl p-6 sm:p-8 space-y-6 border-2 border-emerald-400/50 print-box">
+      <div class="flex flex-wrap justify-between items-start gap-4 border-b border-slate-800 pb-4">
+        <div>
+          <span class="text-xs font-bold text-emerald-400 uppercase tracking-wider">Hasil Asesmen Kesiapan</span>
+          <h2 class="font-title text-2xl sm:text-3xl text-white" id="resStudentTitle">Laporan Observasi Calon Siswa</h2>
+          <p class="text-xs text-slate-400" id="resMetaInfo">Samuel Jonathan • 6 Tahun 8 Bulan</p>
+        </div>
+        <button onclick="window.print()" class="no-print px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold rounded-xl border border-slate-700 flex items-center gap-1.5">
+          🖨️ Cetak / Simpan PDF
+        </button>
+      </div>
+
+      <!-- STATUS BADGE -->
+      <div class="p-4 rounded-2xl flex items-center gap-4" id="statusContainer">
+        <div class="text-4xl" id="statusEmoji">🌟</div>
+        <div>
+          <h4 class="font-title text-xl font-bold" id="statusTitle">Sangat Siap Masuk SD</h4>
+          <p class="text-xs" id="statusDesc">Fondasi kemandirian anak matang dan didukung lingkungan keluarga yang sangat kondusif.</p>
+        </div>
+      </div>
+
+      <!-- SKOR BREAKDOWN -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div class="p-4 bg-slate-950/60 rounded-2xl border border-slate-800">
+          <span class="text-xs font-bold text-sky-400 block mb-1">Skor Fondasi Anak:</span>
+          <div class="flex items-baseline gap-2">
+            <span class="text-3xl font-black text-white" id="childScoreText">0</span>
+            <span class="text-xs text-slate-400">/ 30 Poin</span>
+          </div>
+          <div class="w-full bg-slate-800 h-2.5 rounded-full mt-2 overflow-hidden">
+            <div id="childProgressBar" class="bg-sky-500 h-full w-0 transition-all duration-500"></div>
+          </div>
+        </div>
+
+        <div class="p-4 bg-slate-950/60 rounded-2xl border border-slate-800">
+          <span class="text-xs font-bold text-amber-400 block mb-1">Skor Kemitraan Orang Tua:</span>
+          <div class="flex items-baseline gap-2">
+            <span class="text-3xl font-black text-white" id="parentScoreText">0</span>
+            <span class="text-xs text-slate-400">/ 24 Poin</span>
+          </div>
+          <div class="w-full bg-slate-800 h-2.5 rounded-full mt-2 overflow-hidden">
+            <div id="parentProgressBar" class="bg-amber-500 h-full w-0 transition-all duration-500"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CATATAN REKOMENDASI GURU & PENDAMPINGAN -->
+      <div class="space-y-3">
+        <h4 class="font-title text-base text-amber-300">Rekomendasi Tindak Lanjut Sekolah & Rumah:</h4>
+        <ul class="text-xs text-slate-300 space-y-2 list-disc pl-5" id="recommendationList">
+          <!-- Diisi otomatis -->
+        </ul>
+      </div>
+
+      <!-- TANDA TANGAN ASESMEN -->
+      <div class="pt-8 grid grid-cols-2 text-center text-xs text-slate-400 border-t border-slate-800 mt-6">
+        <div>
+          <p>Orang Tua / Wali Murid,</p>
+          <div class="h-16"></div>
+          <p class="font-bold text-slate-200" id="signParentName">( ........................................ )</p>
+        </div>
+        <div>
+          <p>Guru / Tim Observasi SD,</p>
+          <div class="h-16"></div>
+          <p class="font-bold text-slate-200">( ........................................ )</p>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="text-center text-xs text-slate-500 pt-8 border-t border-slate-800/80 mt-10 no-print">
+    Instrumen Skrining Transisi PAUD-SD • Dikembangkan untuk <b>nalarsci.id</b> • Thomas Ryantama, M.Kom., Gr.
+  </footer>
+
+  <script>
+    // 10 Butir Fondasi Anak (Bukan Calistung Kaku)
+    const CHILD_ITEMS = [
+      { id: 'c1', label: '1. Kemandirian Toilet (*Toilet Training*)', desc: 'Mampu buang air kecil/besar sendiri dan mencuci tangan tanpa bantuan penuh.' },
+      { id: 'c2', label: '2. Kemandirian Makan & Perlengkapan Pribadi', desc: 'Bisa membuka kotak makan, botol minum, serta memakai/melepas sepatu dan tas sendiri.' },
+      { id: 'c3', label: '3. Regulasi Emosi & Menoleransi Rasa Frustrasi', desc: 'Tidak tantrum berlebih saat menemui kesulitan dan bisa ditenangkan saat berpisah dengan orang tua.' },
+      { id: 'c4', label: '4. Kemampuan Mengikuti Instruksi Sederhana', desc: 'Mampu menyimak dan menjalankan 2–3 perintah sederhana secara berurutan (misal: "ambil buku lalu duduk").' },
+      { id: 'c5', label: '5. Interaksi Sosial & Berbagi', desc: 'Bisa mengantre, menunggu giliran, dan mau berbagi alat belajar dengan teman sebaya.' },
+      { id: 'c6', label: '6. Komunikasi Dua Arah & Menghargai Orang Lain', desc: 'Mampu mengutarakan kebutuhan, perasaan, dan menjawab pertanyaan dengan kalimat sederhana.' },
+      { id: 'c7', label: '7. Motorik Halus (Kesiapan Menulis)', desc: 'Bisa memegang alat tulis (tripod grip wajar), menggunting garis lurus, atau meremas lilin mainan.' },
+      { id: 'c8', label: '8. Motorik Kasar (Koordinasi Tubuh)', desc: 'Mampu melompat dengan dua kaki, berdiri seimbang dengan satu kaki, dan berjalan lurus tanpa oleng.' },
+      { id: 'c9', label: '9. Pra-Literasi Menyenangkan', desc: 'Tertarik mendengarkan dongeng, mengenali simbol benda di sekitarnya, atau membedakan bunyi kata.' },
+      { id: 'c10', label: '10. Pra-Numerasi Konkret', desc: 'Bisa membedakan konsep banyak-sedikit, panjang-pendek, serta membilang benda konkret 1–10.' }
+    ];
+
+    // 8 Butir Komitmen & Kemitraan Orang Tua
+    const PARENT_ITEMS = [
+      { id: 'p1', label: '1. Kedisiplinan Jam Tidur & Istirahat di Rumah', desc: 'Anak memiliki rutinitas tidur teratur sebelum pukul 21.00 sehingga tidak mengantuk di kelas pagi.' },
+      { id: 'p2', label: '2. Pembatasan Gawai / Gadget (*Screen Time*)', desc: 'Orang tua membatasi penggunaan HP/tablet maksimal 1 jam per hari dan tidak bermain gawai sebelum sekolah.' },
+      { id: 'p3', label: '3. Pendampingan Belajar Non-Tekanan', desc: 'Orang tua berkomitmen mendampingi proses adaptasi anak tanpa menuntut ranking atau nilai angka sempurna.' },
+      { id: 'p4', label: '4. Keselarasan Nilai & Aturan Sekolah', desc: 'Mendukung program pembiasaan budi pekerti, kejujuran, dan kesederhanaan yang diterapkan di sekolah.' },
+      { id: 'p5', label: '5. Keterbukaan Riwayat Tumbuh Kembang', desc: 'Orang tua bersedia jujur menyampaikan jika anak memiliki alergi, riwayat medis, atau kebutuhan khusus.' },
+      { id: 'p6', label: '6. Komunikasi Terbuka & Suportif dengan Guru', desc: 'Menghormati waktu guru, mengedepankan musyawarah santun jika terjadi dinamika antar anak di sekolah.' },
+      { id: 'p7', label: '7. Kehadiran dalam Pertemuan Orang Tua', desc: 'Berkomitmen menghadiri parenting, evaluasi berkala, atau konsultasi wali kelas minimal 1 semester sekali.' },
+      { id: 'p8', label: '8. Kemandirian Berpisah di Pintu Gerbang', desc: 'Tidak menunggui anak di depan jendela kelas setelah masa transisi minggu pertama selesai.' }
+    ];
+
+    // Render Pertanyaan Anak
+    const childBox = document.getElementById('childQuestions');
+    childBox.innerHTML = CHILD_ITEMS.map((item, idx) => `
+      <div class="p-3.5 bg-slate-950/60 rounded-2xl border border-slate-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+        <div class="max-w-lg">
+          <h4 class="text-xs font-bold text-white">${item.label}</h4>
+          <p class="text-[11px] text-slate-400 mt-0.5">${item.desc}</p>
+        </div>
+        <div class="flex items-center gap-1.5 w-full sm:w-auto justify-end">
+          <label class="cursor-pointer text-[11px] font-bold px-2.5 py-1.5 rounded-xl bg-slate-800 text-slate-300 has-[:checked]:bg-rose-600 has-[:checked]:text-white transition">
+            <input type="radio" name="${item.id}" value="1" class="hidden"> Perlu Latihan (1)
+          </label>
+          <label class="cursor-pointer text-[11px] font-bold px-2.5 py-1.5 rounded-xl bg-slate-800 text-slate-300 has-[:checked]:bg-amber-500 has-[:checked]:text-slate-950 transition">
+            <input type="radio" name="${item.id}" value="2" class="hidden"> Cukup (2)
+          </label>
+          <label class="cursor-pointer text-[11px] font-bold px-2.5 py-1.5 rounded-xl bg-slate-800 text-slate-300 has-[:checked]:bg-emerald-600 has-[:checked]:text-white transition">
+            <input type="radio" name="${item.id}" value="3" checked class="hidden"> Mandiri (3)
+          </label>
+        </div>
+      </div>
+    `).join('');
+
+    // Render Pertanyaan Orang Tua
+    const parentBox = document.getElementById('parentQuestions');
+    parentBox.innerHTML = PARENT_ITEMS.map((item, idx) => `
+      <div class="p-3.5 bg-slate-950/60 rounded-2xl border border-slate-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+        <div class="max-w-lg">
+          <h4 class="text-xs font-bold text-white">${item.label}</h4>
+          <p class="text-[11px] text-slate-400 mt-0.5">${item.desc}</p>
+        </div>
+        <div class="flex items-center gap-1.5 w-full sm:w-auto justify-end">
+          <label class="cursor-pointer text-[11px] font-bold px-2.5 py-1.5 rounded-xl bg-slate-800 text-slate-300 has-[:checked]:bg-rose-600 has-[:checked]:text-white transition">
+            <input type="radio" name="${item.id}" value="1" class="hidden"> Belum Siap (1)
+          </label>
+          <label class="cursor-pointer text-[11px] font-bold px-2.5 py-1.5 rounded-xl bg-slate-800 text-slate-300 has-[:checked]:bg-amber-500 has-[:checked]:text-slate-950 transition">
+            <input type="radio" name="${item.id}" value="2" class="hidden"> Cukup (2)
+          </label>
+          <label class="cursor-pointer text-[11px] font-bold px-2.5 py-1.5 rounded-xl bg-slate-800 text-slate-300 has-[:checked]:bg-emerald-600 has-[:checked]:text-white transition">
+            <input type="radio" name="${item.id}" value="3" checked class="hidden"> Komitmen (3)
+          </label>
+        </div>
+      </div>
+    `).join('');
+
+    // Fungsi Hitung Kesiapan
+    function calculateReadiness() {
+      const studentName = document.getElementById('studentName').value || 'Calon Siswa';
+      const studentAge = document.getElementById('studentAge').value || '6 Tahun';
+      const parentName = document.getElementById('parentName').value || 'Orang Tua / Wali';
+
+      let childScore = 0;
+      CHILD_ITEMS.forEach(it => {
+        const val = document.querySelector(`input[name="${it.id}"]:checked`);
+        childScore += val ? parseInt(val.value) : 2;
+      });
+
+      let parentScore = 0;
+      PARENT_ITEMS.forEach(it => {
+        const val = document.querySelector(`input[name="${it.id}"]:checked`);
+        parentScore += val ? parseInt(val.value) : 2;
+      });
+
+      // Update Tampilan Hasil
+      document.getElementById('resStudentTitle').innerText = `Laporan Asesmen: ${studentName}`;
+      document.getElementById('resMetaInfo').innerText = `Usia: ${studentAge} • Orang Tua: ${parentName}`;
+      document.getElementById('signParentName').innerText = `( ${parentName} )`;
+
+      document.getElementById('childScoreText').innerText = childScore;
+      document.getElementById('parentScoreText').innerText = parentScore;
+
+      document.getElementById('childProgressBar').style.width = `${(childScore / 30) * 100}%`;
+      document.getElementById('parentProgressBar').style.width = `${(parentScore / 24) * 100}%`;
+
+      const statusBox = document.getElementById('statusContainer');
+      const recList = document.getElementById('recommendationList');
+
+      // Evaluasi Kategori
+      if (childScore >= 25 && parentScore >= 20) {
+        statusBox.className = "p-4 rounded-2xl flex items-center gap-4 bg-emerald-950/60 border border-emerald-500 text-emerald-300";
+        document.getElementById('statusEmoji').innerText = "🌟";
+        document.getElementById('statusTitle').innerText = "Kesiapan Sangat Baik (Direkomendasikan Masuk)";
+        document.getElementById('statusDesc').innerText = "Anak memiliki kemandirian fisik dan emosional yang matang, serta disokong kemitraan orang tua yang sangat selaras.";
+        recList.innerHTML = `
+          <li><b>Kemandirian & Adaptasi:</b> Anak siap langsung mengikuti dinamika kelas 1 tanpa kendala adaptasi berarti.</li>
+          <li><b>Penguatan Rumah:</b> Pertahankan pembatasan gawai dan stimulasi buku cerita di rumah menjelang hari pertama sekolah.</li>
+          <li><b>Kolaborasi:</b> Sekolah menyambut baik keterbukaan orang tua dalam mendukung program sekolah.</li>
+        `;
+      } else if (childScore >= 18 && parentScore >= 15) {
+        statusBox.className = "p-4 rounded-2xl flex items-center gap-4 bg-amber-950/60 border border-amber-500 text-amber-300";
+        document.getElementById('statusEmoji').innerText = "🌱";
+        document.getElementById('statusTitle').innerText = "Siap dengan Pendampingan Adaptasi Khusus";
+        document.getElementById('statusDesc').innerText = "Anak siap bersekolah, namun perlu pembiasaan kemandirian toilet/fokus serta pendampingan intensif bersama orang tua di 2 bulan pertama.";
+        recList.innerHTML = `
+          <li><b>Fokus Kemandirian:</b> Latih anak di rumah untuk membereskan tas sendiri, memakai sepatu, dan mengungkapkan izin ke toilet secara mandiri.</li>
+          <li><b>Dukungan Orang Tua:</b> Kurangi waktu layar (gadget) 1 bulan sebelum masuk sekolah untuk meningkatkan daya rentang fokus anak.</li>
+          <li><b>Masa Orientasi:</b> Guru kelas akan memberikan perhatian ekstra pada pembiasaan antrean dan regulasi emosi saat berpisah di gerbang.</li>
+        `;
+      } else {
+        statusBox.className = "p-4 rounded-2xl flex items-center gap-4 bg-rose-950/60 border border-rose-500 text-rose-300";
+        document.getElementById('statusEmoji').innerText = "⏳";
+        document.getElementById('statusTitle').innerText = "Perlu Penguatan Fondasi Tumbuh Kembang";
+        document.getElementById('statusDesc').innerText = "Dianjurkan konsultasi pendalaman: anak membutuhkan penguatan stimulasi motorik/kemandirian atau pertimbangan usia kematangan.";
+        recList.innerHTML = `
+          <li><b>Observasi Mendalam:</b> Perlu sesi wawancara psikolog anak atau observasi lanjutan bersama kepala sekolah dan guru BK.</li>
+          <li><b>Aspek Kematangan:</b> Jika usia anak masih di bawah 6 tahun, sangat disarankan memperpanjang 1 tahun di jenjang TK B untuk mematangkan rasa percaya diri.</li>
+          <li><b>Komitmen Rumah:</b> Perlu komitmen ketat orang tua dalam merapikan pola tidur, regulasi emosi di rumah, dan mengurangi ketergantungan gawai.</li>
+        `;
+      }
+
+      document.getElementById('resultBox').classList.remove('hidden');
+      document.getElementById('resultBox').scrollIntoView({ behavior: 'smooth' });
+    }
+  </script>
+</body>
+</html>
