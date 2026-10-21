@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pemberitahuan Sistem & Informasi Resmi | Perguruan Methodist Immanuel Bandar Lampung</title>
+  
+  <!-- SEO & Favicon -->
+  <meta name="description" content="Portal resmi pengalihan dan informasi terpadu Perguruan Methodist Immanuel Bandar Lampung (PG-TK, SD, SMP, SMA). A School Where Students Thrive.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN & Lucide Icons -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Plus Jakarta Sans', 'sans-serif'],
+            serif: ['Playfair Display', 'serif'],
+          },
+          colors: {
+            navy: {
+              950: '#060a12',
+              900: '#0b1324',
+              800: '#111e38',
+              700: '#1b2d52',
+            },
+            gold: {
+              400: '#fbbf24',
+              500: '#f59e0b',
+              600: '#d97706',
+            },
+            methodist: {
+              red: '#dc2626',
+              gold: '#eab308'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Custom Glow & Background Grid */
+    .bg-grid-pattern {
+      background-size: 40px 40px;
+      background-image: 
+        linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    }
+    .glass-card {
+      background: rgba(17, 30, 56, 0.7);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .glass-card-hover {
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .glass-card-hover:hover {
+      transform: translateY(-4px);
+      border-color: rgba(245, 158, 11, 0.3);
+      box-shadow: 0 16px 32px -8px rgba(245, 158, 11, 0.1);
+    }
+    .animate-pulse-slow {
+      animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 0.8; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.02); }
+    }
+  </style>
+</head>
+<body class="bg-navy-950 text-slate-200 font-sans antialiased selection:bg-gold-500 selection:text-navy-950 relative overflow-x-hidden min-h-screen">
+
+  <!-- Background Decorative Ambient Lighting -->
+  <div class="fixed inset-0 bg-grid-pattern pointer-events-none z-0"></div>
+  <div class="fixed top-[-10rem] left-1/2 -translate-x-1/2 w-[700px] h-[500px] bg-gradient-to-tr from-amber-500/15 via-red-600/10 to-blue-600/15 blur-[140px] pointer-events-none z-0"></div>
+  <div class="fixed bottom-[-10rem] right-[-10rem] w-[500px] h-[400px] bg-blue-500/10 blur-[130px] pointer-events-none z-0"></div>
+
+  <!-- Top Announcement Bar (Maintenance Notice) -->
+  <header class="relative z-20 border-b border-amber-500/20 bg-amber-500/10 backdrop-blur-md px-4 py-2.5 text-center text-xs sm:text-sm font-medium text-amber-200">
+    <div class="max-w-7xl mx-auto flex items-center justify-center gap-2">
+      <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/30">
+        <i data-lucide="wrench" class="w-3 h-3 mr-1 inline"></i> SYSTEM UPGRADE
+      </span>
+      <span>Domain resmi <strong>methodist-bdl.sch.id</strong> sedang dalam optimalisasi infrastruktur cloud & AI terpadu.</span>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-16">
+
+    <!-- HERO SECTION: BRANDING & APOLOGY -->
+    <section class="text-center space-y-6 pt-4 sm:pt-8">
+      
+      <!-- Official Badge & Logo -->
+      <div class="inline-flex flex-col items-center gap-3">
+        <div class="relative group">
+          <div class="absolute -inset-1.5 bg-gradient-to-r from-amber-500 to-red-600 rounded-full blur-md opacity-40 group-hover:opacity-75 transition duration-500"></div>
+          <div class="relative w-24 h-24 rounded-full bg-navy-900 border-2 border-amber-500/40 p-3 flex items-center justify-center shadow-xl">
+            <!-- Methodist Cross and Flame SVG Emblem -->
+            <svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-md" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <!-- Methodist Flame -->
+              <path d="M48 22C42 34 32 46 36 62C38 70 44 76 52 76C46 71 44 64 47 57C49 53 54 49 55 43C56 37 54 28 48 22Z" fill="#DC2626"/>
+              <path d="M43 45C38 52 35 60 38 68C40 73 45 77 50 78C44 74 42 67 45 61C47 57 51 54 52 49C53 45 50 39 43 45Z" fill="#F59E0B"/>
+              <!-- Methodist Cross -->
+              <rect x="58" y="24" width="7" height="52" rx="1.5" fill="#E2E8F0"/>
+              <rect x="47" y="38" width="29" height="7" rx="1.5" fill="#E2E8F0"/>
+            </svg>
+          </div>
+        </div>
+
+        <div class="space-y-1">
+          <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-navy-800/80 border border-slate-700/60 text-xs font-semibold tracking-wider uppercase text-amber-400">
+            <i data-lucide="shield-check" class="w-3.5 h-3.5"></i> Perguruan Kristen Methodist Immanuel Bandar Lampung
+          </div>
+          <p class="text-xs text-slate-400 font-mono tracking-wide">PG-TK • SD • SMP • SMA</p>
+        </div>
+      </div>
+
+      <!-- Main Headline with Tagline -->
+      <div class="space-y-4 max-w-3xl mx-auto">
+        <h1 class="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-tight">
+          A School Where <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-500 font-serif italic">Students Thrive</span>
+        </h1>
+        <p class="text-base sm:text-lg text-slate-300 leading-relaxed font-light">
+          Mohon maaf atas ketidaknyamanan Anda. Portal utama kami sedang dalam pemeliharaan terencana demi menghadirkan sistem informasi akademik terpadu yang lebih andal, cerdas, dan interaktif.
+        </p>
+      </div>
+
+      <!-- Status Progress Bar -->
+      <div class="max-w-md mx-auto p-4 rounded-2xl glass-card border border-slate-800/90 text-left space-y-2">
+        <div class="flex items-center justify-between text-xs font-semibold">
+          <span class="flex items-center gap-1.5 text-slate-300">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+            Penyelarasan Server & Layanan SPMB
+          </span>
+          <span class="text-amber-400 font-mono">85% Complete</span>
+        </div>
+        <div class="w-full bg-navy-950 rounded-full h-2 overflow-hidden p-0.5 border border-slate-800">
+          <div class="bg-gradient-to-r from-amber-500 to-emerald-400 h-full rounded-full transition-all duration-1000 w-[85%]"></div>
+        </div>
+        <p class="text-[11px] text-slate-400 flex items-center justify-between pt-1">
+          <span>Estimasi selesai: Segera</span>
+          <span>Domain target: methodist-bdl.sch.id</span>
+        </p>
+      </div>
+
+      <!-- Quick Emergency Actions -->
+      <div class="flex flex-wrap items-center justify-center gap-3 pt-2">
+        <a href="https://wa.me/6285183163610?text=Halo%20Layanan%20SPMB%20Methodist%20Immanuel,%20saya%20ingin%20menanyakan%20informasi%20pendaftaran%20siswa%20baru" 
+           target="_blank" 
+           class="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl font-bold text-sm bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-white shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/30 transition-all transform hover:-translate-y-0.5">
+          <i data-lucide="message-circle" class="w-4 h-4"></i>
+          Hubungi WhatsApp SPMB
+        </a>
+
+        <a href="#profil-sekolah" 
+           class="inline-flex items-center gap-2 px-5 py-3.5 rounded-xl font-semibold text-sm bg-navy-800/90 hover:bg-navy-700/90 text-slate-200 border border-slate-700/80 transition-all">
+          <i data-lucide="book-open" class="w-4 h-4 text-amber-400"></i>
+          Visi, Misi & Profil
+        </a>
+
+        <a href="#kontak-lokasi" 
+           class="inline-flex items-center gap-2 px-5 py-3.5 rounded-xl font-semibold text-sm bg-navy-800/90 hover:bg-navy-700/90 text-slate-200 border border-slate-700/80 transition-all">
+          <i data-lucide="map-pin" class="w-4 h-4 text-amber-400"></i>
+          Alamat & Lokasi
+        </a>
+      </div>
+    </section>
+
+    <!-- SECTION 2: HIGHLIGHT SPMB TA 2027/2028 (PROMO GELOMBANG AKTIF - TANPA RUPIAH) -->
+    <section class="glass-card rounded-3xl p-6 sm:p-10 border border-amber-500/20 relative overflow-hidden">
+      <div class="absolute -right-16 -bottom-16 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+        <!-- Text Promo -->
+        <div class="lg:col-span-7 space-y-4">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/20 border border-amber-500/30 text-amber-300 text-xs font-bold uppercase tracking-wider">
+            <i data-lucide="sparkles" class="w-3.5 h-3.5"></i> Penerimaan Siswa Baru TA 2027/2028
+          </div>
+          
+          <h2 class="text-2xl sm:text-3xl font-extrabold text-white leading-tight">
+            Kesempatan Terbatas: <br class="hidden sm:block">
+            <span class="text-amber-400">Gelombang Beasiswa Potongan Uang Pembangunan (UP)</span>
+          </h2>
+          
+          <p class="text-slate-300 text-sm sm:text-base leading-relaxed">
+            Kami menyambut putra-putri Anda untuk bertumbuh dalam keunggulan iman, kecerdasan akademik, dan karakter luhur. Saat ini sedang berlangsung gelombang beasiswa potongan khusus bagi peserta didik baru. 
+          </p>
+
+          <div class="space-y-2 pt-2">
+            <div class="flex items-center gap-2 text-sm text-slate-200">
+              <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400 flex-shrink-0"></i>
+              <span>Tersedia untuk jenjang <strong>PG-TK, SD, SMP, hingga SMA</strong>.</span>
+            </div>
+            <div class="flex items-center gap-2 text-sm text-slate-200">
+              <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400 flex-shrink-0"></i>
+              <span>Skema khusus untuk <strong>Kategori SD Dalam</strong> (asal TK Methodist) maupun <strong>Kategori SD Luar</strong> (TK Umum).</span>
+            </div>
+            <div class="flex items-center gap-2 text-sm text-slate-200">
+              <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400 flex-shrink-0"></i>
+              <span>Kuota potongan terbatas dan ditutup sewaktu-waktu saat kuota gelombang terpenuhi.</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- CTA Box (Hubungi WhatsApp Langsung) -->
+        <div class="lg:col-span-5">
+          <div class="bg-navy-900/90 rounded-2xl border border-amber-500/30 p-6 space-y-5 text-center shadow-2xl relative">
+            <div class="inline-flex p-3 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-400 mb-1">
+              <i data-lucide="badge-percent" class="w-8 h-8"></i>
+            </div>
+            
+            <div>
+              <h3 class="text-lg font-bold text-white">Konsultasi Kuota & Rincian Pendaftaran</h3>
+              <p class="text-xs text-slate-400 mt-1">Dapatkan informasi sisa kuota beasiswa aktif, panduan formulir, dan jadwal observasi langsung dari tim sekretariat.</p>
+            </div>
+
+            <div class="p-3.5 rounded-xl bg-navy-950/70 border border-slate-800 text-left space-y-1.5">
+              <span class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block">Hotline Resmi SPMB:</span>
+              <p class="font-mono text-base font-bold text-emerald-400 flex items-center justify-between">
+                <span>+62 851-8316-3610</span>
+                <span class="text-[10px] bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded border border-emerald-500/30">Online</span>
+              </p>
+            </div>
+
+            <a href="https://wa.me/6285183163610?text=Halo%20Admin%20SPMB%20Methodist%20Immanuel,%20mohon%20informasi%20lengkap%20rincian%20biaya%20dan%20sisa%20kuota%20beasiswa%20terbaru" 
+               target="_blank" 
+               class="w-full inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl font-bold text-sm bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-navy-950 shadow-lg shadow-amber-500/20 transition-all">
+              <i data-lucide="message-square" class="w-4 h-4"></i>
+              Tanya Kuota Beasiswa via WhatsApp
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 3: VISI, MISI, MOTTO & NILAI KARAKTER -->
+    <section id="profil-sekolah" class="space-y-8 scroll-mt-20">
+      <div class="text-center space-y-2 max-w-2xl mx-auto">
+        <h2 class="text-xs font-bold uppercase tracking-widest text-amber-400">Landasan Pendidikan Kami</h2>
+        <h3 class="text-2xl sm:text-3xl font-extrabold text-white">Visi, Misi & Karakter Keunggulan</h3>
+        <p class="text-slate-400 text-sm">Mempersiapkan generasi beriman teguh, berilmu unggul, dan siap berdampak bagi bangsa.</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Visi Card -->
+        <div class="glass-card rounded-2xl p-6 border border-slate-800 glass-card-hover space-y-4">
+          <div class="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
+            <i data-lucide="compass" class="w-6 h-6"></i>
+          </div>
+          <div>
+            <span class="text-[11px] font-bold text-amber-400 uppercase tracking-wider">Visi Perguruan</span>
+            <h4 class="text-lg font-bold text-white mt-1">Berprestasi, Berkarakter, Berwawasan Global</h4>
+          </div>
+          <p class="text-slate-300 text-sm leading-relaxed">
+            Menjadi lembaga pendidikan Kristen yang unggul dalam membina pribadi berkualitas tinggi dalam <strong>Iman, Ilmu, dan Kasih</strong>, serta peduli dan berbudaya lingkungan.
+          </p>
+        </div>
+
+        <!-- Misi Card -->
+        <div class="glass-card rounded-2xl p-6 border border-slate-800 glass-card-hover space-y-4">
+          <div class="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+            <i data-lucide="target" class="w-6 h-6"></i>
+          </div>
+          <div>
+            <span class="text-[11px] font-bold text-emerald-400 uppercase tracking-wider">Misi Perguruan</span>
+            <h4 class="text-lg font-bold text-white mt-1">Holistik & Berkelanjutan</h4>
+          </div>
+          <ul class="text-slate-300 text-xs sm:text-sm space-y-2 list-disc list-inside">
+            <li>Menumbuhkan kedewasaan rohani dan iman kristiani yang tangguh.</li>
+            <li>Mengembangkan mutu pembelajaran inovatif berwawasan global.</li>
+            <li>Membina kepemimpinan mandiri, disiplin, peduli sesama, dan tanggung jawab kebangsaan.</li>
+          </ul>
+        </div>
+
+        <!-- Motto & Nilai Card -->
+        <div class="glass-card rounded-2xl p-6 border border-slate-800 glass-card-hover space-y-4">
+          <div class="w-12 h-12 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400">
+            <i data-lucide="award" class="w-6 h-6"></i>
+          </div>
+          <div>
+            <span class="text-[11px] font-bold text-blue-400 uppercase tracking-wider">Motto & Nilai Utama</span>
+            <h4 class="text-lg font-bold text-white mt-1">Santun, Berkualitas, Beriman</h4>
+          </div>
+          <div class="flex flex-wrap gap-1.5 pt-1">
+            <span class="px-2.5 py-1 rounded-md bg-navy-900 border border-slate-700 text-xs text-slate-200">Religius</span>
+            <span class="px-2.5 py-1 rounded-md bg-navy-900 border border-slate-700 text-xs text-slate-200">Jujur</span>
+            <span class="px-2.5 py-1 rounded-md bg-navy-900 border border-slate-700 text-xs text-slate-200">Disiplin</span>
+            <span class="px-2.5 py-1 rounded-md bg-navy-900 border border-slate-700 text-xs text-slate-200">Toleransi</span>
+            <span class="px-2.5 py-1 rounded-md bg-navy-900 border border-slate-700 text-xs text-slate-200">Peduli Lingkungan</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 4: FASILITAS UNGGULAN & EKOSISTEM BELAJAR -->
+    <section class="space-y-6">
+      <div class="text-center space-y-2 max-w-2xl mx-auto">
+        <h2 class="text-xs font-bold uppercase tracking-widest text-amber-400">Fasilitas Modern</h2>
+        <h3 class="text-2xl sm:text-3xl font-extrabold text-white">Lingkungan Tepat untuk Bertumbuh</h3>
+      </div>
+
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+        <!-- Fasilitas 1 -->
+        <div class="p-4 rounded-xl glass-card border border-slate-800 text-center space-y-2">
+          <div class="w-10 h-10 mx-auto rounded-lg bg-navy-900 flex items-center justify-center text-amber-400">
+            <i data-lucide="cpu" class="w-5 h-5"></i>
+          </div>
+          <p class="text-xs font-bold text-slate-200">Lab Komputer & Coding AI</p>
+        </div>
+
+        <!-- Fasilitas 2 -->
+        <div class="p-4 rounded-xl glass-card border border-slate-800 text-center space-y-2">
+          <div class="w-10 h-10 mx-auto rounded-lg bg-navy-900 flex items-center justify-center text-amber-400">
+            <i data-lucide="wifi" class="w-5 h-5"></i>
+          </div>
+          <p class="text-xs font-bold text-slate-200">Wi-Fi 6 & Cloud Campus</p>
+        </div>
+
+        <!-- Fasilitas 3 -->
+        <div class="p-4 rounded-xl glass-card border border-slate-800 text-center space-y-2">
+          <div class="w-10 h-10 mx-auto rounded-lg bg-navy-900 flex items-center justify-center text-amber-400">
+            <i data-lucide="book" class="w-5 h-5"></i>
+          </div>
+          <p class="text-xs font-bold text-slate-200">Perpustakaan Digital (SLiMS)</p>
+        </div>
+
+        <!-- Fasilitas 4 -->
+        <div class="p-4 rounded-xl glass-card border border-slate-800 text-center space-y-2">
+          <div class="w-10 h-10 mx-auto rounded-lg bg-navy-900 flex items-center justify-center text-amber-400">
+            <i data-lucide="trophy" class="w-5 h-5"></i>
+          </div>
+          <p class="text-xs font-bold text-slate-200">Lapangan Basket Standar DBL</p>
+        </div>
+
+        <!-- Fasilitas 5 -->
+        <div class="p-4 rounded-xl glass-card border border-slate-800 text-center space-y-2">
+          <div class="w-10 h-10 mx-auto rounded-lg bg-navy-900 flex items-center justify-center text-amber-400">
+            <i data-lucide="music" class="w-5 h-5"></i>
+          </div>
+          <p class="text-xs font-bold text-slate-200">Ruang Musik & Seni Budaya</p>
+        </div>
+
+        <!-- Fasilitas 6 -->
+        <div class="p-4 rounded-xl glass-card border border-slate-800 text-center space-y-2">
+          <div class="w-10 h-10 mx-auto rounded-lg bg-navy-900 flex items-center justify-center text-amber-400">
+            <i data-lucide="church" class="w-5 h-5"></i>
+          </div>
+          <p class="text-xs font-bold text-slate-200">Kapel Ibadah Terpadu</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 5: KONTAK DARURAT, TATA USAHA & LOKASI -->
+    <section id="kontak-lokasi" class="glass-card rounded-3xl p-6 sm:p-10 border border-slate-800 scroll-mt-20 space-y-8">
+      <div class="border-b border-slate-800 pb-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <span class="text-xs font-bold uppercase tracking-wider text-amber-400">Layanan Darurat & Administrasi</span>
+          <h3 class="text-2xl font-bold text-white mt-1">Kontak Resmi & Alamat Kampus</h3>
+        </div>
+        <div class="text-xs text-slate-400 font-mono">
+          Operasional TU: Senin – Jumat (07.30 – 14.30 WIB)
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        
+        <!-- Kontak 1: SPMB -->
+        <div class="p-5 rounded-2xl bg-navy-900/80 border border-slate-800 space-y-3">
+          <div class="flex items-center gap-2 text-emerald-400">
+            <i data-lucide="message-circle" class="w-5 h-5"></i>
+            <h4 class="font-bold text-white text-sm">Sekretariat SPMB / Pendaftaran</h4>
+          </div>
+          <p class="text-xs text-slate-400">Pertanyaan pendaftaran, syarat berkas, dan informasi kuota siswa baru.</p>
+          <a href="https://wa.me/6285183163610" target="_blank" class="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-400 hover:text-emerald-300">
+            Chat WhatsApp: 0851-8316-3610 &rarr;
+          </a>
+        </div>
+
+        <!-- Kontak 2: Administrasi / TU -->
+        <div class="p-5 rounded-2xl bg-navy-900/80 border border-slate-800 space-y-3">
+          <div class="flex items-center gap-2 text-blue-400">
+            <i data-lucide="file-text" class="w-5 h-5"></i>
+            <h4 class="font-bold text-white text-sm">Tata Usaha & Legalisir Alumni</h4>
+          </div>
+          <p class="text-xs text-slate-400">Layanan administrasi berkas siswa aktif dan permohonan legalisir ijazah alumni.</p>
+          <div class="text-xs text-slate-300">
+            Langsung ke kantor TU di Kompleks Perguruan Methodist Immanuel pada jam kerja.
+          </div>
+        </div>
+
+        <!-- Kontak 3: Lokasi -->
+        <div class="p-5 rounded-2xl bg-navy-900/80 border border-slate-800 space-y-3">
+          <div class="flex items-center gap-2 text-amber-400">
+            <i data-lucide="map-pin" class="w-5 h-5"></i>
+            <h4 class="font-bold text-white text-sm">Alamat Kampus</h4>
+          </div>
+          <p class="text-xs text-slate-300 leading-relaxed" id="address-text">
+            Jl. Dr. Susilo No. 6, Sumur Batu, Kec. Teluk Betung Utara, Kota Bandar Lampung, Lampung 35214
+          </p>
+          <div class="pt-1 flex items-center gap-3">
+            <button onclick="copyAddress()" class="inline-flex items-center gap-1 text-[11px] font-semibold text-amber-400 hover:text-amber-300">
+              <i data-lucide="copy" class="w-3.5 h-3.5"></i> <span id="copy-label">Salin Alamat</span>
+            </button>
+            <span class="text-slate-600">|</span>
+            <a href="https://maps.google.com/?q=Perguruan+Methodist+Immanuel+Bandar+Lampung" target="_blank" class="inline-flex items-center gap-1 text-[11px] font-semibold text-blue-400 hover:text-blue-300">
+              <i data-lucide="external-link" class="w-3.5 h-3.5"></i> Google Maps
+            </a>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="relative z-10 border-t border-slate-800/80 py-8 text-center text-xs text-slate-400 space-y-2">
+    <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <p>&copy; 2026 Perguruan Kristen Methodist Immanuel Bandar Lampung. Seluruh hak cipta dilindungi.</p>
+      <div class="flex items-center gap-4 text-xs font-medium">
+        <span class="text-slate-400">Host Cadangan: <code class="text-amber-400/90 font-mono">nalarsci.id</code></span>
+        <span>•</span>
+        <span class="text-slate-400">Status Server: <span class="text-emerald-400">Normal Maintenance</span></span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Script Lucide Icons & Clipboard -->
+  <script>
+    lucide.createIcons();
+
+    function copyAddress() {
+      const address = document.getElementById("address-text").innerText;
+      navigator.clipboard.writeText(address).then(() => {
+        const label = document.getElementById("copy-label");
+        label.innerText = "Tersalin ke Clipboard!";
+        label.classList.add("text-emerald-400");
+        setTimeout(() => {
+          label.innerText = "Salin Alamat";
+          label.classList.remove("text-emerald-400");
+        }, 2000);
+      });
+    }
+  </script>
+</body>
+</html>
