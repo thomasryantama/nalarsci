@@ -1,0 +1,1368 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulasi Tekanan Hidrostatis & Christian Worldview - PID</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap');
+        
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            touch-action: manipulation;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .font-mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #090e17;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e293b;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #334155;
+        }
+
+        /* Glow Visuals */
+        .glow-cyan {
+            box-shadow: 0 0 25px rgba(6, 182, 212, 0.3);
+        }
+        .glow-amber {
+            box-shadow: 0 0 25px rgba(245, 158, 11, 0.3);
+        }
+        .glow-emerald {
+            box-shadow: 0 0 25px rgba(16, 185, 129, 0.3);
+        }
+
+        .touch-btn {
+            transition: transform 0.1s ease, background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        .touch-btn:active {
+            transform: scale(0.96);
+        }
+
+        #simCanvas {
+            cursor: crosshair;
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col overflow-x-hidden selection:bg-cyan-500 selection:text-black">
+
+    <!-- TOP NAVIGATION / HEADER FOR PID -->
+    <header class="bg-slate-900/90 border-b border-slate-800 backdrop-blur sticky top-0 z-50 px-5 py-3 flex items-center justify-between shadow-xl">
+        <div class="flex items-center space-x-3.5">
+            <div class="p-2.5 bg-gradient-to-tr from-cyan-600/30 to-blue-500/20 border border-cyan-500/40 rounded-2xl text-cyan-400 shadow-md shadow-cyan-500/10">
+                <i data-lucide="waves" class="w-7 h-7"></i>
+            </div>
+            <div>
+                <div class="flex items-center gap-2">
+                    <h1 class="text-xl font-extrabold tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-sky-300 to-indigo-300">
+                        HYDRO-PHYSICS PID
+                    </h1>
+                    <span class="px-2 py-0.5 rounded-md bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-[10px] font-bold">KELAS VIII</span>
+                </div>
+                <p class="text-xs text-slate-400 font-medium">Hukum Tekanan Hidrostatis & Integrasi Mandat Penatalayanan Ciptaan</p>
+            </div>
+        </div>
+
+        <!-- MODE NAVIGATION TABS -->
+        <nav class="flex bg-slate-950 p-1.5 rounded-2xl border border-slate-800/80 shadow-inner">
+            <button id="tabSim" onclick="switchTab('sim')" class="flex items-center space-x-2 px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all duration-200 bg-cyan-500 text-slate-950 shadow-md glow-cyan touch-btn">
+                <i data-lucide="flask-conical" class="w-4 h-4"></i>
+                <span>Simulasi Lab</span>
+            </button>
+            <button id="tabDam" onclick="switchTab('dam')" class="flex items-center space-x-2 px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all duration-200 text-slate-400 hover:text-slate-200 touch-btn">
+                <i data-lucide="shield-alert" class="w-4 h-4"></i>
+                <span>Game Bendungan</span>
+            </button>
+            <button id="tabQuiz" onclick="switchTab('quiz')" class="flex items-center space-x-2 px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all duration-200 text-slate-400 hover:text-slate-200 touch-btn">
+                <i data-lucide="trophy" class="w-4 h-4"></i>
+                <span>Gameshow & Match</span>
+            </button>
+        </nav>
+
+        <!-- UTILITIES & ACTIONS -->
+        <div class="flex items-center gap-2.5">
+            <button onclick="openWorldviewModal()" class="flex items-center space-x-2 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/40 text-amber-300 px-4 py-2.5 rounded-xl text-xs font-bold transition touch-btn">
+                <i data-lucide="book-open-check" class="w-4 h-4 text-amber-400"></i>
+                <span class="hidden md:inline">Refleksi Worldview</span>
+            </button>
+            <button onclick="toggleAudioMute()" id="btnAudioToggle" title="Audio Efek" class="p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 touch-btn">
+                <i data-lucide="volume-2" id="audioIcon" class="w-4 h-4 text-cyan-400"></i>
+            </button>
+            <button onclick="toggleFullscreen()" title="Layar Penuh" class="p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 touch-btn">
+                <i data-lucide="maximize" class="w-4 h-4"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT CONTAINER -->
+    <main class="flex-1 p-4 lg:p-6 max-w-7xl mx-auto w-full grid grid-cols-1 gap-6">
+
+        <!-- ================= MODE 1: LAB SIMULASI DIGITAL ================= -->
+        <section id="sectionSim" class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            
+            <!-- CONTROLS PANEL (LEFT) -->
+            <div class="lg:col-span-4 flex flex-col gap-4">
+                
+                <!-- LIQUID DENSITY SELECTOR -->
+                <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 sm:p-5 shadow-lg">
+                    <label class="text-xs font-bold uppercase tracking-wider text-cyan-400 flex items-center space-x-2 mb-3">
+                        <i data-lucide="droplet" class="w-4 h-4"></i>
+                        <span>Pilih Jenis Fluida (&rho;)</span>
+                    </label>
+                    <div class="grid grid-cols-3 gap-2">
+                        <button onclick="setFluid('oil', 800, '#f59e0b', 'Minyak')" id="btnOil" class="fluid-btn p-3 rounded-xl border border-slate-800 bg-slate-950 text-slate-300 font-semibold text-xs flex flex-col items-center gap-1.5 touch-btn">
+                            <span class="w-3.5 h-3.5 rounded-full bg-amber-500 inline-block shadow"></span>
+                            <span>Minyak</span>
+                            <span class="text-[10px] text-slate-400 font-mono">800 kg/m³</span>
+                        </button>
+                        <button onclick="setFluid('water', 1000, '#38bdf8', 'Air Murni')" id="btnWater" class="fluid-btn p-3 rounded-xl border-2 border-cyan-500 bg-cyan-950/40 text-cyan-300 font-semibold text-xs flex flex-col items-center gap-1.5 touch-btn glow-cyan">
+                            <span class="w-3.5 h-3.5 rounded-full bg-sky-400 inline-block shadow"></span>
+                            <span>Air Murni</span>
+                            <span class="text-[10px] text-cyan-200 font-mono">1000 kg/m³</span>
+                        </button>
+                        <button onclick="setFluid('salt', 1025, '#818cf8', 'Air Laut')" id="btnSalt" class="fluid-btn p-3 rounded-xl border border-slate-800 bg-slate-950 text-slate-300 font-semibold text-xs flex flex-col items-center gap-1.5 touch-btn">
+                            <span class="w-3.5 h-3.5 rounded-full bg-indigo-400 inline-block shadow"></span>
+                            <span>Air Laut</span>
+                            <span class="text-[10px] text-slate-400 font-mono">1025 kg/m³</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- GRAVITY & ACCELERATION -->
+                <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 sm:p-5 shadow-lg">
+                    <div class="flex justify-between items-center mb-3">
+                        <label class="text-xs font-bold uppercase tracking-wider text-emerald-400 flex items-center space-x-2">
+                            <i data-lucide="globe" class="w-4 h-4"></i>
+                            <span>Percepatan Gravitasi (g)</span>
+                        </label>
+                        <span id="gravValue" class="text-xs font-mono font-bold text-emerald-300 bg-emerald-950/60 px-2.5 py-1 rounded-lg border border-emerald-500/30">9.80 m/s²</span>
+                    </div>
+                    
+                    <input type="range" id="gravSlider" min="1.0" max="25.0" step="0.1" value="9.8" oninput="updateGravity(this.value)" class="w-full accent-emerald-500 h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer mb-3">
+                    
+                    <div class="grid grid-cols-3 gap-2">
+                        <button onclick="setGravityPreset('Bulan', 1.62)" id="btnGravMoon" class="grav-btn p-2 bg-slate-950 hover:bg-slate-800 rounded-xl text-xs font-medium text-slate-300 border border-slate-800 touch-btn">🌕 Bulan (1.62)</button>
+                        <button onclick="setGravityPreset('Bumi', 9.8)" id="btnGravEarth" class="grav-btn p-2 bg-emerald-950/60 border border-emerald-500/60 rounded-xl text-xs font-bold text-emerald-300 touch-btn">🌍 Bumi (9.8)</button>
+                        <button onclick="setGravityPreset('Jupiter', 24.79)" id="btnGravJupiter" class="grav-btn p-2 bg-slate-950 hover:bg-slate-800 rounded-xl text-xs font-medium text-slate-300 border border-slate-800 touch-btn">🪐 Jupiter (24.8)</button>
+                    </div>
+                </div>
+
+                <!-- HOLE NOZZLE CONTROLS (TORRICELLI) -->
+                <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 sm:p-5 shadow-lg">
+                    <div class="flex items-center justify-between mb-3">
+                        <label class="text-xs font-bold uppercase tracking-wider text-indigo-400 flex items-center space-x-2">
+                            <i data-lucide="disc" class="w-4 h-4"></i>
+                            <span>Katup Uji Pancaran (Torricelli)</span>
+                        </label>
+                        <button onclick="closeAllHoles()" class="text-[10px] text-slate-400 hover:text-red-400 underline font-semibold">Tutup Semua</button>
+                    </div>
+                    <div class="space-y-2">
+                        <button onclick="toggleHole(1)" id="btnHole1" class="w-full p-2.5 bg-slate-950 border border-red-500/30 text-slate-200 rounded-xl font-bold text-xs flex justify-between items-center touch-btn">
+                            <span class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-red-400"></span> Lubang A (Kedalaman 1.0 m)</span>
+                            <span id="stHole1" class="px-2 py-0.5 rounded bg-red-500/20 text-red-400 text-[10px]">TERTUTUP</span>
+                        </button>
+                        <button onclick="toggleHole(2)" id="btnHole2" class="w-full p-2.5 bg-slate-950 border border-red-500/30 text-slate-200 rounded-xl font-bold text-xs flex justify-between items-center touch-btn">
+                            <span class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-red-400"></span> Lubang B (Kedalaman 2.5 m)</span>
+                            <span id="stHole2" class="px-2 py-0.5 rounded bg-red-500/20 text-red-400 text-[10px]">TERTUTUP</span>
+                        </button>
+                        <button onclick="toggleHole(3)" id="btnHole3" class="w-full p-2.5 bg-slate-950 border border-red-500/30 text-slate-200 rounded-xl font-bold text-xs flex justify-between items-center touch-btn">
+                            <span class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-red-400"></span> Lubang C (Kedalaman 4.0 m)</span>
+                            <span id="stHole3" class="px-2 py-0.5 rounded bg-red-500/20 text-red-400 text-[10px]">TERTUTUP</span>
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- SIMULATION CANVAS & SENSOR DISPLAY (RIGHT) -->
+            <div class="lg:col-span-8 flex flex-col gap-4">
+                
+                <!-- CANVAS DISPLAY AREA -->
+                <div class="relative bg-slate-900 border border-slate-800 rounded-3xl p-4 overflow-hidden shadow-2xl flex-1 flex flex-col items-center justify-center min-h-[440px]">
+                    
+                    <!-- HUD SENSOR READOUT BOX -->
+                    <div class="absolute top-4 right-4 bg-slate-950/90 border border-cyan-500/40 backdrop-blur rounded-2xl p-4 shadow-2xl z-20 min-w-[210px]">
+                        <div class="flex items-center justify-between border-b border-slate-800 pb-2 mb-2">
+                            <span class="text-xs font-bold text-cyan-400 flex items-center gap-1.5">
+                                <i data-lucide="gauge" class="w-4 h-4"></i>
+                                MANOMETER SENSOR
+                            </span>
+                            <span class="inline-block w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
+                        </div>
+                        <div class="space-y-1.5">
+                            <div class="flex justify-between text-xs">
+                                <span class="text-slate-400">Kedalaman (h):</span>
+                                <span id="readDepth" class="font-mono text-cyan-300 font-bold">2.00 m</span>
+                            </div>
+                            <div class="flex justify-between text-xs">
+                                <span class="text-slate-400">Massa Jenis (&rho;):</span>
+                                <span id="readDensity" class="font-mono text-slate-200 font-semibold">1000 kg/m³</span>
+                            </div>
+                            <div class="flex justify-between text-xs">
+                                <span class="text-slate-400">Gravitasi (g):</span>
+                                <span id="readGravity" class="font-mono text-slate-200 font-semibold">9.80 m/s²</span>
+                            </div>
+                            <div class="pt-2 border-t border-slate-800 flex justify-between items-baseline">
+                                <span class="text-xs font-bold text-slate-300">Tekanan Hidrostatis (P):</span>
+                                <span id="readPressure" class="font-mono text-xl font-extrabold text-amber-400">19.60 kPa</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- INSTRUCTION OVERLAY -->
+                    <div class="absolute top-4 left-4 text-xs bg-slate-950/80 border border-slate-800 px-3.5 py-2 rounded-xl text-slate-300 z-10 pointer-events-none flex items-center gap-2">
+                        <span class="text-amber-400">💡</span>
+                        <span>Sentuh & geser sensor lingkaran kuning di dalam tangki air.</span>
+                    </div>
+
+                    <!-- SIMULATION CANVAS -->
+                    <canvas id="simCanvas" class="w-full h-[400px] rounded-2xl bg-slate-950 border border-slate-800/80"></canvas>
+                </div>
+
+                <!-- CHRISTIAN WORLDVIEW INSIGHT CARD -->
+                <div class="bg-gradient-to-r from-amber-950/25 via-slate-900 to-slate-900 border border-amber-500/30 rounded-2xl p-4 sm:p-5 flex items-start space-x-4 shadow-lg">
+                    <div class="p-3 bg-amber-500/10 border border-amber-500/30 rounded-2xl text-amber-400 flex-shrink-0">
+                        <i data-lucide="compass" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xs font-bold text-amber-300 tracking-wider uppercase flex items-center gap-2">
+                            <span>Integrasi Iman & Sains: Hukum Alam yang Setia</span>
+                        </h3>
+                        <p class="text-xs text-slate-300 mt-1 leading-relaxed">
+                            Hubungan matematis <span class="font-mono text-cyan-300 font-bold">P = &rho; &times; g &times; h</span> selalu konstan dan dapat diandalkan karena Allah memelihara semesta dengan setia (Kolose 1:17). Kepastian ini memungkinkan para insinyur merancang kapal selam, alat selam penyelamat, hingga bendungan yang melindungi jutaan jiwa manusia.
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- ================= MODE 2: GAME BENDUNGAN ================= -->
+        <section id="sectionDam" class="hidden grid grid-cols-1 lg:grid-cols-12 gap-6">
+            
+            <!-- DAM BUILDER PANEL -->
+            <div class="lg:col-span-5 bg-slate-900/90 border border-slate-800 rounded-3xl p-6 flex flex-col justify-between shadow-2xl">
+                <div>
+                    <div class="flex justify-between items-center border-b border-slate-800 pb-4 mb-5">
+                        <div>
+                            <span class="text-xs font-bold text-amber-400 tracking-widest uppercase">Misi Insinyur Sipil Kristen</span>
+                            <h2 class="text-lg font-extrabold text-slate-100">Desain Dinding Penahan Banjir</h2>
+                        </div>
+                        <div class="p-2.5 bg-amber-500/10 border border-amber-500/30 rounded-xl text-amber-400">
+                            <i data-lucide="hard-hat" class="w-6 h-6"></i>
+                        </div>
+                    </div>
+
+                    <p class="text-xs text-slate-300 mb-5 leading-relaxed">
+                        Desa di lembah bergantung pada bendungan ini! Karena tekanan hidrostatis bertambah seiring kedalaman (<span class="text-cyan-300 font-mono">P = &rho;gh</span>), atur ketebalan dinding beton di 3 zona agar bendungan tidak jebol.
+                    </p>
+
+                    <!-- SECTION SLIDERS -->
+                    <div class="space-y-4">
+                        
+                        <!-- Top Wall Thickness -->
+                        <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800">
+                            <div class="flex justify-between text-xs font-bold mb-2">
+                                <span class="text-slate-300">Zona 1 (Atas - Kedalaman Dangkal)</span>
+                                <span id="valThicknessTop" class="text-cyan-400 font-mono">2.0 m</span>
+                            </div>
+                            <input type="range" id="thickTop" min="1.0" max="10.0" step="0.5" value="2.0" oninput="updateDamConfig()" class="w-full accent-cyan-500 h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer">
+                            <div class="flex justify-between text-[10px] text-slate-500 mt-1">
+                                <span>1.0 m</span>
+                                <span>Syarat Min: 2.0 m</span>
+                                <span>10.0 m</span>
+                            </div>
+                        </div>
+
+                        <!-- Mid Wall Thickness -->
+                        <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800">
+                            <div class="flex justify-between text-xs font-bold mb-2">
+                                <span class="text-slate-300">Zona 2 (Tengah - Tekanan Sedang)</span>
+                                <span id="valThicknessMid" class="text-cyan-400 font-mono">3.0 m</span>
+                            </div>
+                            <input type="range" id="thickMid" min="1.0" max="10.0" step="0.5" value="3.0" oninput="updateDamConfig()" class="w-full accent-cyan-500 h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer">
+                            <div class="flex justify-between text-[10px] text-slate-500 mt-1">
+                                <span>1.0 m</span>
+                                <span>Syarat Min: 4.5 m</span>
+                                <span>10.0 m</span>
+                            </div>
+                        </div>
+
+                        <!-- Bottom Wall Thickness -->
+                        <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800">
+                            <div class="flex justify-between text-xs font-bold mb-2">
+                                <span class="text-slate-300">Zona 3 (Dasar - Tekanan Maksimum!)</span>
+                                <span id="valThicknessBot" class="text-cyan-400 font-mono">4.0 m</span>
+                            </div>
+                            <input type="range" id="thickBot" min="1.0" max="10.0" step="0.5" value="4.0" oninput="updateDamConfig()" class="w-full accent-cyan-500 h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer">
+                            <div class="flex justify-between text-[10px] text-slate-500 mt-1">
+                                <span>1.0 m</span>
+                                <span>Syarat Min: 8.0 m</span>
+                                <span>10.0 m</span>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="mt-6 pt-4 border-t border-slate-800 flex gap-3">
+                    <button onclick="testDamSafety()" class="flex-1 py-4 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 font-extrabold text-sm rounded-2xl shadow-lg glow-emerald touch-btn flex items-center justify-center space-x-2">
+                        <i data-lucide="play" class="w-5 h-5 fill-current"></i>
+                        <span>UJI KEKUATAN STRUKTUR BENDUNGAN</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- DAM VISUALIZATION & SIMULATION -->
+            <div class="lg:col-span-7 bg-slate-900 border border-slate-800 rounded-3xl p-4 flex flex-col justify-between relative overflow-hidden shadow-2xl min-h-[480px]">
+                
+                <!-- STATUS HUD -->
+                <div class="absolute top-6 left-6 z-10 bg-slate-950/85 border border-slate-800 backdrop-blur px-4 py-2 rounded-2xl flex items-center space-x-3 shadow-lg">
+                    <div id="damStatusBadge" class="w-3 h-3 rounded-full bg-slate-500"></div>
+                    <span id="damStatusText" class="text-xs font-bold text-slate-300">Status Bendungan: SIAP DIUJI</span>
+                </div>
+
+                <canvas id="damCanvas" class="w-full h-full rounded-2xl bg-slate-950 border border-slate-800/80"></canvas>
+
+                <!-- FEEDBACK DIALOG BOX -->
+                <div id="damFeedback" class="hidden absolute bottom-6 left-6 right-6 p-4 rounded-2xl border backdrop-blur transition-all shadow-2xl"></div>
+            </div>
+
+        </section>
+
+        <!-- ================= MODE 3: GAMESHOW & MATCH-UP ================= -->
+        <section id="sectionQuiz" class="hidden grid grid-cols-1 lg:grid-cols-12 gap-6">
+            
+            <!-- SUB TAB NAVIGATION FOR GAMES -->
+            <div class="lg:col-span-12 flex justify-center mb-1">
+                <div class="bg-slate-900 border border-slate-800 p-1.5 rounded-2xl flex space-x-2">
+                    <button onclick="switchGameSub('quiz')" id="subTabQuiz" class="px-6 py-2.5 rounded-xl font-bold text-xs bg-amber-500 text-slate-950 shadow-md transition touch-btn">
+                        🏆 Kuis Gameshow
+                    </button>
+                    <button onclick="switchGameSub('match')" id="subTabMatch" class="px-6 py-2.5 rounded-xl font-bold text-xs text-slate-400 hover:text-slate-200 transition touch-btn">
+                        🔗 Match-Up Konsep Fisika
+                    </button>
+                </div>
+            </div>
+
+            <!-- GAMESHOW QUIZ CONTAINER -->
+            <div id="quizContainer" class="lg:col-span-12 bg-slate-900/90 border border-slate-800 rounded-3xl p-6 lg:p-8 shadow-2xl flex flex-col justify-between min-h-[480px]">
+                
+                <!-- QUIZ HEADER -->
+                <div class="flex justify-between items-center border-b border-slate-800 pb-4">
+                    <div class="flex items-center space-x-3">
+                        <span id="quizStep" class="px-3 py-1 bg-amber-500/20 border border-amber-500/40 text-amber-300 font-mono text-xs font-bold rounded-lg">Soal 1 / 5</span>
+                        <h2 class="text-sm sm:text-base font-bold text-slate-200">Kuis Tekanan Hidrostatis & Worldview</h2>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <div class="flex items-center space-x-1.5 bg-slate-950 px-3 py-1.5 rounded-xl border border-slate-800">
+                            <i data-lucide="timer" class="w-4 h-4 text-cyan-400"></i>
+                            <span id="quizTimer" class="font-mono font-bold text-cyan-300 text-sm">20s</span>
+                        </div>
+                        <div class="flex items-center space-x-1.5 bg-slate-950 px-3 py-1.5 rounded-xl border border-slate-800">
+                            <i data-lucide="star" class="w-4 h-4 text-amber-400 fill-amber-400"></i>
+                            <span id="quizScore" class="font-mono font-bold text-amber-300 text-sm">0 PTS</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- QUESTION DISPLAY -->
+                <div class="my-6">
+                    <h3 id="questionText" class="text-base sm:text-xl font-extrabold text-slate-100 leading-relaxed">
+                        -- Memuat Soal Kuis --
+                    </h3>
+                </div>
+
+                <!-- OPTIONS GRID -->
+                <div id="quizOptions" class="grid grid-cols-1 md:grid-cols-2 gap-3.5 mb-6"></div>
+
+                <!-- EXPLANATION BOX -->
+                <div id="quizExplanation" class="hidden p-4 rounded-2xl bg-slate-950 border border-slate-800 text-xs leading-relaxed"></div>
+
+                <!-- NEXT BUTTON -->
+                <div class="flex justify-end pt-4 border-t border-slate-800">
+                    <button id="btnNextQuiz" onclick="nextQuestion()" class="hidden px-6 py-3 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-extrabold text-xs rounded-xl shadow-lg glow-cyan touch-btn flex items-center space-x-2">
+                        <span>Lanjutkan Pertanyaan</span>
+                        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- MATCH-UP GAME CONTAINER -->
+            <div id="matchContainer" class="hidden lg:col-span-12 bg-slate-900/90 border border-slate-800 rounded-3xl p-6 lg:p-8 shadow-2xl">
+                <div class="border-b border-slate-800 pb-4 mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h2 class="text-lg font-bold text-slate-100">Match-Up: Pasangkan Fenomena & Konsep</h2>
+                            <span id="matchScoreBadge" class="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 text-xs font-mono font-bold">0 / 4 Selesai</span>
+                        </div>
+                        <p class="text-xs text-slate-400 mt-0.5">Ketuk 1 kartu fenomena di sebelah kiri, lalu ketuk penjelasannya di sebelah kanan!</p>
+                    </div>
+                    <button onclick="initMatchGame()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-bold border border-slate-700 touch-btn flex items-center gap-2">
+                        <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+                        <span>Reset Game</span>
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-3" id="matchLeftCol"></div>
+                    <div class="space-y-3" id="matchRightCol"></div>
+                </div>
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- CHRISTIAN WORLDVIEW MODAL -->
+    <div id="worldviewModal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-amber-500/40 rounded-3xl max-w-2xl w-full p-6 lg:p-8 shadow-2xl relative overflow-hidden">
+            
+            <button onclick="closeWorldviewModal()" class="absolute top-5 right-5 text-slate-400 hover:text-slate-200 p-1">
+                <i data-lucide="x" class="w-6 h-6"></i>
+            </button>
+
+            <div class="flex items-center space-x-3 mb-6">
+                <div class="p-3 bg-amber-500/10 border border-amber-500/30 rounded-2xl text-amber-400">
+                    <i data-lucide="book-open" class="w-7 h-7"></i>
+                </div>
+                <div>
+                    <h2 class="text-xl font-extrabold text-slate-100">Integrasi Christian Worldview</h2>
+                    <p class="text-xs text-amber-400 font-semibold">Kerangka Alkitabiah: Creation, Fall, Redemption, Restoration (CFRR)</p>
+                </div>
+            </div>
+
+            <div class="space-y-4 text-xs leading-relaxed text-slate-300 max-h-[60vh] overflow-y-auto pr-2">
+                <div class="p-4 bg-slate-950 rounded-2xl border border-slate-800">
+                    <h3 class="font-bold text-cyan-300 text-sm mb-1 flex items-center gap-2">
+                        <span>1. CREATION (Penciptaan & Keteraturan)</span>
+                    </h3>
+                    <p>Allah menciptakan alam semesta berlandaskan hukum fisika yang pasti dan konsisten. Rumus <span class="font-mono text-cyan-300 font-bold">P = &rho;&times;g&times;h</span> bukanlah kebetulan liar, melainkan cerminan kesetiaan dan ketertiban Sang Khalik yang menopang semesta (Ayub 38:8-11; Kolose 1:17).</p>
+                </div>
+
+                <div class="p-4 bg-slate-950 rounded-2xl border border-slate-800">
+                    <h3 class="font-bold text-rose-400 text-sm mb-1 flex items-center gap-2">
+                        <span>2. FALL (Dampak Kejatuhan & Keserakahan)</span>
+                    </h3>
+                    <p>Dosa memicu kelalaian, keserakahan, dan korupsi material. Mengabaikan kalkulasi hukum alam demi menekan biaya (misalnya memangkas ketebalan dasar bendungan) dapat meruntuhkan konstruksi dan merenggut ribuan nyawa tak berdosa.</p>
+                </div>
+
+                <div class="p-4 bg-slate-950 rounded-2xl border border-slate-800">
+                    <h3 class="font-bold text-emerald-400 text-sm mb-1 flex items-center gap-2">
+                        <span>3. REDEMPTION & RESTORATION (Penatalayanan & Kasih)</span>
+                    </h3>
+                    <p>Orang percaya dipanggil memperbarui cara berpikirnya. Menekuni fisika dan teknik adalah mandat penatalayanan (<strong class="text-amber-200">Stewardship</strong>, Kejadian 1:28). Para insinyur Kristen menggunakan ilmu hidrostatis untuk menciptakan teknologi pencegah banjir, kapal selam penyelamat, dan pemurnian air bersih demi memuliakan Allah dan mengasihi sesama.</p>
+                </div>
+            </div>
+
+            <div class="mt-6 pt-4 border-t border-slate-800 flex justify-end">
+                <button onclick="closeWorldviewModal()" class="px-6 py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs rounded-xl shadow-md touch-btn">
+                    Saya Mengerti & Siap Mengaplikasikannya
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT APPLICATION LOGIC -->
+    <script>
+        /* ================= Web Audio API Synthesizer ================= */
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        let audioCtx = null;
+        let isAudioMuted = false;
+
+        function getAudioContext() {
+            if (!audioCtx) {
+                audioCtx = new AudioContext();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            return audioCtx;
+        }
+
+        function playSound(type) {
+            if (isAudioMuted) return;
+            try {
+                const ctx = getAudioContext();
+                const now = ctx.currentTime;
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+
+                if (type === 'click') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(480, now);
+                    gain.gain.setValueAtTime(0.08, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+                    osc.start(now);
+                    osc.stop(now + 0.05);
+                } else if (type === 'splash') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(220, now);
+                    osc.frequency.exponentialRampToValueAtTime(140, now + 0.15);
+                    gain.gain.setValueAtTime(0.12, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+                    osc.start(now);
+                    osc.stop(now + 0.15);
+                } else if (type === 'correct') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(523.25, now);
+                    osc.frequency.exponentialRampToValueAtTime(659.25, now + 0.08);
+                    osc.frequency.exponentialRampToValueAtTime(783.99, now + 0.16);
+                    gain.gain.setValueAtTime(0.25, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+                    osc.start(now);
+                    osc.stop(now + 0.35);
+                } else if (type === 'wrong') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(160, now);
+                    osc.frequency.setValueAtTime(110, now + 0.12);
+                    gain.gain.setValueAtTime(0.3, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.28);
+                    osc.start(now);
+                    osc.stop(now + 0.28);
+                } else if (type === 'alarm') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(440, now);
+                    osc.frequency.setValueAtTime(330, now + 0.15);
+                    gain.gain.setValueAtTime(0.3, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+                    osc.start(now);
+                    osc.stop(now + 0.4);
+                } else if (type === 'victory') {
+                    const freqs = [523.25, 659.25, 783.99, 1046.50];
+                    freqs.forEach((f, idx) => {
+                        const o = ctx.createOscillator();
+                        const g = ctx.createGain();
+                        o.connect(g);
+                        g.connect(ctx.destination);
+                        o.frequency.setValueAtTime(f, now + idx * 0.08);
+                        g.gain.setValueAtTime(0.18, now + idx * 0.08);
+                        g.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.08 + 0.22);
+                        o.start(now + idx * 0.08);
+                        o.stop(now + idx * 0.08 + 0.22);
+                    });
+                }
+            } catch(e) {}
+        }
+
+        function toggleAudioMute() {
+            isAudioMuted = !isAudioMuted;
+            const icon = document.getElementById('audioIcon');
+            if (isAudioMuted) {
+                icon.setAttribute('data-lucide', 'volume-x');
+                icon.classList.remove('text-cyan-400');
+                icon.classList.add('text-slate-500');
+            } else {
+                icon.setAttribute('data-lucide', 'volume-2');
+                icon.classList.remove('text-slate-500');
+                icon.classList.add('text-cyan-400');
+                playSound('click');
+            }
+            lucide.createIcons();
+        }
+
+        /* ================= Global State ================= */
+        let activeTab = 'sim';
+        let fluidDensity = 1000;
+        let fluidColor = '#38bdf8';
+        let fluidName = 'Air Murni';
+        let gravity = 9.8;
+        
+        let holes = [
+            { id: 1, depth: 1.0, active: false, yFrac: 0.25 },
+            { id: 2, depth: 2.5, active: false, yFrac: 0.55 },
+            { id: 3, depth: 4.0, active: false, yFrac: 0.85 }
+        ];
+
+        let sensorPos = { depth: 2.0, x: 0.5 };
+        let isDraggingSensor = false;
+
+        /* ================= Canvas Engine & Setup ================= */
+        const canvas = document.getElementById('simCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            const dpr = window.devicePixelRatio || 1;
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+            ctx.scale(dpr, dpr);
+        }
+
+        window.addEventListener('resize', () => {
+            resizeCanvas();
+            resizeDamCanvas();
+        });
+
+        /* ================= Tab Switcher ================= */
+        function switchTab(tab) {
+            playSound('click');
+            activeTab = tab;
+            
+            document.getElementById('sectionSim').classList.add('hidden');
+            document.getElementById('sectionDam').classList.add('hidden');
+            document.getElementById('sectionQuiz').classList.add('hidden');
+
+            document.getElementById('tabSim').className = "flex items-center space-x-2 px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all duration-200 text-slate-400 hover:text-slate-200 touch-btn";
+            document.getElementById('tabDam').className = "flex items-center space-x-2 px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all duration-200 text-slate-400 hover:text-slate-200 touch-btn";
+            document.getElementById('tabQuiz').className = "flex items-center space-x-2 px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all duration-200 text-slate-400 hover:text-slate-200 touch-btn";
+
+            if (tab === 'sim') {
+                document.getElementById('sectionSim').classList.remove('hidden');
+                document.getElementById('tabSim').className = "flex items-center space-x-2 px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all duration-200 bg-cyan-500 text-slate-950 shadow-md glow-cyan touch-btn";
+                resizeCanvas();
+            } else if (tab === 'dam') {
+                document.getElementById('sectionDam').classList.remove('hidden');
+                document.getElementById('tabDam').className = "flex items-center space-x-2 px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all duration-200 bg-amber-500 text-slate-950 shadow-md glow-amber touch-btn";
+                resizeDamCanvas();
+            } else if (tab === 'quiz') {
+                document.getElementById('sectionQuiz').classList.remove('hidden');
+                document.getElementById('tabQuiz').className = "flex items-center space-x-2 px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all duration-200 bg-emerald-500 text-slate-950 shadow-md glow-emerald touch-btn";
+            }
+            lucide.createIcons();
+        }
+
+        /* ================= Mode 1: Lab Simulasi Engine ================= */
+        function setFluid(type, density, color, name) {
+            playSound('splash');
+            fluidDensity = density;
+            fluidColor = color;
+            fluidName = name;
+
+            document.querySelectorAll('.fluid-btn').forEach(btn => {
+                btn.className = "fluid-btn p-3 rounded-xl border border-slate-800 bg-slate-950 text-slate-300 font-semibold text-xs flex flex-col items-center gap-1.5 touch-btn";
+            });
+
+            if (type === 'oil') document.getElementById('btnOil').className = "fluid-btn p-3 rounded-xl border-2 border-amber-500 bg-amber-950/40 text-amber-300 font-semibold text-xs flex flex-col items-center gap-1.5 touch-btn glow-amber";
+            if (type === 'water') document.getElementById('btnWater').className = "fluid-btn p-3 rounded-xl border-2 border-cyan-500 bg-cyan-950/40 text-cyan-300 font-semibold text-xs flex flex-col items-center gap-1.5 touch-btn glow-cyan";
+            if (type === 'salt') document.getElementById('btnSalt').className = "fluid-btn p-3 rounded-xl border-2 border-indigo-500 bg-indigo-950/40 text-indigo-300 font-semibold text-xs flex flex-col items-center gap-1.5 touch-btn";
+
+            updateSensorReadout();
+        }
+
+        function updateGravity(val) {
+            gravity = parseFloat(val);
+            document.getElementById('gravValue').innerText = `${gravity.toFixed(2)} m/s²`;
+            document.querySelectorAll('.grav-btn').forEach(b => {
+                b.className = "grav-btn p-2 bg-slate-950 hover:bg-slate-800 rounded-xl text-xs font-medium text-slate-300 border border-slate-800 touch-btn";
+            });
+            updateSensorReadout();
+        }
+
+        function setGravityPreset(planet, val) {
+            playSound('click');
+            document.getElementById('gravSlider').value = val;
+            updateGravity(val);
+            if (planet === 'Bulan') document.getElementById('btnGravMoon').className = "grav-btn p-2 bg-emerald-950/60 border border-emerald-500/60 rounded-xl text-xs font-bold text-emerald-300 touch-btn";
+            if (planet === 'Bumi') document.getElementById('btnGravEarth').className = "grav-btn p-2 bg-emerald-950/60 border border-emerald-500/60 rounded-xl text-xs font-bold text-emerald-300 touch-btn";
+            if (planet === 'Jupiter') document.getElementById('btnGravJupiter').className = "grav-btn p-2 bg-emerald-950/60 border border-emerald-500/60 rounded-xl text-xs font-bold text-emerald-300 touch-btn";
+        }
+
+        function toggleHole(id) {
+            playSound('click');
+            const h = holes.find(x => x.id === id);
+            if (h) {
+                h.active = !h.active;
+                const btn = document.getElementById(`btnHole${id}`);
+                const st = document.getElementById(`stHole${id}`);
+
+                if (h.active) {
+                    playSound('splash');
+                    btn.className = "w-full p-2.5 bg-emerald-950/40 border border-emerald-500/50 text-emerald-300 rounded-xl font-bold text-xs flex justify-between items-center touch-btn";
+                    st.className = "px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 text-[10px]";
+                    st.innerText = "MEMANCAR";
+                } else {
+                    btn.className = "w-full p-2.5 bg-slate-950 border border-red-500/30 text-slate-200 rounded-xl font-bold text-xs flex justify-between items-center touch-btn";
+                    st.className = "px-2 py-0.5 rounded bg-red-500/20 text-red-400 text-[10px]";
+                    st.innerText = "TERTUTUP";
+                }
+            }
+        }
+
+        function closeAllHoles() {
+            playSound('click');
+            holes.forEach(h => {
+                h.active = false;
+                const btn = document.getElementById(`btnHole${h.id}`);
+                const st = document.getElementById(`stHole${h.id}`);
+                btn.className = "w-full p-2.5 bg-slate-950 border border-red-500/30 text-slate-200 rounded-xl font-bold text-xs flex justify-between items-center touch-btn";
+                st.className = "px-2 py-0.5 rounded bg-red-500/20 text-red-400 text-[10px]";
+                st.innerText = "TERTUTUP";
+            });
+        }
+
+        function updateSensorReadout() {
+            document.getElementById('readDepth').innerText = `${sensorPos.depth.toFixed(2)} m`;
+            document.getElementById('readDensity').innerText = `${fluidDensity} kg/m³`;
+            document.getElementById('readGravity').innerText = `${gravity.toFixed(2)} m/s²`;
+            
+            // P = rho * g * h (Pa) -> convert to kPa (/1000)
+            const pressureKPa = (fluidDensity * gravity * sensorPos.depth) / 1000;
+            document.getElementById('readPressure').innerText = `${pressureKPa.toFixed(2)} kPa`;
+        }
+
+        /* ================= Render Lab Simulation Loop ================= */
+        let animParticles = [];
+
+        function drawSim() {
+            const rect = canvas.getBoundingClientRect();
+            const w = rect.width;
+            const h = rect.height;
+
+            ctx.clearRect(0, 0, w, h);
+
+            // Tank layout metrics
+            const tankWidth = w * 0.44;
+            const tankHeight = h * 0.76;
+            const tankX = w * 0.08;
+            const tankY = h * 0.14;
+
+            // Gradient Fluid Fill
+            const fluidGrad = ctx.createLinearGradient(tankX, tankY, tankX, tankY + tankHeight);
+            fluidGrad.addColorStop(0, fluidColor + '55');
+            fluidGrad.addColorStop(1, fluidColor + 'cc'); // Lebih pekat di dasar mencerminkan densitas tekanan
+
+            ctx.fillStyle = fluidGrad;
+            ctx.fillRect(tankX, tankY, tankWidth, tankHeight);
+
+            // Tank Border Glass Frame
+            ctx.strokeStyle = '#475569';
+            ctx.lineWidth = 3;
+            ctx.strokeRect(tankX, tankY, tankWidth, tankHeight);
+
+            // Water Surface Wave Effect
+            ctx.fillStyle = fluidColor;
+            ctx.fillRect(tankX, tankY - 3, tankWidth, 5);
+
+            // Depth Ruler Markers
+            ctx.fillStyle = '#94a3b8';
+            ctx.font = '10px monospace';
+            for (let d = 0; d <= 4.5; d += 1.0) {
+                const yPos = tankY + (d / 4.5) * tankHeight;
+                ctx.fillStyle = '#64748b';
+                ctx.fillRect(tankX - 8, yPos, 8, 2);
+                ctx.fillStyle = '#cbd5e1';
+                ctx.fillText(`${d.toFixed(1)}m`, tankX - 40, yPos + 4);
+            }
+
+            // Floor / Ground
+            ctx.fillStyle = '#1e293b';
+            ctx.fillRect(0, tankY + tankHeight + 20, w, 10);
+
+            // Draw Holes and Torricelli Physics Streams (v = sqrt(2gh))
+            holes.forEach(hole => {
+                const holeY = tankY + hole.yFrac * tankHeight;
+                const holeX = tankX + tankWidth;
+
+                // Hole Nozzle
+                ctx.fillStyle = hole.active ? '#10b981' : '#ef4444';
+                ctx.beginPath();
+                ctx.arc(holeX, holeY, 5.5, 0, Math.PI * 2);
+                ctx.fill();
+
+                if (hole.active) {
+                    // Kecepatan murni Torricelli: v = sqrt(2 * g * h)
+                    const v = Math.sqrt(2 * gravity * hole.depth);
+                    const scaleX = 22;
+                    const scaleY = 16;
+                    
+                    ctx.beginPath();
+                    ctx.strokeStyle = fluidColor;
+                    ctx.lineWidth = 4;
+                    ctx.moveTo(holeX, holeY);
+
+                    // Plot kurva parabola pancaran
+                    let px = holeX;
+                    let py = holeY;
+                    for (let t = 0; t < 1.4; t += 0.04) {
+                        px = holeX + v * t * scaleX;
+                        py = holeY + 0.5 * gravity * t * t * scaleY;
+                        if (py > tankY + tankHeight + 20) break;
+                        ctx.lineTo(px, py);
+                    }
+                    ctx.stroke();
+
+                    // Partikel percikan
+                    if (Math.random() < 0.45) {
+                        animParticles.push({
+                            x: holeX,
+                            y: holeY,
+                            vx: v * (0.85 + Math.random() * 0.3) * scaleX,
+                            vy: 0,
+                            life: 1.0
+                        });
+                    }
+                }
+            });
+
+            // Update & Render Partikel
+            for (let i = animParticles.length - 1; i >= 0; i--) {
+                let p = animParticles[i];
+                p.x += p.vx * 0.016;
+                p.y += p.vy * 0.016;
+                p.vy += gravity * 16 * 0.016;
+                p.life -= 0.035;
+
+                ctx.fillStyle = fluidColor;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, 2.5, 0, Math.PI * 2);
+                ctx.fill();
+
+                if (p.life <= 0 || p.y > tankY + tankHeight + 20) {
+                    animParticles.splice(i, 1);
+                }
+            }
+
+            // Draw Pressure Sensor Node & Cable
+            const sensorCanvasY = tankY + (sensorPos.depth / 4.5) * tankHeight;
+            const sensorCanvasX = tankX + sensorPos.x * tankWidth;
+
+            // Sensor Cable
+            ctx.beginPath();
+            ctx.setLineDash([4, 4]);
+            ctx.strokeStyle = '#f59e0b';
+            ctx.lineWidth = 2;
+            ctx.moveTo(sensorCanvasX, 0);
+            ctx.lineTo(sensorCanvasX, sensorCanvasY);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // Sensor Outer Glow Ring
+            ctx.fillStyle = '#f59e0b';
+            ctx.beginPath();
+            ctx.arc(sensorCanvasX, sensorCanvasY, 13, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 2.5;
+            ctx.stroke();
+
+            // Inner Indicator
+            ctx.fillStyle = '#0f172a';
+            ctx.beginPath();
+            ctx.arc(sensorCanvasX, sensorCanvasY, 5, 0, Math.PI * 2);
+            ctx.fill();
+
+            requestAnimationFrame(drawSim);
+        }
+
+        /* Sensor Drag Listeners */
+        function handleSensorMove(clientX, clientY) {
+            const rect = canvas.getBoundingClientRect();
+            const mouseX = clientX - rect.left;
+            const mouseY = clientY - rect.top;
+
+            const tankWidth = rect.width * 0.44;
+            const tankHeight = rect.height * 0.76;
+            const tankX = rect.width * 0.08;
+            const tankY = rect.height * 0.14;
+
+            let relY = (mouseY - tankY) / tankHeight;
+            let relX = (mouseX - tankX) / tankWidth;
+
+            relY = Math.max(0, Math.min(1.0, relY));
+            relX = Math.max(0.1, Math.min(0.9, relX));
+
+            sensorPos.depth = relY * 4.5;
+            sensorPos.x = relX;
+
+            updateSensorReadout();
+        }
+
+        canvas.addEventListener('mousedown', (e) => {
+            isDraggingSensor = true;
+            handleSensorMove(e.clientX, e.clientY);
+        });
+        window.addEventListener('mousemove', (e) => {
+            if (isDraggingSensor && activeTab === 'sim') {
+                handleSensorMove(e.clientX, e.clientY);
+            }
+        });
+        window.addEventListener('mouseup', () => { isDraggingSensor = false; });
+
+        canvas.addEventListener('touchstart', (e) => {
+            if (e.touches.length > 0) {
+                isDraggingSensor = true;
+                handleSensorMove(e.touches[0].clientX, e.touches[0].clientY);
+            }
+        }, { passive: true });
+        canvas.addEventListener('touchmove', (e) => {
+            if (isDraggingSensor && activeTab === 'sim' && e.touches.length > 0) {
+                handleSensorMove(e.touches[0].clientX, e.touches[0].clientY);
+            }
+        }, { passive: true });
+        canvas.addEventListener('touchend', () => { isDraggingSensor = false; });
+
+
+        /* ================= Mode 2: Game Insinyur Bendungan ================= */
+        const damCanvas = document.getElementById('damCanvas');
+        const damCtx = damCanvas.getContext('2d');
+
+        let damConfig = { top: 2.0, mid: 3.0, bot: 4.0 };
+        let damTestState = 'idle';
+
+        function resizeDamCanvas() {
+            const dpr = window.devicePixelRatio || 1;
+            const rect = damCanvas.getBoundingClientRect();
+            damCanvas.width = rect.width * dpr;
+            damCanvas.height = rect.height * dpr;
+            damCtx.scale(dpr, dpr);
+            drawDam();
+        }
+
+        function updateDamConfig() {
+            damConfig.top = parseFloat(document.getElementById('thickTop').value);
+            damConfig.mid = parseFloat(document.getElementById('thickMid').value);
+            damConfig.bot = parseFloat(document.getElementById('thickBot').value);
+
+            document.getElementById('valThicknessTop').innerText = `${damConfig.top.toFixed(1)} m`;
+            document.getElementById('valThicknessMid').innerText = `${damConfig.mid.toFixed(1)} m`;
+            document.getElementById('valThicknessBot').innerText = `${damConfig.bot.toFixed(1)} m`;
+
+            damTestState = 'idle';
+            document.getElementById('damStatusBadge').className = "w-3 h-3 rounded-full bg-slate-500";
+            document.getElementById('damStatusText').innerText = "Status Bendungan: SIAP DIUJI";
+            document.getElementById('damFeedback').classList.add('hidden');
+
+            drawDam();
+        }
+
+        function testDamSafety() {
+            playSound('click');
+            damTestState = 'testing';
+            document.getElementById('damStatusBadge').className = "w-3 h-3 rounded-full bg-amber-400 animate-ping";
+            document.getElementById('damStatusText').innerText = "Status: MENGHITUNG TEKANAN AIR HIDROSTATIS...";
+
+            setTimeout(() => {
+                const isTopOk = damConfig.top >= 2.0;
+                const isMidOk = damConfig.mid >= 4.5;
+                const isBotOk = damConfig.bot >= 8.0;
+
+                const feedback = document.getElementById('damFeedback');
+                feedback.classList.remove('hidden');
+
+                if (isTopOk && isMidOk && isBotOk) {
+                    damTestState = 'success';
+                    playSound('victory');
+                    document.getElementById('damStatusBadge').className = "w-3 h-3 rounded-full bg-emerald-400";
+                    document.getElementById('damStatusText').innerText = "Status: AMAN! DESA TERLINDUNGI";
+
+                    feedback.className = "absolute bottom-6 left-6 right-6 p-4 rounded-2xl border backdrop-blur bg-emerald-950/90 border-emerald-500/60 text-emerald-200 text-xs shadow-2xl";
+                    feedback.innerHTML = `
+                        <div class="flex items-center space-x-2 font-bold text-sm text-emerald-300 mb-1">
+                            <i data-lucide="check-circle-2" class="w-5 h-5"></i>
+                            <span>Konstruksi Sempurna Sesuai Hukum Fisika!</span>
+                        </div>
+                        <p>Desain dinding trapesium melebar ke bawah (${damConfig.bot}m di dasar) menahan tekanan hidrostatis maksimum (<span class="font-mono text-cyan-300">P = &rho;gh</span>). Ini mencerminkan hikmat penatalayanan (stewardship) yang setia menjaga keselamatan warga!</p>
+                    `;
+                    confetti({ particleCount: 70, spread: 70, origin: { y: 0.6 } });
+                } else {
+                    damTestState = 'failed';
+                    playSound('alarm');
+                    document.getElementById('damStatusBadge').className = "w-3 h-3 rounded-full bg-rose-500";
+                    document.getElementById('damStatusText').innerText = "Status: KRITIS! BENDUNGAN JEBOL & BANJIR";
+
+                    let reason = "";
+                    if (!isBotOk) reason += " • Dasar bendungan terlalu tipis untuk menahan tekanan puncak hidrostatis di kedalaman dasar!";
+                    if (!isMidOk) reason += " • Bagian tengah retak akibat gaya dorong volume air yang besar.";
+
+                    feedback.className = "absolute bottom-6 left-6 right-6 p-4 rounded-2xl border backdrop-blur bg-rose-950/90 border-rose-500/60 text-rose-200 text-xs shadow-2xl";
+                    feedback.innerHTML = `
+                        <div class="flex items-center space-x-2 font-bold text-sm text-rose-300 mb-1">
+                            <i data-lucide="alert-triangle" class="w-5 h-5"></i>
+                            <span>Bendungan Runtuh & Air Meluap!</span>
+                        </div>
+                        <p>${reason}<br><strong class="text-amber-300">Refleksi Worldview:</strong> Mengabaikan hukum ketetapan alam ciptaan Allah dan kompromi kualitas dapat berakibat fatal bagi keselamatan sesama.</p>
+                    `;
+                }
+                lucide.createIcons();
+                drawDam();
+            }, 1000);
+        }
+
+        function drawDam() {
+            const rect = damCanvas.getBoundingClientRect();
+            const w = rect.width;
+            const h = rect.height;
+
+            damCtx.clearRect(0, 0, w, h);
+
+            // Water Reservoir
+            const waterGrad = damCtx.createLinearGradient(0, h * 0.2, 0, h * 0.9);
+            waterGrad.addColorStop(0, '#0284c7');
+            waterGrad.addColorStop(1, '#0c4a6e');
+
+            damCtx.fillStyle = waterGrad;
+            damCtx.fillRect(0, h * 0.2, w * 0.44, h * 0.7);
+
+            // Pressure Vector Arrows
+            damCtx.strokeStyle = '#38bdf8';
+            damCtx.lineWidth = 2;
+            for (let y = h * 0.26; y <= h * 0.86; y += 26) {
+                const arrowLength = ((y - h * 0.2) / (h * 0.7)) * (w * 0.16) + 8;
+                damCtx.beginPath();
+                damCtx.moveTo(w * 0.44 - arrowLength, y);
+                damCtx.lineTo(w * 0.44, y);
+                damCtx.stroke();
+
+                // Arrow head
+                damCtx.beginPath();
+                damCtx.moveTo(w * 0.44 - 6, y - 4);
+                damCtx.lineTo(w * 0.44, y);
+                damCtx.lineTo(w * 0.44 - 6, y + 4);
+                damCtx.stroke();
+            }
+
+            // Concrete Dam Geometry
+            const damX = w * 0.44;
+            const topW = (damConfig.top / 10.0) * (w * 0.18);
+            const midW = (damConfig.mid / 10.0) * (w * 0.18);
+            const botW = (damConfig.bot / 10.0) * (w * 0.18);
+
+            damCtx.beginPath();
+            damCtx.moveTo(damX, h * 0.2);
+            damCtx.lineTo(damX + topW, h * 0.2);
+            damCtx.lineTo(damX + midW, h * 0.55);
+            damCtx.lineTo(damX + botW, h * 0.9);
+            damCtx.lineTo(damX, h * 0.9);
+            damCtx.closePath();
+
+            if (damTestState === 'failed') {
+                damCtx.fillStyle = '#7f1d1d';
+                damCtx.strokeStyle = '#ef4444';
+            } else if (damTestState === 'success') {
+                damCtx.fillStyle = '#065f46';
+                damCtx.strokeStyle = '#10b981';
+            } else {
+                damCtx.fillStyle = '#334155';
+                damCtx.strokeStyle = '#64748b';
+            }
+
+            damCtx.fill();
+            damCtx.lineWidth = 3;
+            damCtx.stroke();
+
+            // Retakan & Rembesan jika gagal
+            if (damTestState === 'failed') {
+                damCtx.strokeStyle = '#fca5a5';
+                damCtx.lineWidth = 2.5;
+                damCtx.beginPath();
+                damCtx.moveTo(damX + botW * 0.4, h * 0.88);
+                damCtx.lineTo(damX + botW * 0.6, h * 0.75);
+                damCtx.lineTo(damX + botW * 0.5, h * 0.65);
+                damCtx.stroke();
+
+                // Air meluap ke desa
+                damCtx.fillStyle = 'rgba(2, 132, 199, 0.45)';
+                damCtx.fillRect(damX + botW, h * 0.72, w - (damX + botW), h * 0.18);
+            }
+
+            // Village Ground Zone
+            damCtx.fillStyle = '#0f172a';
+            damCtx.fillRect(damX + botW, h * 0.78, w - (damX + botW), h * 0.12);
+
+            // Village Labels & Icons
+            damCtx.fillStyle = '#f8fafc';
+            damCtx.font = '20px sans-serif';
+            damCtx.fillText('🏡  🏡  🏫  🏡', w * 0.74, h * 0.75);
+        }
+
+        /* ================= Mode 3: Gameshow Quiz Engine ================= */
+        const quizData = [
+            {
+                q: "Mengapa pancaran air pada lubang paling bawah sebuah tangki meluncur paling jauh?",
+                options: [
+                    "A. Karena massa jenis air di bawah lebih besar daripada di atas",
+                    "B. Karena kedalaman (h) paling besar, sehingga tekanan hidrostatisnya paling tinggi",
+                    "C. Karena gaya gravitasi hanya bekerja pada bagian dasar tangki",
+                    "D. Karena bentuk lubang bawah secara alami menyedot udara luar"
+                ],
+                ans: 1,
+                exp: "<strong>Jawaban Benar: B.</strong> Berdasarkan rumus P = &rho;gh, tekanan hidrostatis berbanding lurus dengan kedalaman (h). Semakin dalam posisi lubang, semakin besar gaya dorong air per satuan luas."
+            },
+            {
+                q: "Sebuah kapal selam menyelam dari kedalaman 10 m ke 50 m di air laut. Apa yang terjadi pada tekanan hidrostatis yang dialami dinding kapal?",
+                options: [
+                    "A. Tekanan meningkat 5 kali lipat",
+                    "B. Tekanan berkurang secara drastis",
+                    "C. Tekanan tetap konstan karena air laut homogen",
+                    "D. Tekanan menjadi nol karena berada di dalam air"
+                ],
+                ans: 0,
+                exp: "<strong>Jawaban Benar: A.</strong> Karena kedalaman (h) bertambah 5 kali lipat (dari 10 m menjadi 50 m) dan nilai &rho; serta g tetap, tekanan hidrostatisnya meningkat tepat 5 kali lipat."
+            },
+            {
+                q: "Bagaimana rumus matematis P = ρ × g × h mencerminkan pandangan Christian Worldview tentang alam semesta?",
+                options: [
+                    "A. Alam semesta terjadi secara acak tanpa adanya aturan fisika yang pasti",
+                    "B. Hukum fisika selalu berubah tergantung situasi zaman",
+                    "C. Keteraturan dan kepastian hukum alam mencerminkan sifat Allah yang setia dan teratur (Creation)",
+                    "D. Manusia berhak mengabaikan hukum fisika tanpa risiko celaka"
+                ],
+                ans: 2,
+                exp: "<strong>Jawaban Benar: C.</strong> Keteraturan hukum alam adalah cerminan keteraturan Allah (Creation). Karena hukum alam konstan, manusia dapat meneliti sains dan merancang teknologi yang aman."
+            },
+            {
+                q: "Mengapa bagian dasar dinding bendungan air selalu dibangun jauh lebih tebal dibanding bagian atasnya?",
+                options: [
+                    "A. Untuk menghemat semen dan bahan bangunan di bagian atas",
+                    "B. Menahan tekanan hidrostatis puncak di kedalaman air guna melindungi nyawa warga di hilir",
+                    "C. Murni sebagai nilai estetika arsitektur bangunan",
+                    "D. Mengurangi hambatan angin kencang di permukaan waduk"
+                ],
+                ans: 1,
+                exp: "<strong>Jawaban Benar: B.</strong> Tekanan hidrostatis berbanding lurus dengan kedalaman air. Dasar bendungan harus paling tebal untuk menahan beban gaya dorong air terbesar demi keselamatan publik."
+            }
+        ];
+
+        let currentQIndex = 0;
+        let score = 0;
+        let timerSeconds = 20;
+        let timerInterval = null;
+
+        function startQuiz() {
+            currentQIndex = 0;
+            score = 0;
+            showQuestion();
+        }
+
+        function showQuestion() {
+            clearInterval(timerInterval);
+            timerSeconds = 20;
+            document.getElementById('quizTimer').innerText = `${timerSeconds}s`;
+
+            const q = quizData[currentQIndex];
+            document.getElementById('quizStep').innerText = `Soal ${currentQIndex + 1} / ${quizData.length}`;
+            document.getElementById('questionText').innerText = q.q;
+            document.getElementById('quizScore').innerText = `${score} PTS`;
+
+            const optionsContainer = document.getElementById('quizOptions');
+            optionsContainer.innerHTML = '';
+
+            q.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = "p-4 bg-slate-950 hover:bg-slate-800 border border-slate-800 hover:border-cyan-500/50 rounded-2xl text-left text-xs font-semibold text-slate-200 transition touch-btn";
+                btn.innerText = opt;
+                btn.onclick = () => selectOption(idx);
+                optionsContainer.appendChild(btn);
+            });
+
+            document.getElementById('quizExplanation').classList.add('hidden');
+            document.getElementById('btnNextQuiz').classList.add('hidden');
+
+            timerInterval = setInterval(() => {
+                timerSeconds--;
+                document.getElementById('quizTimer').innerText = `${timerSeconds}s`;
+                if (timerSeconds <= 0) {
+                    clearInterval(timerInterval);
+                    selectOption(-1);
+                }
+            }, 1000);
+        }
+
+        function selectOption(optIndex) {
+            clearInterval(timerInterval);
+            const q = quizData[currentQIndex];
+            const optionsBtns = document.getElementById('quizOptions').children;
+
+            for (let i = 0; i < optionsBtns.length; i++) {
+                optionsBtns[i].disabled = true;
+                if (i === q.ans) {
+                    optionsBtns[i].className = "p-4 bg-emerald-950/80 border-2 border-emerald-500 text-emerald-200 rounded-2xl text-left text-xs font-bold";
+                } else if (i === optIndex) {
+                    optionsBtns[i].className = "p-4 bg-rose-950/80 border-2 border-rose-500 text-rose-200 rounded-2xl text-left text-xs font-bold";
+                }
+            }
+
+            if (optIndex === q.ans) {
+                playSound('correct');
+                score += 100 + timerSeconds * 5;
+                document.getElementById('quizScore').innerText = `${score} PTS`;
+                confetti({ particleCount: 35, spread: 60, origin: { y: 0.7 } });
+            } else {
+                playSound('wrong');
+            }
+
+            const expBox = document.getElementById('quizExplanation');
+            expBox.innerHTML = q.exp;
+            expBox.classList.remove('hidden');
+
+            document.getElementById('btnNextQuiz').classList.remove('hidden');
+        }
+
+        function nextQuestion() {
+            playSound('click');
+            currentQIndex++;
+            if (currentQIndex < quizData.length) {
+                showQuestion();
+            } else {
+                playSound('victory');
+                document.getElementById('questionText').innerText = `🎉 Kuis Selesai! Skor Akhir Kamu: ${score} PTS`;
+                document.getElementById('quizOptions').innerHTML = '';
+                document.getElementById('quizExplanation').innerHTML = `
+                    <div class="text-center py-4">
+                        <p class="text-sm font-bold text-amber-300 mb-2">Refleksi Akhir Pembelajaran:</p>
+                        <p class="text-xs text-slate-300 max-w-lg mx-auto">Selamat! Kamu memahami bahwa hukum fisika mencerminkan keteraturan Allah, dan mempelajarinya adalah bagian dari panggilan kita untuk mengasihi dan melindungi sesama.</p>
+                        <button onclick="startQuiz()" class="mt-4 px-6 py-2.5 bg-amber-500 text-slate-950 font-bold text-xs rounded-xl touch-btn">Mainkan Kuis Lagi</button>
+                    </div>
+                `;
+                document.getElementById('btnNextQuiz').classList.add('hidden');
+            }
+        }
+
+        /* ================= Mode 3 Sub: Match-Up Game Engine ================= */
+        const matchPairs = [
+            { id: 1, item: "Dinding Dasar Bendungan Dibuat Sangat Tebal", match: "Menahan tekanan hidrostatis maksimum yang berada di posisi paling dalam (h)" },
+            { id: 2, item: "Ketetapan Rumus Matematis P = ρ × g × h", match: "Bukti konsistensi dan kesetiaan Allah memelihara hukum alam (Creation)" },
+            { id: 3, item: "Telinga Penyelam Sakit Saat Menyelam Dalam", match: "Dampak langsung pertambahan kedalaman (h) melipatgandakan gaya tekan air" },
+            { id: 4, item: "Insinyur Merancang Konstruksi Saluran Air dengan Teliti", match: "Wujud Penatalayanan (Stewardship) dalam menjaga keselamatan sesama" }
+        ];
+
+        let selectedLeft = null;
+        let matchedCount = 0;
+
+        function switchGameSub(mode) {
+            playSound('click');
+            if (mode === 'quiz') {
+                document.getElementById('quizContainer').classList.remove('hidden');
+                document.getElementById('matchContainer').classList.add('hidden');
+                document.getElementById('subTabQuiz').className = "px-6 py-2.5 rounded-xl font-bold text-xs bg-amber-500 text-slate-950 shadow-md transition touch-btn";
+                document.getElementById('subTabMatch').className = "px-6 py-2.5 rounded-xl font-bold text-xs text-slate-400 hover:text-slate-200 transition touch-btn";
+            } else {
+                document.getElementById('quizContainer').classList.add('hidden');
+                document.getElementById('matchContainer').classList.remove('hidden');
+                document.getElementById('subTabQuiz').className = "px-6 py-2.5 rounded-xl font-bold text-xs text-slate-400 hover:text-slate-200 transition touch-btn";
+                document.getElementById('subTabMatch').className = "px-6 py-2.5 rounded-xl font-bold text-xs bg-emerald-500 text-slate-950 shadow-md transition touch-btn";
+                initMatchGame();
+            }
+        }
+
+        function initMatchGame() {
+            selectedLeft = null;
+            matchedCount = 0;
+            document.getElementById('matchScoreBadge').innerText = "0 / 4 Selesai";
+
+            const leftCol = document.getElementById('matchLeftCol');
+            const rightCol = document.getElementById('matchRightCol');
+
+            leftCol.innerHTML = '';
+            rightCol.innerHTML = '';
+
+            const shuffledRight = [...matchPairs].sort(() => Math.random() - 0.5);
+
+            matchPairs.forEach(p => {
+                const btn = document.createElement('button');
+                btn.className = "w-full p-4 bg-slate-950 border border-slate-800 hover:border-cyan-500 rounded-2xl text-left text-xs font-bold text-slate-200 touch-btn";
+                btn.innerText = `📌 ${p.item}`;
+                btn.onclick = () => selectLeftMatch(p.id, btn);
+                btn.id = `leftMatch-${p.id}`;
+                leftCol.appendChild(btn);
+            });
+
+            shuffledRight.forEach(p => {
+                const btn = document.createElement('button');
+                btn.className = "w-full p-4 bg-slate-950 border border-slate-800 hover:border-emerald-500 rounded-2xl text-left text-xs font-semibold text-slate-300 touch-btn";
+                btn.innerText = `💡 ${p.match}`;
+                btn.onclick = () => selectRightMatch(p.id, btn);
+                btn.id = `rightMatch-${p.id}`;
+                rightCol.appendChild(btn);
+            });
+        }
+
+        function selectLeftMatch(id, btn) {
+            playSound('click');
+            selectedLeft = id;
+            document.querySelectorAll('#matchLeftCol button').forEach(b => {
+                if (!b.disabled) {
+                    b.classList.remove('border-amber-500', 'bg-amber-950/40');
+                }
+            });
+            btn.classList.add('border-amber-500', 'bg-amber-950/40');
+        }
+
+        function selectRightMatch(id, btn) {
+            if (!selectedLeft) {
+                playSound('wrong');
+                return;
+            }
+
+            if (selectedLeft === id) {
+                playSound('correct');
+                matchedCount++;
+                document.getElementById('matchScoreBadge').innerText = `${matchedCount} / 4 Selesai`;
+
+                const leftBtn = document.getElementById(`leftMatch-${id}`);
+                leftBtn.className = "w-full p-4 bg-emerald-950/60 border-2 border-emerald-500 text-emerald-300 rounded-2xl text-left text-xs font-bold opacity-70 pointer-events-none";
+                btn.className = "w-full p-4 bg-emerald-950/60 border-2 border-emerald-500 text-emerald-300 rounded-2xl text-left text-xs font-bold opacity-70 pointer-events-none";
+
+                leftBtn.disabled = true;
+                btn.disabled = true;
+
+                confetti({ particleCount: 30, spread: 55, origin: { y: 0.6 } });
+                selectedLeft = null;
+
+                if (matchedCount === matchPairs.length) {
+                    playSound('victory');
+                }
+            } else {
+                playSound('wrong');
+                btn.classList.add('border-rose-500', 'bg-rose-950/30');
+                setTimeout(() => {
+                    btn.classList.remove('border-rose-500', 'bg-rose-950/30');
+                }, 700);
+            }
+        }
+
+        /* ================= Worldview Modal Logic ================= */
+        function openWorldviewModal() {
+            playSound('click');
+            document.getElementById('worldviewModal').classList.remove('hidden');
+        }
+        function closeWorldviewModal() {
+            playSound('click');
+            document.getElementById('worldviewModal').classList.add('hidden');
+        }
+
+        function toggleFullscreen() {
+            playSound('click');
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(() => {});
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen().catch(() => {});
+                }
+            }
+        }
+
+        /* ================= App Initialization ================= */
+        window.onload = function() {
+            lucide.createIcons();
+            resizeCanvas();
+            resizeDamCanvas();
+            updateSensorReadout();
+            drawSim();
+            startQuiz();
+        };
+    </script>
+</body>
+</html>
