@@ -67,7 +67,8 @@
     </div>
 
     <div class="flex items-center gap-2">
-      <select id="pilih-tipe" class="bg-slate-900 border border-slate-700 text-teal-300 text-xs font-bold px-3 py-2 rounded-xl outline-none focus:border-teal-400">
+      <!-- Selector Masuk / Pulang yang tidak saling mengunci -->
+      <select id="pilih-tipe" onchange="gantiModeAbsen()" class="bg-slate-900 border border-slate-700 text-teal-300 text-xs font-bold px-3 py-2 rounded-xl outline-none focus:border-teal-400">
         <option value="Masuk">🟢 Presensi Masuk Pagi</option>
         <option value="Pulang">🔴 Presensi Pulang Sore</option>
       </select>
@@ -146,7 +147,7 @@
         </div>
 
         <div id="box-nama-manual">
-          <label class="block text-slate-400 font-bold mb-1">Atau Ketik Nama Lengkap Baru (Jika belum ada di daftar):</label>
+          <label class="block text-slate-400 font-bold mb-1">Atau Ketik Nama Lengkap Baru:</label>
           <input type="text" id="input-nama-guru" placeholder="Ketik nama lengkap..." class="w-full p-3 rounded-xl bg-slate-900 border border-teal-800 text-white outline-none focus:border-teal-400">
         </div>
 
@@ -197,6 +198,7 @@
             <option value="bulan">📆 Rekap Bulanan</option>
             <option value="semester">🎓 Rekap Semester</option>
             <option value="tahun">🏛️ Rekap Tahunan</option>
+            <option value="semua">📑 Seluruh Catatan</option>
           </select>
         </div>
 
@@ -291,7 +293,7 @@
     </div>
   </div>
 
-  <!-- ================= LOGIKA JAVASCRIPT LENGKAP ================= -->
+  <!-- ================= LOGIKA JAVASCRIPT ================= -->
   <script>
     const API_GURU_URL = "https://script.google.com/macros/s/AKfycbzzCHn0XFkiPNWm-I4opfmS2V9d9PNYPStNTUnUd2-TWPqQBksuWoQcTzb6O9ZFN6RgyA/exec";
 
@@ -299,7 +301,7 @@
     let labeledFaceDescriptors = [];
     let faceMatcher = null;
     let isProcessing = false;
-    let cooldownTimer = {};
+    let cooldownTimer = {}; // Menyimpan cooldown independen: [nama_tipe]
     let targetAksiAdmin = "";
     let tokenAdminSementara = null;
     let daftarMasterGuruCache = [];
@@ -331,9 +333,16 @@
       }
     });
 
+    function gantiModeAbsen() {
+      // Reset status deteksi seketika saat guru memilih mode Pulang/Masuk
+      isProcessing = false;
+      document.getElementById('feedback-main').innerText = "Menunggu Wajah Terdeteksi...";
+      document.getElementById('feedback-sub').innerText = `Siap melakukan presensi ${document.getElementById('pilih-tipe').value}`;
+    }
+
     async function sinkronisasiBiometrikDariCloud() {
       try {
-        document.getElementById('feedback-sub').innerText = "Menyinkronkan data biometrik dari server Google...";
+        document.getElementById('feedback-sub').innerText = "Menyinkronkan data biometrik dari server...";
         const r = await fetch(API_GURU_URL);
         const res = await r.json();
 
@@ -379,7 +388,7 @@
         if (detections) {
           if (!faceMatcher) {
             document.getElementById('feedback-main').innerText = "Database Biometrik Kosong";
-            document.getElementById('feedback-sub').innerText = "Silakan klik Daftarkan Wajah untuk merekam data ke Spreadsheet.";
+            document.getElementById('feedback-sub').innerText = "Silakan klik Daftarkan Wajah terlebih dahulu.";
             return;
           }
 
@@ -399,11 +408,16 @@
 
     async function eksekusiPresensiSukses(namaGuru) {
       const now = Date.now();
-      if (cooldownTimer[namaGuru] && (now - cooldownTimer[namaGuru] < 60000)) return;
-      cooldownTimer[namaGuru] = now;
+      const tipeAbsen = document.getElementById('pilih-tipe').value;
+      const keyCooldown = `${namaGuru}_${tipeAbsen}`;
+
+      // Cooldown dipisah per tipe (Masuk vs Pulang tidak saling mengunci)
+      if (cooldownTimer[keyCooldown] && (now - cooldownTimer[keyCooldown] < 45000)) {
+        return;
+      }
+      cooldownTimer[keyCooldown] = now;
       isProcessing = true;
 
-      const tipeAbsen = document.getElementById('pilih-tipe').value;
       document.getElementById('feedback-main').innerText = `✅ Teridentifikasi: ${namaGuru}`;
       document.getElementById('feedback-sub').innerText = `Merekam presensi ${tipeAbsen} ke server...`;
 
@@ -439,7 +453,7 @@
     function tambahRiwayatTerkini(nama, waktu, status, tipe) {
       const box = document.getElementById('history-box');
       const item = document.createElement('div');
-      item.className = "p-3 bg-slate-900/90 rounded-2xl border border-teal-900/80 flex justify-between items-center text-xs";
+      item.className = "p-3 bg-slate-900/90 rounded-2xl border border-teal-900/80 flex justify-between items-center text-xs animate-fade-in";
       item.innerHTML = `
         <div>
           <p class="font-bold text-white">${nama}</p>
@@ -453,6 +467,7 @@
       if (box.children.length > 3) box.removeChild(box.lastChild);
     }
 
+    // ================= OTORISASI PIN ADMIN =================
     function mintaAksesAdmin(aksi) {
       targetAksiAdmin = aksi;
       if (tokenAdminSementara) {
@@ -592,6 +607,7 @@
       }
     }
 
+    // ================= REKAP SERVER & FILTER TANGGAL LENGKAP =================
     function bukaModalRekap() {
       document.getElementById('modal-rekap').classList.remove('hidden');
       sesuaikanFilterPeriode();
@@ -633,7 +649,7 @@
       const tipe = document.getElementById('filter-periode-tipe').value;
       const box = document.getElementById('box-subfilter');
       const now = new Date();
-      const tglSekarang = now.toISOString().split('T')[0];
+      const tglSekarang = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
       const blnSekarang = String(now.getMonth() + 1).padStart(2, '0');
 
       if (tipe === 'hari') {
@@ -673,21 +689,34 @@
             <option value="2027">2027</option>
           </select>
         `;
+      } else {
+        box.innerHTML = `<span class="block text-[10px] text-slate-500 italic mt-4">Semua tanggal log</span>`;
       }
     }
 
     function normalisasiTanggalLog(tglStr) {
       if (!tglStr) return "";
-      if (tglStr.includes('T')) tglStr = tglStr.split('T')[0];
-      const p = tglStr.split(/[-/]/);
-      if (p.length === 3) {
-        if (p[0].length === 4) {
-          return `${p[0]}-${String(p[1]).padStart(2, '0')}-${String(p[2]).padStart(2, '0')}`;
-        } else if (p[2].length === 4) {
-          return `${p[2]}-${String(p[1]).padStart(2, '0')}-${String(p[0]).padStart(2, '0')}`;
+      let s = String(tglStr).trim();
+      if (s.includes('T')) s = s.split('T')[0];
+      
+      // Jika format DD/MM/YYYY
+      if (s.includes('/')) {
+        const p = s.split('/');
+        if (p.length === 3) {
+          if (p[2].length === 4) return `${p[2]}-${String(p[1]).padStart(2, '0')}-${String(p[0]).padStart(2, '0')}`;
+          if (p[0].length === 4) return `${p[0]}-${String(p[1]).padStart(2, '0')}-${String(p[2]).padStart(2, '0')}`;
         }
       }
-      return tglStr;
+
+      // Jika format YYYY-MM-DD
+      if (s.includes('-')) {
+        const p = s.split('-');
+        if (p.length === 3) {
+          if (p[0].length === 4) return `${p[0]}-${String(p[1]).padStart(2, '0')}-${String(p[2]).padStart(2, '0')}`;
+          if (p[2].length === 4) return `${p[2]}-${String(p[1]).padStart(2, '0')}-${String(p[0]).padStart(2, '0')}`;
+        }
+      }
+      return s;
     }
 
     function filterTabelRekap() {
@@ -717,6 +746,8 @@
         } else if (tipePeriode === 'tahun') {
           const thnInput = document.getElementById('param-thn') ? document.getElementById('param-thn').value : "2026";
           cocokWaktu = (thn === thnInput);
+        } else if (tipePeriode === 'semua') {
+          cocokWaktu = true;
         }
 
         const cocokStatus = (statusFilter === 'semua' || log.status === statusFilter);
@@ -748,7 +779,7 @@
             <td class="p-2.5 font-mono text-slate-300">${log.tanggal}</td>
             <td class="p-2.5 font-bold text-white">${log.nama}</td>
             <td class="p-2.5 font-mono text-teal-300">${jam}</td>
-            <td class="p-2.5 text-slate-400">${log.tipe}</td>
+            <td class="p-2.5 text-slate-400 font-semibold">${log.tipe}</td>
             <td class="p-2.5 text-center">
               <span class="px-2 py-0.5 rounded text-[10px] font-bold ${log.status === 'Terlambat' ? 'bg-rose-500/20 text-rose-300' : 'bg-emerald-500/20 text-emerald-300'}">
                 ${log.status}
