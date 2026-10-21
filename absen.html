@@ -62,11 +62,10 @@
       </div>
       <div>
         <h1 class="font-title text-lg sm:text-xl text-white tracking-wide leading-tight">SMART FACE <span class="text-teal-400">ATTENDANCE</span></h1>
-        <p class="text-[11px] text-slate-400">Presensi Biometrik Dewan Guru • SD Methodist Immanuel</p>
+        <p class="text-[11px] text-slate-400">Presensi Biometrik Sekolah • SD Methodist Immanuel</p>
       </div>
     </div>
 
-    <!-- Tombol Mode & Panel Admin -->
     <div class="flex items-center gap-2">
       <select id="pilih-tipe" class="bg-slate-900 border border-slate-700 text-teal-300 text-xs font-bold px-3 py-2 rounded-xl outline-none focus:border-teal-400">
         <option value="Masuk">🟢 Presensi Masuk Pagi</option>
@@ -74,7 +73,7 @@
       </select>
 
       <button onclick="mintaAksesAdmin('enroll')" class="bg-slate-800 hover:bg-slate-700 text-teal-300 border border-teal-800 font-title text-xs font-bold px-3 py-2 rounded-xl transition flex items-center gap-1.5 shadow">
-        <i class="fa-solid fa-lock"></i> <span class="hidden sm:inline">Rekam Guru Baru</span>
+        <i class="fa-solid fa-lock"></i> <span class="hidden sm:inline">Daftarkan Wajah</span>
       </button>
 
       <button onclick="mintaAksesAdmin('rekap')" class="bg-teal-600 hover:bg-teal-500 text-white font-title text-xs font-bold px-3.5 py-2 rounded-xl transition flex items-center gap-1.5 shadow">
@@ -83,7 +82,7 @@
     </div>
   </header>
 
-  <!-- ================= AREA UTAMA KAMERA ================= -->
+  <!-- ================= AREA KAMERA ================= -->
   <main class="flex-grow flex flex-col items-center justify-center space-y-4 no-print">
     <div id="video-wrapper">
       <video id="video-feed" autoplay muted playsinline></video>
@@ -103,13 +102,13 @@
 
   <!-- ================= FOOTER KREDIT RESMI ================= -->
   <footer class="mt-6 pt-3 border-t border-slate-800/80 text-center text-xs text-slate-500 space-y-1 no-print">
-    <p>Smart Face Attendance System • SD Methodist Immanuel</p>
+    <p>Smart Face Attendance System • SD Methodist Immanuel Bandar Lampung</p>
     <p class="text-[11px] text-teal-400/90 font-mono font-bold tracking-wide">
       Architected & Developed by: Thomas Ryantama, M.Kom., Gr. | NalarSci Lab
     </p>
   </footer>
 
-  <!-- ================= 1. MODAL OTORISASI PIN ADMIN ================= -->
+  <!-- ================= MODAL OTORISASI PIN ADMIN ================= -->
   <div id="modal-auth" class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden no-print">
     <div class="glass-card max-w-xs w-full rounded-3xl p-6 border border-teal-500/40 bg-slate-950 text-center space-y-4 shadow-2xl">
       <div class="w-12 h-12 bg-amber-500/10 border border-amber-500/30 rounded-2xl flex items-center justify-center mx-auto text-2xl text-amber-400">
@@ -130,23 +129,41 @@
     </div>
   </div>
 
-  <!-- ================= 2. MODAL REKAM GURU BARU (ENROLLMENT) ================= -->
+  <!-- ================= MODAL REKAM WAJAH (PILIH NAMA & ROLE DARI DAFTAR) ================= -->
   <div id="modal-enroll" class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden no-print">
     <div class="glass-card max-w-md w-full rounded-3xl p-6 border border-teal-500/40 bg-slate-950 shadow-2xl space-y-4">
       <div class="flex justify-between items-center border-b border-teal-900/60 pb-3">
-        <h3 class="font-title text-base text-teal-300">Perekaman Vektor & Master Guru</h3>
+        <h3 class="font-title text-base text-teal-300">Pendaftaran Wajah ke Sistem</h3>
         <button onclick="tutupModalEnrollment()" class="text-slate-400 hover:text-white font-bold text-lg">✕</button>
       </div>
 
       <div class="space-y-3 text-xs">
+        <!-- OPSI NAMA DARI MASTER ATAU KETIK BARU -->
         <div>
-          <label class="block text-slate-300 font-bold mb-1">Nama Lengkap Guru & Gelar:</label>
-          <input type="text" id="input-nama-guru" placeholder="Contoh: Dra. Ester Simanjuntak, M.Pd." class="w-full p-3 rounded-xl bg-slate-900 border border-teal-800 text-white outline-none focus:border-teal-400">
+          <label class="block text-slate-300 font-bold mb-1">Pilih Nama dari Daftar Master:</label>
+          <select id="select-nama-master" onchange="sinkronisasiNamaMaster()" class="w-full p-3 rounded-xl bg-slate-900 border border-teal-800 text-white outline-none focus:border-teal-400 font-bold">
+            <option value="">-- Muat daftar nama... --</option>
+          </select>
         </div>
+
+        <div id="box-nama-manual">
+          <label class="block text-slate-400 font-bold mb-1">Atau Ketik Nama Lengkap Baru (Jika belum ada di daftar):</label>
+          <input type="text" id="input-nama-guru" placeholder="Ketik nama lengkap..." class="w-full p-3 rounded-xl bg-slate-900 border border-teal-800 text-white outline-none focus:border-teal-400">
+        </div>
+
+        <!-- PILIHAN ROLE FIX -->
         <div>
-          <label class="block text-slate-300 font-bold mb-1">Jabatan / Guru Kelas / Mapel:</label>
-          <input type="text" id="input-jabatan-guru" placeholder="Contoh: Kepala Sekolah / Guru Kelas 4B" class="w-full p-3 rounded-xl bg-slate-900 border border-teal-800 text-white outline-none focus:border-teal-400">
+          <label class="block text-slate-300 font-bold mb-1">Pilih Jabatan / Role:</label>
+          <select id="select-role-guru" class="w-full p-3 rounded-xl bg-slate-900 border border-teal-800 text-teal-300 font-bold outline-none focus:border-teal-400 text-xs">
+            <option value="Guru">👨‍🏫 Guru</option>
+            <option value="Kepsek">🏛️ Kepsek (Kepala Sekolah)</option>
+            <option value="Wakasis">🛡️ Wakasis (Waka Kesiswaan)</option>
+            <option value="Wakakur">📚 Wakakur (Waka Kurikulum)</option>
+            <option value="Pramubakti">🧹 Pramubakti / Tendik</option>
+            <option value="Murid">🎒 Murid / Siswa</option>
+          </select>
         </div>
+
         <div>
           <label class="block text-slate-300 font-bold mb-1">Nomor WhatsApp Resmi (Opsional):</label>
           <input type="text" id="input-wa-guru" placeholder="08xxxxxxxxxx" class="w-full p-3 rounded-xl bg-slate-900 border border-teal-800 text-white outline-none focus:border-teal-400">
@@ -155,19 +172,19 @@
 
       <div class="pt-2">
         <button onclick="rekamVektorWajah()" id="btn-rekam" class="w-full py-3 bg-teal-600 hover:bg-teal-500 text-white font-title text-xs font-bold rounded-xl transition shadow flex items-center justify-center gap-2">
-          <i class="fa-solid fa-camera"></i> Pindai Wajah & Simpan ke Master
+          <i class="fa-solid fa-camera"></i> Pindai Wajah & Daftarkan
         </button>
       </div>
     </div>
   </div>
 
-  <!-- ================= 3. MODAL REKAPITULASI PRESENSI ADMIN MULTI-PERIODE ================= -->
+  <!-- ================= MODAL REKAPITULASI PRESENSI ================= -->
   <div id="modal-rekap" class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 flex items-center justify-center p-3 sm:p-5 hidden no-print">
     <div class="glass-card max-w-4xl w-full rounded-3xl p-5 sm:p-6 border border-teal-500/40 bg-slate-900 shadow-2xl flex flex-col max-h-[92vh]">
       
       <div class="flex justify-between items-center border-b border-teal-900/80 pb-3 mb-3">
         <div>
-          <h3 class="font-title text-lg text-teal-300">Rekapitulasi Kehadiran Dewan Guru</h3>
+          <h3 class="font-title text-lg text-teal-300">Rekapitulasi Kehadiran Presensi</h3>
           <p class="text-[11px] text-slate-400">Laporan multi-periode terintegrasi Google Spreadsheet.</p>
         </div>
         <button onclick="tutupModalRekap()" class="text-slate-400 hover:text-white font-bold text-xl px-2">✕</button>
@@ -185,9 +202,7 @@
           </select>
         </div>
 
-        <div id="box-subfilter">
-          <!-- Parameter bulan/semester dinamis -->
-        </div>
+        <div id="box-subfilter"></div>
 
         <div>
           <label class="block text-[10px] text-slate-400 font-bold mb-1">Status Kehadiran:</label>
@@ -199,7 +214,7 @@
         </div>
 
         <div>
-          <label class="block text-[10px] text-slate-400 font-bold mb-1">Cari Nama Guru:</label>
+          <label class="block text-[10px] text-slate-400 font-bold mb-1">Cari Nama:</label>
           <input type="text" id="filter-rekap-nama" oninput="filterTabelRekap()" placeholder="Ketik nama..." class="w-full p-2 rounded-xl bg-slate-900 border border-teal-800 text-white text-xs outline-none focus:border-teal-400">
         </div>
       </div>
@@ -226,14 +241,14 @@
           <thead class="bg-slate-900 text-teal-300 uppercase text-[10px] font-bold sticky top-0 border-b border-teal-900">
             <tr>
               <th class="p-2.5">Tanggal</th>
-              <th class="p-2.5">Nama Guru</th>
+              <th class="p-2.5">Nama</th>
               <th class="p-2.5">Waktu Tap</th>
               <th class="p-2.5">Tipe</th>
               <th class="p-2.5 text-center">Status</th>
             </tr>
           </thead>
           <tbody id="tbody-rekap-guru" class="divide-y divide-teal-950/60">
-            <!-- Diisi otomatis -->
+            <tr><td colspan="5" class="p-6 text-center text-slate-500 italic">Memuat data presensi...</td></tr>
           </tbody>
         </table>
       </div>
@@ -249,13 +264,14 @@
     </div>
   </div>
 
-  <!-- ================= 4. LEMBAR CETAK FISIK RESMI (PRINT ONLY) ================= -->
+  <!-- ================= LEMBAR CETAK FISIK RESMI ================= -->
   <div id="area-cetak-rekap" class="hidden p-6 max-w-4xl mx-auto bg-white text-black text-xs">
     <div class="border-b-2 border-black pb-2 mb-4 text-center">
       <h3 class="text-xs font-semibold uppercase tracking-wider">YAYASAN PENDIDIKAN METHODIST IMMANUEL</h3>
       <h2 class="text-base font-black uppercase tracking-wide">SD METHODIST IMMANUEL BANDAR LAMPUNG</h2>
-      <p class="text-[10px] text-gray-700">Jl. Raden Intan No. 123, Bandar Lampung • Telp: (0721) 123456</p>
-      <h1 class="text-sm font-black uppercase underline mt-2" id="pr-judul-laporan">LAPORAN REKAPITULASI PRESENSI DEWAN GURU</h1>
+      <p class="text-[11px] font-bold text-gray-800">TERAKREDITASI A</p>
+      <p class="text-[10px] text-gray-700">Jalan Dr. Susilo No. 6, Sumur Batu, Teluk Betung Utara, Bandar Lampung</p>
+      <h1 class="text-sm font-black uppercase underline mt-2">LAPORAN REKAPITULASI PRESENSI</h1>
       <p class="text-[10px] text-gray-600" id="pr-periode-info">Periode: -</p>
     </div>
 
@@ -279,7 +295,6 @@
 
   <script>
     const API_GURU_URL = "https://script.google.com/macros/s/AKfycbzzCHn0XFkiPNWm-I4opfmS2V9d9PNYPStNTUnUd2-TWPqQBksuWoQcTzb6O9ZFN6RgyA/exec";
-    const PIN_ADMIN_DEFAULT = "2026";
 
     const video = document.getElementById('video-feed');
     let labeledFaceDescriptors = [];
@@ -287,7 +302,9 @@
     let isProcessing = false;
     let cooldownTimer = {};
     let targetAksiAdmin = "";
-    let dataServerPresensi = { daftarGuru: [], riwayatLog: [] };
+    let tokenAdminSementara = null;
+    let daftarMasterGuruCache = [];
+    let dataServerPresensi = { riwayatLog: [] };
 
     window.addEventListener('DOMContentLoaded', async () => {
       try {
@@ -307,8 +324,8 @@
           mulaiPemindaianLoop();
         });
 
-        // Tarik data riwayat dari Google Apps Script
-        tarikDataServer();
+        // Ambil daftar nama master di latar belakang
+        muatOpsiMasterGuru();
 
       } catch (err) {
         document.getElementById('loading-msg').innerHTML = `<span class="text-rose-400">Gagal kamera: ${err.message}</span>`;
@@ -352,7 +369,6 @@
         const res = await resp.json();
         if (res.status === "success") {
           tambahRiwayatTerkini(namaGuru, res.waktu, res.statusPresensi, tipeAbsen);
-          tarikDataServer(); // Update cache rekap
         }
       } catch (e) {
         console.error(e);
@@ -365,6 +381,7 @@
       if ('speechSynthesis' in window) {
         const ucapan = new SpeechSynthesisUtterance();
         ucapan.lang = 'id-ID';
+        ucapan.rate = 1.0;
         ucapan.text = tipe === 'Masuk' ? `Selamat pagi ${nama}, selamat bertugas.` : `Terima kasih ${nama}, selamat beristirahat.`;
         window.speechSynthesis.speak(ucapan);
       }
@@ -390,46 +407,118 @@
     // ================= OTORISASI PIN ADMIN =================
     function mintaAksesAdmin(aksi) {
       targetAksiAdmin = aksi;
-      document.getElementById('modal-auth').classList.remove('hidden');
-      document.getElementById('input-pin-auth').value = "";
-      document.getElementById('input-pin-auth').focus();
+      if (tokenAdminSementara) {
+        if (targetAksiAdmin === 'enroll') bukaModalEnrollment();
+        if (targetAksiAdmin === 'rekap') bukaModalRekap();
+      } else {
+        document.getElementById('modal-auth').classList.remove('hidden');
+        document.getElementById('input-pin-auth').value = "";
+        document.getElementById('input-pin-auth').focus();
+      }
     }
 
     function tutupModalAuth() {
       document.getElementById('modal-auth').classList.add('hidden');
     }
 
-    function verifikasiPinAdmin(e) {
+    async function verifikasiPinAdmin(e) {
       e.preventDefault();
-      const pin = document.getElementById('input-pin-auth').value.trim();
-      if (pin === PIN_ADMIN_DEFAULT) {
-        tutupModalAuth();
-        if (targetAksiAdmin === 'enroll') bukaModalEnrollment();
-        if (targetAksiAdmin === 'rekap') bukaModalRekap();
-      } else {
-        alert("PIN Admin Salah!");
+      const inputPin = document.getElementById('input-pin-auth').value.trim();
+      const submitBtn = e.target.querySelector('button[type="submit"]');
+
+      if (!inputPin) return;
+
+      submitBtn.disabled = true;
+      submitBtn.innerText = "Memverifikasi...";
+
+      try {
+        const resp = await fetch(API_GURU_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify({ action: "verifikasi_admin", pin: inputPin })
+        });
+        const res = await resp.json();
+
+        if (res.status === "success") {
+          tokenAdminSementara = inputPin;
+          tutupModalAuth();
+          if (targetAksiAdmin === 'enroll') bukaModalEnrollment();
+          if (targetAksiAdmin === 'rekap') bukaModalRekap();
+        } else {
+          alert("⚠️ Akses Ditolak: PIN Admin salah!");
+          document.getElementById('input-pin-auth').value = "";
+        }
+      } catch (err) {
+        alert("Gagal otorisasi: " + err.message);
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerText = "Buka";
       }
     }
 
-    // ================= ENROLLMENT GURU KE MASTER =================
+    // ================= SINKRONISASI MASTER KE DROPDOWN =================
+    async function muatOpsiMasterGuru() {
+      try {
+        const r = await fetch(API_GURU_URL);
+        const res = await r.json();
+        if (res.status === "success" && res.daftarGuru) {
+          daftarMasterGuruCache = res.daftarGuru;
+          const select = document.getElementById('select-nama-master');
+          let opt = '<option value="">-- Pilih dari Daftar Nama Master --</option>';
+          res.daftarGuru.forEach(g => {
+            opt += `<option value="${g.nama}" data-role="${g.role}" data-wa="${g.wa}">${g.nama} (${g.role})</option>`;
+          });
+          opt += '<option value="__manual__">➕ Ketik Nama Baru Lainnya...</option>';
+          select.innerHTML = opt;
+        }
+      } catch (e) {
+        console.error("Gagal muat master:", e);
+      }
+    }
+
+    function sinkronisasiNamaMaster() {
+      const select = document.getElementById('select-nama-master');
+      const boxManual = document.getElementById('box-nama-manual');
+      const val = select.value;
+
+      if (val === "__manual__") {
+        boxManual.classList.remove('hidden');
+        document.getElementById('input-nama-guru').value = "";
+        document.getElementById('input-wa-guru').value = "";
+      } else if (val) {
+        boxManual.classList.add('hidden');
+        document.getElementById('input-nama-guru').value = val;
+
+        const optTerpilih = select.options[select.selectedIndex];
+        const role = optTerpilih.dataset.role;
+        const wa = optTerpilih.dataset.wa;
+
+        if (role) document.getElementById('select-role-guru').value = role;
+        if (wa && wa !== "-") document.getElementById('input-wa-guru').value = wa;
+      } else {
+        boxManual.classList.remove('hidden');
+      }
+    }
+
     function bukaModalEnrollment() {
       document.getElementById('modal-enroll').classList.remove('hidden');
+      muatOpsiMasterGuru();
     }
 
     function tutupModalEnrollment() {
       document.getElementById('modal-enroll').classList.add('hidden');
       document.getElementById('input-nama-guru').value = "";
-      document.getElementById('input-jabatan-guru').value = "";
       document.getElementById('input-wa-guru').value = "";
+      document.getElementById('select-nama-master').value = "";
     }
 
     async function rekamVektorWajah() {
-      const nama = document.getElementById('input-nama-guru').value.trim();
-      const jabatan = document.getElementById('input-jabatan-guru').value.trim() || "Dewan Guru";
+      let nama = document.getElementById('input-nama-guru').value.trim();
+      const role = document.getElementById('select-role-guru').value;
       const wa = document.getElementById('input-wa-guru').value.trim() || "-";
 
       if (!nama) {
-        alert("Ketikkan nama lengkap guru!");
+        alert("Pilih atau ketikkan nama lengkap terlebih dahulu!");
         return;
       }
 
@@ -439,13 +528,13 @@
 
       const detections = await faceapi.detectSingleFace(video).withFaceLandmarks().withFaceDescriptor();
       if (!detections) {
-        alert("Wajah tidak terdeteksi! Harap menatap lurus ke kamera.");
+        alert("Wajah tidak terdeteksi! Harap menghadap lurus ke kamera.");
         btn.disabled = false;
-        btn.innerText = "Pindai Wajah & Simpan ke Master";
+        btn.innerText = "Pindai Wajah & Daftarkan";
         return;
       }
 
-      // 1. Simpan Vektor AI ke LocalStorage
+      // 1. Simpan Vektor Wajah ke LocalStorage
       const descArray = Array.from(detections.descriptor);
       let localDB = JSON.parse(localStorage.getItem('db_wajah_guru') || "[]");
       localDB = localDB.filter(item => item.nama.toLowerCase() !== nama.toLowerCase());
@@ -453,33 +542,33 @@
       localStorage.setItem('db_wajah_guru', JSON.stringify(localDB));
       muatDatabaseWajahLokal();
 
-      // 2. Simpan Data Guru ke Google Spreadsheet Tab Master_Guru
-      btn.innerText = "⏳ Mendaftarkan ke Spreadsheet Master...";
+      // 2. Simpan atau perbarui data master di Google Spreadsheet
+      btn.innerText = "⏳ Menyimpan ke Spreadsheet Master...";
       try {
         const resp = await fetch(API_GURU_URL, {
           method: "POST",
           headers: { "Content-Type": "text/plain;charset=utf-8" },
           body: JSON.stringify({
             action: "tambah_guru_master",
-            pin: PIN_ADMIN_DEFAULT,
+            pin: tokenAdminSementara,
             namaGuru: nama,
-            jabatan: jabatan,
+            role: role,
             wa: wa
           })
         });
         const res = await resp.json();
         if (res.status === "success") {
-          alert(`✅ Sempurna! Wajah dan identitas ${nama} berhasil masuk ke Master Guru.`);
+          alert(`✅ Sukses! Wajah dan identitas ${nama} [${role}] berhasil didaftarkan.`);
           tutupModalEnrollment();
-          tarikDataServer();
+          muatOpsiMasterGuru();
         } else {
           alert("Gagal: " + res.message);
         }
       } catch (err) {
-        alert("Kesalahan jaringan: " + err);
+        alert("Kesalahan koneksi: " + err.message);
       } finally {
         btn.disabled = false;
-        btn.innerText = "Pindai Wajah & Simpan ke Master";
+        btn.innerText = "Pindai Wajah & Daftarkan";
       }
     }
 
@@ -490,62 +579,104 @@
       faceMatcher = new faceapi.FaceMatcher(labeledFaceDescriptors, 0.45);
     }
 
-    // ================= DATA REKAP & CETAK LAPORAN =================
-    function tarikDataServer() {
-      fetch(API_GURU_URL)
-        .then(r => r.json())
-        .then(res => {
-          if (res.status === "success") {
-            dataServerPresensi = res;
-            filterTabelRekap();
-          }
-        })
-        .catch(e => console.error("Error data:", e));
-    }
-
+    // ================= REKAP SERVER & FILTER TANGGAL LENGKAP =================
     function bukaModalRekap() {
       document.getElementById('modal-rekap').classList.remove('hidden');
       sesuaikanFilterPeriode();
-      filterTabelRekap();
+      tarikDataRekapServer();
     }
 
     function tutupModalRekap() {
       document.getElementById('modal-rekap').classList.add('hidden');
     }
 
+    async function tarikDataRekapServer() {
+      if (!tokenAdminSementara) return;
+
+      const tbody = document.getElementById('tbody-rekap-guru');
+      tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-teal-400 font-bold">⏳ Mengambil data presensi dari server...</td></tr>`;
+
+      try {
+        const resp = await fetch(API_GURU_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify({
+            action: "ambil_rekap_admin",
+            pin: tokenAdminSementara
+          })
+        });
+        const res = await resp.json();
+        if (res.status === "success") {
+          dataServerPresensi.riwayatLog = res.riwayatLog || [];
+          filterTabelRekap();
+        } else {
+          tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-rose-400 font-bold">${res.message}</td></tr>`;
+        }
+      } catch (e) {
+        tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-rose-400">Gagal memuat rekap: ${e.message}</td></tr>`;
+      }
+    }
+
     function sesuaikanFilterPeriode() {
       const tipe = document.getElementById('filter-periode-tipe').value;
       const box = document.getElementById('box-subfilter');
+      const now = new Date();
+      const tglSekarang = now.toISOString().split('T')[0];
+      const blnSekarang = String(now.getMonth() + 1).padStart(2, '0');
 
       if (tipe === 'hari') {
-        box.innerHTML = `<label class="block text-[10px] text-slate-400 font-bold mb-1">Tanggal:</label><input type="date" id="param-tgl" value="${new Date().toISOString().split('T')[0]}" onchange="filterTabelRekap()" class="w-full p-2 rounded-xl bg-slate-900 border border-teal-800 text-white text-xs outline-none focus:border-teal-400">`;
+        box.innerHTML = `<label class="block text-[10px] text-slate-400 font-bold mb-1">Tanggal:</label><input type="date" id="param-tgl" value="${tglSekarang}" onchange="filterTabelRekap()" class="w-full p-2 rounded-xl bg-slate-900 border border-teal-800 text-white text-xs outline-none focus:border-teal-400">`;
       } else if (tipe === 'bulan') {
         box.innerHTML = `
           <label class="block text-[10px] text-slate-400 font-bold mb-1">Bulan:</label>
           <select id="param-bln" onchange="filterTabelRekap()" class="w-full p-2 rounded-xl bg-slate-900 border border-teal-800 text-white text-xs outline-none focus:border-teal-400">
-            <option value="01">Januari</option><option value="02">Februari</option><option value="03">Maret</option>
-            <option value="04">April</option><option value="05">Mei</option><option value="06">Juni</option>
-            <option value="07">Juli</option><option value="08">Agustus</option><option value="09">September</option>
-            <option value="10" selected>Oktober</option><option value="11">November</option><option value="12">Desember</option>
+            <option value="01" ${blnSekarang==='01'?'selected':''}>Januari</option>
+            <option value="02" ${blnSekarang==='02'?'selected':''}>Februari</option>
+            <option value="03" ${blnSekarang==='03'?'selected':''}>Maret</option>
+            <option value="04" ${blnSekarang==='04'?'selected':''}>April</option>
+            <option value="05" ${blnSekarang==='05'?'selected':''}>Mei</option>
+            <option value="06" ${blnSekarang==='06'?'selected':''}>Juni</option>
+            <option value="07" ${blnSekarang==='07'?'selected':''}>Juli</option>
+            <option value="08" ${blnSekarang==='08'?'selected':''}>Agustus</option>
+            <option value="09" ${blnSekarang==='09'?'selected':''}>September</option>
+            <option value="10" ${blnSekarang==='10'?'selected':''}>Oktober</option>
+            <option value="11" ${blnSekarang==='11'?'selected':''}>November</option>
+            <option value="12" ${blnSekarang==='12'?'selected':''}>Desember</option>
           </select>
         `;
       } else if (tipe === 'semester') {
+        const isGanjil = (now.getMonth() + 1) >= 7;
         box.innerHTML = `
           <label class="block text-[10px] text-slate-400 font-bold mb-1">Semester:</label>
           <select id="param-sem" onchange="filterTabelRekap()" class="w-full p-2 rounded-xl bg-slate-900 border border-teal-800 text-white text-xs outline-none focus:border-teal-400">
-            <option value="ganjil" selected>Semester Ganjil (Jul - Des)</option>
-            <option value="genap">Semester Genap (Jan - Jun)</option>
+            <option value="ganjil" ${isGanjil?'selected':''}>Semester Ganjil (Jul - Des)</option>
+            <option value="genap" ${!isGanjil?'selected':''}>Semester Genap (Jan - Jun)</option>
           </select>
         `;
       } else if (tipe === 'tahun') {
         box.innerHTML = `
-          <label class="block text-[10px] text-slate-400 font-bold mb-1">Tahun Ajaran:</label>
+          <label class="block text-[10px] text-slate-400 font-bold mb-1">Tahun:</label>
           <select id="param-thn" onchange="filterTabelRekap()" class="w-full p-2 rounded-xl bg-slate-900 border border-teal-800 text-white text-xs outline-none focus:border-teal-400">
             <option value="2026" selected>2026</option>
             <option value="2027">2027</option>
           </select>
         `;
       }
+    }
+
+    function normalisasiTanggalLog(tglStr) {
+      if (!tglStr) return "";
+      // Handle format ISO "2026-10-21" atau "2026-10-21T..."
+      if (tglStr.includes('T')) tglStr = tglStr.split('T')[0];
+      const p = tglStr.split(/[-/]/);
+      if (p.length === 3) {
+        if (p[0].length === 4) { // yyyy-mm-dd
+          return `${p[0]}-${String(p[1]).padStart(2, '0')}-${String(p[2]).padStart(2, '0')}`;
+        } else if (p[2].length === 4) { // dd-mm-yyyy
+          return `${p[2]}-${String(p[1]).padStart(2, '0')}-${String(p[0]).padStart(2, '0')}`;
+        }
+      }
+      return tglStr;
     }
 
     function filterTabelRekap() {
@@ -557,14 +688,17 @@
 
       const filtered = dataServerPresensi.riwayatLog.filter(log => {
         let cocokWaktu = true;
-        const [thn, bln, tgl] = log.tanggal.split('-');
+        const tglBersih = normalisasiTanggalLog(log.tanggal);
+        const parts = tglBersih.split('-');
+        const thn = parts[0];
+        const bln = parts[1];
 
         if (tipePeriode === 'hari') {
           const tglInput = document.getElementById('param-tgl') ? document.getElementById('param-tgl').value : "";
-          if (tglInput) cocokWaktu = (log.tanggal === tglInput);
+          if (tglInput) cocokWaktu = (tglBersih === tglInput);
         } else if (tipePeriode === 'bulan') {
-          const blnInput = document.getElementById('param-bln') ? document.getElementById('param-bln').value : "10";
-          cocokWaktu = (bln === blnInput);
+          const blnInput = document.getElementById('param-bln') ? document.getElementById('param-bln').value : "";
+          if (blnInput) cocokWaktu = (bln === blnInput);
         } else if (tipePeriode === 'semester') {
           const semInput = document.getElementById('param-sem') ? document.getElementById('param-sem').value : "ganjil";
           const m = parseInt(bln, 10);
@@ -580,7 +714,6 @@
         return cocokWaktu && cocokStatus && cocokNama;
       });
 
-      // Hitung Metrik
       let countTepat = 0, countTelat = 0;
       filtered.forEach(item => {
         if (item.status === 'Terlambat') countTelat++;
@@ -591,26 +724,28 @@
       document.getElementById('metric-tepat-waktu').innerText = countTepat;
       document.getElementById('metric-terlambat').innerText = countTelat;
 
-      // Render Baris Tabel
       const tbody = document.getElementById('tbody-rekap-guru');
       if (filtered.length === 0) {
         tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-500 italic">Tidak ada catatan presensi pada periode ini.</td></tr>`;
         return;
       }
 
-      tbody.innerHTML = filtered.map(log => `
-        <tr class="hover:bg-teal-950/30 transition">
-          <td class="p-2.5 font-mono text-slate-300">${log.tanggal}</td>
-          <td class="p-2.5 font-bold text-white">${log.nama}</td>
-          <td class="p-2.5 font-mono text-teal-300">${log.waktuPenuh.split(' ')[1] || log.waktuPenuh}</td>
-          <td class="p-2.5 text-slate-400">${log.tipe}</td>
-          <td class="p-2.5 text-center">
-            <span class="px-2 py-0.5 rounded text-[10px] font-bold ${log.status === 'Terlambat' ? 'bg-rose-500/20 text-rose-300' : 'bg-emerald-500/20 text-emerald-300'}">
-              ${log.status}
-            </span>
-          </td>
-        </tr>
-      `).join('');
+      tbody.innerHTML = filtered.map(log => {
+        const jam = log.waktuPenuh.includes(' ') ? log.waktuPenuh.split(' ')[1] : log.waktuPenuh;
+        return `
+          <tr class="hover:bg-teal-950/30 transition">
+            <td class="p-2.5 font-mono text-slate-300">${log.tanggal}</td>
+            <td class="p-2.5 font-bold text-white">${log.nama}</td>
+            <td class="p-2.5 font-mono text-teal-300">${jam}</td>
+            <td class="p-2.5 text-slate-400">${log.tipe}</td>
+            <td class="p-2.5 text-center">
+              <span class="px-2 py-0.5 rounded text-[10px] font-bold ${log.status === 'Terlambat' ? 'bg-rose-500/20 text-rose-300' : 'bg-emerald-500/20 text-emerald-300'}">
+                ${log.status}
+              </span>
+            </td>
+          </tr>
+        `;
+      }).join('');
     }
 
     function cetakLaporanGuru() {
@@ -626,10 +761,10 @@
           <thead>
             <tr style="background:#f1f5f9;">
               <th style="padding:6px; border:1px solid #333;">Tanggal</th>
-              <th style="padding:6px; border:1px solid #333;">Nama Lengkap Guru</th>
+              <th style="padding:6px; border:1px solid #333;">Nama Lengkap</th>
               <th style="padding:6px; border:1px solid #333;">Waktu Presensi</th>
               <th style="padding:6px; border:1px solid #333;">Tipe</th>
-              <th style="padding:6px; border:1px solid #333;">Keterangan / Status</th>
+              <th style="padding:6px; border:1px solid #333;">Status</th>
             </tr>
           </thead>
           <tbody>
