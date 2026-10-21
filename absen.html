@@ -67,7 +67,6 @@
     </div>
 
     <div class="flex items-center gap-2">
-      <!-- Selector Masuk / Pulang yang tidak saling mengunci -->
       <select id="pilih-tipe" onchange="gantiModeAbsen()" class="bg-slate-900 border border-slate-700 text-teal-300 text-xs font-bold px-3 py-2 rounded-xl outline-none focus:border-teal-400">
         <option value="Masuk">🟢 Presensi Masuk Pagi</option>
         <option value="Pulang">🔴 Presensi Pulang Sore</option>
@@ -293,7 +292,7 @@
     </div>
   </div>
 
-  <!-- ================= LOGIKA JAVASCRIPT ================= -->
+  <!-- ================= LOGIKA JAVASCRIPT LENGKAP ================= -->
   <script>
     const API_GURU_URL = "https://script.google.com/macros/s/AKfycbzzCHn0XFkiPNWm-I4opfmS2V9d9PNYPStNTUnUd2-TWPqQBksuWoQcTzb6O9ZFN6RgyA/exec";
 
@@ -301,7 +300,7 @@
     let labeledFaceDescriptors = [];
     let faceMatcher = null;
     let isProcessing = false;
-    let cooldownTimer = {}; // Menyimpan cooldown independen: [nama_tipe]
+    let cooldownTimer = {};
     let targetAksiAdmin = "";
     let tokenAdminSementara = null;
     let daftarMasterGuruCache = [];
@@ -334,7 +333,6 @@
     });
 
     function gantiModeAbsen() {
-      // Reset status deteksi seketika saat guru memilih mode Pulang/Masuk
       isProcessing = false;
       document.getElementById('feedback-main').innerText = "Menunggu Wajah Terdeteksi...";
       document.getElementById('feedback-sub').innerText = `Siap melakukan presensi ${document.getElementById('pilih-tipe').value}`;
@@ -411,7 +409,6 @@
       const tipeAbsen = document.getElementById('pilih-tipe').value;
       const keyCooldown = `${namaGuru}_${tipeAbsen}`;
 
-      // Cooldown dipisah per tipe (Masuk vs Pulang tidak saling mengunci)
       if (cooldownTimer[keyCooldown] && (now - cooldownTimer[keyCooldown] < 45000)) {
         return;
       }
@@ -467,7 +464,6 @@
       if (box.children.length > 3) box.removeChild(box.lastChild);
     }
 
-    // ================= OTORISASI PIN ADMIN =================
     function mintaAksesAdmin(aksi) {
       targetAksiAdmin = aksi;
       if (tokenAdminSementara) {
@@ -607,7 +603,7 @@
       }
     }
 
-    // ================= REKAP SERVER & FILTER TANGGAL LENGKAP =================
+    // ================= REKAP SERVER VIA METODE GET (BEBAS REDIRECT/CORS) =================
     function bukaModalRekap() {
       document.getElementById('modal-rekap').classList.remove('hidden');
       sesuaikanFilterPeriode();
@@ -625,15 +621,11 @@
       tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-teal-400 font-bold">⏳ Mengambil data presensi dari server...</td></tr>`;
 
       try {
-        const resp = await fetch(API_GURU_URL, {
-          method: "POST",
-          headers: { "Content-Type": "text/plain;charset=utf-8" },
-          body: JSON.stringify({
-            action: "ambil_rekap_admin",
-            pin: tokenAdminSementara
-          })
-        });
+        // Ambil data via GET dengan query parameter (Aman dari isu 302 redirect Google Apps Script)
+        const urlRekap = `${API_GURU_URL}?action=ambil_rekap_admin&pin=${encodeURIComponent(tokenAdminSementara)}&t=${Date.now()}`;
+        const resp = await fetch(urlRekap);
         const res = await resp.json();
+
         if (res.status === "success") {
           dataServerPresensi.riwayatLog = res.riwayatLog || [];
           filterTabelRekap();
