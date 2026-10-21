@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smart Face Attendance — SD Methodist Immanuel</title>
+  <meta name="robots" content="noindex, nofollow">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Model AI Face-API Client-side -->
+  <script src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api/dist/face-api.js"></script>
+
+  <style>
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: radial-gradient(circle at 50% 0%, #0f172a 0%, #020617 100%);
+      color: #f8fafc;
+      min-height: 100vh;
+    }
+    .font-title { font-family: 'Fredoka', sans-serif; }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.04);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    #video-wrapper {
+      position: relative;
+      width: 100%;
+      max-width: 540px;
+      aspect-ratio: 4/3;
+      margin: 0 auto;
+      border-radius: 24px;
+      overflow: hidden;
+      border: 2px solid rgba(20, 184, 166, 0.3);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8);
+      background: #000;
+    }
+    video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transform: scaleX(-1); /* Cermin */
+    }
+    canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      transform: scaleX(-1);
+    }
+  </style>
+</head>
+<body class="p-3 sm:p-5 flex flex-col justify-between min-h-screen">
+
+  <!-- ================= TOP BAR ================= -->
+  <header class="glass-card rounded-3xl p-4 mb-4 flex flex-wrap justify-between items-center gap-3">
+    <div class="flex items-center gap-3">
+      <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-teal-500 to-emerald-600 flex items-center justify-center text-white text-xl shadow-lg shadow-teal-500/20">
+        <i class="fa-solid fa-camera-viewfinder"></i>
+      </div>
+      <div>
+        <h1 class="font-title text-lg sm:text-xl text-white tracking-wide leading-tight">SMART FACE <span class="text-teal-400">ATTENDANCE</span></h1>
+        <p class="text-[11px] text-slate-400">Pemindai Wajah Dewan Guru & Staf • SD Methodist Immanuel</p>
+      </div>
+    </div>
+
+    <!-- Tombol Mode & Perekaman Wajah Baru -->
+    <div class="flex items-center gap-2">
+      <select id="pilih-tipe" class="bg-slate-900 border border-slate-700 text-teal-300 text-xs font-bold px-3 py-2 rounded-xl outline-none focus:border-teal-400">
+        <option value="Masuk">🟢 Presensi Masuk Pagi</option>
+        <option value="Pulang">🔴 Presensi Pulang Sore</option>
+      </select>
+
+      <button onclick="bukaModalEnrollment()" class="bg-teal-600 hover:bg-teal-500 text-white font-title text-xs font-bold px-3.5 py-2 rounded-xl transition flex items-center gap-1.5 shadow">
+        <i class="fa-solid fa-user-plus"></i> <span class="hidden sm:inline">Rekam Guru Baru</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ================= AREA UTAMA KAMERA SCANNER ================= -->
+  <main class="flex-grow flex flex-col items-center justify-center space-y-4">
+
+    <!-- Kontainer Kamera Video -->
+    <div id="video-wrapper">
+      <video id="video-feed" autoplay muted playsinline></video>
+      <div id="camera-loading" class="absolute inset-0 flex flex-col items-center justify-center bg-slate-950/90 text-slate-400 text-xs gap-3">
+        <div class="w-10 h-10 border-4 border-teal-400 border-t-transparent rounded-full animate-spin"></div>
+        <span id="loading-msg" class="font-bold">Menginisialisasi kamera dan model AI...</span>
+      </div>
+    </div>
+
+    <!-- Banner Feedback Status Deteksi -->
+    <div class="w-full max-w-lg glass-card p-3.5 rounded-2xl border border-teal-900/60 text-center space-y-1" id="status-card">
+      <p class="text-xs text-slate-400 font-semibold" id="feedback-sub">Silakan berdiri di depan kamera lobi</p>
+      <p class="font-title text-base sm:text-lg text-white" id="feedback-main">Menunggu Wajah Terdeteksi...</p>
+    </div>
+
+    <!-- Feed Presensi 3 Guru Terakhir -->
+    <div class="w-full max-w-lg space-y-1.5" id="history-box">
+      <!-- Diisi otomatis saat sukses absen -->
+    </div>
+
+  </main>
+
+  <!-- ================= FOOTER DENGAN KREDIT RESMI ================= -->
+  <footer class="mt-6 pt-3 border-t border-slate-800/80 text-center text-xs text-slate-500 space-y-1">
+    <p>Smart Face Attendance System • SD Methodist Immanuel</p>
+    <p class="text-[11px] text-teal-400/80 font-mono font-semibold">
+      Architected & Developed by: Thomas Ryantama, M.Kom., Gr. | NalarSci Lab
+    </p>
+  </footer>
+
+  <!-- ================= MODAL REKAM WAJAH BARU (ENROLLMENT) ================= -->
+  <div id="modal-enroll" class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+    <div class="glass-card max-w-md w-full rounded-3xl p-6 border border-teal-500/40 bg-slate-950 shadow-2xl space-y-4">
+      <div class="flex justify-between items-center border-b border-teal-900/60 pb-3">
+        <h3 class="font-title text-base text-teal-300">Perekaman Vektor Wajah Guru</h3>
+        <button onclick="tutupModalEnrollment()" class="text-slate-400 hover:text-white font-bold text-lg">✕</button>
+      </div>
+
+      <div class="space-y-3 text-xs">
+        <div>
+          <label class="block text-slate-300 font-bold mb-1">Nama Lengkap Guru (Sesuai Master):</label>
+          <input type="text" id="input-nama-guru" placeholder="Contoh: Dra. Ester Simanjuntak, M.Pd." class="w-full p-3 rounded-xl bg-slate-900 border border-teal-800 text-white outline-none focus:border-teal-400">
+        </div>
+        <div>
+          <label class="block text-slate-300 font-bold mb-1">Jabatan / Keterangan:</label>
+          <input type="text" id="input-jabatan-guru" placeholder="Contoh: Kepala Sekolah / Guru Kelas 4B" class="w-full p-3 rounded-xl bg-slate-900 border border-teal-800 text-white outline-none focus:border-teal-400">
+        </div>
+        <p class="text-[11px] text-slate-400 leading-relaxed">
+          Posisikan guru menghadap lurus ke kamera dengan pencahayaan terang, lalu tekan tombol simpan di bawah.
+        </p>
+      </div>
+
+      <div class="pt-2">
+        <button onclick="rekamVektorWajah()" id="btn-rekam" class="w-full py-3 bg-teal-600 hover:bg-teal-500 text-white font-title text-xs font-bold rounded-xl transition shadow flex items-center justify-center gap-2">
+          <i class="fa-solid fa-camera"></i> Pindai & Simpan Wajah Guru
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ENDPOINT API APPS SCRIPT YANG TELAH DI-DEPLOY
+    const API_GURU_URL = "https://script.google.com/macros/s/AKfycbzzCHn0XFkiPNWm-I4opfmS2V9d9PNYPStNTUnUd2-TWPqQBksuWoQcTzb6O9ZFN6RgyA/exec";
+
+    const video = document.getElementById('video-feed');
+    let labeledFaceDescriptors = [];
+    let faceMatcher = null;
+    let isProcessing = false;
+    let cooldownTimer = {};
+
+    // 1. Inisialisasi Model AI & Kamera
+    window.addEventListener('DOMContentLoaded', async () => {
+      try {
+        const MODEL_URL = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/';
+        document.getElementById('loading-msg').innerText = "Mengunduh model bobot biometrik wajah...";
+        
+        await Promise.all([
+          faceapi.nets.ssdMobilenetv1.loadFromUri(MODEL_URL),
+          faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
+          faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL)
+        ]);
+
+        document.getElementById('loading-msg').innerText = "Membuka sensor kamera...";
+        const stream = await navigator.mediaDevices.getUserMedia({ video: { width: 640, height: 480 } });
+        video.srcObject = stream;
+
+        // Muat database vektor wajah lokal
+        muatDatabaseWajahLokal();
+
+        video.addEventListener('play', () => {
+          document.getElementById('camera-loading').classList.add('hidden');
+          mulaiPemindaianLoop();
+        });
+
+      } catch (err) {
+        document.getElementById('loading-msg').innerHTML = `<span class="text-rose-400">Gagal inisialisasi: ${err.message}</span>`;
+      }
+    });
+
+    // 2. Loop Deteksi & Pencocokan Wajah
+    function mulaiPemindaianLoop() {
+      const displaySize = { width: video.videoWidth || 640, height: video.videoHeight || 480 };
+      
+      setInterval(async () => {
+        if (isProcessing) return;
+
+        const detections = await faceapi.detectSingleFace(video)
+          .withFaceLandmarks()
+          .withFaceDescriptor();
+
+        if (detections && faceMatcher) {
+          const match = faceMatcher.findBestMatch(detections.descriptor);
+          
+          if (match.label !== 'unknown' && match.distance < 0.45) {
+            eksekusiPresensiSukses(match.label);
+          } else {
+            document.getElementById('feedback-main').innerText = "Wajah Belum Terdaftar";
+            document.getElementById('feedback-sub').innerText = "Silakan daftarkan wajah lewat tombol di kanan atas";
+          }
+        }
+      }, 500); // Evaluasi tiap 0.5 detik
+    }
+
+    // 3. Kirim Presensi ke Google Apps Script Backend
+    async function eksekusiPresensiSukses(namaGuru) {
+      const now = Date.now();
+      // Beri cooldown 60 detik agar tidak double tap
+      if (cooldownTimer[namaGuru] && (now - cooldownTimer[namaGuru] < 60000)) {
+        return;
+      }
+      cooldownTimer[namaGuru] = now;
+      isProcessing = true;
+
+      const tipeAbsen = document.getElementById('pilih-tipe').value;
+      document.getElementById('feedback-main').innerText = `✅ Teridentifikasi: ${namaGuru}`;
+      document.getElementById('feedback-sub').innerText = `Menyimpan presensi ${tipeAbsen} ke server...`;
+
+      // Suara Sapaan Audio
+      ucapkanSapaan(namaGuru, tipeAbsen);
+
+      try {
+        const resp = await fetch(API_GURU_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify({
+            namaGuru: namaGuru,
+            tipe: tipeAbsen,
+            keterangan: "Presensi Wajah Pos Lobi"
+          })
+        });
+
+        const res = await resp.json();
+        if (res.status === "success") {
+          tambahRiwayatTerkini(namaGuru, res.waktu, res.statusPresensi, tipeAbsen);
+        }
+      } catch (e) {
+        console.error("Gagal kirim log:", e);
+      } finally {
+        setTimeout(() => { isProcessing = false; }, 3000);
+      }
+    }
+
+    function ucapkanSapaan(nama, tipe) {
+      if ('speechSynthesis' in window) {
+        const ucapan = new SpeechSynthesisUtterance();
+        ucapan.lang = 'id-ID';
+        ucapan.rate = 1.0;
+        ucapan.text = tipe === 'Masuk' ? `Selamat pagi ${nama}, selamat bertugas.` : `Terima kasih ${nama}, selamat beristirahat.`;
+        window.speechSynthesis.speak(ucapan);
+      }
+    }
+
+    function tambahRiwayatTerkini(nama, waktu, status, tipe) {
+      const box = document.getElementById('history-box');
+      const item = document.createElement('div');
+      item.className = "p-3 bg-slate-900/90 rounded-2xl border border-teal-900/80 flex justify-between items-center text-xs animate-fade-in";
+      item.innerHTML = `
+        <div>
+          <p class="font-bold text-white">${nama}</p>
+          <p class="text-[10px] text-slate-400">${tipe} • ${waktu}</p>
+        </div>
+        <span class="px-2 py-0.5 rounded text-[10px] font-bold ${status === 'Terlambat' ? 'bg-rose-500/20 text-rose-300' : 'bg-emerald-500/20 text-emerald-300'}">
+          ${status}
+        </span>
+      `;
+      box.prepend(item);
+      if (box.children.length > 3) box.removeChild(box.lastChild);
+    }
+
+    // 4. Perekaman Vektor Wajah Guru Baru
+    function bukaModalEnrollment() {
+      document.getElementById('modal-enroll').classList.remove('hidden');
+    }
+
+    function tutupModalEnrollment() {
+      document.getElementById('modal-enroll').classList.add('hidden');
+      document.getElementById('input-nama-guru').value = "";
+      document.getElementById('input-jabatan-guru').value = "";
+    }
+
+    async function rekamVektorWajah() {
+      const nama = document.getElementById('input-nama-guru').value.trim();
+      if (!nama) {
+        alert("Masukkan nama lengkap guru!");
+        return;
+      }
+
+      const btn = document.getElementById('btn-rekam');
+      btn.disabled = true;
+      btn.innerText = "⏳ Memindai struktur wajah...";
+
+      const detections = await faceapi.detectSingleFace(video)
+        .withFaceLandmarks()
+        .withFaceDescriptor();
+
+      if (!detections) {
+        alert("Wajah tidak terdeteksi! Pastikan guru menatap lurus ke kamera.");
+        btn.disabled = false;
+        btn.innerText = "Pindai & Simpan Wajah Guru";
+        return;
+      }
+
+      // Simpan array 128 vektor ke localStorage
+      const descriptorArray = Array.from(detections.descriptor);
+      let localDB = JSON.parse(localStorage.getItem('db_wajah_guru') || "[]");
+
+      // Hapus data lama jika ada nama yang sama
+      localDB = localDB.filter(item => item.nama.toLowerCase() !== nama.toLowerCase());
+      localDB.push({ nama: nama, descriptor: descriptorArray });
+
+      localStorage.setItem('db_wajah_guru', JSON.stringify(localDB));
+      muatDatabaseWajahLokal();
+
+      alert(`✅ Berhasil merekam vektor wajah untuk ${nama}!`);
+      btn.disabled = false;
+      btn.innerText = "Pindai & Simpan Wajah Guru";
+      tutupModalEnrollment();
+    }
+
+    function muatDatabaseWajahLokal() {
+      const localDB = JSON.parse(localStorage.getItem('db_wajah_guru') || "[]");
+      if (localDB.length === 0) {
+        faceMatcher = null;
+        return;
+      }
+
+      labeledFaceDescriptors = localDB.map(item => {
+        const desc = new Float32Array(item.descriptor);
+        return new faceapi.LabeledFaceDescriptors(item.nama, [desc]);
+      });
+
+      faceMatcher = new faceapi.FaceMatcher(labeledFaceDescriptors, 0.45);
+    }
+  </script>
+</body>
+</html>
