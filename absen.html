@@ -3,14 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Smart Face Attendance — SD Methodist Immanuel</title>
+  <title>Smart Face Attendance & Rekap Presensi — SD Methodist Immanuel</title>
   <meta name="robots" content="noindex, nofollow">
 
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-  <!-- Model AI Face-API Client-side -->
   <script src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api/dist/face-api.js"></script>
 
   <style>
@@ -43,133 +41,265 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
-      transform: scaleX(-1); /* Cermin */
-    }
-    canvas {
-      position: absolute;
-      top: 0;
-      left: 0;
       transform: scaleX(-1);
+    }
+    @media print {
+      body { background: white !important; color: black !important; padding: 0 !important; }
+      header, footer, button, #video-wrapper, #status-card, #history-box, .no-print { display: none !important; }
+      #area-cetak-rekap { display: block !important; }
+      table { border-collapse: collapse !important; width: 100% !important; color: black !important; }
+      th, td { border: 1px solid #333 !important; padding: 5px 8px !important; }
     }
   </style>
 </head>
 <body class="p-3 sm:p-5 flex flex-col justify-between min-h-screen">
 
   <!-- ================= TOP BAR ================= -->
-  <header class="glass-card rounded-3xl p-4 mb-4 flex flex-wrap justify-between items-center gap-3">
+  <header class="glass-card rounded-3xl p-4 mb-4 flex flex-wrap justify-between items-center gap-3 no-print">
     <div class="flex items-center gap-3">
       <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-teal-500 to-emerald-600 flex items-center justify-center text-white text-xl shadow-lg shadow-teal-500/20">
         <i class="fa-solid fa-camera-viewfinder"></i>
       </div>
       <div>
         <h1 class="font-title text-lg sm:text-xl text-white tracking-wide leading-tight">SMART FACE <span class="text-teal-400">ATTENDANCE</span></h1>
-        <p class="text-[11px] text-slate-400">Pemindai Wajah Dewan Guru & Staf • SD Methodist Immanuel</p>
+        <p class="text-[11px] text-slate-400">Presensi Biometrik Dewan Guru • SD Methodist Immanuel</p>
       </div>
     </div>
 
-    <!-- Tombol Mode & Perekaman Wajah Baru -->
+    <!-- Tombol Mode & Panel Admin -->
     <div class="flex items-center gap-2">
       <select id="pilih-tipe" class="bg-slate-900 border border-slate-700 text-teal-300 text-xs font-bold px-3 py-2 rounded-xl outline-none focus:border-teal-400">
         <option value="Masuk">🟢 Presensi Masuk Pagi</option>
         <option value="Pulang">🔴 Presensi Pulang Sore</option>
       </select>
 
-      <button onclick="bukaModalEnrollment()" class="bg-teal-600 hover:bg-teal-500 text-white font-title text-xs font-bold px-3.5 py-2 rounded-xl transition flex items-center gap-1.5 shadow">
-        <i class="fa-solid fa-user-plus"></i> <span class="hidden sm:inline">Rekam Guru Baru</span>
+      <button onclick="mintaAksesAdmin('enroll')" class="bg-slate-800 hover:bg-slate-700 text-teal-300 border border-teal-800 font-title text-xs font-bold px-3 py-2 rounded-xl transition flex items-center gap-1.5 shadow">
+        <i class="fa-solid fa-lock"></i> <span class="hidden sm:inline">Rekam Guru Baru</span>
+      </button>
+
+      <button onclick="mintaAksesAdmin('rekap')" class="bg-teal-600 hover:bg-teal-500 text-white font-title text-xs font-bold px-3.5 py-2 rounded-xl transition flex items-center gap-1.5 shadow">
+        <i class="fa-solid fa-chart-pie"></i> Rekap Admin
       </button>
     </div>
   </header>
 
-  <!-- ================= AREA UTAMA KAMERA SCANNER ================= -->
-  <main class="flex-grow flex flex-col items-center justify-center space-y-4">
-
-    <!-- Kontainer Kamera Video -->
+  <!-- ================= AREA UTAMA KAMERA ================= -->
+  <main class="flex-grow flex flex-col items-center justify-center space-y-4 no-print">
     <div id="video-wrapper">
       <video id="video-feed" autoplay muted playsinline></video>
       <div id="camera-loading" class="absolute inset-0 flex flex-col items-center justify-center bg-slate-950/90 text-slate-400 text-xs gap-3">
         <div class="w-10 h-10 border-4 border-teal-400 border-t-transparent rounded-full animate-spin"></div>
-        <span id="loading-msg" class="font-bold">Menginisialisasi kamera dan model AI...</span>
+        <span id="loading-msg" class="font-bold">Menginisialisasi kamera dan model biometrik...</span>
       </div>
     </div>
 
-    <!-- Banner Feedback Status Deteksi -->
     <div class="w-full max-w-lg glass-card p-3.5 rounded-2xl border border-teal-900/60 text-center space-y-1" id="status-card">
-      <p class="text-xs text-slate-400 font-semibold" id="feedback-sub">Silakan berdiri di depan kamera lobi</p>
+      <p class="text-xs text-slate-400 font-semibold" id="feedback-sub">Posisikan wajah menghadap kamera lobi</p>
       <p class="font-title text-base sm:text-lg text-white" id="feedback-main">Menunggu Wajah Terdeteksi...</p>
     </div>
 
-    <!-- Feed Presensi 3 Guru Terakhir -->
-    <div class="w-full max-w-lg space-y-1.5" id="history-box">
-      <!-- Diisi otomatis saat sukses absen -->
-    </div>
-
+    <div class="w-full max-w-lg space-y-1.5" id="history-box"></div>
   </main>
 
-  <!-- ================= FOOTER DENGAN KREDIT RESMI ================= -->
-  <footer class="mt-6 pt-3 border-t border-slate-800/80 text-center text-xs text-slate-500 space-y-1">
+  <!-- ================= FOOTER KREDIT RESMI ================= -->
+  <footer class="mt-6 pt-3 border-t border-slate-800/80 text-center text-xs text-slate-500 space-y-1 no-print">
     <p>Smart Face Attendance System • SD Methodist Immanuel</p>
-    <p class="text-[11px] text-teal-400/80 font-mono font-semibold">
+    <p class="text-[11px] text-teal-400/90 font-mono font-bold tracking-wide">
       Architected & Developed by: Thomas Ryantama, M.Kom., Gr. | NalarSci Lab
     </p>
   </footer>
 
-  <!-- ================= MODAL REKAM WAJAH BARU (ENROLLMENT) ================= -->
-  <div id="modal-enroll" class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+  <!-- ================= 1. MODAL OTORISASI PIN ADMIN ================= -->
+  <div id="modal-auth" class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden no-print">
+    <div class="glass-card max-w-xs w-full rounded-3xl p-6 border border-teal-500/40 bg-slate-950 text-center space-y-4 shadow-2xl">
+      <div class="w-12 h-12 bg-amber-500/10 border border-amber-500/30 rounded-2xl flex items-center justify-center mx-auto text-2xl text-amber-400">
+        🔐
+      </div>
+      <div>
+        <h3 class="font-title text-base text-white">Akses Terproteksi Admin</h3>
+        <p class="text-[11px] text-slate-400 mt-1">Ketikkan PIN Pengelola Presensi untuk melanjutkan.</p>
+      </div>
+
+      <form onsubmit="verifikasiPinAdmin(event)" class="space-y-3">
+        <input type="password" id="input-pin-auth" placeholder="Ketik PIN Admin..." class="w-full p-3 rounded-xl bg-slate-900 border border-teal-800 text-white text-center font-mono tracking-widest text-sm outline-none focus:border-teal-400">
+        <div class="flex gap-2">
+          <button type="button" onclick="tutupModalAuth()" class="flex-1 py-2.5 bg-slate-800 text-slate-300 rounded-xl text-xs font-bold transition">Batal</button>
+          <button type="submit" class="flex-1 py-2.5 bg-teal-600 hover:bg-teal-500 text-white rounded-xl text-xs font-bold font-title transition shadow">Buka</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= 2. MODAL REKAM GURU BARU (ENROLLMENT) ================= -->
+  <div id="modal-enroll" class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden no-print">
     <div class="glass-card max-w-md w-full rounded-3xl p-6 border border-teal-500/40 bg-slate-950 shadow-2xl space-y-4">
       <div class="flex justify-between items-center border-b border-teal-900/60 pb-3">
-        <h3 class="font-title text-base text-teal-300">Perekaman Vektor Wajah Guru</h3>
+        <h3 class="font-title text-base text-teal-300">Perekaman Vektor & Master Guru</h3>
         <button onclick="tutupModalEnrollment()" class="text-slate-400 hover:text-white font-bold text-lg">✕</button>
       </div>
 
       <div class="space-y-3 text-xs">
         <div>
-          <label class="block text-slate-300 font-bold mb-1">Nama Lengkap Guru (Sesuai Master):</label>
+          <label class="block text-slate-300 font-bold mb-1">Nama Lengkap Guru & Gelar:</label>
           <input type="text" id="input-nama-guru" placeholder="Contoh: Dra. Ester Simanjuntak, M.Pd." class="w-full p-3 rounded-xl bg-slate-900 border border-teal-800 text-white outline-none focus:border-teal-400">
         </div>
         <div>
-          <label class="block text-slate-300 font-bold mb-1">Jabatan / Keterangan:</label>
+          <label class="block text-slate-300 font-bold mb-1">Jabatan / Guru Kelas / Mapel:</label>
           <input type="text" id="input-jabatan-guru" placeholder="Contoh: Kepala Sekolah / Guru Kelas 4B" class="w-full p-3 rounded-xl bg-slate-900 border border-teal-800 text-white outline-none focus:border-teal-400">
         </div>
-        <p class="text-[11px] text-slate-400 leading-relaxed">
-          Posisikan guru menghadap lurus ke kamera dengan pencahayaan terang, lalu tekan tombol simpan di bawah.
-        </p>
+        <div>
+          <label class="block text-slate-300 font-bold mb-1">Nomor WhatsApp Resmi (Opsional):</label>
+          <input type="text" id="input-wa-guru" placeholder="08xxxxxxxxxx" class="w-full p-3 rounded-xl bg-slate-900 border border-teal-800 text-white outline-none focus:border-teal-400">
+        </div>
       </div>
 
       <div class="pt-2">
         <button onclick="rekamVektorWajah()" id="btn-rekam" class="w-full py-3 bg-teal-600 hover:bg-teal-500 text-white font-title text-xs font-bold rounded-xl transition shadow flex items-center justify-center gap-2">
-          <i class="fa-solid fa-camera"></i> Pindai & Simpan Wajah Guru
+          <i class="fa-solid fa-camera"></i> Pindai Wajah & Simpan ke Master
         </button>
       </div>
     </div>
   </div>
 
+  <!-- ================= 3. MODAL REKAPITULASI PRESENSI ADMIN MULTI-PERIODE ================= -->
+  <div id="modal-rekap" class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 flex items-center justify-center p-3 sm:p-5 hidden no-print">
+    <div class="glass-card max-w-4xl w-full rounded-3xl p-5 sm:p-6 border border-teal-500/40 bg-slate-900 shadow-2xl flex flex-col max-h-[92vh]">
+      
+      <div class="flex justify-between items-center border-b border-teal-900/80 pb-3 mb-3">
+        <div>
+          <h3 class="font-title text-lg text-teal-300">Rekapitulasi Kehadiran Dewan Guru</h3>
+          <p class="text-[11px] text-slate-400">Laporan multi-periode terintegrasi Google Spreadsheet.</p>
+        </div>
+        <button onclick="tutupModalRekap()" class="text-slate-400 hover:text-white font-bold text-xl px-2">✕</button>
+      </div>
+
+      <!-- FILTER PERIODE REKAP -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-3 bg-slate-950/80 p-2.5 rounded-2xl border border-teal-900/60 text-xs">
+        <div>
+          <label class="block text-[10px] text-slate-400 font-bold mb-1">Rentang Periode:</label>
+          <select id="filter-periode-tipe" onchange="sesuaikanFilterPeriode()" class="w-full p-2 rounded-xl bg-slate-900 border border-teal-800 text-white font-bold outline-none focus:border-teal-400 text-xs">
+            <option value="hari">📅 Hari Ini</option>
+            <option value="bulan">📆 Rekap Bulanan</option>
+            <option value="semester">🎓 Rekap Semester</option>
+            <option value="tahun">🏛️ Rekap Tahunan</option>
+          </select>
+        </div>
+
+        <div id="box-subfilter">
+          <!-- Parameter bulan/semester dinamis -->
+        </div>
+
+        <div>
+          <label class="block text-[10px] text-slate-400 font-bold mb-1">Status Kehadiran:</label>
+          <select id="filter-rekap-status" onchange="filterTabelRekap()" class="w-full p-2 rounded-xl bg-slate-900 border border-teal-800 text-white font-bold outline-none focus:border-teal-400 text-xs">
+            <option value="semua">Semua Status</option>
+            <option value="Tepat Waktu">Tepat Waktu</option>
+            <option value="Terlambat">Terlambat</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-[10px] text-slate-400 font-bold mb-1">Cari Nama Guru:</label>
+          <input type="text" id="filter-rekap-nama" oninput="filterTabelRekap()" placeholder="Ketik nama..." class="w-full p-2 rounded-xl bg-slate-900 border border-teal-800 text-white text-xs outline-none focus:border-teal-400">
+        </div>
+      </div>
+
+      <!-- KARTU RINGKASAN METRIK -->
+      <div class="grid grid-cols-3 gap-2 text-center text-xs mb-3">
+        <div class="bg-slate-950/90 p-2.5 rounded-xl border border-teal-900/60">
+          <span class="text-[10px] text-slate-400 block">Total Log Hadir</span>
+          <span class="font-title text-base text-teal-300 font-bold" id="metric-total-hadir">0</span>
+        </div>
+        <div class="bg-slate-950/90 p-2.5 rounded-xl border border-teal-900/60">
+          <span class="text-[10px] text-slate-400 block">Tepat Waktu</span>
+          <span class="font-title text-base text-emerald-400 font-bold" id="metric-tepat-waktu">0</span>
+        </div>
+        <div class="bg-slate-950/90 p-2.5 rounded-xl border border-teal-900/60">
+          <span class="text-[10px] text-slate-400 block">Terlambat</span>
+          <span class="font-title text-base text-rose-400 font-bold" id="metric-terlambat">0</span>
+        </div>
+      </div>
+
+      <!-- TABEL DAFTAR REKAP -->
+      <div class="overflow-y-auto flex-grow border border-teal-900/60 rounded-xl bg-slate-950/60">
+        <table class="w-full text-left text-xs text-slate-300">
+          <thead class="bg-slate-900 text-teal-300 uppercase text-[10px] font-bold sticky top-0 border-b border-teal-900">
+            <tr>
+              <th class="p-2.5">Tanggal</th>
+              <th class="p-2.5">Nama Guru</th>
+              <th class="p-2.5">Waktu Tap</th>
+              <th class="p-2.5">Tipe</th>
+              <th class="p-2.5 text-center">Status</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-rekap-guru" class="divide-y divide-teal-950/60">
+            <!-- Diisi otomatis -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- FOOTER MODAL & TOMBOL CETAK -->
+      <div class="flex justify-between items-center pt-3 mt-1 border-t border-teal-900/80">
+        <span class="text-[11px] text-slate-500 font-mono">Arsitektur: Thomas Ryantama, Gr.</span>
+        <button onclick="cetakLaporanGuru()" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs px-4 py-2 rounded-xl transition flex items-center gap-1.5 shadow">
+          🖨️ Cetak Laporan Presensi Fisik
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ================= 4. LEMBAR CETAK FISIK RESMI (PRINT ONLY) ================= -->
+  <div id="area-cetak-rekap" class="hidden p-6 max-w-4xl mx-auto bg-white text-black text-xs">
+    <div class="border-b-2 border-black pb-2 mb-4 text-center">
+      <h3 class="text-xs font-semibold uppercase tracking-wider">YAYASAN PENDIDIKAN METHODIST IMMANUEL</h3>
+      <h2 class="text-base font-black uppercase tracking-wide">SD METHODIST IMMANUEL BANDAR LAMPUNG</h2>
+      <p class="text-[10px] text-gray-700">Jl. Raden Intan No. 123, Bandar Lampung • Telp: (0721) 123456</p>
+      <h1 class="text-sm font-black uppercase underline mt-2" id="pr-judul-laporan">LAPORAN REKAPITULASI PRESENSI DEWAN GURU</h1>
+      <p class="text-[10px] text-gray-600" id="pr-periode-info">Periode: -</p>
+    </div>
+
+    <div id="pr-konten-tabel"></div>
+
+    <div class="flex justify-between mt-12 text-xs text-center">
+      <div>
+        <p>Mengetahui,</p>
+        <p><b>Kepala Sekolah</b></p>
+        <div style="height: 60px;"></div>
+        <p><u>Dra. Ester Simanjuntak, M.Pd.</u></p>
+      </div>
+      <div>
+        <p id="pr-titi-mangsa">Bandar Lampung, -</p>
+        <p><b>Waka Kesiswaan & IT</b></p>
+        <div style="height: 60px;"></div>
+        <p><u>Thomas Ryantama, M.Kom., Gr.</u></p>
+      </div>
+    </div>
+  </div>
+
   <script>
-    // ENDPOINT API APPS SCRIPT YANG TELAH DI-DEPLOY
     const API_GURU_URL = "https://script.google.com/macros/s/AKfycbzzCHn0XFkiPNWm-I4opfmS2V9d9PNYPStNTUnUd2-TWPqQBksuWoQcTzb6O9ZFN6RgyA/exec";
+    const PIN_ADMIN_DEFAULT = "2026";
 
     const video = document.getElementById('video-feed');
     let labeledFaceDescriptors = [];
     let faceMatcher = null;
     let isProcessing = false;
     let cooldownTimer = {};
+    let targetAksiAdmin = "";
+    let dataServerPresensi = { daftarGuru: [], riwayatLog: [] };
 
-    // 1. Inisialisasi Model AI & Kamera
     window.addEventListener('DOMContentLoaded', async () => {
       try {
         const MODEL_URL = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/';
-        document.getElementById('loading-msg').innerText = "Mengunduh model bobot biometrik wajah...";
-        
         await Promise.all([
           faceapi.nets.ssdMobilenetv1.loadFromUri(MODEL_URL),
           faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
           faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL)
         ]);
 
-        document.getElementById('loading-msg').innerText = "Membuka sensor kamera...";
         const stream = await navigator.mediaDevices.getUserMedia({ video: { width: 640, height: 480 } });
         video.srcObject = stream;
-
-        // Muat database vektor wajah lokal
         muatDatabaseWajahLokal();
 
         video.addEventListener('play', () => {
@@ -177,42 +307,33 @@
           mulaiPemindaianLoop();
         });
 
+        // Tarik data riwayat dari Google Apps Script
+        tarikDataServer();
+
       } catch (err) {
-        document.getElementById('loading-msg').innerHTML = `<span class="text-rose-400">Gagal inisialisasi: ${err.message}</span>`;
+        document.getElementById('loading-msg').innerHTML = `<span class="text-rose-400">Gagal kamera: ${err.message}</span>`;
       }
     });
 
-    // 2. Loop Deteksi & Pencocokan Wajah
     function mulaiPemindaianLoop() {
-      const displaySize = { width: video.videoWidth || 640, height: video.videoHeight || 480 };
-      
       setInterval(async () => {
         if (isProcessing) return;
-
-        const detections = await faceapi.detectSingleFace(video)
-          .withFaceLandmarks()
-          .withFaceDescriptor();
-
+        const detections = await faceapi.detectSingleFace(video).withFaceLandmarks().withFaceDescriptor();
         if (detections && faceMatcher) {
           const match = faceMatcher.findBestMatch(detections.descriptor);
-          
           if (match.label !== 'unknown' && match.distance < 0.45) {
             eksekusiPresensiSukses(match.label);
           } else {
             document.getElementById('feedback-main').innerText = "Wajah Belum Terdaftar";
-            document.getElementById('feedback-sub').innerText = "Silakan daftarkan wajah lewat tombol di kanan atas";
+            document.getElementById('feedback-sub').innerText = "Minta admin mendaftarkan wajah terlebih dahulu";
           }
         }
-      }, 500); // Evaluasi tiap 0.5 detik
+      }, 500);
     }
 
-    // 3. Kirim Presensi ke Google Apps Script Backend
     async function eksekusiPresensiSukses(namaGuru) {
       const now = Date.now();
-      // Beri cooldown 60 detik agar tidak double tap
-      if (cooldownTimer[namaGuru] && (now - cooldownTimer[namaGuru] < 60000)) {
-        return;
-      }
+      if (cooldownTimer[namaGuru] && (now - cooldownTimer[namaGuru] < 60000)) return;
       cooldownTimer[namaGuru] = now;
       isProcessing = true;
 
@@ -220,26 +341,21 @@
       document.getElementById('feedback-main').innerText = `✅ Teridentifikasi: ${namaGuru}`;
       document.getElementById('feedback-sub').innerText = `Menyimpan presensi ${tipeAbsen} ke server...`;
 
-      // Suara Sapaan Audio
       ucapkanSapaan(namaGuru, tipeAbsen);
 
       try {
         const resp = await fetch(API_GURU_URL, {
           method: "POST",
           headers: { "Content-Type": "text/plain;charset=utf-8" },
-          body: JSON.stringify({
-            namaGuru: namaGuru,
-            tipe: tipeAbsen,
-            keterangan: "Presensi Wajah Pos Lobi"
-          })
+          body: JSON.stringify({ namaGuru: namaGuru, tipe: tipeAbsen, keterangan: "Presensi Wajah Pos Lobi" })
         });
-
         const res = await resp.json();
         if (res.status === "success") {
           tambahRiwayatTerkini(namaGuru, res.waktu, res.statusPresensi, tipeAbsen);
+          tarikDataServer(); // Update cache rekap
         }
       } catch (e) {
-        console.error("Gagal kirim log:", e);
+        console.error(e);
       } finally {
         setTimeout(() => { isProcessing = false; }, 3000);
       }
@@ -249,7 +365,6 @@
       if ('speechSynthesis' in window) {
         const ucapan = new SpeechSynthesisUtterance();
         ucapan.lang = 'id-ID';
-        ucapan.rate = 1.0;
         ucapan.text = tipe === 'Masuk' ? `Selamat pagi ${nama}, selamat bertugas.` : `Terima kasih ${nama}, selamat beristirahat.`;
         window.speechSynthesis.speak(ucapan);
       }
@@ -258,7 +373,7 @@
     function tambahRiwayatTerkini(nama, waktu, status, tipe) {
       const box = document.getElementById('history-box');
       const item = document.createElement('div');
-      item.className = "p-3 bg-slate-900/90 rounded-2xl border border-teal-900/80 flex justify-between items-center text-xs animate-fade-in";
+      item.className = "p-3 bg-slate-900/90 rounded-2xl border border-teal-900/80 flex justify-between items-center text-xs";
       item.innerHTML = `
         <div>
           <p class="font-bold text-white">${nama}</p>
@@ -272,7 +387,31 @@
       if (box.children.length > 3) box.removeChild(box.lastChild);
     }
 
-    // 4. Perekaman Vektor Wajah Guru Baru
+    // ================= OTORISASI PIN ADMIN =================
+    function mintaAksesAdmin(aksi) {
+      targetAksiAdmin = aksi;
+      document.getElementById('modal-auth').classList.remove('hidden');
+      document.getElementById('input-pin-auth').value = "";
+      document.getElementById('input-pin-auth').focus();
+    }
+
+    function tutupModalAuth() {
+      document.getElementById('modal-auth').classList.add('hidden');
+    }
+
+    function verifikasiPinAdmin(e) {
+      e.preventDefault();
+      const pin = document.getElementById('input-pin-auth').value.trim();
+      if (pin === PIN_ADMIN_DEFAULT) {
+        tutupModalAuth();
+        if (targetAksiAdmin === 'enroll') bukaModalEnrollment();
+        if (targetAksiAdmin === 'rekap') bukaModalRekap();
+      } else {
+        alert("PIN Admin Salah!");
+      }
+    }
+
+    // ================= ENROLLMENT GURU KE MASTER =================
     function bukaModalEnrollment() {
       document.getElementById('modal-enroll').classList.remove('hidden');
     }
@@ -281,60 +420,225 @@
       document.getElementById('modal-enroll').classList.add('hidden');
       document.getElementById('input-nama-guru').value = "";
       document.getElementById('input-jabatan-guru').value = "";
+      document.getElementById('input-wa-guru').value = "";
     }
 
     async function rekamVektorWajah() {
       const nama = document.getElementById('input-nama-guru').value.trim();
+      const jabatan = document.getElementById('input-jabatan-guru').value.trim() || "Dewan Guru";
+      const wa = document.getElementById('input-wa-guru').value.trim() || "-";
+
       if (!nama) {
-        alert("Masukkan nama lengkap guru!");
+        alert("Ketikkan nama lengkap guru!");
         return;
       }
 
       const btn = document.getElementById('btn-rekam');
       btn.disabled = true;
-      btn.innerText = "⏳ Memindai struktur wajah...";
+      btn.innerText = "⏳ Memindai biometrik wajah...";
 
-      const detections = await faceapi.detectSingleFace(video)
-        .withFaceLandmarks()
-        .withFaceDescriptor();
-
+      const detections = await faceapi.detectSingleFace(video).withFaceLandmarks().withFaceDescriptor();
       if (!detections) {
-        alert("Wajah tidak terdeteksi! Pastikan guru menatap lurus ke kamera.");
+        alert("Wajah tidak terdeteksi! Harap menatap lurus ke kamera.");
         btn.disabled = false;
-        btn.innerText = "Pindai & Simpan Wajah Guru";
+        btn.innerText = "Pindai Wajah & Simpan ke Master";
         return;
       }
 
-      // Simpan array 128 vektor ke localStorage
-      const descriptorArray = Array.from(detections.descriptor);
+      // 1. Simpan Vektor AI ke LocalStorage
+      const descArray = Array.from(detections.descriptor);
       let localDB = JSON.parse(localStorage.getItem('db_wajah_guru') || "[]");
-
-      // Hapus data lama jika ada nama yang sama
       localDB = localDB.filter(item => item.nama.toLowerCase() !== nama.toLowerCase());
-      localDB.push({ nama: nama, descriptor: descriptorArray });
-
+      localDB.push({ nama: nama, descriptor: descArray });
       localStorage.setItem('db_wajah_guru', JSON.stringify(localDB));
       muatDatabaseWajahLokal();
 
-      alert(`✅ Berhasil merekam vektor wajah untuk ${nama}!`);
-      btn.disabled = false;
-      btn.innerText = "Pindai & Simpan Wajah Guru";
-      tutupModalEnrollment();
+      // 2. Simpan Data Guru ke Google Spreadsheet Tab Master_Guru
+      btn.innerText = "⏳ Mendaftarkan ke Spreadsheet Master...";
+      try {
+        const resp = await fetch(API_GURU_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify({
+            action: "tambah_guru_master",
+            pin: PIN_ADMIN_DEFAULT,
+            namaGuru: nama,
+            jabatan: jabatan,
+            wa: wa
+          })
+        });
+        const res = await resp.json();
+        if (res.status === "success") {
+          alert(`✅ Sempurna! Wajah dan identitas ${nama} berhasil masuk ke Master Guru.`);
+          tutupModalEnrollment();
+          tarikDataServer();
+        } else {
+          alert("Gagal: " + res.message);
+        }
+      } catch (err) {
+        alert("Kesalahan jaringan: " + err);
+      } finally {
+        btn.disabled = false;
+        btn.innerText = "Pindai Wajah & Simpan ke Master";
+      }
     }
 
     function muatDatabaseWajahLokal() {
       const localDB = JSON.parse(localStorage.getItem('db_wajah_guru') || "[]");
-      if (localDB.length === 0) {
-        faceMatcher = null;
+      if (localDB.length === 0) { faceMatcher = null; return; }
+      labeledFaceDescriptors = localDB.map(item => new faceapi.LabeledFaceDescriptors(item.nama, [new Float32Array(item.descriptor)]));
+      faceMatcher = new faceapi.FaceMatcher(labeledFaceDescriptors, 0.45);
+    }
+
+    // ================= DATA REKAP & CETAK LAPORAN =================
+    function tarikDataServer() {
+      fetch(API_GURU_URL)
+        .then(r => r.json())
+        .then(res => {
+          if (res.status === "success") {
+            dataServerPresensi = res;
+            filterTabelRekap();
+          }
+        })
+        .catch(e => console.error("Error data:", e));
+    }
+
+    function bukaModalRekap() {
+      document.getElementById('modal-rekap').classList.remove('hidden');
+      sesuaikanFilterPeriode();
+      filterTabelRekap();
+    }
+
+    function tutupModalRekap() {
+      document.getElementById('modal-rekap').classList.add('hidden');
+    }
+
+    function sesuaikanFilterPeriode() {
+      const tipe = document.getElementById('filter-periode-tipe').value;
+      const box = document.getElementById('box-subfilter');
+
+      if (tipe === 'hari') {
+        box.innerHTML = `<label class="block text-[10px] text-slate-400 font-bold mb-1">Tanggal:</label><input type="date" id="param-tgl" value="${new Date().toISOString().split('T')[0]}" onchange="filterTabelRekap()" class="w-full p-2 rounded-xl bg-slate-900 border border-teal-800 text-white text-xs outline-none focus:border-teal-400">`;
+      } else if (tipe === 'bulan') {
+        box.innerHTML = `
+          <label class="block text-[10px] text-slate-400 font-bold mb-1">Bulan:</label>
+          <select id="param-bln" onchange="filterTabelRekap()" class="w-full p-2 rounded-xl bg-slate-900 border border-teal-800 text-white text-xs outline-none focus:border-teal-400">
+            <option value="01">Januari</option><option value="02">Februari</option><option value="03">Maret</option>
+            <option value="04">April</option><option value="05">Mei</option><option value="06">Juni</option>
+            <option value="07">Juli</option><option value="08">Agustus</option><option value="09">September</option>
+            <option value="10" selected>Oktober</option><option value="11">November</option><option value="12">Desember</option>
+          </select>
+        `;
+      } else if (tipe === 'semester') {
+        box.innerHTML = `
+          <label class="block text-[10px] text-slate-400 font-bold mb-1">Semester:</label>
+          <select id="param-sem" onchange="filterTabelRekap()" class="w-full p-2 rounded-xl bg-slate-900 border border-teal-800 text-white text-xs outline-none focus:border-teal-400">
+            <option value="ganjil" selected>Semester Ganjil (Jul - Des)</option>
+            <option value="genap">Semester Genap (Jan - Jun)</option>
+          </select>
+        `;
+      } else if (tipe === 'tahun') {
+        box.innerHTML = `
+          <label class="block text-[10px] text-slate-400 font-bold mb-1">Tahun Ajaran:</label>
+          <select id="param-thn" onchange="filterTabelRekap()" class="w-full p-2 rounded-xl bg-slate-900 border border-teal-800 text-white text-xs outline-none focus:border-teal-400">
+            <option value="2026" selected>2026</option>
+            <option value="2027">2027</option>
+          </select>
+        `;
+      }
+    }
+
+    function filterTabelRekap() {
+      if (!dataServerPresensi.riwayatLog) return;
+
+      const tipePeriode = document.getElementById('filter-periode-tipe').value;
+      const statusFilter = document.getElementById('filter-rekap-status').value;
+      const namaFilter = (document.getElementById('filter-rekap-nama').value || "").toLowerCase().trim();
+
+      const filtered = dataServerPresensi.riwayatLog.filter(log => {
+        let cocokWaktu = true;
+        const [thn, bln, tgl] = log.tanggal.split('-');
+
+        if (tipePeriode === 'hari') {
+          const tglInput = document.getElementById('param-tgl') ? document.getElementById('param-tgl').value : "";
+          if (tglInput) cocokWaktu = (log.tanggal === tglInput);
+        } else if (tipePeriode === 'bulan') {
+          const blnInput = document.getElementById('param-bln') ? document.getElementById('param-bln').value : "10";
+          cocokWaktu = (bln === blnInput);
+        } else if (tipePeriode === 'semester') {
+          const semInput = document.getElementById('param-sem') ? document.getElementById('param-sem').value : "ganjil";
+          const m = parseInt(bln, 10);
+          cocokWaktu = (semInput === 'ganjil') ? (m >= 7 && m <= 12) : (m >= 1 && m <= 6);
+        } else if (tipePeriode === 'tahun') {
+          const thnInput = document.getElementById('param-thn') ? document.getElementById('param-thn').value : "2026";
+          cocokWaktu = (thn === thnInput);
+        }
+
+        const cocokStatus = (statusFilter === 'semua' || log.status === statusFilter);
+        const cocokNama = log.nama.toLowerCase().includes(namaFilter);
+
+        return cocokWaktu && cocokStatus && cocokNama;
+      });
+
+      // Hitung Metrik
+      let countTepat = 0, countTelat = 0;
+      filtered.forEach(item => {
+        if (item.status === 'Terlambat') countTelat++;
+        else countTepat++;
+      });
+
+      document.getElementById('metric-total-hadir').innerText = filtered.length;
+      document.getElementById('metric-tepat-waktu').innerText = countTepat;
+      document.getElementById('metric-terlambat').innerText = countTelat;
+
+      // Render Baris Tabel
+      const tbody = document.getElementById('tbody-rekap-guru');
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-500 italic">Tidak ada catatan presensi pada periode ini.</td></tr>`;
         return;
       }
 
-      labeledFaceDescriptors = localDB.map(item => {
-        const desc = new Float32Array(item.descriptor);
-        return new faceapi.LabeledFaceDescriptors(item.nama, [desc]);
-      });
+      tbody.innerHTML = filtered.map(log => `
+        <tr class="hover:bg-teal-950/30 transition">
+          <td class="p-2.5 font-mono text-slate-300">${log.tanggal}</td>
+          <td class="p-2.5 font-bold text-white">${log.nama}</td>
+          <td class="p-2.5 font-mono text-teal-300">${log.waktuPenuh.split(' ')[1] || log.waktuPenuh}</td>
+          <td class="p-2.5 text-slate-400">${log.tipe}</td>
+          <td class="p-2.5 text-center">
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold ${log.status === 'Terlambat' ? 'bg-rose-500/20 text-rose-300' : 'bg-emerald-500/20 text-emerald-300'}">
+              ${log.status}
+            </span>
+          </td>
+        </tr>
+      `).join('');
+    }
 
-      faceMatcher = new faceapi.FaceMatcher(labeledFaceDescriptors, 0.45);
+    function cetakLaporanGuru() {
+      const tipe = document.getElementById('filter-periode-tipe').options[document.getElementById('filter-periode-tipe').selectedIndex].text;
+      const tglCetak = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+
+      document.getElementById('pr-periode-info').innerText = `Rentang: ${tipe} • Dicetak: ${tglCetak}`;
+      document.getElementById('pr-titi-mangsa').innerText = `Bandar Lampung, ${tglCetak}`;
+
+      const barisTabel = document.getElementById('tbody-rekap-guru').innerHTML;
+      document.getElementById('pr-konten-tabel').innerHTML = `
+        <table style="width:100%; border-collapse:collapse; font-size:11px; margin-top:10px;">
+          <thead>
+            <tr style="background:#f1f5f9;">
+              <th style="padding:6px; border:1px solid #333;">Tanggal</th>
+              <th style="padding:6px; border:1px solid #333;">Nama Lengkap Guru</th>
+              <th style="padding:6px; border:1px solid #333;">Waktu Presensi</th>
+              <th style="padding:6px; border:1px solid #333;">Tipe</th>
+              <th style="padding:6px; border:1px solid #333;">Keterangan / Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${barisTabel}
+          </tbody>
+        </table>
+      `;
+
+      window.print();
     }
   </script>
 </body>
