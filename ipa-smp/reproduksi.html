@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arcade Pembinaan Pria Terhormat - PID Game Suite</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: {
+                            800: '#1e293b',
+                            900: '#0f172a',
+                            950: '#020617',
+                        },
+                        neon: {
+                            blue: '#3b82f6',
+                            cyan: '#06b6d4',
+                            emerald: '#10b981',
+                            rose: '#f43f5e',
+                            amber: '#f59e0b',
+                            purple: '#a855f7'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
+        
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: manipulation;
+        }
+
+        .game-section {
+            display: none;
+            height: calc(100vh - 88px);
+        }
+
+        .game-section.active {
+            display: flex;
+        }
+
+        /* Custom Touch-Friendly Scrollbars */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.6);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #3b82f6;
+            border-radius: 4px;
+        }
+
+        .wheel-transform {
+            transition: transform 4s cubic-bezier(0.15, 0.99, 0.18, 0.99);
+        }
+
+        .glow-effect {
+            box-shadow: 0 0 25px rgba(59, 130, 246, 0.25);
+        }
+    </style>
+</head>
+<body class="bg-navy-950 text-white overflow-hidden select-none">
+
+    <!-- HEADER / DASHBOARD TOP BAR FOR PID -->
+    <header class="h-22 bg-navy-900 border-b border-slate-800 px-6 py-3 flex items-center justify-between z-50 relative shadow-2xl">
+        <!-- Arcade Brand / Title -->
+        <div class="flex items-center gap-4 cursor-pointer" onclick="showDashboard()">
+            <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-blue-600 via-indigo-500 to-amber-400 flex items-center justify-center font-black text-navy-950 text-2xl shadow-lg shadow-blue-500/20">
+                ✝
+            </div>
+            <div>
+                <div class="flex items-center gap-2">
+                    <h1 class="text-xl font-extrabold text-white tracking-wide">PRIA TERHORMAT</h1>
+                    <span class="px-2 py-0.5 rounded-md bg-blue-500/20 border border-blue-500/40 text-blue-400 text-xs font-bold">ARCADE HUB</span>
+                </div>
+                <p class="text-xs text-slate-400 font-semibold">1 Korintus 6:19-20 &bull; Pembinaan Siswa Pria Kelas 7 SMP</p>
+            </div>
+        </div>
+
+        <!-- TEAM SCOREBOARD (TOUCH OPERATED) -->
+        <div class="flex items-center gap-6 bg-navy-950/90 px-5 py-2 rounded-2xl border border-slate-800 shadow-inner">
+            <!-- Tim A -->
+            <div class="flex items-center gap-3">
+                <div class="flex flex-col items-end">
+                    <span class="text-xs font-bold text-blue-400 tracking-wider">TIM PRIA A</span>
+                    <span id="score-a" class="font-black text-2xl text-amber-400">0</span>
+                </div>
+                <div class="flex flex-col gap-1">
+                    <button onclick="changeScore('A', 50)" class="w-7 h-7 rounded-lg bg-blue-600 hov
