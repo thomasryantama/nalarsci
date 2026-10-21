@@ -1,455 +1,958 @@
 <!DOCTYPE html>
-<html lang="id" class="scroll-smooth">
+<html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pemberitahuan Sistem & Informasi Resmi | Perguruan Methodist Immanuel Bandar Lampung</title>
-  
-  <!-- SEO & Favicon -->
-  <meta name="description" content="Portal resmi pengalihan dan informasi terpadu Perguruan Methodist Immanuel Bandar Lampung (PG-TK, SD, SMP, SMA). A School Where Students Thrive.">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
-  
-  <!-- Tailwind CSS CDN & Lucide Icons -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://unpkg.com/lucide@latest"></script>
-  
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['Plus Jakarta Sans', 'sans-serif'],
-            serif: ['Playfair Display', 'serif'],
-          },
-          colors: {
-            navy: {
-              950: '#060a12',
-              900: '#0b1324',
-              800: '#111e38',
-              700: '#1b2d52',
-            },
-            gold: {
-              400: '#fbbf24',
-              500: '#f59e0b',
-              600: '#d97706',
-            },
-            methodist: {
-              red: '#dc2626',
-              gold: '#eab308'
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arcade Pembinaan Pria Terhormat - PID Game Suite</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: {
+                            800: '#1e293b',
+                            900: '#0f172a',
+                            950: '#020617',
+                        },
+                        neon: {
+                            blue: '#3b82f6',
+                            cyan: '#06b6d4',
+                            emerald: '#10b981',
+                            rose: '#f43f5e',
+                            amber: '#f59e0b',
+                            purple: '#a855f7'
+                        }
+                    }
+                }
             }
-          }
         }
-      }
-    }
-  </script>
+    </script>
 
-  <style>
-    /* Custom Glow & Background Grid */
-    .bg-grid-pattern {
-      background-size: 40px 40px;
-      background-image: 
-        linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-    }
-    .glass-card {
-      background: rgba(17, 30, 56, 0.7);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-    }
-    .glass-card-hover {
-      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    .glass-card-hover:hover {
-      transform: translateY(-4px);
-      border-color: rgba(245, 158, 11, 0.3);
-      box-shadow: 0 16px 32px -8px rgba(245, 158, 11, 0.1);
-    }
-    .animate-pulse-slow {
-      animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-    }
-    @keyframes pulse {
-      0%, 100% { opacity: 0.8; transform: scale(1); }
-      50% { opacity: 1; transform: scale(1.02); }
-    }
-  </style>
-</head>
-<body class="bg-navy-950 text-slate-200 font-sans antialiased selection:bg-gold-500 selection:text-navy-950 relative overflow-x-hidden min-h-screen">
-
-  <!-- Background Decorative Ambient Lighting -->
-  <div class="fixed inset-0 bg-grid-pattern pointer-events-none z-0"></div>
-  <div class="fixed top-[-10rem] left-1/2 -translate-x-1/2 w-[700px] h-[500px] bg-gradient-to-tr from-amber-500/15 via-red-600/10 to-blue-600/15 blur-[140px] pointer-events-none z-0"></div>
-  <div class="fixed bottom-[-10rem] right-[-10rem] w-[500px] h-[400px] bg-blue-500/10 blur-[130px] pointer-events-none z-0"></div>
-
-  <!-- Top Announcement Bar (Maintenance Notice) -->
-  <header class="relative z-20 border-b border-amber-500/20 bg-amber-500/10 backdrop-blur-md px-4 py-2.5 text-center text-xs sm:text-sm font-medium text-amber-200">
-    <div class="max-w-7xl mx-auto flex items-center justify-center gap-2">
-      <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/30">
-        <i data-lucide="wrench" class="w-3 h-3 mr-1 inline"></i> SYSTEM UPGRADE
-      </span>
-      <span>Domain resmi <strong>methodist-bdl.sch.id</strong> sedang dalam optimalisasi infrastruktur cloud & AI terpadu.</span>
-    </div>
-  </header>
-
-  <!-- Main Container -->
-  <main class="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-16">
-
-    <!-- HERO SECTION: BRANDING & APOLOGY -->
-    <section class="text-center space-y-6 pt-4 sm:pt-8">
-      
-      <!-- Official Badge & Logo -->
-      <div class="inline-flex flex-col items-center gap-3">
-        <div class="relative group">
-          <div class="absolute -inset-1.5 bg-gradient-to-r from-amber-500 to-red-600 rounded-full blur-md opacity-40 group-hover:opacity-75 transition duration-500"></div>
-          <div class="relative w-24 h-24 rounded-full bg-navy-900 border-2 border-amber-500/40 p-3 flex items-center justify-center shadow-xl">
-            <!-- Methodist Cross and Flame SVG Emblem -->
-            <svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-md" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <!-- Methodist Flame -->
-              <path d="M48 22C42 34 32 46 36 62C38 70 44 76 52 76C46 71 44 64 47 57C49 53 54 49 55 43C56 37 54 28 48 22Z" fill="#DC2626"/>
-              <path d="M43 45C38 52 35 60 38 68C40 73 45 77 50 78C44 74 42 67 45 61C47 57 51 54 52 49C53 45 50 39 43 45Z" fill="#F59E0B"/>
-              <!-- Methodist Cross -->
-              <rect x="58" y="24" width="7" height="52" rx="1.5" fill="#E2E8F0"/>
-              <rect x="47" y="38" width="29" height="7" rx="1.5" fill="#E2E8F0"/>
-            </svg>
-          </div>
-        </div>
-
-        <div class="space-y-1">
-          <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-navy-800/80 border border-slate-700/60 text-xs font-semibold tracking-wider uppercase text-amber-400">
-            <i data-lucide="shield-check" class="w-3.5 h-3.5"></i> Perguruan Kristen Methodist Immanuel Bandar Lampung
-          </div>
-          <p class="text-xs text-slate-400 font-mono tracking-wide">PG-TK • SD • SMP • SMA</p>
-        </div>
-      </div>
-
-      <!-- Main Headline with Tagline -->
-      <div class="space-y-4 max-w-3xl mx-auto">
-        <h1 class="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-tight">
-          A School Where <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-500 font-serif italic">Students Thrive</span>
-        </h1>
-        <p class="text-base sm:text-lg text-slate-300 leading-relaxed font-light">
-          Mohon maaf atas ketidaknyamanan Anda. Portal utama kami sedang dalam pemeliharaan terencana demi menghadirkan sistem informasi akademik terpadu yang lebih andal, cerdas, dan interaktif.
-        </p>
-      </div>
-
-      <!-- Status Progress Bar -->
-      <div class="max-w-md mx-auto p-4 rounded-2xl glass-card border border-slate-800/90 text-left space-y-2">
-        <div class="flex items-center justify-between text-xs font-semibold">
-          <span class="flex items-center gap-1.5 text-slate-300">
-            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-            Penyelarasan Server & Layanan SPMB
-          </span>
-          <span class="text-amber-400 font-mono">85% Complete</span>
-        </div>
-        <div class="w-full bg-navy-950 rounded-full h-2 overflow-hidden p-0.5 border border-slate-800">
-          <div class="bg-gradient-to-r from-amber-500 to-emerald-400 h-full rounded-full transition-all duration-1000 w-[85%]"></div>
-        </div>
-        <p class="text-[11px] text-slate-400 flex items-center justify-between pt-1">
-          <span>Estimasi selesai: Segera</span>
-          <span>Domain target: methodist-bdl.sch.id</span>
-        </p>
-      </div>
-
-      <!-- Quick Emergency Actions -->
-      <div class="flex flex-wrap items-center justify-center gap-3 pt-2">
-        <a href="https://wa.me/6285183163610?text=Halo%20Layanan%20SPMB%20Methodist%20Immanuel,%20saya%20ingin%20menanyakan%20informasi%20pendaftaran%20siswa%20baru" 
-           target="_blank" 
-           class="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl font-bold text-sm bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-white shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/30 transition-all transform hover:-translate-y-0.5">
-          <i data-lucide="message-circle" class="w-4 h-4"></i>
-          Hubungi WhatsApp SPMB
-        </a>
-
-        <a href="#profil-sekolah" 
-           class="inline-flex items-center gap-2 px-5 py-3.5 rounded-xl font-semibold text-sm bg-navy-800/90 hover:bg-navy-700/90 text-slate-200 border border-slate-700/80 transition-all">
-          <i data-lucide="book-open" class="w-4 h-4 text-amber-400"></i>
-          Visi, Misi & Profil
-        </a>
-
-        <a href="#kontak-lokasi" 
-           class="inline-flex items-center gap-2 px-5 py-3.5 rounded-xl font-semibold text-sm bg-navy-800/90 hover:bg-navy-700/90 text-slate-200 border border-slate-700/80 transition-all">
-          <i data-lucide="map-pin" class="w-4 h-4 text-amber-400"></i>
-          Alamat & Lokasi
-        </a>
-      </div>
-    </section>
-
-    <!-- SECTION 2: HIGHLIGHT SPMB TA 2027/2028 (PROMO GELOMBANG AKTIF - TANPA RUPIAH) -->
-    <section class="glass-card rounded-3xl p-6 sm:p-10 border border-amber-500/20 relative overflow-hidden">
-      <div class="absolute -right-16 -bottom-16 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
-
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-        <!-- Text Promo -->
-        <div class="lg:col-span-7 space-y-4">
-          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/20 border border-amber-500/30 text-amber-300 text-xs font-bold uppercase tracking-wider">
-            <i data-lucide="sparkles" class="w-3.5 h-3.5"></i> Penerimaan Siswa Baru TA 2027/2028
-          </div>
-          
-          <h2 class="text-2xl sm:text-3xl font-extrabold text-white leading-tight">
-            Kesempatan Terbatas: <br class="hidden sm:block">
-            <span class="text-amber-400">Gelombang Beasiswa Potongan Uang Pembangunan (UP)</span>
-          </h2>
-          
-          <p class="text-slate-300 text-sm sm:text-base leading-relaxed">
-            Kami menyambut putra-putri Anda untuk bertumbuh dalam keunggulan iman, kecerdasan akademik, dan karakter luhur. Saat ini sedang berlangsung gelombang beasiswa potongan khusus bagi peserta didik baru. 
-          </p>
-
-          <div class="space-y-2 pt-2">
-            <div class="flex items-center gap-2 text-sm text-slate-200">
-              <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400 flex-shrink-0"></i>
-              <span>Tersedia untuk jenjang <strong>PG-TK, SD, SMP, hingga SMA</strong>.</span>
-            </div>
-            <div class="flex items-center gap-2 text-sm text-slate-200">
-              <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400 flex-shrink-0"></i>
-              <span>Skema khusus untuk <strong>Kategori SD Dalam</strong> (asal TK Methodist) maupun <strong>Kategori SD Luar</strong> (TK Umum).</span>
-            </div>
-            <div class="flex items-center gap-2 text-sm text-slate-200">
-              <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400 flex-shrink-0"></i>
-              <span>Kuota potongan terbatas dan ditutup sewaktu-waktu saat kuota gelombang terpenuhi.</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- CTA Box (Hubungi WhatsApp Langsung) -->
-        <div class="lg:col-span-5">
-          <div class="bg-navy-900/90 rounded-2xl border border-amber-500/30 p-6 space-y-5 text-center shadow-2xl relative">
-            <div class="inline-flex p-3 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-400 mb-1">
-              <i data-lucide="badge-percent" class="w-8 h-8"></i>
-            </div>
-            
-            <div>
-              <h3 class="text-lg font-bold text-white">Konsultasi Kuota & Rincian Pendaftaran</h3>
-              <p class="text-xs text-slate-400 mt-1">Dapatkan informasi sisa kuota beasiswa aktif, panduan formulir, dan jadwal observasi langsung dari tim sekretariat.</p>
-            </div>
-
-            <div class="p-3.5 rounded-xl bg-navy-950/70 border border-slate-800 text-left space-y-1.5">
-              <span class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block">Hotline Resmi SPMB:</span>
-              <p class="font-mono text-base font-bold text-emerald-400 flex items-center justify-between">
-                <span>+62 851-8316-3610</span>
-                <span class="text-[10px] bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded border border-emerald-500/30">Online</span>
-              </p>
-            </div>
-
-            <a href="https://wa.me/6285183163610?text=Halo%20Admin%20SPMB%20Methodist%20Immanuel,%20mohon%20informasi%20lengkap%20rincian%20biaya%20dan%20sisa%20kuota%20beasiswa%20terbaru" 
-               target="_blank" 
-               class="w-full inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl font-bold text-sm bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-navy-950 shadow-lg shadow-amber-500/20 transition-all">
-              <i data-lucide="message-square" class="w-4 h-4"></i>
-              Tanya Kuota Beasiswa via WhatsApp
-            </a>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- SECTION 3: VISI, MISI, MOTTO & NILAI KARAKTER -->
-    <section id="profil-sekolah" class="space-y-8 scroll-mt-20">
-      <div class="text-center space-y-2 max-w-2xl mx-auto">
-        <h2 class="text-xs font-bold uppercase tracking-widest text-amber-400">Landasan Pendidikan Kami</h2>
-        <h3 class="text-2xl sm:text-3xl font-extrabold text-white">Visi, Misi & Karakter Keunggulan</h3>
-        <p class="text-slate-400 text-sm">Mempersiapkan generasi beriman teguh, berilmu unggul, dan siap berdampak bagi bangsa.</p>
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <!-- Visi Card -->
-        <div class="glass-card rounded-2xl p-6 border border-slate-800 glass-card-hover space-y-4">
-          <div class="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
-            <i data-lucide="compass" class="w-6 h-6"></i>
-          </div>
-          <div>
-            <span class="text-[11px] font-bold text-amber-400 uppercase tracking-wider">Visi Perguruan</span>
-            <h4 class="text-lg font-bold text-white mt-1">Berprestasi, Berkarakter, Berwawasan Global</h4>
-          </div>
-          <p class="text-slate-300 text-sm leading-relaxed">
-            Menjadi lembaga pendidikan Kristen yang unggul dalam membina pribadi berkualitas tinggi dalam <strong>Iman, Ilmu, dan Kasih</strong>, serta peduli dan berbudaya lingkungan.
-          </p>
-        </div>
-
-        <!-- Misi Card -->
-        <div class="glass-card rounded-2xl p-6 border border-slate-800 glass-card-hover space-y-4">
-          <div class="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
-            <i data-lucide="target" class="w-6 h-6"></i>
-          </div>
-          <div>
-            <span class="text-[11px] font-bold text-emerald-400 uppercase tracking-wider">Misi Perguruan</span>
-            <h4 class="text-lg font-bold text-white mt-1">Holistik & Berkelanjutan</h4>
-          </div>
-          <ul class="text-slate-300 text-xs sm:text-sm space-y-2 list-disc list-inside">
-            <li>Menumbuhkan kedewasaan rohani dan iman kristiani yang tangguh.</li>
-            <li>Mengembangkan mutu pembelajaran inovatif berwawasan global.</li>
-            <li>Membina kepemimpinan mandiri, disiplin, peduli sesama, dan tanggung jawab kebangsaan.</li>
-          </ul>
-        </div>
-
-        <!-- Motto & Nilai Card -->
-        <div class="glass-card rounded-2xl p-6 border border-slate-800 glass-card-hover space-y-4">
-          <div class="w-12 h-12 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400">
-            <i data-lucide="award" class="w-6 h-6"></i>
-          </div>
-          <div>
-            <span class="text-[11px] font-bold text-blue-400 uppercase tracking-wider">Motto & Nilai Utama</span>
-            <h4 class="text-lg font-bold text-white mt-1">Santun, Berkualitas, Beriman</h4>
-          </div>
-          <div class="flex flex-wrap gap-1.5 pt-1">
-            <span class="px-2.5 py-1 rounded-md bg-navy-900 border border-slate-700 text-xs text-slate-200">Religius</span>
-            <span class="px-2.5 py-1 rounded-md bg-navy-900 border border-slate-700 text-xs text-slate-200">Jujur</span>
-            <span class="px-2.5 py-1 rounded-md bg-navy-900 border border-slate-700 text-xs text-slate-200">Disiplin</span>
-            <span class="px-2.5 py-1 rounded-md bg-navy-900 border border-slate-700 text-xs text-slate-200">Toleransi</span>
-            <span class="px-2.5 py-1 rounded-md bg-navy-900 border border-slate-700 text-xs text-slate-200">Peduli Lingkungan</span>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- SECTION 4: FASILITAS UNGGULAN & EKOSISTEM BELAJAR -->
-    <section class="space-y-6">
-      <div class="text-center space-y-2 max-w-2xl mx-auto">
-        <h2 class="text-xs font-bold uppercase tracking-widest text-amber-400">Fasilitas Modern</h2>
-        <h3 class="text-2xl sm:text-3xl font-extrabold text-white">Lingkungan Tepat untuk Bertumbuh</h3>
-      </div>
-
-      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
-        <!-- Fasilitas 1 -->
-        <div class="p-4 rounded-xl glass-card border border-slate-800 text-center space-y-2">
-          <div class="w-10 h-10 mx-auto rounded-lg bg-navy-900 flex items-center justify-center text-amber-400">
-            <i data-lucide="cpu" class="w-5 h-5"></i>
-          </div>
-          <p class="text-xs font-bold text-slate-200">Lab Komputer & Coding AI</p>
-        </div>
-
-        <!-- Fasilitas 2 -->
-        <div class="p-4 rounded-xl glass-card border border-slate-800 text-center space-y-2">
-          <div class="w-10 h-10 mx-auto rounded-lg bg-navy-900 flex items-center justify-center text-amber-400">
-            <i data-lucide="wifi" class="w-5 h-5"></i>
-          </div>
-          <p class="text-xs font-bold text-slate-200">Wi-Fi 6 & Cloud Campus</p>
-        </div>
-
-        <!-- Fasilitas 3 -->
-        <div class="p-4 rounded-xl glass-card border border-slate-800 text-center space-y-2">
-          <div class="w-10 h-10 mx-auto rounded-lg bg-navy-900 flex items-center justify-center text-amber-400">
-            <i data-lucide="book" class="w-5 h-5"></i>
-          </div>
-          <p class="text-xs font-bold text-slate-200">Perpustakaan Digital (SLiMS)</p>
-        </div>
-
-        <!-- Fasilitas 4 -->
-        <div class="p-4 rounded-xl glass-card border border-slate-800 text-center space-y-2">
-          <div class="w-10 h-10 mx-auto rounded-lg bg-navy-900 flex items-center justify-center text-amber-400">
-            <i data-lucide="trophy" class="w-5 h-5"></i>
-          </div>
-          <p class="text-xs font-bold text-slate-200">Lapangan Basket Standar DBL</p>
-        </div>
-
-        <!-- Fasilitas 5 -->
-        <div class="p-4 rounded-xl glass-card border border-slate-800 text-center space-y-2">
-          <div class="w-10 h-10 mx-auto rounded-lg bg-navy-900 flex items-center justify-center text-amber-400">
-            <i data-lucide="music" class="w-5 h-5"></i>
-          </div>
-          <p class="text-xs font-bold text-slate-200">Ruang Musik & Seni Budaya</p>
-        </div>
-
-        <!-- Fasilitas 6 -->
-        <div class="p-4 rounded-xl glass-card border border-slate-800 text-center space-y-2">
-          <div class="w-10 h-10 mx-auto rounded-lg bg-navy-900 flex items-center justify-center text-amber-400">
-            <i data-lucide="church" class="w-5 h-5"></i>
-          </div>
-          <p class="text-xs font-bold text-slate-200">Kapel Ibadah Terpadu</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- SECTION 5: KONTAK DARURAT, TATA USAHA & LOKASI -->
-    <section id="kontak-lokasi" class="glass-card rounded-3xl p-6 sm:p-10 border border-slate-800 scroll-mt-20 space-y-8">
-      <div class="border-b border-slate-800 pb-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <span class="text-xs font-bold uppercase tracking-wider text-amber-400">Layanan Darurat & Administrasi</span>
-          <h3 class="text-2xl font-bold text-white mt-1">Kontak Resmi & Alamat Kampus</h3>
-        </div>
-        <div class="text-xs text-slate-400 font-mono">
-          Operasional TU: Senin – Jumat (07.30 – 14.30 WIB)
-        </div>
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
         
-        <!-- Kontak 1: SPMB -->
-        <div class="p-5 rounded-2xl bg-navy-900/80 border border-slate-800 space-y-3">
-          <div class="flex items-center gap-2 text-emerald-400">
-            <i data-lucide="message-circle" class="w-5 h-5"></i>
-            <h4 class="font-bold text-white text-sm">Sekretariat SPMB / Pendaftaran</h4>
-          </div>
-          <p class="text-xs text-slate-400">Pertanyaan pendaftaran, syarat berkas, dan informasi kuota siswa baru.</p>
-          <a href="https://wa.me/6285183163610" target="_blank" class="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-400 hover:text-emerald-300">
-            Chat WhatsApp: 0851-8316-3610 &rarr;
-          </a>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: manipulation;
+        }
+
+        .game-section {
+            display: none;
+            height: calc(100vh - 84px);
+        }
+
+        .game-section.active {
+            display: flex;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.6);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #3b82f6;
+            border-radius: 4px;
+        }
+
+        .wheel-transform {
+            transition: transform 4s cubic-bezier(0.12, 0.95, 0.2, 1);
+        }
+
+        .glow-effect {
+            box-shadow: 0 0 25px rgba(59, 130, 246, 0.2);
+        }
+
+        .glow-gold {
+            box-shadow: 0 0 25px rgba(245, 158, 11, 0.25);
+        }
+    </style>
+</head>
+<body class="bg-navy-950 text-white overflow-hidden select-none">
+
+    <!-- HEADER / DASHBOARD TOP BAR FOR PID -->
+    <header class="h-[84px] bg-navy-900/95 backdrop-blur border-b border-slate-800 px-6 py-2 flex items-center justify-between z-40 relative shadow-2xl">
+        <!-- Arcade Brand / Title -->
+        <div class="flex items-center gap-4 cursor-pointer" onclick="showDashboard()">
+            <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-blue-600 via-indigo-500 to-amber-400 flex items-center justify-center font-black text-navy-950 text-2xl shadow-lg shadow-blue-500/20">
+                <i data-lucide="shield-check" class="w-7 h-7 text-navy-950"></i>
+            </div>
+            <div>
+                <div class="flex items-center gap-2">
+                    <h1 class="text-xl font-extrabold text-white tracking-wide">PRIA TERHORMAT</h1>
+                    <span class="px-2 py-0.5 rounded-md bg-blue-500/20 border border-blue-500/40 text-blue-400 text-xs font-bold">PID ARCADE</span>
+                </div>
+                <p class="text-xs text-slate-400 font-semibold">1 Korintus 6:19-20 &bull; Pembinaan Siswa Pria Kelas 7</p>
+            </div>
         </div>
 
-        <!-- Kontak 2: Administrasi / TU -->
-        <div class="p-5 rounded-2xl bg-navy-900/80 border border-slate-800 space-y-3">
-          <div class="flex items-center gap-2 text-blue-400">
-            <i data-lucide="file-text" class="w-5 h-5"></i>
-            <h4 class="font-bold text-white text-sm">Tata Usaha & Legalisir Alumni</h4>
-          </div>
-          <p class="text-xs text-slate-400">Layanan administrasi berkas siswa aktif dan permohonan legalisir ijazah alumni.</p>
-          <div class="text-xs text-slate-300">
-            Langsung ke kantor TU di Kompleks Perguruan Methodist Immanuel pada jam kerja.
-          </div>
-        </div>
+        <!-- TEAM SCOREBOARD (TOUCH OPERATED) -->
+        <div class="flex items-center gap-5 bg-navy-950 px-5 py-1.5 rounded-2xl border border-slate-800 shadow-inner">
+            <!-- Tim A -->
+            <div class="flex items-center gap-3">
+                <div class="flex flex-col items-end">
+                    <span class="text-[11px] font-bold text-blue-400 tracking-wider">TIM PRIA A</span>
+                    <span id="score-a" class="font-black text-2xl text-amber-400 leading-tight">0</span>
+                </div>
+                <div class="flex flex-col gap-1">
+                    <button onclick="changeScore('A', 50)" class="w-7 h-6 rounded bg-blue-600 hover:bg-blue-500 active:scale-95 text-white font-bold text-xs flex items-center justify-center border border-blue-400 shadow">+</button>
+                    <button onclick="changeScore('A', -50)" class="w-7 h-6 rounded bg-slate-800 hover:bg-slate-700 active:scale-95 text-red-400 font-bold text-xs flex items-center justify-center border border-slate-700">-</button>
+                </div>
+            </div>
 
-        <!-- Kontak 3: Lokasi -->
-        <div class="p-5 rounded-2xl bg-navy-900/80 border border-slate-800 space-y-3">
-          <div class="flex items-center gap-2 text-amber-400">
-            <i data-lucide="map-pin" class="w-5 h-5"></i>
-            <h4 class="font-bold text-white text-sm">Alamat Kampus</h4>
-          </div>
-          <p class="text-xs text-slate-300 leading-relaxed" id="address-text">
-            Jl. Dr. Susilo No. 6, Sumur Batu, Kec. Teluk Betung Utara, Kota Bandar Lampung, Lampung 35214
-          </p>
-          <div class="pt-1 flex items-center gap-3">
-            <button onclick="copyAddress()" class="inline-flex items-center gap-1 text-[11px] font-semibold text-amber-400 hover:text-amber-300">
-              <i data-lucide="copy" class="w-3.5 h-3.5"></i> <span id="copy-label">Salin Alamat</span>
+            <div class="w-px h-8 bg-slate-800"></div>
+
+            <!-- Tim B -->
+            <div class="flex items-center gap-3">
+                <div class="flex flex-col items-end">
+                    <span class="text-[11px] font-bold text-purple-400 tracking-wider">TIM PRIA B</span>
+                    <span id="score-b" class="font-black text-2xl text-amber-400 leading-tight">0</span>
+                </div>
+                <div class="flex flex-col gap-1">
+                    <button onclick="changeScore('B', 50)" class="w-7 h-6 rounded bg-purple-600 hover:bg-purple-500 active:scale-95 text-white font-bold text-xs flex items-center justify-center border border-purple-400 shadow">+</button>
+                    <button onclick="changeScore('B', -50)" class="w-7 h-6 rounded bg-slate-800 hover:bg-slate-700 active:scale-95 text-red-400 font-bold text-xs flex items-center justify-center border border-slate-700">-</button>
+                </div>
+            </div>
+
+            <button onclick="resetScores()" title="Reset Skor" class="p-1.5 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-400 hover:text-white transition">
+                <i data-lucide="refresh-cw" class="w-4 h-4"></i>
             </button>
-            <span class="text-slate-600">|</span>
-            <a href="https://maps.google.com/?q=Perguruan+Methodist+Immanuel+Bandar+Lampung" target="_blank" class="inline-flex items-center gap-1 text-[11px] font-semibold text-blue-400 hover:text-blue-300">
-              <i data-lucide="external-link" class="w-3.5 h-3.5"></i> Google Maps
-            </a>
-          </div>
         </div>
 
-      </div>
-    </section>
+        <!-- CONTROLS & UTILITIES -->
+        <div class="flex items-center gap-3">
+            <button onclick="showDashboard()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 active:scale-95 border border-slate-700 text-slate-200 transition-all font-bold text-sm flex items-center gap-2">
+                <i data-lucide="layout-grid" class="w-4 h-4"></i>
+                <span>Menu Utama</span>
+            </button>
 
-  </main>
+            <button onclick="toggleFullscreen()" class="p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 active:scale-95 border border-slate-700 text-slate-300">
+                <i data-lucide="maximize" class="w-5 h-5"></i>
+            </button>
+        </div>
+    </header>
 
-  <!-- FOOTER -->
-  <footer class="relative z-10 border-t border-slate-800/80 py-8 text-center text-xs text-slate-400 space-y-2">
-    <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-      <p>&copy; 2026 Perguruan Kristen Methodist Immanuel Bandar Lampung. Seluruh hak cipta dilindungi.</p>
-      <div class="flex items-center gap-4 text-xs font-medium">
-        <span class="text-slate-400">Host Cadangan: <code class="text-amber-400/90 font-mono">nalarsci.id</code></span>
-        <span>•</span>
-        <span class="text-slate-400">Status Server: <span class="text-emerald-400">Normal Maintenance</span></span>
-      </div>
+    <!-- MAIN GAME CONTAINER -->
+    <main class="relative w-full h-[calc(100vh-84px)] overflow-hidden">
+
+        <!-- SECTION: DASHBOARD MENU -->
+        <div id="section-dashboard" class="game-section active flex-col items-center justify-center p-6 bg-gradient-to-b from-navy-900 via-navy-950 to-black overflow-y-auto">
+            <div class="max-w-6xl w-full space-y-6 my-auto">
+                <div class="text-center space-y-2">
+                    <span class="px-4 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-bold inline-flex items-center gap-2">
+                        <i data-lucide="trophy" class="w-3.5 h-3.5"></i> PAPAN INTERAKTIF DIGITAL &bull; SESI PRIA SEJATI
+                    </span>
+                    <h2 class="text-4xl lg:text-5xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-cyan-300 to-amber-300">
+                        MULTI-GAME ARCADE SUITE
+                    </h2>
+                    <p class="text-slate-400 text-sm max-w-2xl mx-auto font-medium">
+                        Eksplorasi pubertas, anatomi, proteksi diri, etika digital, dan hafalan firman Tuhan secara kompetitif dan bermartabat.
+                    </p>
+                </div>
+
+                <!-- 5 GAME CARDS GRID -->
+                <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                    <!-- Game 1 Card -->
+                    <div onclick="openGame(1)" class="bg-slate-900/90 hover:bg-slate-800 border border-slate-800 hover:border-blue-500 p-5 rounded-3xl cursor-pointer transition-all duration-300 group flex flex-col justify-between h-72 glow-effect">
+                        <div class="space-y-3">
+                            <div class="w-12 h-12 rounded-2xl bg-blue-500/20 border border-blue-500/40 text-blue-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                <i data-lucide="help-circle" class="w-6 h-6"></i>
+                            </div>
+                            <div>
+                                <span class="text-xs font-extrabold text-blue-400 uppercase tracking-wider">GAME 1</span>
+                                <h3 class="text-base font-bold text-white group-hover:text-blue-300 transition-colors leading-snug mt-1">Mitos atau Fakta Pubertas</h3>
+                            </div>
+                        </div>
+                        <p class="text-xs text-slate-400 line-clamp-3">Pilah pemahaman ilmiah dan emosi masa pubertas secara akurat.</p>
+                        <div class="pt-3 border-t border-slate-800 flex items-center justify-between text-xs font-bold text-blue-400">
+                            <span>Main Sekarang</span>
+                            <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
+                        </div>
+                    </div>
+
+                    <!-- Game 2 Card -->
+                    <div onclick="openGame(2)" class="bg-slate-900/90 hover:bg-slate-800 border border-slate-800 hover:border-cyan-500 p-5 rounded-3xl cursor-pointer transition-all duration-300 group flex flex-col justify-between h-72 glow-effect">
+                        <div class="space-y-3">
+                            <div class="w-12 h-12 rounded-2xl bg-cyan-500/20 border border-cyan-500/40 text-cyan-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                <i data-lucide="dna" class="w-6 h-6"></i>
+                            </div>
+                            <div>
+                                <span class="text-xs font-extrabold text-cyan-400 uppercase tracking-wider">GAME 2</span>
+                                <h3 class="text-base font-bold text-white group-hover:text-cyan-300 transition-colors leading-snug mt-1">Anatomi Match & Connect</h3>
+                            </div>
+                        </div>
+                        <p class="text-xs text-slate-400 line-clamp-3">Hubungkan struktur organ biologis pria dengan fungsinya masing-masing.</p>
+                        <div class="pt-3 border-t border-slate-800 flex items-center justify-between text-xs font-bold text-cyan-400">
+                            <span>Main Sekarang</span>
+                            <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
+                        </div>
+                    </div>
+
+                    <!-- Game 3 Card -->
+                    <div onclick="openGame(3)" class="bg-slate-900/90 hover:bg-slate-800 border border-slate-800 hover:border-emerald-500 p-5 rounded-3xl cursor-pointer transition-all duration-300 group flex flex-col justify-between h-72 glow-effect">
+                        <div class="space-y-3">
+                            <div class="w-12 h-12 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                <i data-lucide="shield-check" class="w-6 h-6"></i>
+                            </div>
+                            <div>
+                                <span class="text-xs font-extrabold text-emerald-400 uppercase tracking-wider">GAME 3</span>
+                                <h3 class="text-base font-bold text-white group-hover:text-emerald-300 transition-colors leading-snug mt-1">Lampu Hijau vs Merah Sentuhan</h3>
+                            </div>
+                        </div>
+                        <p class="text-xs text-slate-400 line-clamp-3">Kenali batas etika pertemanan yang aman dan waspada pelecehan.</p>
+                        <div class="pt-3 border-t border-slate-800 flex items-center justify-between text-xs font-bold text-emerald-400">
+                            <span>Main Sekarang</span>
+                            <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
+                        </div>
+                    </div>
+
+                    <!-- Game 4 Card -->
+                    <div onclick="openGame(4)" class="bg-slate-900/90 hover:bg-slate-800 border border-slate-800 hover:border-amber-500 p-5 rounded-3xl cursor-pointer transition-all duration-300 group flex flex-col justify-between h-72 glow-effect">
+                        <div class="space-y-3">
+                            <div class="w-12 h-12 rounded-2xl bg-amber-500/20 border border-amber-500/40 text-amber-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                <i data-lucide="smartphone" class="w-6 h-6"></i>
+                            </div>
+                            <div>
+                                <span class="text-xs font-extrabold text-amber-400 uppercase tracking-wider">GAME 4</span>
+                                <h3 class="text-base font-bold text-white group-hover:text-amber-300 transition-colors leading-snug mt-1">Keputusan Pria Terhormat</h3>
+                            </div>
+                        </div>
+                        <p class="text-xs text-slate-400 line-clamp-3">Latihan mengambil sikap berani saat menghadapi dilema di medsos dan game.</p>
+                        <div class="pt-3 border-t border-slate-800 flex items-center justify-between text-xs font-bold text-amber-400">
+                            <span>Main Sekarang</span>
+                            <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
+                        </div>
+                    </div>
+
+                    <!-- Game 5 Card -->
+                    <div onclick="openGame(5)" class="bg-slate-900/90 hover:bg-slate-800 border border-slate-800 hover:border-purple-500 p-5 rounded-3xl cursor-pointer transition-all duration-300 group flex flex-col justify-between h-72 glow-effect">
+                        <div class="space-y-3">
+                            <div class="w-12 h-12 rounded-2xl bg-purple-500/20 border border-purple-500/40 text-purple-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                <i data-lucide="disc" class="w-6 h-6"></i>
+                            </div>
+                            <div>
+                                <span class="text-xs font-extrabold text-purple-400 uppercase tracking-wider">GAME 5</span>
+                                <h3 class="text-base font-bold text-white group-hover:text-purple-300 transition-colors leading-snug mt-1">Roda Acak & Tantangan Ayat</h3>
+                            </div>
+                        </div>
+                        <p class="text-xs text-slate-400 line-clamp-3">Putar roda berhadiah firman dan diskusikan komitmen hidup disiplin.</p>
+                        <div class="pt-3 border-t border-slate-800 flex items-center justify-between text-xs font-bold text-purple-400">
+                            <span>Main Sekarang</span>
+                            <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION GAME 1: MITOS VS FAKTA -->
+        <div id="section-game1" class="game-section flex-col p-6 bg-navy-950">
+            <div class="flex justify-between items-center mb-4">
+                <div>
+                    <span class="text-xs font-bold text-blue-400 tracking-widest uppercase">GAME 1</span>
+                    <h2 class="text-2xl lg:text-3xl font-extrabold text-white">MITOS ATAU FAKTA PUBERTAS?</h2>
+                    <p class="text-slate-400 text-xs sm:text-sm">Ketuk salah satu pernyataan di kiri, lalu tentukan apakah itu FAKTA atau MITOS!</p>
+                </div>
+                <button onclick="resetGame1()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl border border-slate-700 flex items-center gap-2 font-semibold text-xs sm:text-sm">
+                    <i data-lucide="rotate-ccw" class="w-4 h-4"></i> Reset Game
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 h-full pb-6 overflow-hidden">
+                <div class="bg-slate-900/90 border border-slate-800 p-4 rounded-3xl flex flex-col justify-between overflow-hidden">
+                    <div class="overflow-hidden flex flex-col">
+                        <h3 class="text-xs font-bold text-slate-400 uppercase mb-3 flex items-center gap-2">
+                            <i data-lucide="layers" class="text-blue-400 w-4 h-4"></i> Pilih Kartu Pernyataan:
+                        </h3>
+                        <div id="g1-cards-container" class="space-y-2.5 overflow-y-auto max-h-[calc(100vh-280px)] pr-1"></div>
+                    </div>
+                    <p class="text-[11px] text-slate-500 pt-2 text-center border-t border-slate-800/80">Pilih 1 kartu, lalu tekan FAKTA atau MITOS di samping.</p>
+                </div>
+
+                <div class="lg:col-span-2 grid grid-cols-2 gap-5 h-full">
+                    <div onclick="answerGame1('FAKTA')" class="bg-emerald-950/20 border-2 border-dashed border-emerald-500/50 hover:border-emerald-400 rounded-3xl p-6 flex flex-col items-center justify-center text-center cursor-pointer hover:bg-emerald-950/40 transition-all active:scale-[0.98]">
+                        <div class="w-20 h-20 rounded-3xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 mb-4">
+                            <i data-lucide="check-circle-2" class="w-10 h-10"></i>
+                        </div>
+                        <h3 class="text-3xl font-black text-emerald-400">FAKTA</h3>
+                        <p class="text-emerald-200/60 text-xs mt-2 max-w-xs">Pernyataan terbukti benar secara medis dan firman Tuhan</p>
+                    </div>
+
+                    <div onclick="answerGame1('MITOS')" class="bg-rose-950/20 border-2 border-dashed border-rose-500/50 hover:border-rose-400 rounded-3xl p-6 flex flex-col items-center justify-center text-center cursor-pointer hover:bg-rose-950/40 transition-all active:scale-[0.98]">
+                        <div class="w-20 h-20 rounded-3xl bg-rose-500/10 border border-rose-500/30 flex items-center justify-center text-rose-400 mb-4">
+                            <i data-lucide="x-circle" class="w-10 h-10"></i>
+                        </div>
+                        <h3 class="text-3xl font-black text-rose-400">MITOS</h3>
+                        <p class="text-rose-200/60 text-xs mt-2 max-w-xs">Anggapan yang salah atau informasi yang keliru</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION GAME 2: ANATOMI MATCHING -->
+        <div id="section-game2" class="game-section flex-col p-6 bg-navy-950">
+            <div class="flex justify-between items-center mb-4">
+                <div>
+                    <span class="text-xs font-bold text-cyan-400 tracking-widest uppercase">GAME 2</span>
+                    <h2 class="text-2xl lg:text-3xl font-extrabold text-white">ANATOMI MATCH & CONNECT</h2>
+                    <p class="text-slate-400 text-xs sm:text-sm">Ketuk nama organ di sebelah kiri, kemudian ketuk fungsinya yang tepat di sebelah kanan!</p>
+                </div>
+                <button onclick="resetGame2()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl border border-slate-700 flex items-center gap-2 font-semibold text-xs sm:text-sm">
+                    <i data-lucide="rotate-ccw" class="w-4 h-4"></i> Reset Game
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 h-full pb-6 overflow-hidden">
+                <div class="space-y-3 overflow-y-auto max-h-[calc(100vh-230px)] pr-1" id="g2-organ-container"></div>
+                <div class="space-y-3 overflow-y-auto max-h-[calc(100vh-230px)] pr-1" id="g2-fungsi-container"></div>
+            </div>
+        </div>
+
+        <!-- SECTION GAME 3: TOUCH BOUNDARIES -->
+        <div id="section-game3" class="game-section flex-col p-6 bg-navy-950">
+            <div class="flex justify-between items-center mb-4">
+                <div>
+                    <span class="text-xs font-bold text-emerald-400 tracking-widest uppercase">GAME 3</span>
+                    <h2 class="text-2xl lg:text-3xl font-extrabold text-white">LAMPU HIJAU VS MERAH SENTUHAN</h2>
+                    <p class="text-slate-400 text-xs sm:text-sm">Tentukan apakah skenario sentuhan termasuk ZONA HIJAU (Aman) atau ZONA MERAH (Bahaya)!</p>
+                </div>
+                <button onclick="resetGame3()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl border border-slate-700 flex items-center gap-2 font-semibold text-xs sm:text-sm">
+                    <i data-lucide="rotate-ccw" class="w-4 h-4"></i> Reset Game
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 h-full pb-6 overflow-hidden">
+                <div class="bg-slate-900 border border-slate-800 p-4 rounded-3xl flex flex-col justify-between overflow-hidden">
+                    <div class="overflow-hidden flex flex-col">
+                        <h3 class="text-xs font-bold text-slate-400 uppercase mb-3">Pilih Skenario Pergaulan:</h3>
+                        <div id="g3-cards-container" class="space-y-2.5 overflow-y-auto max-h-[calc(100vh-280px)] pr-1"></div>
+                    </div>
+                </div>
+
+                <div onclick="answerGame3('HIJAU')" class="bg-emerald-950/20 border-2 border-emerald-500/50 hover:border-emerald-400 rounded-3xl p-6 flex flex-col items-center justify-center text-center cursor-pointer hover:bg-emerald-950/40 transition-all active:scale-[0.98]">
+                    <div class="w-20 h-20 rounded-3xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center mb-4">
+                        <i data-lucide="shield-check" class="w-12 h-12"></i>
+                    </div>
+                    <h3 class="text-3xl font-black text-emerald-400">ZONA HIJAU</h3>
+                    <p class="text-emerald-200/70 text-xs mt-2 max-w-xs">Sentuhan Aman, Sopan, dan Menghargai Persahabatan</p>
+                </div>
+
+                <div onclick="answerGame3('MERAH')" class="bg-rose-950/20 border-2 border-rose-500/50 hover:border-rose-400 rounded-3xl p-6 flex flex-col items-center justify-center text-center cursor-pointer hover:bg-rose-950/40 transition-all active:scale-[0.98]">
+                    <div class="w-20 h-20 rounded-3xl bg-rose-500/20 text-rose-400 flex items-center justify-center mb-4">
+                        <i data-lucide="shield-alert" class="w-12 h-12"></i>
+                    </div>
+                    <h3 class="text-3xl font-black text-rose-400">ZONA MERAH</h3>
+                    <p class="text-rose-200/70 text-xs mt-2 max-w-xs">DILARANG & BERBAHAYA! Tolak Tegas, Menjauh, dan Segera Lapor Guru/Ortu!</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION GAME 4: DIGITAL DILEMMA -->
+        <div id="section-game4" class="game-section flex-col p-6 bg-navy-950">
+            <div class="flex justify-between items-center mb-4">
+                <div>
+                    <span class="text-xs font-bold text-amber-400 tracking-widest uppercase">GAME 4</span>
+                    <h2 class="text-2xl lg:text-3xl font-extrabold text-white">KEPUTUSAN PRIA TERHORMAT</h2>
+                    <p class="text-slate-400 text-xs sm:text-sm">Bagaimana pria terhormat bersikap bijak di media sosial dan dunia nyata?</p>
+                </div>
+                <div class="text-xs sm:text-sm font-bold text-amber-400 bg-amber-500/10 px-3 py-1.5 rounded-lg border border-amber-500/30" id="g4-progress">Skenario 1 dari 4</div>
+            </div>
+
+            <div class="max-w-3xl mx-auto w-full bg-slate-900 border border-slate-800 p-6 sm:p-8 rounded-3xl space-y-5 shadow-2xl my-auto">
+                <div class="flex items-center gap-3">
+                    <div class="p-3 bg-amber-500/10 border border-amber-500/30 text-amber-400 rounded-2xl">
+                        <i data-lucide="help-circle" class="w-6 h-6"></i>
+                    </div>
+                    <h3 id="g4-title" class="text-lg sm:text-xl font-bold text-white">Judul Skenario</h3>
+                </div>
+
+                <p id="g4-description" class="text-slate-300 text-sm sm:text-base leading-relaxed bg-navy-950 p-4 sm:p-5 rounded-2xl border border-slate-800">
+                    Skenario deskripsi...
+                </p>
+
+                <div id="g4-options-container" class="space-y-3"></div>
+
+                <div id="g4-feedback-box" class="hidden p-4 rounded-2xl text-xs sm:text-sm font-semibold"></div>
+            </div>
+        </div>
+
+        <!-- SECTION GAME 5: WHEEL & VERSE CHALLENGE -->
+        <div id="section-game5" class="game-section flex-col p-6 bg-navy-950">
+            <div class="flex justify-between items-center mb-2">
+                <div>
+                    <span class="text-xs font-bold text-purple-400 tracking-widest uppercase">GAME 5</span>
+                    <h2 class="text-2xl lg:text-3xl font-extrabold text-white">RODA ACAK & TANTANGAN AYAT</h2>
+                    <p class="text-slate-400 text-xs sm:text-sm">Putar roda untuk mendapatkan ayat komitmen dan pertanyaan refleksi tim!</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center h-full pb-6">
+                <!-- Wheel Section -->
+                <div class="flex flex-col items-center justify-center relative">
+                    <!-- Pointer Arrow -->
+                    <div class="w-0 h-0 border-l-[16px] border-l-transparent border-r-[16px] border-r-transparent border-t-[26px] border-t-amber-400 absolute top-[-10px] z-20 drop-shadow-lg"></div>
+
+                    <!-- SVG Wheel Container -->
+                    <div class="w-72 h-72 sm:w-80 sm:h-80 rounded-full border-8 border-slate-800 relative shadow-2xl overflow-hidden bg-navy-900 flex items-center justify-center glow-effect">
+                        <svg id="wheel-svg" class="w-full h-full wheel-transform" viewBox="0 0 100 100"></svg>
+                    </div>
+
+                    <button onclick="spinWheel()" id="spin-btn" class="mt-5 px-8 py-3.5 bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white font-extrabold text-base rounded-2xl shadow-xl transition-all active:scale-95 flex items-center gap-3">
+                        <i data-lucide="disc" class="w-5 h-5"></i>
+                        <span>PUTAR RODA SEKARANG!</span>
+                    </button>
+                </div>
+
+                <!-- Verse Challenge Box -->
+                <div class="bg-slate-900 border border-slate-800 p-6 sm:p-8 rounded-3xl space-y-5 flex flex-col justify-center shadow-xl">
+                    <div class="flex items-center gap-3 text-purple-400">
+                        <i data-lucide="book-open" class="w-6 h-6"></i>
+                        <h3 class="text-lg font-bold text-white">Kartu Firman & Diskusi Reflektif</h3>
+                    </div>
+
+                    <div id="verse-card-box" class="space-y-4">
+                        <div class="p-5 bg-navy-950 rounded-2xl border border-slate-800">
+                            <span class="text-xs font-bold text-amber-400 uppercase tracking-widest block mb-2" id="verse-ref">
+                                Menunggu Putaran Roda
+                            </span>
+                            <blockquote id="verse-text" class="text-sm sm:text-base italic text-slate-300">
+                                "Tekan tombol di sebelah kiri untuk mengundi tantangan kelompok."
+                            </blockquote>
+                        </div>
+
+                        <div id="verse-question" class="p-4 bg-purple-950/40 border border-purple-500/40 rounded-2xl text-xs sm:text-sm font-semibold text-purple-200 hidden">
+                            <!-- Pertanyaan muncul otomatis setelah roda berhenti -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- CUSTOM POPUP MODAL (Touch-friendly untuk Layar Besar) -->
+    <div id="custom-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+        <div class="bg-navy-900 border border-slate-700 max-w-md w-full p-6 rounded-3xl shadow-2xl text-center space-y-4 animate-scale">
+            <div id="modal-icon" class="w-16 h-16 mx-auto rounded-2xl flex items-center justify-center text-3xl"></div>
+            <h3 id="modal-title" class="text-xl font-black text-white"></h3>
+            <p id="modal-message" class="text-sm text-slate-300 leading-relaxed"></p>
+            <button onclick="closeModal()" class="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl active:scale-95 transition">
+                Lanjutkan
+            </button>
+        </div>
     </div>
-  </footer>
 
-  <!-- Script Lucide Icons & Clipboard -->
-  <script>
-    lucide.createIcons();
+    <!-- SCRIPT ENGINE -->
+    <script>
+        // --- WEB AUDIO API SYNTHESIZER ---
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-    function copyAddress() {
-      const address = document.getElementById("address-text").innerText;
-      navigator.clipboard.writeText(address).then(() => {
-        const label = document.getElementById("copy-label");
-        label.innerText = "Tersalin ke Clipboard!";
-        label.classList.add("text-emerald-400");
-        setTimeout(() => {
-          label.innerText = "Salin Alamat";
-          label.classList.remove("text-emerald-400");
-        }, 2000);
-      });
-    }
-  </script>
+        function playSound(type) {
+            try {
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                const now = audioCtx.currentTime;
+
+                if (type === 'correct') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(523.25, now);
+                    osc.frequency.exponentialRampToValueAtTime(659.25, now + 0.08);
+                    osc.frequency.exponentialRampToValueAtTime(783.99, now + 0.16);
+                    gain.gain.setValueAtTime(0.3, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+                    osc.start(now);
+                    osc.stop(now + 0.35);
+                } else if (type === 'wrong') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(160, now);
+                    osc.frequency.setValueAtTime(110, now + 0.12);
+                    gain.gain.setValueAtTime(0.35, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                    osc.start(now);
+                    osc.stop(now + 0.3);
+                } else if (type === 'click') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(450, now);
+                    gain.gain.setValueAtTime(0.12, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.04);
+                    osc.start(now);
+                    osc.stop(now + 0.04);
+                } else if (type === 'spin') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(280, now);
+                    gain.gain.setValueAtTime(0.12, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
+                    osc.start(now);
+                    osc.stop(now + 0.05);
+                } else if (type === 'victory') {
+                    const notes = [523.25, 659.25, 783.99, 1046.50];
+                    notes.forEach((freq, idx) => {
+                        const o = audioCtx.createOscillator();
+                        const g = audioCtx.createGain();
+                        o.connect(g);
+                        g.connect(audioCtx.destination);
+                        o.frequency.setValueAtTime(freq, now + idx * 0.09);
+                        g.gain.setValueAtTime(0.2, now + idx * 0.09);
+                        g.gain.exponentialRampToValueAtTime(0.01, now + idx * 0.09 + 0.22);
+                        o.start(now + idx * 0.09);
+                        o.stop(now + idx * 0.09 + 0.22);
+                    });
+                }
+            } catch(e) {
+                console.log("Audio API menunggu interaksi pengguna.");
+            }
+        }
+
+        // --- CUSTOM MODAL POPUP ---
+        function showCustomModal(status, title, message) {
+            const modal = document.getElementById('custom-modal');
+            const icon = document.getElementById('modal-icon');
+            const titleEl = document.getElementById('modal-title');
+            const msgEl = document.getElementById('modal-message');
+
+            titleEl.innerText = title;
+            msgEl.innerText = message;
+
+            if (status === 'success') {
+                icon.className = "w-16 h-16 mx-auto rounded-2xl flex items-center justify-center text-3xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/30";
+                icon.innerHTML = `<i data-lucide="check" class="w-8 h-8"></i>`;
+            } else if (status === 'danger') {
+                icon.className = "w-16 h-16 mx-auto rounded-2xl flex items-center justify-center text-3xl bg-rose-500/20 text-rose-400 border border-rose-500/30";
+                icon.innerHTML = `<i data-lucide="x" class="w-8 h-8"></i>`;
+            } else {
+                icon.className = "w-16 h-16 mx-auto rounded-2xl flex items-center justify-center text-3xl bg-amber-500/20 text-amber-400 border border-amber-500/30";
+                icon.innerHTML = `<i data-lucide="alert-circle" class="w-8 h-8"></i>`;
+            }
+
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            lucide.createIcons();
+        }
+
+        function closeModal() {
+            playSound('click');
+            const modal = document.getElementById('custom-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        // --- NAVIGATION ENGINE ---
+        function showDashboard() {
+            playSound('click');
+            document.querySelectorAll('.game-section').forEach(el => el.classList.remove('active'));
+            document.getElementById('section-dashboard').classList.add('active');
+            lucide.createIcons();
+        }
+
+        function openGame(gameNum) {
+            playSound('click');
+            document.querySelectorAll('.game-section').forEach(el => el.classList.remove('active'));
+            document.getElementById(`section-game${gameNum}`).classList.add('active');
+
+            if(gameNum === 1) resetGame1();
+            if(gameNum === 2) resetGame2();
+            if(gameNum === 3) resetGame3();
+            if(gameNum === 4) loadGame4Scenario(0);
+            if(gameNum === 5) renderWheelSVG();
+
+            lucide.createIcons();
+        }
+
+        // --- SCOREBOARD SYSTEM ---
+        let scoreA = 0;
+        let scoreB = 0;
+
+        function changeScore(team, amount) {
+            playSound('click');
+            if (team === 'A') {
+                scoreA = Math.max(0, scoreA + amount);
+                document.getElementById('score-a').innerText = scoreA;
+            } else {
+                scoreB = Math.max(0, scoreB + amount);
+                document.getElementById('score-b').innerText = scoreB;
+            }
+
+            if (amount > 0) {
+                confetti({ particleCount: 30, spread: 50, origin: { y: 0.15 } });
+            }
+        }
+
+        function resetScores() {
+            scoreA = 0;
+            scoreB = 0;
+            document.getElementById('score-a').innerText = 0;
+            document.getElementById('score-b').innerText = 0;
+            playSound('click');
+        }
+
+        // --- GAME 1: MITOS VS FAKTA ---
+        const g1Data = [
+            { id: 1, text: "Setiap remaja pria mengalami perubahan pubertas pada umur yang persis sama.", type: "MITOS" },
+            { id: 2, text: "Kelenjar minyak dan keringat yang aktif dapat memicu timbulnya jerawat dan bau badan.", type: "FAKTA" },
+            { id: 3, text: "Rasa ingin tahu tentang perubahan bentuk tubuh di usia SMP adalah hal alami.", type: "FAKTA" },
+            { id: 4, text: "Mimpi basah adalah mekanisme biologis alami tubuh dalam merilis sperma berkala.", type: "FAKTA" },
+            { id: 5, text: "Anak laki-laki tidak perlu rajin mencuci muka atau ganti baju setiap hari.", type: "MITOS" },
+            { id: 6, text: "Perubahan emosi dan suasana hati (mood) dipengaruhi oleh hormon pubertas.", type: "FAKTA" }
+        ];
+
+        let g1SelectedId = null;
+
+        function resetGame1() {
+            g1SelectedId = null;
+            const container = document.getElementById('g1-cards-container');
+            container.innerHTML = '';
+            g1Data.forEach(item => {
+                const card = document.createElement('div');
+                card.id = `g1-card-${item.id}`;
+                card.className = "p-3.5 rounded-2xl border border-slate-800 bg-navy-950 text-slate-200 text-xs font-semibold cursor-pointer hover:border-blue-500 transition-all shadow";
+                card.innerText = `"${item.text}"`;
+                card.onclick = () => {
+                    g1SelectedId = item.id;
+                    playSound('click');
+                    document.querySelectorAll('#g1-cards-container div').forEach(c => c.classList.remove('border-blue-500', 'bg-blue-600/20'));
+                    card.classList.add('border-blue-500', 'bg-blue-600/20');
+                };
+                container.appendChild(card);
+            });
+        }
+
+        function answerGame1(userChoice) {
+            if (!g1SelectedId) {
+                showCustomModal('warning', 'PILIH KARTU DULU', 'Silakan ketuk salah satu kartu pernyataan di sebelah kiri terlebih dahulu.');
+                return;
+            }
+
+            const item = g1Data.find(d => d.id === g1SelectedId);
+            if (item.type === userChoice) {
+                playSound('correct');
+                confetti({ particleCount: 35, spread: 60, origin: { y: 0.5 } });
+                showCustomModal('success', 'JAWABAN BENAR!', `"${item.text}" memang merupakan ${item.type}.`);
+                document.getElementById(`g1-card-${item.id}`).classList.add('opacity-30', 'pointer-events-none');
+                g1SelectedId = null;
+            } else {
+                playSound('wrong');
+                showCustomModal('danger', 'KURANG TEPAT!', `Pernyataan ini seharusnya tergolong sebagai ${item.type}.`);
+            }
+        }
+
+        // --- GAME 2: ANATOMI MATCHING ---
+        const g2Organs = [
+            { id: 1, name: "Testis" },
+            { id: 2, name: "Epididimis" },
+            { id: 3, name: "Vas Deferens" },
+            { id: 4, name: "Uretra" },
+            { id: 5, name: "Prostat & Vesikula Seminalis" }
+        ];
+
+        const g2Fungsi = [
+            { targetId: 1, text: "Menghasilkan sel sperma dan hormon testosteron." },
+            { targetId: 2, text: "Tempat penyimpanan dan pematangan sel sperma." },
+            { targetId: 3, text: "Saluran yang mengalirkan sperma matang menuju uretra." },
+            { targetId: 4, text: "Saluran akhir keluarnya urine dan cairan sperma (semen)." },
+            { targetId: 5, text: "Menghasilkan cairan nutrisi pelindung dan pembawa sel sperma." }
+        ];
+
+        let g2SelectedOrgan = null;
+
+        function resetGame2() {
+            g2SelectedOrgan = null;
+            const organContainer = document.getElementById('g2-organ-container');
+            const fungsiContainer = document.getElementById('g2-fungsi-container');
+            organContainer.innerHTML = '';
+            fungsiContainer.innerHTML = '';
+
+            g2Organs.forEach(o => {
+                const btn = document.createElement('button');
+                btn.id = `g2-organ-${o.id}`;
+                btn.className = "w-full p-4 rounded-2xl bg-slate-900 border border-slate-800 text-left font-bold text-slate-200 text-sm hover:border-cyan-500 transition-all shadow";
+                btn.innerText = o.name;
+                btn.onclick = () => {
+                    playSound('click');
+                    g2SelectedOrgan = o.id;
+                    document.querySelectorAll('#g2-organ-container button').forEach(b => b.classList.remove('border-cyan-500', 'bg-cyan-500/20'));
+                    btn.classList.add('border-cyan-500', 'bg-cyan-500/20');
+                };
+                organContainer.appendChild(btn);
+            });
+
+            const shuffled = [...g2Fungsi].sort(() => Math.random() - 0.5);
+            shuffled.forEach(f => {
+                const btn = document.createElement('button');
+                btn.className = "w-full p-4 rounded-2xl bg-slate-900 border border-slate-800 text-left text-xs sm:text-sm font-semibold text-slate-300 hover:border-cyan-500 transition-all shadow";
+                btn.innerText = f.text;
+                btn.onclick = () => {
+                    if (!g2SelectedOrgan) {
+                        showCustomModal('warning', 'PILIH ORGAN', 'Ketuk nama organ di kolom sebelah kiri terlebih dahulu!');
+                        return;
+                    }
+                    if (g2SelectedOrgan === f.targetId) {
+                        playSound('correct');
+                        confetti({ particleCount: 30, spread: 50 });
+                        showCustomModal('success', 'PASANGAN COCOK!', 'Organ biologis dan fungsi sainsnya tepat serasi.');
+                        document.getElementById(`g2-organ-${f.targetId}`).classList.add('opacity-30', 'pointer-events-none');
+                        btn.classList.add('opacity-30', 'pointer-events-none');
+                        g2SelectedOrgan = null;
+                    } else {
+                        playSound('wrong');
+                        showCustomModal('danger', 'BELUM TEPAT', 'Fungsi tersebut bukan milik organ yang kamu pilih. Coba lagi!');
+                    }
+                };
+                fungsiContainer.appendChild(btn);
+            });
+        }
+
+        // --- GAME 3: TOUCH SAFETY ZONES ---
+        const g3Data = [
+            { id: 1, text: "Jabat tangan saat berkenalan dengan teman baru.", zone: "HIJAU" },
+            { id: 2, text: "Tepuk bahu teman sebagai bentuk dukungan moral.", zone: "HIJAU" },
+            { id: 3, text: "Tos tangan (High-Five) sehabis main olahraga bersama.", zone: "HIJAU" },
+            { id: 4, text: "Menyentuh area tubuh yang tertutup pakaian renang orang lain.", zone: "MERAH" },
+            { id: 5, text: "Memfoto bagian intim tubuh sendiri atau orang lain.", zone: "MERAH" },
+            { id: 6, text: "Memaksa memegang teman yang sudah bilang 'Hentikan!'.", zone: "MERAH" }
+        ];
+
+        let g3SelectedId = null;
+
+        function resetGame3() {
+            g3SelectedId = null;
+            const container = document.getElementById('g3-cards-container');
+            container.innerHTML = '';
+            g3Data.forEach(item => {
+                const card = document.createElement('div');
+                card.id = `g3-card-${item.id}`;
+                card.className = "p-3.5 rounded-2xl border border-slate-800 bg-navy-950 text-slate-200 text-xs font-semibold cursor-pointer hover:border-emerald-500 transition-all shadow";
+                card.innerText = `"${item.text}"`;
+                card.onclick = () => {
+                    g3SelectedId = item.id;
+                    playSound('click');
+                    document.querySelectorAll('#g3-cards-container div').forEach(c => c.classList.remove('border-emerald-500', 'bg-emerald-600/20'));
+                    card.classList.add('border-emerald-500', 'bg-emerald-600/20');
+                };
+                container.appendChild(card);
+            });
+        }
+
+        function answerGame3(userZone) {
+            if (!g3SelectedId) {
+                showCustomModal('warning', 'PILIH SKENARIO', 'Pilih salah satu kartu skenario pergaulan di sebelah kiri terlebih dahulu!');
+                return;
+            }
+
+            const item = g3Data.find(d => d.id === g3SelectedId);
+            if (item.zone === userZone) {
+                playSound('correct');
+                confetti({ particleCount: 35, spread: 60, origin: { y: 0.5 } });
+                showCustomModal('success', 'KLASIFIKASI TEPAT!', `"${item.text}" adalah ${userZone === 'HIJAU' ? 'ZONA HIJAU (Aman & Sopan)' : 'ZONA MERAH (Bahaya & Pelanggaran)'}.`);
+                document.getElementById(`g3-card-${item.id}`).classList.add('opacity-30', 'pointer-events-none');
+                g3SelectedId = null;
+            } else {
+                playSound('wrong');
+                showCustomModal('danger', 'SALAH ZONA!', `Skenario ini seharusnya masuk ${item.zone === 'HIJAU' ? 'ZONA HIJAU' : 'ZONA MERAH'}.`);
+            }
+        }
+
+        // --- GAME 4: DIGITAL DILEMMA SCENARIOS ---
+        const g4Scenarios = [
+            {
+                title: "Foto Tidak Pantas di Grup WhatsApp",
+                desc: "Seorang teman di grup chat mengirimkan konten/foto vulgar orang lain dan mengajak teman-teman mengejeknya. Apa tindakanmu?",
+                options: [
+                    { text: "Tolak menyebarkan, ingatkan sopan secara pribadi, atau laporkan ke guru/orang tua.", isCorrect: true, feedback: "TEPAT SEKALI! Pria terhormat melindungi nama baik orang lain dan tidak terlibat penyebaran konten buruk." },
+                    { text: "Ikut tertawa dan meneruskan foto tersebut ke teman kelas lain.", isCorrect: false, feedback: "SALAH BESAR! Meneruskan foto tidak pantas melanggar etika kristiani dan hukum perlindungan data." }
+                ]
+            },
+            {
+                title: "Permintaan Foto Intim Pribadi",
+                desc: "Seseorang yang kamu kenal di game online meminta foto bagian tubuh pribadimu dengan janji skin game langka. Apa tindakanmu?",
+                options: [
+                    { text: "Kirim saja karena penasaran dan dijanjikan hadiah.", isCorrect: false, feedback: "SANGAT BERBAHAYA! Jangan pernah memfoto atau membagikan area pribadi tubuhmu kepada siapa pun!" },
+                    { text: "Tolak tegas! Segera blokir akunnya dan ceritakan kepada orang tua/guru.", isCorrect: true, feedback: "HEBAT! Tubuhmu adalah Bait Allah yang harus dijaga martabat dan privasinya." }
+                ]
+            },
+            {
+                title: "Manajemen Waktu Layar (Screen Time)",
+                desc: "Kamu sedang asyik bermain game online sampai larut malam, padahal besok pagi harus sekolah dan ibadah. Apa tindakan disiplinmu?",
+                options: [
+                    { text: "Matikan HP tepat waktu agar tubuh mendapatkan hak istirahat yang sehat.", isCorrect: true, feedback: "LUAR BIASA! Menjaga tubuh pemberian Tuhan berarti mematuhi jam tidur yang cukup." },
+                    { text: "Begadang semalaman karena tanggung mengejar peringkat game.", isCorrect: false, feedback: "KURANG BIJAK! Merusak ritme istirahat tubuh melemahkan fokus belajar dan kesehatan fisikmu." }
+                ]
+            }
+        ];
+
+        let g4CurrentIdx = 0;
+
+        function loadGame4Scenario(idx) {
+            g4CurrentIdx = idx;
+            const current = g4Scenarios[idx];
+            document.getElementById('g4-progress').innerText = `Skenario ${idx + 1} dari ${g4Scenarios.length}`;
+            document.getElementById('g4-title').innerText = current.title;
+            document.getElementById('g4-description').innerText = current.desc;
+
+            const optionsContainer = document.getElementById('g4-options-container');
+            const feedbackBox = document.getElementById('g4-feedback-box');
+            optionsContainer.innerHTML = '';
+            feedbackBox.className = "hidden p-4 rounded-2xl text-xs sm:text-sm font-semibold";
+
+            current.options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = "w-full p-4 rounded-2xl bg-navy-950 border border-slate-800 text-left text-xs sm:text-sm font-semibold text-slate-200 hover:border-amber-500 transition-all shadow";
+                btn.innerText = opt.text;
+                btn.onclick = () => {
+                    feedbackBox.classList.remove('hidden');
+                    if (opt.isCorrect) {
+                        playSound('correct');
+                        confetti({ particleCount: 30 });
+                        feedbackBox.className = "p-4 rounded-2xl text-xs sm:text-sm font-bold bg-emerald-950 border border-emerald-500 text-emerald-300";
+                        feedbackBox.innerText = opt.feedback;
+                    } else {
+                        playSound('wrong');
+                        feedbackBox.className = "p-4 rounded-2xl text-xs sm:text-sm font-bold bg-rose-950 border border-rose-500 text-rose-300";
+                        feedbackBox.innerText = opt.feedback;
+                    }
+
+                    setTimeout(() => {
+                        if (g4CurrentIdx < g4Scenarios.length - 1) {
+                            loadGame4Scenario(g4CurrentIdx + 1);
+                        } else {
+                            playSound('victory');
+                            showCustomModal('success', 'SKENARIO SELESAI!', 'Seluruh skenario pembinaan karakter telah berhasil diselesaikan.');
+                        }
+                    }, 2400);
+                };
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        // --- GAME 5: WHEEL & VERSE CHALLENGE ---
+        const g5Slices = [
+            { label: "Mazmur 139:14", verse: "Aku bersyukur kepada-Mu oleh karena kejadianku dahsyat dan ajaib; ajaib apa yang Kaubuat...", q: "Sebutkan 2 hal konkret pada fisik tubuhmu yang kamu syukuri sebagai karya agung Tuhan!" },
+            { label: "1 Korintus 6:19", verse: "Tidak tahukah kamu, bahwa tubuhmu adalah bait Roh Kudus yang diam di dalam kamu...", q: "Bagaimana cara seorang remaja pria menjaga 'Bait Allah' ini tetap kudus setiap hari?" },
+            { label: "Mazmur 119:9", verse: "Dengan apakah seorang muda mempertahankan kelakuannya bersih? Dengan menjaganya sesuai dengan firman-Mu.", q: "Sebutkan 1 komitmen hidup bersih yang ingin kamu terapkan dalam pertemanan di sekolah!" },
+            { label: "1 Timotius 4:12", verse: "Jangan seorang pun menganggap engkau rendah karena engkau muda. Jadilah teladan...", q: "Berikan contoh konkret menjadi teladan dalam perkataan saat bermain bersama teman!" }
+        ];
+
+        let wheelRotation = 0;
+
+        function renderWheelSVG() {
+            const svg = document.getElementById('wheel-svg');
+            svg.innerHTML = '';
+            const total = g5Slices.length;
+            const colors = ['#3b82f6', '#10b981', '#f59e0b', '#a855f7'];
+
+            g5Slices.forEach((slice, idx) => {
+                const startAngle = (idx * 360) / total;
+                const endAngle = ((idx + 1) * 360) / total;
+
+                const radStart = (Math.PI * startAngle) / 180;
+                const radEnd = (Math.PI * endAngle) / 180;
+
+                const x1 = 50 + 50 * Math.cos(radStart);
+                const y1 = 50 + 50 * Math.sin(radStart);
+                const x2 = 50 + 50 * Math.cos(radEnd);
+                const y2 = 50 + 50 * Math.sin(radEnd);
+
+                const pathData = `M 50 50 L ${x1} ${y1} A 50 50 0 0 1 ${x2} ${y2} Z`;
+
+                const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                
+                const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                path.setAttribute('d', pathData);
+                path.setAttribute('fill', colors[idx % colors.length]);
+                path.setAttribute('opacity', '0.9');
+                g.appendChild(path);
+
+                // Tambahkan label teks pada potongan roda
+                const midAngle = startAngle + (360 / total) / 2;
+                const radMid = (Math.PI * midAngle) / 180;
+                const tx = 50 + 32 * Math.cos(radMid);
+                const ty = 50 + 32 * Math.sin(radMid);
+
+                const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                text.setAttribute('x', tx);
+                text.setAttribute('y', ty);
+                text.setAttribute('fill', '#ffffff');
+                text.setAttribute('font-size', '4');
+                text.setAttribute('font-weight', 'bold');
+                text.setAttribute('text-anchor', 'middle');
+                text.setAttribute('dominant-baseline', 'central');
+                text.setAttribute('transform', `rotate(${midAngle + 90}, ${tx}, ${ty})`);
+                text.textContent = slice.label.split(' ')[0];
+                g.appendChild(text);
+
+                svg.appendChild(g);
+            });
+        }
+
+        function spinWheel() {
+            const svg = document.getElementById('wheel-svg');
+            const btn = document.getElementById('spin-btn');
+            btn.disabled = true;
+
+            const selectedIdx = Math.floor(Math.random() * g5Slices.length);
+            const sliceDeg = 360 / g5Slices.length;
+            
+            // Jarum panah ada di arah Jam 12 (270 derajat pada koordinat SVG)
+            const targetAngle = 270 - (selectedIdx * sliceDeg + sliceDeg / 2);
+            const extraRotations = 360 * 5; 
+            
+            wheelRotation = wheelRotation + extraRotations + ((targetAngle - (wheelRotation % 360) + 360) % 360);
+            svg.style.transform = `rotate(${wheelRotation}deg)`;
+
+            let spinSoundInterval = setInterval(() => {
+                playSound('spin');
+            }, 160);
+
+            setTimeout(() => {
+                clearInterval(spinSoundInterval);
+                playSound('victory');
+                btn.disabled = false;
+
+                const item = g5Slices[selectedIdx];
+                document.getElementById('verse-ref').innerText = item.label;
+                document.getElementById('verse-text').innerText = `"${item.verse}"`;
+                
+                const qBox = document.getElementById('verse-question');
+                qBox.classList.remove('hidden');
+                qBox.innerHTML = `<strong>TANTANGAN KELOMPOK:</strong> ${item.q}`;
+
+                confetti({ particleCount: 50, spread: 70 });
+            }, 4000);
+        }
+
+        // --- FULLSCREEN UTILITY ---
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(() => {});
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen().catch(() => {});
+                }
+            }
+        }
+
+        // --- INITIALIZATION ---
+        window.onload = function() {
+            lucide.createIcons();
+            renderWheelSVG();
+        };
+    </script>
 </body>
 </html>
