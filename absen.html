@@ -6,9 +6,15 @@
   <title>Smart Face Attendance & Rekap Presensi — SD Methodist Immanuel</title>
   <meta name="robots" content="noindex, nofollow">
 
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Fredoka & Nunito -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <!-- Font Awesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Face API Library -->
   <script src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api/dist/face-api.js"></script>
 
   <style>
@@ -70,7 +76,7 @@
     </div>
 
     <div class="flex flex-wrap items-center gap-2">
-      <!-- TOMBOL ON/OFF KAMERA -->
+      <!-- TOMBOL TOGGLE ON/OFF KAMERA -->
       <button id="btn-toggle-kamera" onclick="toggleStatusKamera()" class="bg-rose-950/80 hover:bg-rose-900 border border-rose-600/60 text-rose-300 font-title text-xs font-bold px-3 py-2 rounded-xl transition flex items-center gap-1.5 shadow">
         <i id="icon-toggle-kamera" class="fa-solid fa-video-slash"></i>
         <span id="text-toggle-kamera">Kamera: Nonaktif</span>
@@ -91,19 +97,19 @@
     </div>
   </header>
 
-  <!-- ================= AREA KAMERA ================= -->
+  <!-- ================= AREA KAMERA & STATUS ================= -->
   <main class="flex-grow flex flex-col items-center justify-center space-y-4 no-print">
     <div id="video-wrapper">
       <video id="video-feed" autoplay muted playsinline></video>
       
-      <!-- Overlay Saat Kamera Dimatikan / Standby -->
+      <!-- Overlay Saat Kamera Dimatikan / Standby Awal -->
       <div id="camera-standby-overlay" class="absolute inset-0 flex flex-col items-center justify-center bg-slate-950/95 text-slate-300 text-xs gap-3 p-4 text-center">
         <div class="w-16 h-16 rounded-full bg-slate-800/80 border border-slate-700 flex items-center justify-center text-2xl text-slate-400">
           <i class="fa-solid fa-video-slash"></i>
         </div>
         <div>
           <p class="font-bold text-sm text-white">Kamera dalam Kondisi Siaga (Mati)</p>
-          <p class="text-[11px] text-slate-400 mt-1 max-w-xs">Tekan tombol di bawah untuk menyalakan kamera & mulai memindai presensi.</p>
+          <p class="text-[11px] text-slate-400 mt-1 max-w-xs">Tekan tombol di bawah untuk menyalakan kamera dan memulai pemindaian presensi.</p>
         </div>
         <button onclick="toggleStatusKamera()" class="mt-1 px-4 py-2 bg-teal-600 hover:bg-teal-500 text-white font-title font-bold text-xs rounded-xl shadow transition flex items-center gap-2">
           <i class="fa-solid fa-video"></i> Aktifkan Kamera Sekarang
@@ -122,6 +128,7 @@
       <p class="font-title text-base sm:text-lg text-white" id="feedback-main">Kamera Nonaktif</p>
     </div>
 
+    <!-- Riwayat Presensi Terkini -->
     <div class="w-full max-w-lg space-y-1.5" id="history-box"></div>
   </main>
 
@@ -154,18 +161,18 @@
     </div>
   </div>
 
-  <!-- ================= MODAL REKAM WAJAH (DILENGKAPI LIVE PREVIEW SEJAJAR) ================= -->
+  <!-- ================= MODAL DAFTAR WAJAH (LIVE PREVIEW 2 KOLOM) ================= -->
   <div id="modal-enroll" class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 flex items-center justify-center p-3 sm:p-5 hidden no-print overflow-y-auto">
     <div class="glass-card max-w-3xl w-full rounded-3xl p-5 sm:p-6 border border-teal-500/40 bg-slate-950 shadow-2xl space-y-4 my-auto">
       <div class="flex justify-between items-center border-b border-teal-900/60 pb-3">
         <div>
           <h3 class="font-title text-base sm:text-lg text-teal-300">Pendaftaran Biometrik Wajah</h3>
-          <p class="text-[11px] text-slate-400">Pastikan wajah tampak jelas di layar monitor sebelum menekan tombol rekam.</p>
+          <p class="text-[11px] text-slate-400">Pastikan wajah tampak jelas di layar pratinjau sebelum menekan tombol rekam.</p>
         </div>
         <button onclick="tutupModalEnrollment()" class="text-slate-400 hover:text-white font-bold text-xl px-2">✕</button>
       </div>
 
-      <!-- TATA LETAK 2 KOLOM: KAMERA PREVIEW SEBELAH KIRI, FORM SEBELAH KANAN -->
+      <!-- TATA LETAK 2 KOLOM: VIDEO PREVIEW DI KIRI, FORM DATA DI KANAN -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
         <!-- Kolom Preview Kamera Khusus Pendaftaran -->
         <div class="flex flex-col items-center">
@@ -187,7 +194,7 @@
           <span class="text-[10px] text-slate-400 mt-1.5"><i class="fa-solid fa-circle-info text-teal-400 mr-1"></i>Pencahayaan cukup, tatap lurus ke lensa</span>
         </div>
 
-        <!-- Kolom Formulir Data -->
+        <!-- Kolom Formulir Data Pengajar / Siswa -->
         <div class="space-y-3 text-xs">
           <div>
             <label class="block text-slate-300 font-bold mb-1">1. Pilih Nama dari Master Data:</label>
@@ -229,7 +236,7 @@
     </div>
   </div>
 
-  <!-- ================= MODAL REKAPITULASI (TAB: REKAP HARIAN & REKAP BULANAN) ================= -->
+  <!-- ================= MODAL REKAPITULASI (TAB: HARIAN vs BULANAN) ================= -->
   <div id="modal-rekap" class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 flex items-center justify-center p-3 sm:p-5 hidden no-print">
     <div class="glass-card max-w-4xl w-full rounded-3xl p-5 sm:p-6 border border-teal-500/40 bg-slate-900 shadow-2xl flex flex-col max-h-[92vh]">
       
@@ -243,7 +250,7 @@
 
       <!-- TAB MENU: HARIAN vs BULANAN -->
       <div class="flex border-b border-slate-800 mb-3 gap-2">
-        <button id="tab-btn-harian" onclick="pindahTabRekap('harian')" class="px-4 py-2 font-title text-xs font-bold rounded-t-xl transition bg-teal-600 text-white flex items-center gap-1.5">
+        <button id="tab-btn-harian" onclick="pindahTabRekap('harian')" class="px-4 py-2 font-title text-xs font-bold rounded-t-xl transition bg-teal-600 text-white flex items-center gap-1.5 shadow">
           <i class="fa-solid fa-calendar-day"></i> Rekap Harian
         </button>
         <button id="tab-btn-bulanan" onclick="pindahTabRekap('bulanan')" class="px-4 py-2 font-title text-xs font-bold rounded-t-xl transition bg-slate-800 text-slate-400 hover:text-white flex items-center gap-1.5">
@@ -253,10 +260,8 @@
 
       <!-- FILTER KONTROL BAR -->
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 mb-3 bg-slate-950/80 p-2.5 rounded-2xl border border-teal-900/60 text-xs">
-        <!-- Input Pemilih Tanggal/Bulan -->
-        <div id="container-input-periode">
-          <!-- Diinjeksi otomatis oleh JS berdasarkan tab aktif -->
-        </div>
+        <!-- Input Pemilih Periode (Tanggal / Bulan-Tahun) -->
+        <div id="container-input-periode"></div>
 
         <div>
           <label class="block text-[10px] text-slate-400 font-bold mb-1">Status Kehadiran:</label>
@@ -359,7 +364,6 @@
     let scanIntervalTimer = null;
     let faceMatcher = null;
     let isProcessing = false;
-    let cooldownTimer = {};
     let targetAksiAdmin = "";
     let tokenAdminSementara = null;
     let daftarMasterGuruCache = [];
@@ -380,10 +384,10 @@
         ]);
 
         document.getElementById('camera-loading').classList.add('hidden');
-        document.getElementById('feedback-sub').innerText = "Model AI siap. Kamera dalam kondisi standby.";
-        document.getElementById('feedback-main').innerText = "Kamera Nonaktif (Siaga)";
+        document.getElementById('feedback-sub').innerText = "Model AI siap. Kamera dalam kondisi standby (mati).";
+        document.getElementById('feedback-main').innerText = "Kamera Nonaktif";
 
-        // Sinkronisasi data wajah dari server di background
+        // Sinkronisasi data vektor wajah dari server di latar belakang
         await sinkronisasiBiometrikDariCloud();
 
       } catch (err) {
@@ -505,7 +509,7 @@
             document.getElementById('feedback-sub').innerText = "Posisikan wajah menghadap ke lensa kamera";
           }
         } catch (e) {
-          // Abaikan bila transisi frame video
+          // Abaikan frame transisi
         }
       }, 500);
     }
@@ -545,17 +549,23 @@
       }
     }
 
+    // ================= EKSEKUSI PRESENSI DENGAN KUNCI HARIAN (ANTI-DOUBLE) =================
     async function eksekusiPresensiSukses(namaGuru) {
-      const now = Date.now();
       const tipeAbsen = document.getElementById('pilih-tipe').value;
-      const keyCooldown = `${namaGuru}_${tipeAbsen}`;
+      const now = new Date();
+      const tglHariIni = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+      
+      // 1. KUNCI HARIAN (ANTI-DOUBLE LOG): Mencegah nama yang sama presensi berulang pada hari & tipe yang sama
+      const keyPresensiHariIni = `absen_${namaGuru}_${tipeAbsen}_${tglHariIni}`;
+      const sudahAbsen = localStorage.getItem(keyPresensiHariIni);
 
-      if (cooldownTimer[keyCooldown] && (now - cooldownTimer[keyCooldown] < 45000)) {
+      if (sudahAbsen) {
+        document.getElementById('feedback-main').innerText = `⚠️ Sudah Presensi ${tipeAbsen}`;
+        document.getElementById('feedback-sub').innerText = `${namaGuru} sudah tercatat presensi ${tipeAbsen} hari ini pukul ${sudahAbsen}.`;
         return;
       }
-      cooldownTimer[keyCooldown] = now;
-      isProcessing = true;
 
+      isProcessing = true;
       document.getElementById('feedback-main').innerText = `✅ Teridentifikasi: ${namaGuru}`;
       document.getElementById('feedback-sub').innerText = `Merekam presensi ${tipeAbsen} ke server...`;
 
@@ -565,14 +575,23 @@
         const resp = await fetch(API_GURU_URL, {
           method: "POST",
           headers: { "Content-Type": "text/plain;charset=utf-8" },
-          body: JSON.stringify({ namaGuru: namaGuru, tipe: tipeAbsen, keterangan: "Presensi Wajah Pos Lobi" })
+          body: JSON.stringify({ 
+            namaGuru: namaGuru, 
+            tipe: tipeAbsen, 
+            tanggal: tglHariIni,
+            keterangan: "Presensi Wajah Pos Lobi" 
+          })
         });
         const res = await resp.json();
-        if (res.status === "success") {
-          tambahRiwayatTerkini(namaGuru, res.waktu, res.statusPresensi, tipeAbsen);
+        
+        // Catat kunci presensi harian jika sukses atau sudah ada di server
+        if (res.status === "success" || res.status === "already_exist") {
+          const jamCatat = res.waktu || now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+          localStorage.setItem(keyPresensiHariIni, jamCatat);
+          tambahRiwayatTerkini(namaGuru, jamCatat, res.statusPresensi || "Tepat Waktu", tipeAbsen);
         }
       } catch (e) {
-        console.error(e);
+        console.error("Gagal kirim log presensi:", e);
       } finally {
         setTimeout(() => { isProcessing = false; }, 3000);
       }
@@ -591,7 +610,7 @@
     function tambahRiwayatTerkini(nama, waktu, status, tipe) {
       const box = document.getElementById('history-box');
       const item = document.createElement('div');
-      item.className = "p-3 bg-slate-900/90 rounded-2xl border border-teal-900/80 flex justify-between items-center text-xs";
+      item.className = "p-3 bg-slate-900/90 rounded-2xl border border-teal-900/80 flex justify-between items-center text-xs animate-fade-in";
       item.innerHTML = `
         <div>
           <p class="font-bold text-white">${nama}</p>
@@ -657,9 +676,8 @@
       }
     }
 
-    // ================= PENDAFTARAN BIOMETRIK WAJAH (DENGAN LIVE PREVIEW) =================
+    // ================= PENDAFTARAN BIOMETRIK WAJAH (DENGAN LIVE PREVIEW SEJAJAR) =================
     async function bukaModalEnrollment() {
-      // Pastikan kamera nyala agar preview wajah tampak jelas
       if (!isCameraActive) {
         await nyalakanKamera();
       } else if (cameraStream && videoPreviewEnroll) {
@@ -757,7 +775,7 @@
       }
     }
 
-    // ================= MODAL REKAPITULASI (TAB: HARIAN & BULANAN) =================
+    // ================= MODAL REKAPITULASI (TAB: HARIAN vs BULANAN) =================
     function bukaModalRekap() {
       document.getElementById('modal-rekap').classList.remove('hidden');
       pindahTabRekap(currentTabRekap);
@@ -784,7 +802,7 @@
         
         boxInput.innerHTML = `
           <label class="block text-[10px] text-slate-400 font-bold mb-1">Pilih Tanggal Presensi:</label>
-          <input type="date" id="param-tgl" value="${tglSekarang}" onchange="filterTabelRekap()" class="w-full p-2 rounded-xl bg-slate-900 border border-teal-800 text-white text-xs outline-none focus:border-teal-400">
+          <input type="date" id="param-tgl" value="${tglSekarang}" onchange="filterTabelRekap()" class="w-full p-2 rounded-xl bg-slate-900 border border-teal-800 text-white text-xs outline-none focus:border-teal-400 font-bold">
         `;
       } else {
         btnBulanan.className = "px-4 py-2 font-title text-xs font-bold rounded-t-xl transition bg-teal-600 text-white flex items-center gap-1.5 shadow";
