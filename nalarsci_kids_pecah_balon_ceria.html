@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NalarSci Kids - Pecah Balon Ceria</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
+    }
+    body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background: linear-gradient(180deg, #68d8d6 0%, #07b1ca 50%, #fbd46d 100%);
+      font-family: 'Comic Sans MS', 'Chalkboard SE', 'Fredoka One', cursive, sans-serif;
+      text-align: center;
+      width: 100vw;
+      height: 100vh;
+    }
+
+    #game-stage {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      cursor: pointer;
+    }
+
+    /* Floating Clouds Background Decoration */
+    .cloud {
+      position: absolute;
+      background: rgba(255, 255, 255, 0.7);
+      border-radius: 100px;
+      pointer-events: none;
+      z-index: 1;
+      filter: blur(1px);
+    }
+
+    /* Top Information Bar */
+    #header-bar {
+      position: absolute;
+      top: 15px;
+      left: 20px;
+      right: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 30;
+      pointer-events: none;
+    }
+    .badge {
+      background: #ffffff;
+      padding: 10px 22px;
+      border-radius: 35px;
+      font-size: 24px;
+      font-weight: 900;
+      box-shadow: 0 8px 18px rgba(0,0,0,0.15);
+      border: 4px solid #ffbe0b;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .badge-brand {
+      background: #ff006e;
+      color: #ffffff;
+      border-color: #ffbe0b;
+      font-size: 20px;
+      letter-spacing: 0.5px;
+    }
+    .badge-timer {
+      color: #0582ca;
+      min-width: 130px;
+      justify-content: center;
+    }
+    .badge-score {
+      color: #fb5607;
+      min-width: 140px;
+      justify-content: center;
+    }
+
+    /* Balloon Style */
+    .balloon {
+      position: absolute;
+      border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 45px;
+      color: #fff;
+      cursor: pointer;
+      box-shadow: inset 10px 10px 20px rgba(255, 255, 255, 0.5), inset -8px -8px 15px rgba(0, 0, 0, 0.15), 0 10px 20px rgba(0, 0, 0, 0.15);
+      transform: translateX(-50%);
+      z-index: 10;
+      transition: transform 0.1s ease;
+      animation: wobble 2.5s ease-in-out infinite alternate;
+    }
+    .balloon::after {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 9px solid transparent;
+      border-right: 9px solid transparent;
+      border-bottom: 12px solid inherit;
+    }
+    .balloon::before {
+      content: '';
+      position: absolute;
+      bottom: -32px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 2px;
+      height: 24px;
+      background: rgba(255, 255, 255, 0.8);
+    }
+
+    @keyframes wobble {
+      0% { margin-left: -8px; }
+      100% { margin-left: 8px; }
+    }
+
+    /* Floating Praise Text */
+    .popup-praise {
+      position: absolute;
+      font-size: 38px;
+      font-weight: 900;
+      color: #ffbe0b;
+      text-shadow: 3px 3px 0 #ff006e, -3px -3px 0 #ff006e, 3px -3px 0 #ff006e, -3px 3px 0 #ff006e;
+      pointer-events: none;
+      z-index: 40;
+      transform: translate(-50%, -50%) scale(0.5);
+      animation: floatUpFade 0.6s ease-out forwards;
+    }
+    @keyframes floatUpFade {
+      0% { opacity: 0; transform: translate(-50%, -20%) scale(0.5); }
+      40% { opacity: 1; transform: translate(-50%, -60%) scale(1.35); }
+      100% { opacity: 0; transform: translate(-50%, -100%) scale(1.1); }
+    }
+
+    /* Star Pop Particle */
+    .star-sparkle {
+      position: absolute;
+      font-size: 26px;
+      pointer-events: none;
+      z-index: 35;
+      animation: popSpark 0.5s ease-out forwards;
+    }
+    @keyframes popSpark {
+      0% { transform: translate(0, 0) scale(1.2); opacity: 1; }
+      100% { transform: translate(var(--dx), var(--dy)) scale(0.2); opacity: 0; }
+    }
+
+    /* Bottom Control Hint */
+    #bottom-hint {
+      position: absolute;
+      bottom: 12px;
+      left: 0;
+      right: 0;
+      text-align: center;
+      color: #ffffff;
+      font-size: 19px;
+      font-weight: bold;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.4);
+      z-index: 25;
+      pointer-events: none;
+    }
+
+    /* Game Over / Finish Screen */
+    #gameover-screen {
+      display: none;
+      position: absolute;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.82);
+      z-index: 100;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      backdrop-filter: blur(4px);
+    }
+    .result-box {
+      background: #ffffff;
+      padding: 35px 50px;
+      border-radius: 40px;
+      border: 8px solid #ffbe0b;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+      text-align: center;
+      max-width: 90vw;
+      animation: bounceCard 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    @keyframes bounceCard {
+      from { transform: scale(0.5); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    .result-box h1 {
+      font-size: 46px;
+      color: #ff006e;
+      margin: 0;
+      letter-spacing: 1px;
+    }
+    .result-box .stars-row {
+      font-size: 58px;
+      margin: 15px 0 5px 0;
+    }
+    .result-box .score-display {
+      font-size: 36px;
+      color: #3a86ff;
+      margin: 10px 0 25px 0;
+      font-weight: bold;
+    }
+    .btn-play-again {
+      background: #38b000;
+      color: white;
+      font-size: 26px;
+      font-weight: bold;
+      padding: 16px 42px;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      box-shadow: 0 8px 0 #007200, 0 10px 20px rgba(0,0,0,0.2);
+      transition: all 0.1s ease;
+      font-family: inherit;
+    }
+    .btn-play-again:active {
+      transform: translateY(6px);
+      box-shadow: 0 2px 0 #007200, 0 5px 10px rgba(0,0,0,0.2);
+    }
+  </style>
+</head>
+<body>
+
+<div id="game-stage">
+  <!-- Dynamic Background Clouds -->
+  <div class="cloud" style="width: 200px; height: 60px; top: 12%; left: 8%;"></div>
+  <div class="cloud" style="width: 280px; height: 75px; top: 22%; right: 12%;"></div>
+  <div class="cloud" style="width: 170px; height: 50px; top: 40%; left: 65%;"></div>
+
+  <!-- Header Info -->
+  <div id="header-bar">
+    <div class="badge badge-brand">🚀 NalarSci Kids</div>
+    <div class="badge badge-timer">⏳ <span id="timer-val">30</span>s</div>
+    <div class="badge badge-score">⭐ Skor: <span id="score-val">0</span></div>
+  </div>
+
+  <!-- Instruction Helper -->
+  <div id="bottom-hint">👉 Klik / Sentuh Balon atau Pencet [ SPASI ] di Keyboard! 🎈</div>
+
+  <!-- Game Over Modal -->
+  <div id="gameover-screen">
+    <div class="result-box">
+      <h1>HOREEE! SELESAI! 🥳</h1>
+      <div class="stars-row">⭐ 🏆 ⭐</div>
+      <div class="score-display">Balon Terpecah: <span id="final-score-val">0</span></div>
+      <button class="btn-play-again" id="btn-restart" onclick="restartGame()">Main Lagi (Pencet Spasi)</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Game Elements
+  const stage = document.getElementById('game-stage');
+  const timerVal = document.getElementById('timer-val');
+  const scoreVal = document.getElementById('score-val');
+  const gameOverScreen = document.getElementById('gameover-screen');
+  const finalScoreVal = document.getElementById('final-score-val');
+
+  // Game States
+  let score = 0;
+  let timeLeft = 30;
+  let isGameOver = false;
+  let spawnInterval = null;
+  let countdownInterval = null;
+  const activeBalloons = [];
+
+  // Cheerful Balloon Content (Animal, Fruit, Fun Emoji)
+  const balloonIcons = ['🦁', '🐱', '🐼', '🐰', '🐸', '🐵', '🍓', '🍎', '🍉', '🍌', '⭐', '🍭', '🎈'];
+  const balloonColors = ['#ff006e', '#fb5607', '#ffbe0b', '#3a86ff', '#8338ec', '#06d6a0', '#ef476f', '#118ab2'];
+  const praises = ['PINTAR! 🌟', 'HEBAT! 🎉', 'KEREN! 🚀', 'MANTAP! 👏', 'ASIK! 🥳', 'WOW! ✨'];
+
+  // Zero-dependency Audio Synthesizer (Web Audio API)
+  const AudioEngine = (function() {
+    let ctx = null;
+    function getContext() {
+      if (!ctx) {
+        ctx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (ctx.state === 'suspended') {
+        ctx.resume();
+      }
+      return ctx;
+    }
+
+    return {
+      playPop: function() {
+        try {
+          const c = getContext();
+          const osc = c.createOscillator();
+          const gain = c.createGain();
+          
+          osc.type = 'triangle';
+          // Fast pitch drop simulates instant pop bubble sound
+          osc.frequency.setValueAtTime(650, c.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(80, c.currentTime + 0.08);
+
+          gain.gain.setValueAtTime(0.5, c.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.01, c.currentTime + 0.08);
+
+          osc.connect(gain);
+          gain.connect(c.destination);
+
+          osc.start();
+          osc.stop(c.currentTime + 0.08);
+        } catch (e) {
+          console.warn('Audio blocked or not ready', e);
+        }
+      },
+      playFinish: function() {
+        try {
+          const c = getContext();
+          const notes = [261.63, 329.63, 392.00, 523.25, 659.25];
+          notes.forEach((freq, idx) => {
+            const osc = c.createOscillator();
+            const gain = c.createGain();
+            osc.type = 'sine';
+            const startTime = c.currentTime + idx * 0.11;
+            osc.frequency.setValueAtTime(freq, startTime);
+            gain.gain.setValueAtTime(0.3, startTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, startTime + 0.22);
+            osc.connect(gain);
+            gain.connect(c.destination);
+            osc.start(startTime);
+            osc.stop(startTime + 0.22);
+          });
+        } catch (e) {
+          console.warn('Audio finish error', e);
+        }
+      }
+    };
+  })();
+
+  // Visual Effects: Sparkles and Floating Praise
+  function triggerPopEffects(x, y) {
+    // 1. Floating Praise Text
+    const praise = document.createElement('div');
+    praise.className = 'popup-praise';
+    praise.innerText = praises[Math.floor(Math.random() * praises.length)];
+    praise.style.left = x + 'px';
+    praise.style.top = y + 'px';
+    stage.appendChild(praise);
+    setTimeout(() => praise.remove(), 650);
+
+    // 2. Star Sparkles bursting outwards
+    const sparkleEmojis = ['✨', '⭐', '💥', '💛'];
+    for (let i = 0; i < 6; i++) {
+      const spark = document.createElement('div');
+      spark.className = 'star-sparkle';
+      spark.innerText = sparkleEmojis[Math.floor(Math.random() * sparkleEmojis.length)];
+      spark.style.left = x + 'px';
+      spark.style.top = y + 'px';
+
+      const angle = (Math.PI * 2 / 6) * i + (Math.random() * 0.4);
+      const dist = 50 + Math.random() * 45;
+      spark.style.setProperty('--dx', `${Math.cos(angle) * dist}px`);
+      spark.style.setProperty('--dy', `${Math.sin(angle) * dist}px`);
+
+      stage.appendChild(spark);
+      setTimeout(() => spark.remove(), 500);
+    }
+  }
+
+  // Pop a specific balloon element
+  function popBalloon(balloonEl, directX, directY) {
+    if (isGameOver || !balloonEl || !balloonEl.parentNode) return;
+
+    const rect = balloonEl.getBoundingClientRect();
+    const targetX = directX || (rect.left + rect.width / 2);
+    const targetY = directY || (rect.top + rect.height / 2);
+
+    // Remove from tracking array
+    const index = activeBalloons.indexOf(balloonEl);
+    if (index > -1) {
+      activeBalloons.splice(index, 1);
+    }
+
+    balloonEl.remove();
+
+    // Increment Score and Play Feedback
+    score += 1;
+    scoreVal.innerText = score;
+    AudioEngine.playPop();
+    triggerPopEffects(targetX, targetY);
+  }
+
+  // Spawn Balloon from bottom
+  function spawnBalloon() {
+    if (isGameOver) return;
+
+    const balloon = document.createElement('div');
+    balloon.className = 'balloon';
+
+    // Random styling
+    const size = 90 + Math.floor(Math.random() * 30); // 90px - 120px easy target
+    const color = balloonColors[Math.floor(Math.random() * balloonColors.length)];
+    const icon = balloonIcons[Math.floor(Math.random() * balloonIcons.length)];
+
+    balloon.style.width = size + 'px';
+    balloon.style.height = (size * 1.25) + 'px';
+    balloon.style.backgroundColor = color;
+    balloon.style.borderBottomColor = color; // For tie triangle
+    balloon.innerText = icon;
+
+    // Position along bottom edge
+    const startX = 60 + Math.random() * (window.innerWidth - 120);
+    balloon.style.left = startX + 'px';
+    balloon.style.top = (window.innerHeight + 20) + 'px';
+
+    stage.appendChild(balloon);
+    activeBalloons.push(balloon);
+
+    // Direct Tap / Click Event (High Priority)
+    balloon.addEventListener('pointerdown', (e) => {
+      e.stopPropagation();
+      popBalloon(balloon, e.clientX, e.clientY);
+    });
+
+    // Float upwards animation loop
+    let currentY = window.innerHeight + 20;
+    const riseSpeed = 1.6 + Math.random() * 1.8; // Gentle speed suitable for young kids
+
+    function animateRise() {
+      if (isGameOver) {
+        balloon.remove();
+        return;
+      }
+
+      currentY -= riseSpeed;
+      balloon.style.top = currentY + 'px';
+
+      // Disappear above top bar
+      if (currentY < -150) {
+        const idx = activeBalloons.indexOf(balloon);
+        if (idx > -1) activeBalloons.splice(idx, 1);
+        balloon.remove();
+      } else if (balloon.parentNode) {
+        requestAnimationFrame(animateRise);
+      }
+    }
+
+    requestAnimationFrame(animateRise);
+  }
+
+  // Keyboard Spacebar Alternative: Pops the lowest/easiest balloon on screen
+  window.addEventListener('keydown', (e) => {
+    if (e.code === 'Space' || e.key === ' ' || e.key === 'Enter') {
+      e.preventDefault();
+      if (isGameOver) {
+        restartGame();
+      } else {
+        // Pop lowest active balloon (closest to kid's sight)
+        if (activeBalloons.length > 0) {
+          let lowestBalloon = activeBalloons[0];
+          let maxTop = -9999;
+          activeBalloons.forEach(b => {
+            const topPos = parseFloat(b.style.top);
+            if (topPos > maxTop && topPos < window.innerHeight - 30) {
+              maxTop = topPos;
+              lowestBalloon = b;
+            }
+          });
+          if (lowestBalloon) {
+            popBalloon(lowestBalloon);
+          }
+        }
+      }
+    }
+  });
+
+  // Game Lifecycle Control
+  function startGame() {
+    // Clear any previous balloons
+    activeBalloons.forEach(b => b.remove());
+    activeBalloons.length = 0;
+
+    score = 0;
+    timeLeft = 30;
+    isGameOver = false;
+
+    scoreVal.innerText = score;
+    timerVal.innerText = timeLeft;
+    gameOverScreen.style.display = 'none';
+
+    // Start Spawning every 700ms
+    clearInterval(spawnInterval);
+    spawnInterval = setInterval(spawnBalloon, 700);
+
+    // 30s Countdown Timer
+    clearInterval(countdownInterval);
+    countdownInterval = setInterval(() => {
+      timeLeft--;
+      timerVal.innerText = timeLeft;
+
+      if (timeLeft <= 0) {
+        endGame();
+      }
+    }, 1000);
+  }
+
+  function endGame() {
+    isGameOver = true;
+    clearInterval(spawnInterval);
+    clearInterval(countdownInterval);
+
+    // Clean remaining items
+    activeBalloons.forEach(b => b.remove());
+    activeBalloons.length = 0;
+
+    AudioEngine.playFinish();
+    finalScoreVal.innerText = score;
+    gameOverScreen.style.display = 'flex';
+  }
+
+  function restartGame() {
+    startGame();
+  }
+
+  // Window Resize Responsiveness
+  window.addEventListener('resize', () => {
+    // Maintain positions on dynamic screen rotations
+  });
+
+  // Auto Start Game on Page Load
+  window.addEventListener('load', () => {
+    startGame();
+  });
+</script>
+
+</body>
+</html>
