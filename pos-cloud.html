@@ -1,0 +1,1846 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>POS & Financial Management Cloud — PT TENTREM RAHAYU NUSANTARA</title>
+
+  <!-- TAILWIND & GOOGLE FONTS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Nunito:wght@400;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- FIREBASE SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+  <!-- PUSTAKA BARCODE GENERATOR, QR GENERATOR & SCANNER KAMERA -->
+  <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="https://unpkg.com/html5-qrcode"></script>
+
+  <style>
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: #090d16;
+      color: #f1f5f9;
+    }
+    .font-title { font-family: 'Fredoka', sans-serif; }
+    .font-mono-num { font-family: 'Space Mono', monospace; }
+    
+    .nav-tab.active {
+      background: linear-gradient(135deg, #0d9488, #0f766e);
+      color: #ffffff;
+      box-shadow: 0 4px 14px rgba(13, 148, 136, 0.35);
+    }
+
+    /* CSS PRINT THERMAL, FAKTUR A4 & KWITANSI */
+    @media print {
+      body * { visibility: hidden; }
+      #area-cetak-nota, #area-cetak-nota * { visibility: visible; }
+      #area-cetak-faktur, #area-cetak-faktur * { visibility: visible; }
+      #area-cetak-kwitansi, #area-cetak-kwitansi * { visibility: visible; }
+      #area-cetak-label, #area-cetak-label * { visibility: visible; }
+      
+      .halaman-print {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        background: white !important;
+        color: black !important;
+      }
+      .no-print { display: none !important; }
+    }
+
+    .kertas-thermal {
+      width: 58mm;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 11px;
+      line-height: 1.25;
+      color: #000;
+      background: #fff;
+      padding: 4px;
+      margin: auto;
+    }
+
+    #reader video {
+      border-radius: 16px;
+      object-fit: cover;
+      width: 100% !important;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between">
+
+  <!-- TOP BAR & STATUS CLOUD -->
+  <header class="bg-slate-900/90 border-b border-teal-900/60 sticky top-0 z-40 backdrop-blur-md px-4 py-3">
+    <div class="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-3">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-2xl bg-teal-500/20 border border-teal-500/40 flex items-center justify-center text-teal-400 font-bold text-xl">
+          <i class="fa-solid fa-cash-register"></i>
+        </div>
+        <div>
+          <h1 class="font-title text-base sm:text-lg text-white tracking-wide" id="bar-brand-pt">PT TENTREM RAHAYU NUSANTARA</h1>
+          <p class="text-[11px] text-slate-400" id="bar-kasir-aktif">
+            <span class="text-teal-400 font-bold"><i class="fa-solid fa-shield-halved"></i> WP Non-PKP (PP 55/2022)</span> • Kasir: <b id="bar-nama-direktur">Thomas Ryantama</b>
+          </p>
+        </div>
+      </div>
+
+      <!-- KONEKSI CLOUD & BLUETOOTH PRINTER -->
+      <div class="flex items-center gap-2">
+        <button type="button" onclick="hubungkanPrinterBluetooth()" class="flex items-center gap-1.5 bg-slate-950 px-3 py-1.5 rounded-xl border border-cyan-800/80 text-xs hover:border-cyan-400 transition shadow">
+          <i class="fa-brands fa-bluetooth-b text-cyan-400 text-sm"></i>
+          <span id="status-bt-printer" class="text-slate-300 font-bold">Sambung Printer BT</span>
+        </button>
+
+        <div class="flex items-center gap-2 bg-slate-950 px-3 py-1.5 rounded-xl border border-teal-900/60 text-xs">
+          <span id="dot-cloud" class="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse"></span>
+          <span id="text-cloud" class="text-slate-300 font-bold">Menyambungkan Cloud...</span>
+        </div>
+      </div>
+
+      <!-- MENU NAVIGASI UTAMA -->
+      <nav class="flex items-center gap-1.5 overflow-x-auto text-xs font-bold">
+        <button onclick="bukaTab('kasir')" id="tab-btn-kasir" class="nav-tab active px-3.5 py-2 rounded-xl transition flex items-center gap-1.5">
+          <i class="fa-solid fa-cart-shopping"></i> Kasir POS
+        </button>
+        <button onclick="bukaTab('produk')" id="tab-btn-produk" class="nav-tab px-3.5 py-2 rounded-xl text-slate-400 hover:text-white transition flex items-center gap-1.5">
+          <i class="fa-solid fa-boxes-stacked"></i> Produk & Barcode
+        </button>
+        <button onclick="bukaTab('transaksi')" id="tab-btn-transaksi" class="nav-tab px-3.5 py-2 rounded-xl text-slate-400 hover:text-white transition flex items-center gap-1.5">
+          <i class="fa-solid fa-receipt"></i> Transaksi & SPJ
+        </button>
+        <button onclick="bukaTab('keuangan')" id="tab-btn-keuangan" class="nav-tab px-3.5 py-2 rounded-xl text-slate-400 hover:text-white transition flex items-center gap-1.5">
+          <i class="fa-solid fa-vault"></i> Kas & Modal
+        </button>
+        <button onclick="bukaTab('perusahaan')" id="tab-btn-perusahaan" class="nav-tab px-3.5 py-2 rounded-xl text-slate-400 hover:text-white transition flex items-center gap-1.5">
+          <i class="fa-solid fa-building"></i> Profil PT & Pajak
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ================= KONTEN HALAMAN ================= -->
+  <main class="max-w-7xl w-full mx-auto p-4 md:p-6 flex-grow">
+
+    <!-- 1. TAB KASIR (POS TERMINAL) -->
+    <div id="tab-kasir" class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      
+      <!-- Kolom Katalog & Scanner Kamera -->
+      <div class="lg:col-span-7 space-y-4">
+        <div class="flex flex-wrap gap-2">
+          <!-- Input Cari / Input Barcode USB Scanner -->
+          <div class="relative flex-grow">
+            <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3.5 text-slate-500 text-xs"></i>
+            <input type="text" id="cari-produk" oninput="renderKatalog()" onkeydown="tanganiInputScanner(event)" placeholder="Ketik nama atau tembak Barcode Scanner USB..." class="w-full bg-slate-900 border border-teal-900/60 rounded-xl pl-9 pr-3 py-2.5 text-xs text-white outline-none focus:border-teal-400">
+          </div>
+
+          <!-- Tombol Nyalakan Kamera Barcode / QR -->
+          <button onclick="bukaScannerKamera()" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-3 py-2 rounded-xl text-xs transition flex items-center gap-1.5 shadow">
+            <i class="fa-solid fa-camera"></i> Scan Kamera
+          </button>
+
+          <!-- Tombol Tambah Barang Cepat -->
+          <button onclick="modalTambahProduk()" class="bg-teal-600 hover:bg-teal-500 text-white px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5">
+            <i class="fa-solid fa-plus"></i> Tambah
+          </button>
+        </div>
+
+        <div id="katalog-grid" class="grid grid-cols-2 sm:grid-cols-3 gap-3 max-h-[68vh] overflow-y-auto pr-1">
+          <!-- Render Produk Otomatis -->
+        </div>
+      </div>
+
+      <!-- Kolom Keranjang Kasir -->
+      <div class="lg:col-span-5 bg-slate-900/90 border border-teal-900/60 rounded-3xl p-5 flex flex-col justify-between shadow-2xl h-[88vh]">
+        <div class="space-y-3">
+          <div class="flex justify-between items-center border-b border-teal-950 pb-2">
+            <h3 class="font-title text-white text-base flex items-center gap-2">
+              <i class="fa-solid fa-basket-shopping text-teal-400"></i> Keranjang Penjualan
+            </h3>
+            <button onclick="kosongkanKeranjang()" class="text-rose-400 hover:text-rose-300 text-xs font-bold">Kosongkan</button>
+          </div>
+
+          <div class="flex gap-2 text-xs">
+            <input type="text" id="input-customer" placeholder="Nama Pembeli / Sekolah (cth: Bendahara BOS SMA 2)..." class="w-full bg-slate-950 border border-teal-900/60 rounded-xl p-2 text-white outline-none focus:border-teal-400">
+          </div>
+
+          <!-- Daftar Item di Keranjang -->
+          <div id="keranjang-list" class="overflow-y-auto max-h-[24vh] space-y-2 pr-1 text-xs">
+            <!-- Render Item Otomatis -->
+          </div>
+        </div>
+
+        <!-- Rangkuman Pembayaran & Pajak Sesuai Regulasi -->
+        <div class="border-t border-teal-950 pt-2.5 space-y-2 text-xs">
+          <div class="flex justify-between text-slate-400">
+            <span>Subtotal Tagihan (Bruto)</span>
+            <span class="font-mono-num font-bold text-white" id="ringkas-subtotal">Rp 0</span>
+          </div>
+
+          <!-- SKEMA PERPAJAKAN KHUSUS (DANA BOS DENGAN 2 PILIHAN PENYETORAN) -->
+          <div class="bg-slate-950/80 p-2.5 rounded-xl border border-teal-900/40 space-y-2">
+            <div class="space-y-1">
+              <label class="font-bold flex items-center gap-1 text-[11px] text-amber-300">
+                <i class="fa-solid fa-landmark"></i> Skema Transaksi & Perlakuan Pajak:
+              </label>
+              <select id="skema-pajak" onchange="hitungTotalKasir()" class="w-full bg-slate-900 border border-teal-800 rounded-lg p-1.5 text-[11px] text-teal-200 font-bold outline-none">
+                <option value="bos_mandiri" selected>🏫 Dana BOS: Sekolah Transfer Utuh (Pajak Disetor Mandiri oleh PT)</option>
+                <option value="bos_pp55">🏫 Dana BOS: Bendahara Sekolah Potong PPh 0.5% (PMK 59/2022)</option>
+                <option value="non_pkp">🏢 Penjualan Umum (Non-PKP / Bebas PPN)</option>
+                <option value="ppn_11">📑 Umum + PPN 11% (PKP)</option>
+                <option value="ppn_12">📑 Umum + PPN 12% (PKP)</option>
+              </select>
+            </div>
+
+            <!-- Detail PPN & PPh Final -->
+            <div class="flex justify-between text-[11px] text-slate-400" id="row-ppn">
+              <span>PPN:</span>
+              <span class="font-mono-num font-bold text-slate-300" id="ringkas-ppn">Rp 0 (Bebas PMK 59 ≤ 2 Jt)</span>
+            </div>
+
+            <div class="flex justify-between text-[11px]" id="row-pph">
+              <span id="label-pph" class="text-amber-400">PPh Final 0.5% (PP 55):</span>
+              <span class="font-mono-num font-bold text-amber-400" id="ringkas-pph">Rp 10.000 (Disetor Mandiri)</span>
+            </div>
+          </div>
+
+          <div class="flex justify-between text-slate-400">
+            <span>Diskon Nota (Rp)</span>
+            <input type="number" id="input-diskon" value="0" oninput="hitungTotalKasir()" class="w-24 bg-slate-950 border border-teal-900/60 rounded-lg p-1 text-right text-xs text-white font-mono-num outline-none">
+          </div>
+
+          <!-- Total Tagihan SPJ vs Uang Masuk Rekening -->
+          <div class="grid grid-cols-2 gap-2 bg-slate-950 p-2.5 rounded-xl border border-teal-900/60">
+            <div>
+              <span class="text-[10px] text-slate-400 block font-bold" id="title-spj">TOTAL TAGIHAN SPJ:</span>
+              <span class="font-mono-num text-sm text-teal-300 font-bold" id="ringkas-total-spj">Rp 0</span>
+            </div>
+            <div class="text-right">
+              <span class="text-[10px] text-emerald-400 block font-bold" id="title-transfer">SEKOLAH TRANSFER:</span>
+              <span class="font-mono-num text-sm text-emerald-300 font-bold" id="ringkas-total-net">Rp 0</span>
+            </div>
+          </div>
+
+          <!-- Input Uang Diterima & Kembalian -->
+          <div class="grid grid-cols-2 gap-2 pt-0.5">
+            <div>
+              <label class="block text-[10px] text-slate-400 font-bold mb-1">Metode Bayar:</label>
+              <select id="metode-bayar" class="w-full bg-slate-950 border border-teal-900/60 rounded-xl p-1.5 text-xs text-white font-bold outline-none">
+                <option value="Transfer Bank / SPJ BOS">🏛️ Transfer Bank / SPJ BOS</option>
+                <option value="Tunai">💵 Tunai / Cash</option>
+                <option value="QRIS">📱 QRIS PT</option>
+                <option value="Tempo / Piutang">⏳ Tempo / Invoice</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-[10px] text-slate-400 font-bold mb-1">Uang Diterima / Transfer (Rp):</label>
+              <input type="number" id="uang-bayar" oninput="hitungKembalian()" placeholder="Nominal..." class="w-full bg-slate-950 border border-teal-900/60 rounded-xl p-1.5 text-xs text-white font-mono-num outline-none focus:border-teal-400">
+            </div>
+          </div>
+
+          <div class="flex justify-between text-[11px] bg-teal-950/40 p-1.5 rounded-xl border border-teal-900/40">
+            <span class="text-slate-400">Selisih / Kembalian:</span>
+            <span class="font-mono-num font-bold text-emerald-400" id="uang-kembalian">Rp 0</span>
+          </div>
+
+          <button onclick="prosesTransaksi()" id="btn-bayar" class="w-full bg-teal-600 hover:bg-teal-500 text-white font-title text-sm py-2.5 rounded-2xl font-bold transition shadow-lg flex items-center justify-center gap-2">
+            <i class="fa-solid fa-check"></i> Selesaikan & Cetak Faktur/Kwitansi
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. TAB PRODUK (CRUD & GENERATOR BARCODE) -->
+    <div id="tab-produk" class="hidden space-y-4">
+      <div class="flex justify-between items-center bg-slate-900 p-4 rounded-2xl border border-teal-900/60">
+        <div>
+          <h2 class="font-title text-lg text-white">Manajemen Katalog & Generator Barcode</h2>
+          <p class="text-xs text-slate-400">Cetak label barcode untuk ditempel ke produk atau fisik barang inventaris.</p>
+        </div>
+        <button onclick="modalTambahProduk()" class="bg-teal-600 hover:bg-teal-500 text-white px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2">
+          <i class="fa-solid fa-plus"></i> Tambah Produk Baru
+        </button>
+      </div>
+
+      <div class="overflow-x-auto bg-slate-900 rounded-2xl border border-teal-900/60">
+        <table class="w-full text-left text-xs text-slate-300">
+          <thead class="bg-slate-950 text-teal-300 uppercase text-[10px] font-bold border-b border-teal-900">
+            <tr>
+              <th class="p-3">SKU Barcode</th>
+              <th class="p-3">Nama Produk / Jasa</th>
+              <th class="p-3">Kategori</th>
+              <th class="p-3">Modal (HPP)</th>
+              <th class="p-3">Harga Jual</th>
+              <th class="p-3">Stok</th>
+              <th class="p-3 text-center">Aksi & Barcode</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-produk" class="divide-y divide-teal-950/60">
+            <!-- Render Otomatis -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 3. TAB TRANSAKSI (RIWAYAT, FAKTUR A4 & KWITANSI BOS) -->
+    <div id="tab-transaksi" class="hidden space-y-4">
+      <div class="flex flex-wrap justify-between items-center bg-slate-900 p-4 rounded-2xl border border-teal-900/60 gap-3">
+        <div>
+          <h2 class="font-title text-lg text-white">Riwayat Transaksi Penjualan & Berkas SPJ</h2>
+          <p class="text-xs text-slate-400">Cetak Faktur Resmi PMK 59/2022, Kwitansi SPJ Bendahara Sekolah, atau Nota Kasir Bluetooth.</p>
+        </div>
+        <button onclick="eksporTransaksiCSV()" class="bg-amber-600 hover:bg-amber-500 text-slate-950 px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow">
+          <i class="fa-solid fa-file-csv"></i> Ekspor CSV / Excel
+        </button>
+      </div>
+
+      <div class="overflow-x-auto bg-slate-900 rounded-2xl border border-teal-900/60">
+        <table class="w-full text-left text-xs text-slate-300">
+          <thead class="bg-slate-950 text-teal-300 uppercase text-[10px] font-bold border-b border-teal-900">
+            <tr>
+              <th class="p-3">No. Faktur</th>
+              <th class="p-3">Waktu</th>
+              <th class="p-3">Pelanggan / Sekolah</th>
+              <th class="p-3">Metode</th>
+              <th class="p-3">Tagihan SPJ</th>
+              <th class="p-3">PPh 0.5% (PP 55)</th>
+              <th class="p-3">Transfer / Diterima</th>
+              <th class="p-3 text-center">Cetak Berkas</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-transaksi" class="divide-y divide-teal-950/60">
+            <!-- Render Otomatis -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 4. TAB KEUANGAN & MODAL -->
+    <div id="tab-keuangan" class="hidden space-y-4">
+      <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
+        <div class="bg-slate-900 p-4 rounded-2xl border border-teal-900/60">
+          <span class="text-xs text-slate-400 block">Total Omzet Bruto</span>
+          <span class="font-title text-lg text-emerald-400 font-bold" id="stat-omzet">Rp 0</span>
+        </div>
+        <div class="bg-slate-900 p-4 rounded-2xl border border-teal-900/60">
+          <span class="text-xs text-slate-400 block">Kewajiban PPh Final 0.5%</span>
+          <span class="font-title text-lg text-amber-400 font-bold" id="stat-pajak-terpotong">Rp 0</span>
+        </div>
+        <div class="bg-slate-900 p-4 rounded-2xl border border-teal-900/60">
+          <span class="text-xs text-slate-400 block">Beban & Operasional</span>
+          <span class="font-title text-lg text-rose-400 font-bold" id="stat-biaya">Rp 0</span>
+        </div>
+        <div class="bg-slate-900 p-4 rounded-2xl border border-teal-900/60">
+          <span class="text-xs text-slate-400 block">Kas Bersih Riil (Setelah Pajak)</span>
+          <span class="font-title text-lg text-teal-300 font-bold" id="stat-kas-bersih">Rp 0</span>
+        </div>
+      </div>
+
+      <div class="bg-slate-900 p-5 rounded-2xl border border-teal-900/60 space-y-3">
+        <h3 class="font-title text-base text-white">Catat Arus Kas / Beban Operasional / Setor Pajak</h3>
+        <div class="grid grid-cols-1 sm:grid-cols-4 gap-2.5 text-xs">
+          <select id="kas-jenis" class="bg-slate-950 border border-teal-900/60 rounded-xl p-2.5 text-white font-bold outline-none">
+            <option value="MASUK">➕ Kas Masuk / Suntikan Modal</option>
+            <option value="KELUAR">➖ Kas Keluar / Beban / Setor PPh Final</option>
+          </select>
+          <input type="text" id="kas-keterangan" placeholder="Keterangan transaksi (cth: Setor PPh Final 0.5% NTPN xxx)..." class="bg-slate-950 border border-teal-900/60 rounded-xl p-2.5 text-white outline-none">
+          <input type="number" id="kas-nominal" placeholder="Nominal (Rp)..." class="bg-slate-950 border border-teal-900/60 rounded-xl p-2.5 text-white font-mono-num outline-none">
+          <button onclick="simpanArusKas()" class="bg-teal-600 hover:bg-teal-500 text-white font-bold rounded-xl p-2.5 transition">
+            Simpan Arus Kas
+          </button>
+        </div>
+      </div>
+
+      <div class="overflow-x-auto bg-slate-900 rounded-2xl border border-teal-900/60">
+        <table class="w-full text-left text-xs text-slate-300">
+          <thead class="bg-slate-950 text-teal-300 uppercase text-[10px] font-bold border-b border-teal-900">
+            <tr>
+              <th class="p-3">Waktu</th>
+              <th class="p-3">Tipe</th>
+              <th class="p-3">Keterangan</th>
+              <th class="p-3">Nominal</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-kas" class="divide-y divide-teal-950/60">
+            <!-- Render Kas -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 5. TAB PROFIL PERUSAHAAN (PT, NPWP & LEGALITAS PAJAK) -->
+    <div id="tab-perusahaan" class="hidden space-y-4">
+      <div class="bg-slate-900 p-6 rounded-3xl border border-teal-900/60 space-y-4">
+        <div>
+          <h2 class="font-title text-xl text-white">Identitas Legal PT, NPWP & Keterangan Pajak</h2>
+          <p class="text-xs text-slate-400">Data ini digunakan secara otomatis pada kop faktur resmi A4, kwitansi BOS, label barcode, dan surat tagihan.</p>
+        </div>
+
+        <form onsubmit="simpanProfilPT(event)" class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+          <div>
+            <label class="block text-slate-400 font-bold mb-1">Nama Resmi Perusahaan (PT):</label>
+            <input type="text" id="pt-nama" required class="w-full p-2.5 rounded-xl bg-slate-950 border border-teal-900/60 text-white outline-none focus:border-teal-400">
+          </div>
+          <div>
+            <label class="block text-slate-400 font-bold mb-1">Brand / Nama Usaha (Label Barcode):</label>
+            <input type="text" id="pt-brand" class="w-full p-2.5 rounded-xl bg-slate-950 border border-teal-900/60 text-white outline-none focus:border-teal-400">
+          </div>
+          <div>
+            <label class="block text-slate-400 font-bold mb-1">Nama Direktur / Penanggung Jawab:</label>
+            <input type="text" id="pt-direktur" required value="Thomas Ryantama" class="w-full p-2.5 rounded-xl bg-slate-950 border border-teal-900/60 text-white outline-none focus:border-teal-400">
+          </div>
+          <div>
+            <label class="block text-slate-400 font-bold mb-1">Nomor Pokok Wajib Pajak (NPWP 16 Digit / 15 Digit):</label>
+            <input type="text" id="pt-npwp" required class="w-full p-2.5 rounded-xl bg-slate-950 border border-teal-900/60 text-white font-mono-num outline-none focus:border-teal-400">
+          </div>
+          <div>
+            <label class="block text-slate-400 font-bold mb-1">Nomor WhatsApp / Telepon:</label>
+            <input type="text" id="pt-wa" class="w-full p-2.5 rounded-xl bg-slate-950 border border-teal-900/60 text-white outline-none focus:border-teal-400">
+          </div>
+          <div>
+            <label class="block text-slate-400 font-bold mb-1">Email Resmi PT:</label>
+            <input type="email" id="pt-email" class="w-full p-2.5 rounded-xl bg-slate-950 border border-teal-900/60 text-white outline-none focus:border-teal-400">
+          </div>
+          <div class="sm:col-span-2">
+            <label class="block text-slate-400 font-bold mb-1">Website Perusahaan:</label>
+            <input type="text" id="pt-web" class="w-full p-2.5 rounded-xl bg-slate-950 border border-teal-900/60 text-white outline-none focus:border-teal-400">
+          </div>
+          <div class="sm:col-span-2">
+            <label class="block text-slate-400 font-bold mb-1">Alamat Kantor / Domisili Usaha Lengkap:</label>
+            <textarea id="pt-alamat" rows="2" class="w-full p-2.5 rounded-xl bg-slate-950 border border-teal-900/60 text-white outline-none focus:border-teal-400"></textarea>
+          </div>
+          <div class="sm:col-span-2">
+            <label class="block text-slate-400 font-bold mb-1">Rekening Bank Perusahaan (Tampil di Faktur A4 & Kwitansi):</label>
+            <input type="text" id="pt-bank" class="w-full p-2.5 rounded-xl bg-slate-950 border border-teal-900/60 text-white outline-none focus:border-teal-400">
+          </div>
+
+          <div class="sm:col-span-2 flex justify-end">
+            <button type="submit" id="btn-simpan-pt" class="bg-teal-600 hover:bg-teal-500 text-white font-bold px-6 py-2.5 rounded-xl transition shadow-lg flex items-center gap-2">
+              <i class="fa-solid fa-cloud-arrow-up"></i> Simpan Profil PT & Pajak ke Cloud
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ================= MODAL PEMINDAI BARCODE KAMERA ================= -->
+  <div id="modal-scanner" class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-slate-900 border border-teal-500/40 max-w-sm w-full rounded-3xl p-5 space-y-4 shadow-2xl text-center">
+      <div class="flex justify-between items-center border-b border-teal-900/60 pb-2">
+        <h3 class="font-title text-white text-sm flex items-center gap-2">
+          <i class="fa-solid fa-camera text-teal-400"></i> Arahkan Kamera ke Barcode / QR
+        </h3>
+        <button onclick="tutupScannerKamera()" class="text-slate-400 hover:text-white font-bold text-lg">✕</button>
+      </div>
+      <div id="reader" class="w-full bg-black rounded-2xl overflow-hidden border border-teal-900"></div>
+      <p class="text-[11px] text-slate-400">Arahkan barcode produk ke kamera untuk memasukkan langsung ke keranjang.</p>
+      <button onclick="tutupScannerKamera()" class="w-full py-2.5 bg-slate-800 text-slate-300 rounded-xl font-bold text-xs">
+        Tutup Kamera
+      </button>
+    </div>
+  </div>
+
+  <!-- ================= MODAL GENERATOR LABEL BARCODE ================= -->
+  <div id="modal-label-barcode" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-slate-900 border border-teal-500/40 max-w-sm w-full rounded-3xl p-5 space-y-4 shadow-2xl text-center">
+      <div class="flex justify-between items-center border-b border-teal-900/60 pb-2">
+        <h3 class="font-title text-white text-sm">Label Barcode Produk</h3>
+        <button onclick="tutupModalLabel()" class="text-slate-400 hover:text-white font-bold text-lg">✕</button>
+      </div>
+      <div id="area-label-preview" class="bg-white p-4 rounded-xl text-black border border-slate-300 shadow-inner flex flex-col items-center">
+        <p class="text-[11px] font-bold tracking-tight uppercase" id="label-pt-name">PT TENTREM RAHAYU NUSANTARA</p>
+        <p class="text-xs font-bold mt-1 text-slate-800" id="label-prod-name">-</p>
+        <svg id="barcode-svg" class="my-1"></svg>
+        <p class="text-xs font-black font-mono-num text-teal-900" id="label-prod-price">Rp 0</p>
+      </div>
+      <div class="flex justify-end gap-2 pt-2 border-t border-teal-950 text-xs">
+        <button onclick="tutupModalLabel()" class="px-4 py-2 bg-slate-800 text-slate-300 rounded-xl font-bold">Tutup</button>
+        <button onclick="cetakLabelBarcodeFisik()" class="px-4 py-2 bg-teal-600 hover:bg-teal-500 text-white rounded-xl font-bold flex items-center gap-1.5">
+          <i class="fa-solid fa-print"></i> Cetak Label
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MODAL TAMBAH PRODUK ================= -->
+  <div id="modal-produk" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-slate-900 border border-teal-500/40 max-w-md w-full rounded-3xl p-6 space-y-4 shadow-2xl">
+      <div class="flex justify-between items-center border-b border-teal-900/60 pb-2">
+        <h3 class="font-title text-white text-base" id="modal-produk-title">Tambah Produk / Jasa</h3>
+        <button onclick="tutupModalProduk()" class="text-slate-400 hover:text-white font-bold text-lg">✕</button>
+      </div>
+      <form onsubmit="simpanProdukSubmit(event)" class="space-y-3 text-xs">
+        <input type="hidden" id="prod-id">
+        <div>
+          <label class="block text-slate-400 font-bold mb-1">Kode SKU / Barcode:</label>
+          <div class="flex gap-1.5">
+            <input type="text" id="prod-sku" required class="flex-grow p-2.5 rounded-xl bg-slate-950 border border-teal-900/60 text-white font-mono-num outline-none focus:border-teal-400">
+            <button type="button" onclick="buatSkuAcak()" class="bg-slate-800 hover:bg-slate-700 text-teal-300 px-3 rounded-xl font-bold">Acak</button>
+          </div>
+        </div>
+        <div>
+          <label class="block text-slate-400 font-bold mb-1">Nama Produk / Jasa Layanan:</label>
+          <input type="text" id="prod-nama" required placeholder="cth: Jasa Desain & Pengembangan Website Sekolah..." class="w-full p-2.5 rounded-xl bg-slate-950 border border-teal-900/60 text-white outline-none focus:border-teal-400">
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-slate-400 font-bold mb-1">Kategori:</label>
+            <input type="text" id="prod-kategori" placeholder="Jasa IT / Barang" class="w-full p-2.5 rounded-xl bg-slate-950 border border-teal-900/60 text-white outline-none focus:border-teal-400">
+          </div>
+          <div>
+            <label class="block text-slate-400 font-bold mb-1">Jumlah Stok / Kapasitas:</label>
+            <input type="number" id="prod-stok" required value="10" class="w-full p-2.5 rounded-xl bg-slate-950 border border-teal-900/60 text-white font-mono-num outline-none focus:border-teal-400">
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-slate-400 font-bold mb-1">Harga Modal (HPP):</label>
+            <input type="number" id="prod-hpp" required value="0" class="w-full p-2.5 rounded-xl bg-slate-950 border border-teal-900/60 text-white font-mono-num outline-none focus:border-teal-400">
+          </div>
+          <div>
+            <label class="block text-slate-400 font-bold mb-1">Harga Jual / Nilai Jasa:</label>
+            <input type="number" id="prod-harga" required value="2000000" class="w-full p-2.5 rounded-xl bg-slate-950 border border-teal-900/60 text-white font-mono-num outline-none focus:border-teal-400">
+          </div>
+        </div>
+        <div class="flex justify-end gap-2 pt-2 border-t border-teal-950">
+          <button type="button" onclick="tutupModalProduk()" class="px-4 py-2 bg-slate-800 text-slate-300 rounded-xl font-bold">Batal</button>
+          <button type="submit" class="px-5 py-2 bg-teal-600 hover:bg-teal-500 text-white rounded-xl font-bold">Simpan Produk</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  
+  <!-- ================= MODAL PILIHAN CETAK DOKUMEN ================= -->
+  <div id="modal-pilihan-cetak" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-slate-900 border border-teal-500/40 max-w-sm w-full rounded-3xl p-6 space-y-4 shadow-2xl text-center">
+      <div class="w-14 h-14 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 font-bold text-2xl mx-auto">
+        <i class="fa-solid fa-circle-check"></i>
+      </div>
+      <div>
+        <h3 class="font-title text-white text-base">Transaksi Berhasil Disimpan!</h3>
+        <p class="text-xs text-slate-400 mt-1" id="modal-cetak-info">Pilih jenis dokumen yang ingin dicetak sekarang:</p>
+      </div>
+
+      <div class="space-y-2 pt-2">
+        <button onclick="cetakStrukTerakhir()" class="w-full py-2.5 px-4 bg-teal-600 hover:bg-teal-500 text-white rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition shadow">
+          <i class="fa-solid fa-print"></i> 🖨️ Struk Kasir Thermal (Bluetooth 58mm)
+        </button>
+        <button onclick="cetakFakturTerakhir()" class="w-full py-2.5 px-4 bg-slate-800 hover:bg-slate-700 text-cyan-300 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition border border-teal-900/60">
+          <i class="fa-solid fa-file-invoice"></i> 📄 Lembar Faktur Tagihan A4
+        </button>
+        <button onclick="cetakKwitansiTerakhir()" class="w-full py-2.5 px-4 bg-slate-800 hover:bg-slate-700 text-amber-300 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition border border-teal-900/60">
+          <i class="fa-solid fa-receipt"></i> 📑 Kwitansi Resmi SPJ BOS Sekolah
+        </button>
+      </div>
+
+      <div class="pt-2 border-t border-teal-950">
+        <button onclick="tutupModalCetak()" class="text-xs text-slate-400 hover:text-white font-bold py-1">
+          Selesai / Tutup
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= PRINT AREA 1: NOTA THERMAL KASIR BLUETOOTH ================= -->
+  <div id="area-cetak-nota" class="halaman-print hidden">
+    <div class="kertas-thermal" id="konten-nota-thermal"></div>
+  </div>
+
+  <!-- ================= PRINT AREA 2: FAKTUR INVOICE A4 PMK 59 / PP 55 ================= -->
+  <div id="area-cetak-faktur" class="halaman-print hidden">
+    <div class="p-8 max-w-4xl mx-auto bg-white text-black" id="konten-faktur-a4"></div>
+  </div>
+
+  <!-- ================= PRINT AREA 3: KWITANSI RESMI SPJ BOS SEKOLAH ================= -->
+  <div id="area-cetak-kwitansi" class="halaman-print hidden">
+    <div class="p-8 max-w-4xl mx-auto bg-white text-black" id="konten-kwitansi-spj"></div>
+  </div>
+
+  <!-- ================= PRINT AREA 4: LABEL BARCODE ================= -->
+  <div id="area-cetak-label" class="halaman-print hidden">
+    <div class="p-4 bg-white text-black text-center" id="konten-cetak-label-fisik"></div>
+  </div>
+
+  <!-- JAVASCRIPT LOGIC DENGAN ATURAN PAJAK RESMI PMK 59/2022 & PP 55/2022 -->
+  <script>
+    // Konfigurasi Kredensial Firebase Project pos-tentrem
+    const firebaseConfig = {
+      apiKey: "AIzaSyByzeSzXYYYKRAxl19e1W_yJf5kj6CSKKs",
+      authDomain: "pos-tentrem.firebaseapp.com",
+      projectId: "pos-tentrem",
+      storageBucket: "pos-tentrem.firebasestorage.app",
+      messagingSenderId: "646200731566",
+      appId: "1:646200731566:web:33b59ea9cfcb07b24f0a3f"
+    };
+
+    // Inisialisasi Firebase & Cloud Firestore
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    // Enable persistence with multi-tab support safely
+    try {
+      db.enablePersistence({ synchronizeTabs: true }).catch(err => {
+        console.warn("Offline persistence disabled:", err.code);
+      });
+    } catch (e) {
+      console.warn("Persistence error:", e);
+    }
+
+    let dataProduk = [];
+    let dataTransaksi = [];
+    let dataKas = [];
+    let keranjang = [];
+    let html5QrCode = null;
+
+    // Profil Legal PT Sesuai NPWP & Domisili Resmi
+    let profilPT = {
+      nama: "PT TENTREM RAHAYU NUSANTARA",
+      brand: "PT TENTREM RAHAYU NUSANTARA",
+      direktur: "Thomas Ryantama",
+      npwp: "1000000008057433",
+      wa: "0812-3456-7890",
+      email: "kontak@tentrem.co.id",
+      web: "https://tentrem.co.id",
+      alamat: "Jl. Padat Karya Gg. Nusa Indah IX No. 653, Natar, Lampung Selatan",
+      bank: "Bank Mandiri / BCA: [Nomor Rekening PT] a.n PT TENTREM RAHAYU NUSANTARA"
+    };
+
+    const beepAudio = new Audio("data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU"+Array(300).join("123"));
+
+    window.addEventListener('DOMContentLoaded', () => {
+      inisialisasiSinkronisasiCloud();
+      renderProfilPT();
+    });
+
+    function inisialisasiSinkronisasiCloud() {
+      const dot = document.getElementById('dot-cloud');
+      const text = document.getElementById('text-cloud');
+
+      // 1. Profil PT Listener
+      db.collection("pos_settings").doc("profil_pt").onSnapshot(doc => {
+        dot.className = "w-2.5 h-2.5 rounded-full bg-emerald-400";
+        text.innerText = "Cloud Terhubung (Realtime)";
+        if (doc.exists) {
+          profilPT = Object.assign(profilPT, doc.data());
+          renderProfilPT();
+        } else {
+          db.collection("pos_settings").doc("profil_pt").set(profilPT);
+        }
+      }, err => {
+        console.error("Firebase Settings Error:", err);
+        dot.className = "w-2.5 h-2.5 rounded-full bg-rose-500";
+        if (err.code === "permission-denied") {
+          text.innerText = "Akses Ditolak (Rules Belum Publish)";
+        } else {
+          text.innerText = "Koneksi Offline / " + err.code;
+        }
+      });
+
+      // 2. Produk Listener
+      db.collection("pos_produk").onSnapshot(snapshot => {
+        dataProduk = [];
+        snapshot.forEach(doc => dataProduk.push({ id: doc.id, ...doc.data() }));
+        renderKatalog();
+        renderTabelProduk();
+        dot.className = "w-2.5 h-2.5 rounded-full bg-emerald-400";
+        text.innerText = "Cloud Terhubung (Realtime)";
+      }, err => {
+        console.error("Firebase Produk Error:", err);
+        dot.className = "w-2.5 h-2.5 rounded-full bg-rose-500";
+        if (err.code === "permission-denied") {
+          text.innerText = "Akses Ditolak (Rules Belum Publish)";
+        }
+      });
+
+      // 3. Transaksi Listener
+      db.collection("pos_transaksi").orderBy("waktuTimestamp", "desc").onSnapshot(snapshot => {
+        dataTransaksi = [];
+        snapshot.forEach(doc => dataTransaksi.push({ id: doc.id, ...doc.data() }));
+        renderTabelTransaksi();
+        hitungStatistikKeuangan();
+      }, err => console.warn("Transaksi sync err:", err));
+
+      // 4. Kas Listener
+      db.collection("pos_kas").orderBy("waktuTimestamp", "desc").onSnapshot(snapshot => {
+        dataKas = [];
+        snapshot.forEach(doc => dataKas.push({ id: doc.id, ...doc.data() }));
+        renderTabelKas();
+        hitungStatistikKeuangan();
+      }, err => console.warn("Kas sync err:", err));
+    }
+
+    // Helper aman untuk set dan get nilai DOM
+    function setElValue(id, val) {
+      const el = document.getElementById(id);
+      if (el) el.value = val !== undefined && val !== null ? val : "";
+    }
+    function getElValue(id, defaultVal = "") {
+      const el = document.getElementById(id);
+      return el ? el.value.trim() : defaultVal;
+    }
+
+    // Render Profil PT ke Header & Form Pengaturan
+    function renderProfilPT() {
+      const barBrand = document.getElementById('bar-brand-pt');
+      if (barBrand) barBrand.innerText = profilPT.nama || "PT TENTREM RAHAYU NUSANTARA";
+
+      const barDir = document.getElementById('bar-nama-direktur');
+      if (barDir) barDir.innerText = profilPT.direktur || "Thomas Ryantama";
+
+      setElValue('pt-nama', profilPT.nama);
+      setElValue('pt-brand', profilPT.brand || profilPT.nama);
+      setElValue('pt-direktur', profilPT.direktur || "Thomas Ryantama");
+      setElValue('pt-npwp', profilPT.npwp);
+      setElValue('pt-wa', profilPT.wa);
+      setElValue('pt-email', profilPT.email);
+      setElValue('pt-web', profilPT.web);
+      setElValue('pt-alamat', profilPT.alamat);
+      setElValue('pt-bank', profilPT.bank);
+    }
+
+    function simpanProfilPT(e) {
+      e.preventDefault();
+      const updated = {
+        nama: getElValue('pt-nama', "PT TENTREM RAHAYU NUSANTARA"),
+        brand: getElValue('pt-brand', getElValue('pt-nama')),
+        direktur: getElValue('pt-direktur', "Thomas Ryantama"),
+        npwp: getElValue('pt-npwp', "1000000008057433"),
+        wa: getElValue('pt-wa', ""),
+        email: getElValue('pt-email', ""),
+        web: getElValue('pt-web', ""),
+        alamat: getElValue('pt-alamat', ""),
+        bank: getElValue('pt-bank', "")
+      };
+
+      // Perbarui local state seketika
+      profilPT = Object.assign(profilPT, updated);
+      renderProfilPT();
+
+      const btn = document.getElementById('btn-simpan-pt');
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan...`;
+      }
+
+      db.collection("pos_settings").doc("profil_pt").set(updated)
+        .then(() => {
+          if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i> Simpan Profil PT & Pajak ke Cloud`;
+          }
+          alert("✅ Profil PT dan Ketentuan Pajak berhasil disimpan ke Cloud!");
+        })
+        .catch(err => {
+          if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i> Simpan Profil PT & Pajak ke Cloud`;
+          }
+          alert("❌ Gagal menyimpan ke Cloud: " + err.message);
+        });
+    }
+
+    // Fungsi Terbilang Rupiah untuk Kwitansi Resmi
+    function terbilang(angka) {
+      const bilangan = ["", "Satu", "Dua", "Tiga", "Empat", "Lima", "Enam", "Tujuh", "Delapan", "Sembilan", "Sepuluh", "Sebelas"];
+      angka = Math.floor(angka);
+      if (angka < 12) return bilangan[angka];
+      if (angka < 20) return terbilang(angka - 10) + " Belas";
+      if (angka < 100) return terbilang(Math.floor(angka / 10)) + " Puluh " + terbilang(angka % 10);
+      if (angka < 200) return "Seratus " + terbilang(angka - 100);
+      if (angka < 1000) return terbilang(Math.floor(angka / 100)) + " Ratus " + terbilang(angka % 100);
+      if (angka < 2000) return "Seribu " + terbilang(angka - 1000);
+      if (angka < 1000000) return terbilang(Math.floor(angka / 1000)) + " Ribu " + terbilang(angka % 1000);
+      if (angka < 1000000000) return terbilang(Math.floor(angka / 1000000)) + " Juta " + terbilang(angka % 1000000);
+      if (angka < 1000000000000) return terbilang(Math.floor(angka / 1000000000)) + " Miliar " + terbilang(angka % 1000000000);
+      return angka.toString();
+    }
+
+    // Navigasi Tab
+    function bukaTab(tabId) {
+      ['kasir', 'produk', 'transaksi', 'keuangan', 'perusahaan'].forEach(t => {
+        document.getElementById(`tab-${t}`).classList.toggle('hidden', t !== tabId);
+        document.getElementById(`tab-btn-${t}`).classList.toggle('active', t === tabId);
+      });
+      if (tabId === 'perusahaan') {
+        renderProfilPT();
+      }
+    }
+
+    // ================= SCANNER KAMERA =================
+    function bukaScannerKamera() {
+      document.getElementById('modal-scanner').classList.remove('hidden');
+      html5QrCode = new Html5Qrcode("reader");
+      const config = { fps: 10, qrbox: { width: 250, height: 180 } };
+      html5QrCode.start(
+        { facingMode: "environment" },
+        config,
+        (decodedText) => {
+          try { beepAudio.play(); } catch(e){}
+          prosesBarcodeScanned(decodedText.trim());
+          tutupScannerKamera();
+        },
+        (errorMessage) => {}
+      ).catch(err => {
+        alert("Gagal mengakses kamera: " + err);
+        tutupScannerKamera();
+      });
+    }
+
+    function tutupScannerKamera() {
+      if (html5QrCode) {
+        html5QrCode.stop().then(() => {
+          html5QrCode.clear();
+          document.getElementById('modal-scanner').classList.add('hidden');
+        }).catch(() => document.getElementById('modal-scanner').classList.add('hidden'));
+      } else {
+        document.getElementById('modal-scanner').classList.add('hidden');
+      }
+    }
+
+    function tanganiInputScanner(e) {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        const code = e.target.value.trim();
+        if (code) {
+          prosesBarcodeScanned(code);
+          e.target.value = "";
+        }
+      }
+    }
+
+    function prosesBarcodeScanned(code) {
+      const prod = dataProduk.find(p => (p.sku && p.sku.toLowerCase() === code.toLowerCase()) || p.id === code);
+      if (prod) {
+        tambahKeKeranjang(prod.id);
+      } else {
+        alert(`Produk dengan Barcode/SKU: "${code}" tidak ditemukan!`);
+      }
+    }
+
+    // ================= KATALOG & KERANJANG =================
+    function renderKatalog() {
+      const grid = document.getElementById('katalog-grid');
+      const keyword = (document.getElementById('cari-produk').value || "").toLowerCase().trim();
+
+      const items = dataProduk.filter(p => 
+        p.nama.toLowerCase().includes(keyword) || (p.sku && p.sku.toLowerCase().includes(keyword))
+      );
+
+      if (items.length === 0) {
+        grid.innerHTML = `<div class="col-span-full py-10 text-center text-slate-500 text-xs">Belum ada barang. Klik "+ Tambah" di atas.</div>`;
+        return;
+      }
+
+      grid.innerHTML = items.map(p => `
+        <div onclick="tambahKeKeranjang('${p.id}')" class="bg-slate-900 border border-teal-900/60 hover:border-teal-500/60 p-3 rounded-2xl cursor-pointer transition flex flex-col justify-between shadow">
+          <div>
+            <span class="text-[9px] px-1.5 py-0.5 rounded bg-teal-500/10 text-teal-400 font-mono-num">${p.sku || 'SKU'}</span>
+            <h4 class="font-bold text-white text-xs mt-1 leading-snug line-clamp-2">${p.nama}</h4>
+          </div>
+          <div class="mt-3 flex justify-between items-end border-t border-teal-950 pt-2">
+            <div>
+              <p class="text-[10px] text-slate-400">Stok: ${p.stok}</p>
+              <p class="font-mono-num font-bold text-teal-300 text-xs">Rp ${(Number(p.harga) || 0).toLocaleString('id-ID')}</p>
+            </div>
+            <span class="w-6 h-6 rounded-lg bg-teal-600 text-white flex items-center justify-center text-xs font-bold">+</span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function tambahKeKeranjang(id) {
+      const p = dataProduk.find(item => item.id === id);
+      if (!p) return;
+      if (p.stok <= 0) {
+        alert("Stok barang ini habis!");
+        return;
+      }
+
+      const exist = keranjang.find(item => item.id === id);
+      if (exist) {
+        if (exist.qty + 1 > p.stok) {
+          alert(`Maksimal stok tersedia hanya ${p.stok}!`);
+          return;
+        }
+        exist.qty++;
+      } else {
+        keranjang.push({
+          id: p.id,
+          sku: p.sku || "-",
+          nama: p.nama,
+          harga: Number(p.harga),
+          hpp: Number(p.hpp || 0),
+          qty: 1
+        });
+      }
+      renderKeranjang();
+    }
+
+    function ubahQty(id, delta) {
+      const item = keranjang.find(i => i.id === id);
+      const prod = dataProduk.find(p => p.id === id);
+      if (!item) return;
+
+      if (delta > 0 && prod && item.qty + delta > prod.stok) {
+        alert("Mencapai batas stok!");
+        return;
+      }
+
+      item.qty += delta;
+      if (item.qty <= 0) keranjang = keranjang.filter(i => i.id !== id);
+      renderKeranjang();
+    }
+
+    function kosongkanKeranjang() {
+      keranjang = [];
+      renderKeranjang();
+    }
+
+    function renderKeranjang() {
+      const container = document.getElementById('keranjang-list');
+      if (keranjang.length === 0) {
+        container.innerHTML = `<div class="py-8 text-center text-slate-500 text-xs">Keranjang masih kosong.</div>`;
+        hitungTotalKasir();
+        return;
+      }
+
+      container.innerHTML = keranjang.map(item => `
+        <div class="flex justify-between items-center bg-slate-950 p-2.5 rounded-xl border border-teal-900/40">
+          <div>
+            <p class="font-bold text-white leading-tight">${item.nama}</p>
+            <p class="text-[10px] text-slate-400 font-mono-num">@ Rp ${item.harga.toLocaleString('id-ID')}</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="ubahQty('${item.id}', -1)" class="w-5 h-5 rounded bg-slate-800 text-slate-300 font-bold flex items-center justify-center">-</button>
+            <span class="font-mono-num text-xs font-bold text-teal-300 w-4 text-center">${item.qty}</span>
+            <button onclick="ubahQty('${item.id}', 1)" class="w-5 h-5 rounded bg-slate-800 text-slate-300 font-bold flex items-center justify-center">+</button>
+            <span class="font-mono-num font-bold text-white text-xs w-16 text-right">Rp ${(item.qty * item.harga).toLocaleString('id-ID')}</span>
+          </div>
+        </div>
+      `).join('');
+
+      hitungTotalKasir();
+    }
+
+    // ================= KALKULASI PAJAK RESMI (PMK 59/2022 & PP 55/2022) =================
+    function hitungTotalKasir() {
+      const subtotal = keranjang.reduce((sum, item) => sum + (item.qty * item.harga), 0);
+      const skema = document.getElementById('skema-pajak').value;
+      const diskon = parseFloat(document.getElementById('input-diskon').value) || 0;
+
+      let nominalPPN = 0;
+      let nominalPPh = 0;
+      let labelPPN = "Rp 0 (Non-PKP / PMK 59)";
+      let labelPPh = "-Rp 0";
+      let totalTagihanSPJ = 0;
+      let totalTransferSekolah = 0;
+
+      if (skema === "bos_mandiri") {
+        // KASUS SEKOLAH TIDAK MAU POTONG PAJAK:
+        // - Sekolah ingin SPJ utuh & transfer bulat ke PT
+        // - PPN: Bebas PMK 59/2022 (Pasal 18 ayat 1 huruf a <= 2 Jt) & Status Non-PKP
+        // - PPh Final 0.5% disetor SENDIRI oleh PT Tentrem via Billing Coretax
+        nominalPPN = 0;
+        nominalPPh = Math.round(subtotal * 0.005); // 0.5%
+        labelPPN = "Rp 0 (Bebas PMK 59 ≤ 2 Jt)";
+        labelPPh = `Rp ${nominalPPh.toLocaleString('id-ID')} (Disetor Mandiri PT)`;
+        
+        totalTagihanSPJ = Math.max(0, subtotal - diskon);
+        totalTransferSekolah = totalTagihanSPJ; // Sekolah transfer utuh 2.000.000!
+
+        document.getElementById('title-spj').innerText = "TOTAL TAGIHAN SPJ:";
+        document.getElementById('title-transfer').innerText = "SEKOLAH TRANSFER (BULAT):";
+      } 
+      else if (skema === "bos_pp55") {
+        // KASUS BENDAHARA SEKOLAH MEMOTONG PAJAK RESMI:
+        // - PPh Final 0.5% dipotong bendahara sekolah di muka
+        nominalPPN = 0;
+        nominalPPh = Math.round(subtotal * 0.005);
+        labelPPN = "Rp 0 (Bebas PMK 59 ≤ 2 Jt)";
+        labelPPh = `-Rp ${nominalPPh.toLocaleString('id-ID')} (Dipotong Sekolah)`;
+
+        totalTagihanSPJ = Math.max(0, subtotal - diskon);
+        totalTransferSekolah = Math.max(0, totalTagihanSPJ - nominalPPh); // Sekolah transfer 1.990.000
+
+        document.getElementById('title-spj').innerText = "TOTAL TAGIHAN SPJ:";
+        document.getElementById('title-transfer').innerText = "DITERIMA BERSIH (NET):";
+      } 
+      else if (skema === "non_pkp") {
+        nominalPPN = 0;
+        nominalPPh = 0;
+        labelPPN = "Rp 0 (Wajib Pajak Non-PKP)";
+        labelPPh = "Rp 0 (Non-Pajak)";
+        totalTagihanSPJ = Math.max(0, subtotal - diskon);
+        totalTransferSekolah = totalTagihanSPJ;
+
+        document.getElementById('title-spj').innerText = "TOTAL TAGIHAN:";
+        document.getElementById('title-transfer').innerText = "TOTAL BAYAR:";
+      } 
+      else if (skema === "ppn_11") {
+        nominalPPN = Math.round(subtotal * 0.11);
+        nominalPPh = 0;
+        labelPPN = `Rp ${nominalPPN.toLocaleString('id-ID')} (PPN 11%)`;
+        labelPPh = "Rp 0";
+        totalTagihanSPJ = Math.max(0, subtotal + nominalPPN - diskon);
+        totalTransferSekolah = totalTagihanSPJ;
+
+        document.getElementById('title-spj').innerText = "TOTAL + PPN:";
+        document.getElementById('title-transfer').innerText = "TOTAL BAYAR:";
+      } 
+      else if (skema === "ppn_12") {
+        nominalPPN = Math.round(subtotal * 0.12);
+        nominalPPh = 0;
+        labelPPN = `Rp ${nominalPPN.toLocaleString('id-ID')} (PPN 12%)`;
+        labelPPh = "Rp 0";
+        totalTagihanSPJ = Math.max(0, subtotal + nominalPPN - diskon);
+        totalTransferSekolah = totalTagihanSPJ;
+
+        document.getElementById('title-spj').innerText = "TOTAL + PPN:";
+        document.getElementById('title-transfer').innerText = "TOTAL BAYAR:";
+      }
+
+      document.getElementById('ringkas-subtotal').innerText = `Rp ${subtotal.toLocaleString('id-ID')}`;
+      document.getElementById('ringkas-ppn').innerText = labelPPN;
+      document.getElementById('ringkas-pph').innerText = labelPPh;
+      document.getElementById('ringkas-total-spj').innerText = `Rp ${totalTagihanSPJ.toLocaleString('id-ID')}`;
+      document.getElementById('ringkas-total-net').innerText = `Rp ${totalTransferSekolah.toLocaleString('id-ID')}`;
+
+      // Default uang bayar otomatis mengacu ke yang ditransfer sekolah
+      const bayarInput = document.getElementById('uang-bayar');
+      if (!bayarInput.value || bayarInput.value === "0" || bayarInput.value === "1990000" || bayarInput.value === "2000000") {
+        bayarInput.value = totalTransferSekolah;
+      }
+      hitungKembalian();
+    }
+
+    function hitungKembalian() {
+      const netText = document.getElementById('ringkas-total-net').innerText.replace(/[^0-9]/g, '');
+      const net = parseFloat(netText) || 0;
+      const bayar = parseFloat(document.getElementById('uang-bayar').value) || 0;
+      const selisih = bayar - net;
+      document.getElementById('uang-kembalian').innerText = `Rp ${selisih.toLocaleString('id-ID')}`;
+    }
+
+    // ================= SIMPAN TRANSAKSI KE CLOUD =================
+    function prosesTransaksi() {
+      if (keranjang.length === 0) {
+        alert("Keranjang masih kosong!");
+        return;
+      }
+
+      const spjText = document.getElementById('ringkas-total-spj').innerText.replace(/[^0-9]/g, '');
+      const netText = document.getElementById('ringkas-total-net').innerText.replace(/[^0-9]/g, '');
+      const subtotal = keranjang.reduce((sum, item) => sum + (item.qty * item.harga), 0);
+      const totalSPJ = parseFloat(spjText) || 0;
+      const totalNet = parseFloat(netText) || 0;
+      const bayar = parseFloat(document.getElementById('uang-bayar').value) || totalNet;
+      const metode = document.getElementById('metode-bayar').value;
+      const skema = document.getElementById('skema-pajak').value;
+      const diskon = parseFloat(document.getElementById('input-diskon').value) || 0;
+      const customer = document.getElementById('input-customer').value.trim() || "Bendahara BOS / Sekolah";
+
+      let pphNominal = 0;
+      if (skema === "bos_mandiri" || skema === "bos_pp55") {
+        pphNominal = Math.round(subtotal * 0.005);
+      }
+
+      const now = new Date();
+      const noFaktur = `005/TRN-INV/${(now.getMonth()+1).toString().padStart(2,'0')}/${now.getFullYear()}`;
+
+      const dataOrder = {
+        noFaktur: noFaktur,
+        customer: customer,
+        items: keranjang,
+        subtotal: subtotal,
+        skemaPajak: skema,
+        ppn: 0,
+        pph: pphNominal,
+        diskon: diskon,
+        totalSPJ: totalSPJ,
+        totalNet: totalNet,
+        metode: metode,
+        bayar: bayar,
+        kasir: profilPT.direktur || "Thomas Ryantama",
+        waktuStr: now.toLocaleDateString('id-ID', { day:'numeric', month:'long', year:'numeric' }),
+        waktuTimestamp: firebase.firestore.FieldValue.serverTimestamp()
+      };
+
+      const btn = document.getElementById('btn-bayar');
+      btn.disabled = true;
+      btn.innerText = "Menyimpan ke Cloud...";
+
+      const batch = db.batch();
+      const refTransaksi = db.collection("pos_transaksi").doc();
+      batch.set(refTransaksi, dataOrder);
+
+      keranjang.forEach(item => {
+        const refProd = db.collection("pos_produk").doc(item.id);
+        batch.update(refProd, {
+          stok: firebase.firestore.FieldValue.increment(-item.qty)
+        });
+      });
+
+      batch.commit().then(() => {
+        btn.disabled = false;
+        btn.innerText = "Selesaikan & Cetak Faktur/Kwitansi";
+        terakhirOrder = dataOrder;
+        kosongkanKeranjang();
+        document.getElementById('input-customer').value = "";
+        document.getElementById('uang-bayar').value = "";
+        bukaModalCetak(dataOrder);
+      }).catch(err => {
+        btn.disabled = false;
+        btn.innerText = "Selesaikan & Cetak Faktur/Kwitansi";
+        alert("Gagal memproses transaksi: " + err.message);
+      });
+    }
+
+    // ================= CETAK FAKTUR INVOICE A4 PMK 59 / PP 55 RESMI =================
+    function cetakFakturA4(orderId) {
+      const order = dataTransaksi.find(t => t.id === orderId);
+      if (order) cetakFakturA4Data(order);
+    }
+
+    function cetakFakturA4Data(order) {
+      const container = document.getElementById('konten-faktur-a4');
+      const terbilangStr = terbilang(order.totalSPJ) + " Rupiah";
+      const isSetorMandiri = (order.skemaPajak === "bos_mandiri");
+
+      container.innerHTML = `
+        <div style="text-align:center; border-bottom:2px solid #000; padding-bottom:8px; margin-bottom:12px;">
+          <h1 style="font-size:18px; font-weight:900; margin:0; text-transform:uppercase;">${profilPT.nama}</h1>
+          <p style="font-size:11px; margin:2px 0;">Alamat: ${profilPT.alamat}</p>
+          <p style="font-size:11px; margin:2px 0;">NPWP: <b>${profilPT.npwp}</b> | Telp/WA: ${profilPT.wa}</p>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; margin-bottom:12px; font-size:12px;">
+          <div>
+            <h2 style="font-size:15px; font-weight:900; text-decoration:underline; margin:0 0 4px 0;">INVOICE / FAKTUR TAGIHAN</h2>
+            <p style="margin:2px 0;">Nomor : <b>${order.noFaktur}</b></p>
+            <p style="margin:2px 0;">Tanggal : ${order.waktuStr}</p>
+          </div>
+          <div style="text-align:right;">
+            <p style="margin:0;">Kepada Yth:</p>
+            <h3 style="font-size:13px; font-weight:bold; margin:2px 0;">${order.customer}</h3>
+            <p style="margin:0;">Di Tempat</p>
+          </div>
+        </div>
+
+        <table style="width:100%; border-collapse:collapse; font-size:11px; margin-top:8px;">
+          <thead>
+            <tr style="background:#f1f5f9; border-top:1px solid #000; border-bottom:1px solid #000;">
+              <th style="padding:6px; text-align:center; width:30px;">No.</th>
+              <th style="padding:6px; text-align:left;">Deskripsi Pekerjaan / Nama Barang</th>
+              <th style="padding:6px; text-align:center; width:50px;">Qty</th>
+              <th style="padding:6px; text-align:right; width:120px;">Harga Satuan</th>
+              <th style="padding:6px; text-align:right; width:130px;">Jumlah (Rp)</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${order.items.map((it, idx) => `
+              <tr style="border-bottom:1px solid #ddd;">
+                <td style="padding:6px; text-align:center;">${idx + 1}</td>
+                <td style="padding:6px;"><b>${it.nama}</b></td>
+                <td style="padding:6px; text-align:center;">${it.qty}</td>
+                <td style="padding:6px; text-align:right;">Rp ${it.harga.toLocaleString('id-ID')},-</td>
+                <td style="padding:6px; text-align:right;">Rp ${(it.qty * it.harga).toLocaleString('id-ID')},-</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+
+        <div style="display:flex; justify-content:space-between; margin-top:10px; font-size:11px;">
+          <div style="max-width:400px; padding:8px; border:1px solid #cbd5e1; border-radius:6px; background:#f8fafc;">
+            <p style="margin:0 0 4px 0; font-weight:bold; color:#0f766e;">Catatan Perpajakan untuk Bendahara BOS / Instansi:</p>
+            <ul style="margin:0; padding-left:16px; line-height:1.4;">
+              <li>Wajib Pajak <b>Non-PKP</b> (Bebas Pungut PPN Sesuai Pasal 18 ayat (1) PMK 59/PMK.03/2022).</li>
+              ${isSetorMandiri ? `
+                <li>PPh Final 0,5% (PP No. 55 Tahun 2022) sebesar <b>Rp ${(order.pph || 0).toLocaleString('id-ID')},-</b> disetor mandiri oleh Wajib Pajak penyedia jasa (PT TENTREM RAHAYU NUSANTARA).</li>
+                <li>Jumlah Pembayaran Bersih yang Ditransfer Pihak Sekolah: <b>Rp ${order.totalSPJ.toLocaleString('id-ID')},- (BULAT)</b>.</li>
+              ` : `
+                <li>Dikenakan Pemotongan <b>PPh Final 0,5%</b> (PP No. 55 Tahun 2022) sebesar <b>Rp ${(order.pph || 0).toLocaleString('id-ID')},-</b> oleh pihak bendahara sekolah.</li>
+                <li>Jumlah Pembayaran Bersih yang Ditransfer: <b>Rp ${(order.totalNet || order.totalSPJ).toLocaleString('id-ID')},-</b>.</li>
+              `}
+            </ul>
+          </div>
+
+          <div style="width:280px;">
+            <div style="display:flex; justify-content:space-between; padding:3px 0;">
+              <span>Subtotal:</span>
+              <span style="font-family:monospace; font-weight:bold;">Rp ${order.subtotal.toLocaleString('id-ID')},-</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; padding:3px 0;">
+              <span>PPN (PMK 59 / Non-PKP):</span>
+              <span style="font-family:monospace; font-weight:bold;">Rp 0,-</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; padding:6px 0; border-top:1.5px solid #000; font-size:13px; font-weight:bold;">
+              <span>TOTAL TAGIHAN (SPJ):</span>
+              <span style="font-family:monospace;">Rp ${order.totalSPJ.toLocaleString('id-ID')},-</span>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top:10px; font-size:11px;">
+          <p style="margin:2px 0;"><b>Terbilang:</b> <i>${terbilangStr}</i></p>
+          <p style="margin:4px 0 0 0;">Pembayaran dapat ditransfer ke:</p>
+          <p style="margin:2px 0; font-weight:bold;">${profilPT.bank}</p>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; margin-top:35px; font-size:11px; text-align:center;">
+          <div style="width:180px;">
+            <div id="qrcode-faktur"></div>
+            <p style="font-size:9px; margin-top:4px; color:#555;">Validasi Sistem Cloud</p>
+          </div>
+          <div style="width:220px;">
+            <p style="margin:0;">Bandar Lampung, ${order.waktuStr}</p>
+            <p style="margin:2px 0 0 0;">Hormat Kami,</p>
+            <p style="margin:0; font-weight:bold;">${profilPT.nama}</p>
+            <div style="height:60px;"></div>
+            <p style="margin:0; font-weight:bold; border-top:1px solid #000; padding-top:2px;">( ${profilPT.direktur} )</p>
+            <p style="margin:0; font-size:10px;">Direktur</p>
+          </div>
+        </div>
+      `;
+
+      new QRCode(document.getElementById("qrcode-faktur"), {
+        text: `FAKTUR_RESMI:${order.noFaktur}|PT:${profilPT.nama}|TOTAL:Rp${order.totalSPJ}|PPH:Rp${order.pph}`,
+        width: 70,
+        height: 70
+      });
+
+      document.getElementById('area-cetak-faktur').classList.remove('hidden');
+      setTimeout(() => {
+        window.print();
+        document.getElementById('area-cetak-faktur').classList.add('hidden');
+      }, 250);
+    }
+
+    // ================= CETAK KWITANSI RESMI SPJ BOS SEKOLAH =================
+    function cetakKwitansiSPJ(orderId) {
+      const order = dataTransaksi.find(t => t.id === orderId);
+      if (!order) return;
+
+      const container = document.getElementById('konten-kwitansi-spj');
+      const terbilangStr = terbilang(order.totalSPJ) + " Rupiah";
+
+      container.innerHTML = `
+        <div style="border:3px double #000; padding:20px; font-family:'Nunito', sans-serif;">
+          <div style="display:flex; justify-content:space-between; border-bottom:2px solid #000; padding-bottom:8px; margin-bottom:12px;">
+            <div>
+              <b style="font-size:14px; text-transform:uppercase;">${profilPT.nama}</b><br>
+              <span style="font-size:10px;">${profilPT.alamat}</span><br>
+              <span style="font-size:10px;">NPWP: ${profilPT.npwp}</span>
+            </div>
+            <div style="text-align:right;">
+              <h2 style="font-size:18px; font-weight:bold; letter-spacing:2px; margin:0; text-decoration:underline;">KWITANSI PEMBAYARAN</h2>
+              <span style="font-size:11px;">Nomor: KW-${order.noFaktur}</span>
+            </div>
+          </div>
+
+          <table style="width:100%; font-size:12px; line-height:1.8;">
+            <tr>
+              <td style="width:160px;">Sudah Terima Dari</td>
+              <td style="width:10px;">:</td>
+              <td><b>${order.customer}</b></td>
+            </tr>
+            <tr>
+              <td>Banyaknya Uang</td>
+              <td>:</td>
+              <td style="background:#f1f5f9; padding:4px 8px; font-style:italic; font-weight:bold;">=== ${terbilangStr} ===</td>
+            </tr>
+            <tr>
+              <td style="vertical-align:top;">Untuk Pembayaran</td>
+              <td style="vertical-align:top;">:</td>
+              <td>
+                ${order.items.map(i => `${i.nama} (${i.qty} x Rp ${i.harga.toLocaleString('id-ID')})`).join(', ')}<br>
+                <span style="font-size:10px; color:#475569;">
+                  (Berdasarkan Invoice No: ${order.noFaktur} • PPh Final 0,5% PP No. 55/2022: Rp ${(order.pph || 0).toLocaleString('id-ID')})
+                </span>
+              </td>
+            </tr>
+          </table>
+
+          <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-top:24px;">
+            <div style="border:2px solid #000; padding:10px 18px; font-size:16px; font-weight:bold; font-family:monospace; background:#f8fafc;">
+              Jumlah : Rp ${order.totalSPJ.toLocaleString('id-ID')},-
+            </div>
+
+            <div style="text-align:center; font-size:11px; width:220px;">
+              <p style="margin:0;">Bandar Lampung, ${order.waktuStr}</p>
+              <p style="margin:2px 0 0 0;">Yang Menerima,</p>
+              <p style="margin:0; font-weight:bold;">${profilPT.nama}</p>
+              <div style="height:55px;"></div>
+              <p style="margin:0; font-weight:bold; border-top:1px solid #000; padding-top:2px;">( ${profilPT.direktur} )</p>
+              <p style="margin:0; font-size:10px;">Direktur</p>
+            </div>
+          </div>
+        </div>
+      `;
+
+      document.getElementById('area-cetak-kwitansi').classList.remove('hidden');
+      setTimeout(() => {
+        window.print();
+        document.getElementById('area-cetak-kwitansi').classList.add('hidden');
+      }, 250);
+    }
+
+    // ================= CRUD PRODUK =================
+    function modalTambahProduk() {
+      document.getElementById('modal-produk-title').innerText = "Tambah Produk / Jasa";
+      document.getElementById('prod-id').value = "";
+      buatSkuAcak();
+      document.getElementById('prod-nama').value = "";
+      document.getElementById('prod-kategori').value = "Jasa IT";
+      document.getElementById('prod-stok').value = "10";
+      document.getElementById('prod-hpp').value = "0";
+      document.getElementById('prod-harga').value = "2000000";
+      document.getElementById('modal-produk').classList.remove('hidden');
+    }
+
+    function buatSkuAcak() {
+      document.getElementById('prod-sku').value = `${Math.floor(10000000 + Math.random() * 90000000)}`;
+    }
+
+    function tutupModalProduk() {
+      document.getElementById('modal-produk').classList.add('hidden');
+    }
+
+    function simpanProdukSubmit(e) {
+      e.preventDefault();
+      const id = document.getElementById('prod-id').value;
+      const data = {
+        sku: document.getElementById('prod-sku').value.trim(),
+        nama: document.getElementById('prod-nama').value.trim(),
+        kategori: document.getElementById('prod-kategori').value.trim() || "Umum",
+        stok: parseInt(document.getElementById('prod-stok').value, 10) || 0,
+        hpp: parseFloat(document.getElementById('prod-hpp').value) || 0,
+        harga: parseFloat(document.getElementById('prod-harga').value) || 0
+      };
+
+      if (id) {
+        db.collection("pos_produk").doc(id).update(data)
+          .then(() => tutupModalProduk())
+          .catch(err => alert("Gagal update: " + err.message));
+      } else {
+        db.collection("pos_produk").add(data)
+          .then(() => tutupModalProduk())
+          .catch(err => alert("Gagal tambah: " + err.message));
+      }
+    }
+
+    function hapusProduk(id) {
+      if (confirm("Hapus produk ini dari katalog?")) {
+        db.collection("pos_produk").doc(id).delete();
+      }
+    }
+
+    function renderTabelProduk() {
+      const tbody = document.getElementById('tbody-produk');
+      if (dataProduk.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-slate-500">Belum ada data produk.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = dataProduk.map(p => {
+        const hpp = Number(p.hpp) || 0;
+        const harga = Number(p.harga) || 0;
+        return `
+          <tr class="hover:bg-slate-950/40">
+            <td class="p-3 font-mono-num text-teal-400 font-bold">${p.sku}</td>
+            <td class="p-3 font-bold text-white">${p.nama}</td>
+            <td class="p-3 text-slate-400">${p.kategori}</td>
+            <td class="p-3 font-mono-num text-slate-400">Rp ${hpp.toLocaleString('id-ID')}</td>
+            <td class="p-3 font-mono-num font-bold text-teal-300">Rp ${harga.toLocaleString('id-ID')}</td>
+            <td class="p-3 font-mono-num font-bold ${p.stok <= 5 ? 'text-rose-400' : 'text-slate-300'}">${p.stok}</td>
+            <td class="p-3 text-center space-x-1.5">
+              <button onclick="bukaModalLabel('${p.id}')" class="bg-teal-900/60 hover:bg-teal-700 text-teal-300 px-2.5 py-1 rounded-lg text-[11px] font-bold">
+                <i class="fa-solid fa-barcode"></i> Label
+              </button>
+              <button onclick="hapusProduk('${p.id}')" class="text-rose-400 hover:text-rose-300 px-2 py-1"><i class="fa-solid fa-trash"></i></button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function bukaModalLabel(id) {
+      const p = dataProduk.find(item => item.id === id);
+      if (!p) return;
+      document.getElementById('label-pt-name').innerText = profilPT.brand || profilPT.nama;
+      document.getElementById('label-prod-name').innerText = p.nama;
+      document.getElementById('label-prod-price').innerText = `Rp ${Number(p.harga).toLocaleString('id-ID')}`;
+      JsBarcode("#barcode-svg", p.sku || p.id, { format: "CODE128", width: 1.8, height: 50, displayValue: true, fontSize: 12 });
+      document.getElementById('modal-label-barcode').classList.remove('hidden');
+    }
+
+    function tutupModalLabel() {
+      document.getElementById('modal-label-barcode').classList.add('hidden');
+    }
+
+    function cetakLabelBarcodeFisik() {
+      const clone = document.getElementById('area-label-preview').cloneNode(true);
+      const target = document.getElementById('konten-cetak-label-fisik');
+      target.innerHTML = "";
+      target.appendChild(clone);
+      document.getElementById('area-cetak-label').classList.remove('hidden');
+      window.print();
+      document.getElementById('area-cetak-label').classList.add('hidden');
+    }
+
+    // ================= TAB TRANSAKSI =================
+    function renderTabelTransaksi() {
+      const tbody = document.getElementById('tbody-transaksi');
+      if (dataTransaksi.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-slate-500">Belum ada transaksi.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = dataTransaksi.map(t => `
+        <tr class="hover:bg-slate-950/40">
+          <td class="p-3 font-mono-num text-teal-400 font-bold">${t.noFaktur}</td>
+          <td class="p-3 text-slate-400">${t.waktuStr}</td>
+          <td class="p-3 font-bold text-white">${t.customer}</td>
+          <td class="p-3 text-slate-300">${t.metode}</td>
+          <td class="p-3 font-mono-num font-bold text-teal-300">Rp ${(t.totalSPJ || t.total || 0).toLocaleString('id-ID')}</td>
+          <td class="p-3 font-mono-num text-amber-400">Rp ${(t.pph || 0).toLocaleString('id-ID')}</td>
+          <td class="p-3 font-mono-num font-bold text-emerald-400">Rp ${(t.totalNet || t.total || 0).toLocaleString('id-ID')}</td>
+          <td class="p-3 text-center space-x-1">
+            <button onclick="cetakNotaThermalById('${t.id}')" class="bg-cyan-900/60 hover:bg-cyan-700 text-cyan-300 px-2 py-1 rounded-lg text-[11px] font-bold">
+              <i class="fa-solid fa-print"></i> Struk BT
+            </button>
+            <button onclick="cetakFakturA4('${t.id}')" class="bg-teal-600 hover:bg-teal-500 text-white px-2 py-1 rounded-lg text-[11px] font-bold">
+              <i class="fa-solid fa-file-invoice"></i> Faktur
+            </button>
+            <button onclick="cetakKwitansiSPJ('${t.id}')" class="bg-amber-600 hover:bg-amber-500 text-slate-950 px-2 py-1 rounded-lg text-[11px] font-bold">
+              <i class="fa-solid fa-receipt"></i> Kwitansi
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    // ================= KEUANGAN & ARUS KAS =================
+    function simpanArusKas() {
+      const jenis = document.getElementById('kas-jenis').value;
+      const keterangan = document.getElementById('kas-keterangan').value.trim();
+      const nominal = parseFloat(document.getElementById('kas-nominal').value) || 0;
+
+      if (!keterangan || nominal <= 0) {
+        alert("Harap lengkapi keterangan dan nominal kas!");
+        return;
+      }
+
+      db.collection("pos_kas").add({
+        jenis: jenis,
+        keterangan: keterangan,
+        nominal: nominal,
+        waktuStr: new Date().toLocaleDateString('id-ID'),
+        waktuTimestamp: firebase.firestore.FieldValue.serverTimestamp()
+      }).then(() => {
+        document.getElementById('kas-keterangan').value = "";
+        document.getElementById('kas-nominal').value = "";
+        alert("Arus kas tersimpan!");
+      });
+    }
+
+    function renderTabelKas() {
+      const tbody = document.getElementById('tbody-kas');
+      if (dataKas.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-500">Belum ada riwayat mutasi kas.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = dataKas.map(k => `
+        <tr class="hover:bg-slate-950/40">
+          <td class="p-3 text-slate-400">${k.waktuStr}</td>
+          <td class="p-3 font-bold ${k.jenis === 'MASUK' ? 'text-teal-400' : 'text-rose-400'}">${k.jenis}</td>
+          <td class="p-3 text-white">${k.keterangan}</td>
+          <td class="p-3 font-mono-num font-bold ${k.jenis === 'MASUK' ? 'text-emerald-400' : 'text-rose-400'}">
+            ${k.jenis === 'MASUK' ? '+' : '-'}Rp ${k.nominal.toLocaleString('id-ID')}
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function hitungStatistikKeuangan() {
+      const omzetBruto = dataTransaksi.reduce((sum, t) => sum + (t.totalSPJ || t.total || 0), 0);
+      const totalPPh = dataTransaksi.reduce((sum, t) => sum + (t.pph || 0), 0);
+      const modalMasuk = dataKas.filter(k => k.jenis === 'MASUK').reduce((sum, k) => sum + k.nominal, 0);
+      const biayaKeluar = dataKas.filter(k => k.jenis === 'KELUAR').reduce((sum, k) => sum + k.nominal, 0);
+      // Kas bersih = Total Penerimaan Riil - Beban Operasional
+      const kasBersih = (omzetBruto - totalPPh) + modalMasuk - biayaKeluar;
+
+      document.getElementById('stat-omzet').innerText = `Rp ${omzetBruto.toLocaleString('id-ID')}`;
+      document.getElementById('stat-pajak-terpotong').innerText = `Rp ${totalPPh.toLocaleString('id-ID')}`;
+      document.getElementById('stat-biaya').innerText = `Rp ${biayaKeluar.toLocaleString('id-ID')}`;
+      document.getElementById('stat-kas-bersih').innerText = `Rp ${kasBersih.toLocaleString('id-ID')}`;
+    }
+
+    function eksporTransaksiCSV() {
+      if (dataTransaksi.length === 0) {
+        alert("Tidak ada transaksi untuk diekspor!");
+        return;
+      }
+      let csv = "No Faktur,Waktu,Pelanggan,Metode,Subtotal,PPh 0.5%,Total SPJ,Diterima Bersih\n";
+      dataTransaksi.forEach(t => {
+        csv += `"${t.noFaktur}","${t.waktuStr}","${t.customer}","${t.metode}",${t.subtotal},${t.pph || 0},${t.totalSPJ || t.total},${t.totalNet || t.total}\n`;
+      });
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `Laporan_Transaksi_PT_Tentrem_${new Date().toISOString().slice(0,10)}.csv`;
+      a.click();
+    }
+
+    // ================= DUKUNGAN PRINTER BLUETOOTH THERMAL (ESC/POS) =================
+    let bluetoothDevice = null;
+    let bluetoothCharacteristic = null;
+
+    async function hubungkanPrinterBluetooth() {
+      if (!navigator.bluetooth) {
+        alert("Browser Anda belum mendukung Web Bluetooth API. Gunakan Google Chrome (di Android atau PC/Laptop) dan pastikan Bluetooth perangkat aktif.");
+        return;
+      }
+      try {
+        const statusEl = document.getElementById('status-bt-printer');
+        if (statusEl) statusEl.innerText = "Mencari printer...";
+
+        bluetoothDevice = await navigator.bluetooth.requestDevice({
+          acceptAllDevices: true,
+          optionalServices: [
+            '000018f0-0000-1000-8000-00805f9b34fb', // Standard POS Printer
+            'e7810a71-73ae-499d-8c15-faa9aef0c3f2',
+            '49535343-fe7d-4ae5-8fa9-9fafd205e455',
+            '0000ffe0-0000-1000-8000-00805f9b34fb'
+          ]
+        });
+
+        const server = await bluetoothDevice.gatt.connect();
+        const services = await server.getPrimaryServices();
+        for (const service of services) {
+          const characteristics = await service.getCharacteristics();
+          for (const c of characteristics) {
+            if (c.properties.write || c.properties.writeWithoutResponse) {
+              bluetoothCharacteristic = c;
+              break;
+            }
+          }
+          if (bluetoothCharacteristic) break;
+        }
+
+        if (bluetoothCharacteristic) {
+          if (statusEl) {
+            statusEl.innerText = bluetoothDevice.name || "Printer Terhubung";
+            statusEl.className = "text-emerald-400 font-bold";
+          }
+          alert(`✅ Terhubung ke printer Bluetooth: ${bluetoothDevice.name || "POS Printer"}`);
+        } else {
+          throw new Error("Karakteristik write printer tidak ditemukan.");
+        }
+      } catch (err) {
+        console.warn("Bluetooth connection error:", err);
+        alert("Koneksi Bluetooth batal / gagal: " + err.message);
+      }
+    }
+
+    // Mengirim byte ESC/POS langsung ke printer Bluetooth
+    async function kirimDataKePrinterBluetooth(dataUint8) {
+      if (!bluetoothCharacteristic) {
+        // Jika belum terhubung via direct Web Bluetooth, otomatis pakai dialog cetak thermal 58mm standar browser
+        return false;
+      }
+      try {
+        // Kirim dalam chunk 100 bytes (standar BLE buffer)
+        const CHUNK_SIZE = 100;
+        for (let i = 0; i < dataUint8.length; i += CHUNK_SIZE) {
+          const chunk = dataUint8.slice(i, i + CHUNK_SIZE);
+          await bluetoothCharacteristic.writeValue(chunk);
+        }
+        return true;
+      } catch (err) {
+        console.warn("Gagal kirim ke BLE, fallback ke dialog:", err);
+        return false;
+      }
+    }
+
+    // Helper membuat instruksi ESC/POS raw bytes
+    function buildEscPosReceipt(order) {
+      const ESC = 0x1B;
+      const GS = 0x1D;
+      let buffer = [];
+
+      function addBytes(...bytes) { buffer.push(...bytes); }
+      function addText(text) {
+        for (let i = 0; i < text.length; i++) {
+          buffer.push(text.charCodeAt(i));
+        }
+      }
+      function addLine(text = "") {
+        addText(text);
+        addBytes(0x0A); // Line feed
+      }
+
+      // Initialize printer
+      addBytes(ESC, 0x40);
+
+      // Center Align + Bold (Header)
+      addBytes(ESC, 0x61, 0x01); // Center
+      addBytes(ESC, 0x45, 0x01); // Bold ON
+      addLine(profilPT.nama);
+      addBytes(ESC, 0x45, 0x00); // Bold OFF
+      addLine(profilPT.alamat);
+      addLine(`NPWP: ${profilPT.npwp}`);
+      addLine(`WA: ${profilPT.wa}`);
+      addLine("--------------------------------");
+
+      // Left Align (Transaksi)
+      addBytes(ESC, 0x61, 0x00); // Left
+      addLine(`No   : ${order.noFaktur}`);
+      addLine(`Tgl  : ${order.waktuStr}`);
+      addLine(`Plg  : ${order.customer}`);
+      addLine(`Kasir: ${order.kasir}`);
+      addLine("--------------------------------");
+
+      // Items
+      order.items.forEach(it => {
+        addLine(it.nama);
+        const lineQty = `${it.qty} x ${it.harga.toLocaleString('id-ID')}`;
+        const lineTotal = (it.qty * it.harga).toLocaleString('id-ID');
+        const spaces = Math.max(1, 32 - lineQty.length - lineTotal.length);
+        addLine(lineQty + " ".repeat(spaces) + lineTotal);
+      });
+      addLine("--------------------------------");
+
+      // Totals
+      function formatTotalLine(label, val) {
+        const valStr = `Rp ${val.toLocaleString('id-ID')}`;
+        const spaces = Math.max(1, 32 - label.length - valStr.length);
+        addLine(label + " ".repeat(spaces) + valStr);
+      }
+
+      formatTotalLine("Subtotal:", order.subtotal);
+      if (order.ppn && order.ppn > 0) formatTotalLine("PPN:", order.ppn);
+      if (order.diskon && order.diskon > 0) formatTotalLine("Diskon:", -order.diskon);
+      
+      addBytes(ESC, 0x45, 0x01); // Bold ON
+      formatTotalLine("TOTAL:", order.totalSPJ || order.total);
+      addBytes(ESC, 0x45, 0x00); // Bold OFF
+
+      formatTotalLine("Bayar:", order.bayar || (order.totalSPJ || order.total));
+      const kembalian = Math.max(0, (order.bayar || (order.totalSPJ || order.total)) - (order.totalSPJ || order.total));
+      formatTotalLine("Kembali:", kembalian);
+
+      addLine("--------------------------------");
+      addBytes(ESC, 0x61, 0x01); // Center
+      addLine("*** TERIMA KASIH ***");
+      addLine("Barang/Jasa yg dibeli sah");
+      addLine("");
+      addLine("");
+      addLine("");
+      addBytes(GS, 0x56, 0x41, 0x03); // Feed & Cut
+
+      return new Uint8Array(buffer);
+    }
+
+
+    // CETAK NOTA THERMAL (Dua Jalur: Direct Bluetooth ESC/POS atau Print Dialog 58mm)
+    async function cetakNotaThermal(order) {
+      if (!order) return;
+
+      // Cek apakah terhubung ke Bluetooth langsung
+      if (bluetoothCharacteristic) {
+        const rawBytes = buildEscPosReceipt(order);
+        const sukses = await kirimDataKePrinterBluetooth(rawBytes);
+        if (sukses) {
+          alert("✅ Struk berhasil dicetak langsung ke printer Bluetooth!");
+          return;
+        }
+      }
+
+      // Jalur Fallback: Dialog Cetak Browser dengan format pas 58mm
+      const container = document.getElementById('konten-nota-thermal');
+      container.innerHTML = `
+        <div style="text-align:center; margin-bottom:4px;">
+          <b style="font-size:13px; text-transform:uppercase;">${profilPT.nama}</b><br>
+          <span style="font-size:9px;">${profilPT.alamat}</span><br>
+          <span style="font-size:9px;">NPWP: ${profilPT.npwp}</span><br>
+          <span style="font-size:9px;">WA: ${profilPT.wa}</span>
+        </div>
+        <div style="border-top:1px dashed #000; margin:4px 0;"></div>
+        <div style="font-size:10px;">
+          No  : ${order.noFaktur}<br>
+          Tgl : ${order.waktuStr}<br>
+          Plg : ${order.customer} | Ksr: ${order.kasir}
+        </div>
+        <div style="border-top:1px dashed #000; margin:4px 0;"></div>
+        <div style="font-size:10px;">
+          ${order.items.map(i => `
+            <div style="margin-bottom:2px;">
+              <b>${i.nama}</b><br>
+              <div style="display:flex; justify-content:space-between;">
+                <span>${i.qty} x Rp ${i.harga.toLocaleString('id-ID')}</span>
+                <span>Rp ${(i.qty * i.harga).toLocaleString('id-ID')}</span>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+        <div style="border-top:1px dashed #000; margin:4px 0;"></div>
+        <div style="font-size:10px;">
+          <div style="display:flex; justify-content:space-between;">
+            <span>Subtotal:</span>
+            <span>Rp ${order.subtotal.toLocaleString('id-ID')}</span>
+          </div>
+          ${order.diskon > 0 ? `
+            <div style="display:flex; justify-content:space-between;">
+              <span>Diskon:</span>
+              <span>-Rp ${order.diskon.toLocaleString('id-ID')}</span>
+            </div>
+          ` : ''}
+          <div style="display:flex; justify-content:space-between; font-weight:bold; font-size:11px; margin-top:2px;">
+            <span>TOTAL:</span>
+            <span>Rp ${(order.totalSPJ || order.total).toLocaleString('id-ID')}</span>
+          </div>
+          <div style="display:flex; justify-content:space-between;">
+            <span>Metode:</span>
+            <span>${order.metode}</span>
+          </div>
+          <div style="display:flex; justify-content:space-between;">
+            <span>Bayar:</span>
+            <span>Rp ${(order.bayar || (order.totalSPJ || order.total)).toLocaleString('id-ID')}</span>
+          </div>
+          <div style="display:flex; justify-content:space-between;">
+            <span>Kembali:</span>
+            <span>Rp ${Math.max(0, (order.bayar || (order.totalSPJ || order.total)) - (order.totalSPJ || order.total)).toLocaleString('id-ID')}</span>
+          </div>
+        </div>
+        <div style="border-top:1px dashed #000; margin:4px 0;"></div>
+        
+        <div style="display:flex; flex-direction:column; align-items:center; margin:6px 0;">
+          <div id="qrcode-thermal"></div>
+          <span style="font-size:8px; margin-top:2px;">Scan Validasi Nota</span>
+        </div>
+
+        <div style="text-align:center; font-size:9px; margin-top:3px;">
+          *** TERIMA KASIH ***<br>
+          Barang/Jasa yang dibeli telah sah.
+        </div>
+      `;
+
+      new QRCode(document.getElementById("qrcode-thermal"), {
+        text: `NOTA:${order.noFaktur}|TOTAL:Rp${order.totalSPJ || order.total}|TGL:${order.waktuStr}`,
+        width: 65,
+        height: 65
+      });
+
+      document.getElementById('area-cetak-nota').classList.remove('hidden');
+      setTimeout(() => {
+        window.print();
+        document.getElementById('area-cetak-nota').classList.add('hidden');
+      }, 250);
+    }
+
+    let terakhirOrder = null;
+
+    function bukaModalCetak(order) {
+      terakhirOrder = order;
+      document.getElementById('modal-cetak-info').innerText = `No: ${order.noFaktur} (Rp ${(order.totalSPJ || order.total).toLocaleString('id-ID')})`;
+      document.getElementById('modal-pilihan-cetak').classList.remove('hidden');
+    }
+
+    function tutupModalCetak() {
+      document.getElementById('modal-pilihan-cetak').classList.add('hidden');
+    }
+
+    function cetakStrukTerakhir() {
+      if (terakhirOrder) cetakNotaThermal(terakhirOrder);
+    }
+
+    function cetakFakturTerakhir() {
+      if (terakhirOrder) cetakFakturA4Data(terakhirOrder);
+    }
+
+    function cetakKwitansiTerakhir() {
+      if (terakhirOrder) cetakKwitansiSPJData(terakhirOrder);
+    }
+
+    function cetakNotaThermalById(orderId) {
+      const order = dataTransaksi.find(t => t.id === orderId);
+      if (order) cetakNotaThermal(order);
+    }
+
+    function cetakKwitansiSPJData(order) {
+      if (!order) return;
+      const container = document.getElementById('konten-kwitansi-spj');
+      const terbilangStr = terbilang(order.totalSPJ || order.total) + " Rupiah";
+
+      container.innerHTML = `
+        <div style="border:3px double #000; padding:20px; font-family:'Nunito', sans-serif;">
+          <div style="display:flex; justify-content:space-between; border-bottom:2px solid #000; padding-bottom:8px; margin-bottom:12px;">
+            <div>
+              <b style="font-size:14px; text-transform:uppercase;">${profilPT.nama}</b><br>
+              <span style="font-size:10px;">${profilPT.alamat}</span><br>
+              <span style="font-size:10px;">NPWP: ${profilPT.npwp}</span>
+            </div>
+            <div style="text-align:right;">
+              <h2 style="font-size:18px; font-weight:bold; letter-spacing:2px; margin:0; text-decoration:underline;">KWITANSI PEMBAYARAN</h2>
+              <span style="font-size:11px;">Nomor: KW-${order.noFaktur}</span>
+            </div>
+          </div>
+
+          <table style="width:100%; font-size:12px; line-height:1.8;">
+            <tr>
+              <td style="width:160px;">Sudah Terima Dari</td>
+              <td style="width:10px;">:</td>
+              <td><b>${order.customer}</b></td>
+            </tr>
+            <tr>
+              <td>Banyaknya Uang</td>
+              <td>:</td>
+              <td style="background:#f1f5f9; padding:4px 8px; font-style:italic; font-weight:bold;">=== ${terbilangStr} ===</td>
+            </tr>
+            <tr>
+              <td style="vertical-align:top;">Untuk Pembayaran</td>
+              <td style="vertical-align:top;">:</td>
+              <td>
+                ${order.items.map(i => `${i.nama} (${i.qty} x Rp ${i.harga.toLocaleString('id-ID')})`).join(', ')}<br>
+                <span style="font-size:10px; color:#475569;">
+                  (Berdasarkan Invoice No: ${order.noFaktur} • PPh Final 0,5% PP No. 55/2022: Rp ${(order.pph || 0).toLocaleString('id-ID')})
+                </span>
+              </td>
+            </tr>
+          </table>
+
+          <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-top:24px;">
+            <div style="border:2px solid #000; padding:10px 18px; font-size:16px; font-weight:bold; font-family:monospace; background:#f8fafc;">
+              Jumlah : Rp ${(order.totalSPJ || order.total).toLocaleString('id-ID')},-
+            </div>
+
+            <div style="text-align:center; font-size:11px; width:220px;">
+              <p style="margin:0;">Bandar Lampung, ${order.waktuStr}</p>
+              <p style="margin:2px 0 0 0;">Yang Menerima,</p>
+              <p style="margin:0; font-weight:bold;">${profilPT.nama}</p>
+              <div style="height:55px;"></div>
+              <p style="margin:0; font-weight:bold; border-top:1px solid #000; padding-top:2px;">( ${profilPT.direktur} )</p>
+              <p style="margin:0; font-size:10px;">Direktur</p>
+            </div>
+          </div>
+        </div>
+      `;
+
+      document.getElementById('area-cetak-kwitansi').classList.remove('hidden');
+      setTimeout(() => {
+        window.print();
+        document.getElementById('area-cetak-kwitansi').classList.add('hidden');
+      }, 250);
+    }
+
+  </script>
+</body>
+</html>
