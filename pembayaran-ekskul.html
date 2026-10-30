@@ -107,7 +107,7 @@
     <main class="flex-grow flex items-center justify-center mb-12 no-print">
       <div class="glass-card w-full max-w-3xl rounded-3xl p-6 md:p-8 border border-teal-500/30 shadow-2xl">
         
-        <!-- FILTER KELAS CEPAT (LENGKAP 1 - 6) -->
+        <!-- FILTER KELAS CEPAT -->
         <div class="flex flex-wrap items-center gap-1.5 mb-4" id="bar-filter-kelas">
           <span class="text-[11px] text-slate-400 mr-1 font-bold">Kelas:</span>
           <button onclick="setFilterKelas('semua')" class="filter-btn active px-3 py-1 rounded-xl bg-slate-900 border border-teal-800 text-xs font-bold text-slate-300 transition">Semua</button>
@@ -166,7 +166,6 @@
 
           <!-- RIWAYAT DETAIL: PEMBAYARAN (CASH / TF) & PRESENSI -->
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <!-- Kolom Riwayat Setoran / Pembayaran -->
             <div class="bg-slate-950/60 p-4 rounded-2xl border border-teal-900/60 space-y-2">
               <h3 class="font-title text-xs text-emerald-400 flex items-center gap-1.5">
                 <i class="fa-solid fa-receipt"></i> Riwayat Pembayaran Tercatat:
@@ -176,7 +175,6 @@
               </div>
             </div>
 
-            <!-- Kolom Riwayat Presensi -->
             <div class="bg-slate-950/60 p-4 rounded-2xl border border-teal-900/60 space-y-2">
               <h3 class="font-title text-xs text-sky-400 flex items-center gap-1.5">
                 <i class="fa-solid fa-calendar-check"></i> Riwayat Kehadiran Sesi:
@@ -233,7 +231,6 @@
   <div id="modal-admin-kas" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4 hidden no-print">
     <div class="glass-card max-w-3xl w-full rounded-3xl p-5 sm:p-6 border border-teal-500/40 bg-slate-900 shadow-2xl flex flex-col max-h-[92vh]">
       
-      <!-- HEADER MODAL & TAB SWITCHER -->
       <div class="flex justify-between items-center border-b border-teal-900/80 pb-3 mb-3">
         <div>
           <h3 class="font-title text-lg text-teal-300">Panel Manajemen Kas Ekskul</h3>
@@ -242,7 +239,6 @@
         <button onclick="tutupModalAdmin()" class="text-slate-400 hover:text-white font-bold text-xl px-2">✕</button>
       </div>
 
-      <!-- NAVIGASI TAB MODAL -->
       <div class="flex gap-2 mb-3 bg-slate-950/80 p-1.5 rounded-2xl border border-teal-900/60">
         <button onclick="switchTabAdmin('rekap')" id="tab-btn-rekap" class="tab-admin-btn active flex-1 py-2 text-xs font-bold rounded-xl text-slate-300 transition flex items-center justify-center gap-1.5">
           📊 Rekapitulasi Kas (Lunas / Belum)
@@ -252,10 +248,8 @@
         </button>
       </div>
 
-      <!-- ================= TAB 1: REKAPITULASI KAS & STATUS PEMBAYARAN ================= -->
+      <!-- TAB 1: REKAPITULASI KAS -->
       <div id="content-tab-rekap" class="flex flex-col flex-grow overflow-hidden space-y-3">
-        
-        <!-- KARTU RINGKASAN METRIK KAS (TERMASUK METODE CASH VS TRANSFER) -->
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
           <div class="bg-slate-950/90 p-2.5 rounded-xl border border-teal-900/60">
             <span class="text-[10px] text-slate-400 block">Total Uang Masuk</span>
@@ -279,7 +273,6 @@
           </div>
         </div>
 
-        <!-- FILTER TABEL REKAP (STATUS, KELAS, METODE, CARI) -->
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 bg-slate-950/60 p-2.5 rounded-xl border border-teal-900/40 text-xs">
           <select id="rekap-filter-status" onchange="renderTabelRekap()" class="p-2 rounded-xl bg-slate-900 border border-teal-800 text-white font-bold outline-none focus:border-teal-400 text-xs">
             <option value="semua">📌 Semua Status Siswa</option>
@@ -306,7 +299,6 @@
           <input type="text" id="rekap-cari-nama" oninput="renderTabelRekap()" placeholder="🔍 Cari nama siswa..." class="p-2 rounded-xl bg-slate-900 border border-teal-800 text-white outline-none focus:border-teal-400 text-xs">
         </div>
 
-        <!-- TABEL DATA REKAP -->
         <div class="overflow-y-auto flex-grow border border-teal-900/60 rounded-xl bg-slate-950/60">
           <table class="w-full text-left text-xs text-slate-300">
             <thead class="bg-slate-900 text-teal-300 uppercase text-[10px] font-bold sticky top-0 border-b border-teal-900">
@@ -326,7 +318,6 @@
           </table>
         </div>
 
-        <!-- AKSI EKSPOR -->
         <div class="flex justify-end gap-2 pt-2 border-t border-teal-900/60">
           <button onclick="cetakLaporanRekap()" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs px-3.5 py-2 rounded-xl transition flex items-center gap-1.5 shadow">
             🖨️ Cetak Rekap Laporan Fisik
@@ -334,14 +325,12 @@
         </div>
       </div>
 
-      <!-- ================= TAB 2: PENCATATAN CEKLIS CEPAT (MASSAL) ================= -->
+      <!-- TAB 2: PENCATATAN CEKLIS MASSAL -->
       <div id="content-tab-ceklis" class="hidden flex-col flex-grow overflow-hidden space-y-3">
-        <!-- SEARCH FILTER CEKLIS ADMIN -->
         <div>
           <input type="text" id="cari-admin-ceklis" oninput="filterCeklisAdmin()" placeholder="🔍 Cari nama siswa yang membayar..." class="w-full p-2.5 rounded-xl bg-slate-950 border border-teal-800 text-white text-xs outline-none focus:border-teal-400">
         </div>
 
-        <!-- KONTROL ATAS: METODE (TF / CASH), NOMINAL, PILIH SEMUA -->
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 bg-slate-950/80 p-3 rounded-2xl border border-teal-900/60 text-xs">
           <div>
             <label class="block text-slate-400 font-bold mb-1">Metode Pembayaran</label>
@@ -361,12 +350,10 @@
           </div>
         </div>
 
-        <!-- DAFTAR SISWA CEKLIS -->
         <div class="overflow-y-auto flex-grow space-y-2 pr-1 my-1 divide-y divide-teal-950/60" id="list-ceklis-siswa">
           <p class="p-6 text-center text-slate-500 text-xs">Memuat daftar siswa...</p>
         </div>
 
-        <!-- FOOTER MODAL SIMPAN -->
         <div class="border-t border-teal-900/80 pt-2 space-y-2">
           <div class="flex justify-end">
             <button type="button" onclick="simpanCeklisMassal()" id="btn-simpan-bulk" class="w-full sm:w-1/2 bg-teal-600 hover:bg-teal-500 text-white font-title text-xs py-2.5 rounded-xl font-bold transition shadow-lg flex items-center justify-center gap-1.5">
@@ -405,10 +392,9 @@
 
   <script>
     // ================= KONFIGURASI KEAMANAN PRIVAT =================
-    // Kunci Akses Wali Murid (Bisa via URL ?token=koding2026 atau ketik PIN)
     const KUNCI_WALI_MURID = "koding2026"; 
-    // PIN Khusus Admin / Pengampu untuk membuka Kas & Rekap
-    const PIN_ADMIN_KAS = "2026"; 
+    // PIN Admin sudah disamakan ke 0666 sesuai backend Apps Script
+    const PIN_ADMIN_KAS = "0666"; 
 
     const API_EKSKUL_URL = "https://script.google.com/macros/s/AKfycbycRk6Bzt-GeNoGb1y0HlpmYnucGYIOKtQ83anoZ2MueAuHJQKX4SGxBj9U4Exjlzry/exec";
 
@@ -417,7 +403,6 @@
     let allSelected = false;
     let isAdminAuthenticated = false;
 
-    // Periksa otorisasi saat halaman dimuat
     window.addEventListener('DOMContentLoaded', () => {
       cekOtorisasiUtama();
     });
@@ -462,7 +447,6 @@
       muatDataServer();
     }
 
-    // ================= OTORISASI GANDA ADMIN KAS =================
     function mintaAksesAdmin() {
       if (isAdminAuthenticated) {
         bukaModalAdmin();
@@ -490,7 +474,6 @@
       }
     }
 
-    // ================= LOGIKA TAB ADMIN =================
     function bukaModalAdmin() {
       document.getElementById('modal-admin-kas').classList.remove('hidden');
       switchTabAdmin('rekap');
@@ -517,7 +500,6 @@
       }
     }
 
-    // ================= RENDER TABEL & METRIK REKAP (CASH VS TF) =================
     function renderTabelRekap() {
       if (dataSiswaList.length === 0) return;
 
@@ -526,7 +508,6 @@
       const filterMetode = document.getElementById('rekap-filter-metode').value;
       const filterNama = (document.getElementById('rekap-cari-nama').value || "").toLowerCase().trim();
 
-      // Hitung Metrik Seluruh Siswa & Breakdown Metode Bayar
       let totalMasuk = 0;
       let totalTunggakan = 0;
       let countLunas = 0;
@@ -540,7 +521,6 @@
         if (s.sisaTagihan === 0) countLunas++;
         else countBelum++;
 
-        // Akumulasi riwayat bayar siswa jika ada
         if (s.riwayatPembayaran && Array.isArray(s.riwayatPembayaran)) {
           s.riwayatPembayaran.forEach(p => {
             const m = (p.metode || "").toLowerCase();
@@ -557,7 +537,6 @@
       document.getElementById('metric-lunas').innerText = `${countLunas} Siswa`;
       document.getElementById('metric-belum').innerText = `${countBelum} Siswa`;
 
-      // Filter Data Tabel
       const filtered = dataSiswaList.filter(s => {
         const cocokStatus = filterStatus === 'semua' || 
                             (filterStatus === 'belum' && s.sisaTagihan > 0) || 
@@ -565,7 +544,6 @@
         const cocokKelas = filterKelas === 'semua' || s.kelas.includes(filterKelas);
         const cocokNama = s.nama.toLowerCase().includes(filterNama);
 
-        // Filter metode bayar
         let cocokMetode = true;
         if (filterMetode !== 'semua') {
           const mUtama = s.metodeUtama || (s.riwayatPembayaran && s.riwayatPembayaran[0] ? s.riwayatPembayaran[0].metode : "");
@@ -610,7 +588,6 @@
       }).join('');
     }
 
-    // ================= CETAK LAPORAN REKAP =================
     function cetakLaporanRekap() {
       const tglSekarang = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
       document.getElementById('cetak-tanggal-info').innerText = `Dicetak pada: ${tglSekarang}`;
@@ -655,7 +632,6 @@
       window.print();
     }
 
-    // ================= FUNGSI PORTAL UTAMA =================
     function setFilterKelas(kelas) {
       filterKelasAktif = kelas;
       document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
@@ -877,7 +853,7 @@
         subSelisih.innerText = "Harap selesaikan sebelum sesi lanjut";
       }
 
-      // Riwayat Setoran Pembayaran (Cash vs TF)
+      // Riwayat Setoran Pembayaran
       const listBayar = document.getElementById('list-riwayat-bayar');
       if (!siswa.riwayatPembayaran || siswa.riwayatPembayaran.length === 0) {
         listBayar.innerHTML = '<p class="text-slate-500 italic p-2 text-center bg-slate-950/40 rounded-xl">Belum ada riwayat setoran uang.</p>';
