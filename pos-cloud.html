@@ -389,8 +389,12 @@
             <input type="text" id="pt-brand" class="w-full p-2.5 rounded-xl bg-slate-950 border border-teal-900/60 text-white outline-none focus:border-teal-400">
           </div>
           <div>
-            <label class="block text-slate-400 font-bold mb-1">Nama Direktur / Penanggung Jawab:</label>
+            <label class="block text-slate-400 font-bold mb-1">Nama Penandatangan (Kwitansi & Faktur):</label>
             <input type="text" id="pt-direktur" required value="Thomas Ryantama" class="w-full p-2.5 rounded-xl bg-slate-950 border border-teal-900/60 text-white outline-none focus:border-teal-400">
+          </div>
+          <div>
+            <label class="block text-slate-400 font-bold mb-1">Jabatan Penandatangan di Kwitansi/Faktur:</label>
+            <input type="text" id="pt-jabatan" required value="Direktur Operasional" placeholder="cth: Direktur Operasional / Manager" class="w-full p-2.5 rounded-xl bg-slate-950 border border-teal-900/60 text-white outline-none focus:border-teal-400">
           </div>
           <div>
             <label class="block text-slate-400 font-bold mb-1">Nomor Pokok Wajib Pajak (NPWP 16 Digit / 15 Digit):</label>
@@ -603,6 +607,7 @@
       nama: "PT TENTREM RAHAYU NUSANTARA",
       brand: "PT TENTREM RAHAYU NUSANTARA",
       direktur: "Thomas Ryantama",
+      jabatan: "Direktur Operasional",
       npwp: "1000000008057433",
       wa: "0812-3456-7890",
       email: "kontak@tentrem.co.id",
@@ -696,6 +701,7 @@
       setElValue('pt-nama', profilPT.nama);
       setElValue('pt-brand', profilPT.brand || profilPT.nama);
       setElValue('pt-direktur', profilPT.direktur || "Thomas Ryantama");
+      setElValue('pt-jabatan', profilPT.jabatan || "Direktur Operasional");
       setElValue('pt-npwp', profilPT.npwp);
       setElValue('pt-wa', profilPT.wa);
       setElValue('pt-email', profilPT.email);
@@ -710,6 +716,7 @@
         nama: getElValue('pt-nama', "PT TENTREM RAHAYU NUSANTARA"),
         brand: getElValue('pt-brand', getElValue('pt-nama')),
         direktur: getElValue('pt-direktur', "Thomas Ryantama"),
+        jabatan: getElValue('pt-jabatan', "Direktur Operasional"),
         npwp: getElValue('pt-npwp', "1000000008057433"),
         wa: getElValue('pt-wa', ""),
         email: getElValue('pt-email', ""),
@@ -942,31 +949,25 @@
       let totalTransferSekolah = 0;
 
       if (skema === "bos_mandiri") {
-        // KASUS SEKOLAH TIDAK MAU POTONG PAJAK:
-        // - Sekolah ingin SPJ utuh & transfer bulat ke PT
-        // - PPN: Bebas PMK 59/2022 (Pasal 18 ayat 1 huruf a <= 2 Jt) & Status Non-PKP
-        // - PPh Final 0.5% disetor SENDIRI oleh PT Tentrem via Billing Coretax
         nominalPPN = 0;
-        nominalPPh = Math.round(subtotal * 0.005); // 0.5%
+        nominalPPh = Math.round(subtotal * 0.005);
         labelPPN = "Rp 0 (Bebas PMK 59 ≤ 2 Jt)";
         labelPPh = `Rp ${nominalPPh.toLocaleString('id-ID')} (Disetor Mandiri PT)`;
         
         totalTagihanSPJ = Math.max(0, subtotal - diskon);
-        totalTransferSekolah = totalTagihanSPJ; // Sekolah transfer utuh 2.000.000!
+        totalTransferSekolah = totalTagihanSPJ;
 
         document.getElementById('title-spj').innerText = "TOTAL TAGIHAN SPJ:";
         document.getElementById('title-transfer').innerText = "SEKOLAH TRANSFER (BULAT):";
       } 
       else if (skema === "bos_pp55") {
-        // KASUS BENDAHARA SEKOLAH MEMOTONG PAJAK RESMI:
-        // - PPh Final 0.5% dipotong bendahara sekolah di muka
         nominalPPN = 0;
         nominalPPh = Math.round(subtotal * 0.005);
         labelPPN = "Rp 0 (Bebas PMK 59 ≤ 2 Jt)";
         labelPPh = `-Rp ${nominalPPh.toLocaleString('id-ID')} (Dipotong Sekolah)`;
 
         totalTagihanSPJ = Math.max(0, subtotal - diskon);
-        totalTransferSekolah = Math.max(0, totalTagihanSPJ - nominalPPh); // Sekolah transfer 1.990.000
+        totalTransferSekolah = Math.max(0, totalTagihanSPJ - nominalPPh);
 
         document.getElementById('title-spj').innerText = "TOTAL TAGIHAN SPJ:";
         document.getElementById('title-transfer').innerText = "DITERIMA BERSIH (NET):";
@@ -1011,7 +1012,6 @@
       document.getElementById('ringkas-total-spj').innerText = `Rp ${totalTagihanSPJ.toLocaleString('id-ID')}`;
       document.getElementById('ringkas-total-net').innerText = `Rp ${totalTransferSekolah.toLocaleString('id-ID')}`;
 
-      // Default uang bayar otomatis mengacu ke yang ditransfer sekolah
       const bayarInput = document.getElementById('uang-bayar');
       if (!bayarInput.value || bayarInput.value === "0" || bayarInput.value === "1990000" || bayarInput.value === "2000000") {
         bayarInput.value = totalTransferSekolah;
@@ -1203,7 +1203,7 @@
             <p style="margin:0; font-weight:bold;">${profilPT.nama}</p>
             <div style="height:60px;"></div>
             <p style="margin:0; font-weight:bold; border-top:1px solid #000; padding-top:2px;">( ${profilPT.direktur} )</p>
-            <p style="margin:0; font-size:10px;">Direktur Operasional</p>
+            <p style="margin:0; font-size:10px;">${profilPT.jabatan || "Direktur Operasional"}</p>
           </div>
         </div>
       `;
@@ -1277,7 +1277,7 @@
               <p style="margin:0; font-weight:bold;">${profilPT.nama}</p>
               <div style="height:55px;"></div>
               <p style="margin:0; font-weight:bold; border-top:1px solid #000; padding-top:2px;">( ${profilPT.direktur} )</p>
-              <p style="margin:0; font-size:10px;">Direktur Oeprasional</p>
+              <p style="margin:0; font-size:10px;">${profilPT.jabatan || "Direktur Operasional"}</p>
             </div>
           </div>
         </div>
@@ -1556,11 +1556,9 @@
     // Mengirim byte ESC/POS langsung ke printer Bluetooth
     async function kirimDataKePrinterBluetooth(dataUint8) {
       if (!bluetoothCharacteristic) {
-        // Jika belum terhubung via direct Web Bluetooth, otomatis pakai dialog cetak thermal 58mm standar browser
         return false;
       }
       try {
-        // Kirim dalam chunk 100 bytes (standar BLE buffer)
         const CHUNK_SIZE = 100;
         for (let i = 0; i < dataUint8.length; i += CHUNK_SIZE) {
           const chunk = dataUint8.slice(i, i + CHUNK_SIZE);
@@ -1652,12 +1650,10 @@
       return new Uint8Array(buffer);
     }
 
-
     // CETAK NOTA THERMAL (Dua Jalur: Direct Bluetooth ESC/POS atau Print Dialog 58mm)
     async function cetakNotaThermal(order) {
       if (!order) return;
 
-      // Cek apakah terhubung ke Bluetooth langsung
       if (bluetoothCharacteristic) {
         const rawBytes = buildEscPosReceipt(order);
         const sukses = await kirimDataKePrinterBluetooth(rawBytes);
@@ -1667,7 +1663,6 @@
         }
       }
 
-      // Jalur Fallback: Dialog Cetak Browser dengan format pas 58mm
       const container = document.getElementById('konten-nota-thermal');
       container.innerHTML = `
         <div style="text-align:center; margin-bottom:4px;">
@@ -1749,7 +1744,6 @@
       }, 250);
     }
 
-
     // ================= FITUR HAPUS / BATALKAN TRANSAKSI =================
     async function hapusTransaksi(transaksiId) {
       const order = dataTransaksi.find(t => t.id === transaksiId);
@@ -1773,7 +1767,6 @@
       try {
         const batch = db.batch();
 
-        // 1. Kembalikan stok produk jika dipilih
         if (pulihkanStok && order.items && Array.isArray(order.items)) {
           order.items.forEach(it => {
             if (it.id) {
@@ -1785,7 +1778,6 @@
           });
         }
 
-        // 2. Hapus dokumen transaksi dari Firestore
         const refTrans = db.collection("pos_transaksi").doc(transaksiId);
         batch.delete(refTrans);
 
@@ -1879,7 +1871,7 @@
               <p style="margin:0; font-weight:bold;">${profilPT.nama}</p>
               <div style="height:55px;"></div>
               <p style="margin:0; font-weight:bold; border-top:1px solid #000; padding-top:2px;">( ${profilPT.direktur} )</p>
-              <p style="margin:0; font-size:10px;">Direktur</p>
+              <p style="margin:0; font-size:10px;">${profilPT.jabatan || "Direktur Operasional"}</p>
             </div>
           </div>
         </div>
@@ -1891,7 +1883,6 @@
         document.getElementById('area-cetak-kwitansi').classList.add('hidden');
       }, 250);
     }
-
   </script>
 </body>
 </html>
