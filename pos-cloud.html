@@ -1411,14 +1411,17 @@
           <td class="p-3 font-mono-num text-amber-400">Rp ${(t.pph || 0).toLocaleString('id-ID')}</td>
           <td class="p-3 font-mono-num font-bold text-emerald-400">Rp ${(t.totalNet || t.total || 0).toLocaleString('id-ID')}</td>
           <td class="p-3 text-center space-x-1">
-            <button onclick="cetakNotaThermalById('${t.id}')" class="bg-cyan-900/60 hover:bg-cyan-700 text-cyan-300 px-2 py-1 rounded-lg text-[11px] font-bold">
+            <button onclick="cetakNotaThermalById('${t.id}')" title="Cetak Struk Thermal" class="bg-cyan-900/60 hover:bg-cyan-700 text-cyan-300 px-2 py-1 rounded-lg text-[11px] font-bold">
               <i class="fa-solid fa-print"></i> Struk BT
             </button>
-            <button onclick="cetakFakturA4('${t.id}')" class="bg-teal-600 hover:bg-teal-500 text-white px-2 py-1 rounded-lg text-[11px] font-bold">
+            <button onclick="cetakFakturA4('${t.id}')" title="Cetak Faktur A4" class="bg-teal-600 hover:bg-teal-500 text-white px-2 py-1 rounded-lg text-[11px] font-bold">
               <i class="fa-solid fa-file-invoice"></i> Faktur
             </button>
-            <button onclick="cetakKwitansiSPJ('${t.id}')" class="bg-amber-600 hover:bg-amber-500 text-slate-950 px-2 py-1 rounded-lg text-[11px] font-bold">
+            <button onclick="cetakKwitansiSPJ('${t.id}')" title="Cetak Kwitansi SPJ" class="bg-amber-600 hover:bg-amber-500 text-slate-950 px-2 py-1 rounded-lg text-[11px] font-bold">
               <i class="fa-solid fa-receipt"></i> Kwitansi
+            </button>
+            <button onclick="hapusTransaksi('${t.id}')" title="Hapus / Batalkan Transaksi" class="bg-rose-950/60 hover:bg-rose-700 text-rose-300 px-2 py-1 rounded-lg text-[11px] font-bold border border-rose-800/40">
+              <i class="fa-solid fa-trash"></i> Hapus
             </button>
           </td>
         </tr>
@@ -1744,6 +1747,54 @@
         window.print();
         document.getElementById('area-cetak-nota').classList.add('hidden');
       }, 250);
+    }
+
+
+    // ================= FITUR HAPUS / BATALKAN TRANSAKSI =================
+    async function hapusTransaksi(transaksiId) {
+      const order = dataTransaksi.find(t => t.id === transaksiId);
+      if (!order) return;
+
+      const konfirmasi = confirm(
+        `PERINGATAN: Apakah Anda yakin ingin membatalkan & menghapus transaksi:\n` +
+        `No Faktur: ${order.noFaktur}\n` +
+        `Pelanggan: ${order.customer}\n` +
+        `Total: Rp ${(order.totalSPJ || order.total).toLocaleString('id-ID')}\n\n` +
+        `Data yang dihapus dari Cloud tidak dapat dikembalikan!`
+      );
+      if (!konfirmasi) return;
+
+      const pulihkanStok = confirm(
+        `Apakah Anda ingin MENGEMBALIKAN JUMLAH STOK BARANG yang dibeli ke katalog inventaris?\n\n` +
+        `[OK] = Kembalikan stok barang\n` +
+        `[Batal] = Jangan ubah stok barang`
+      );
+
+      try {
+        const batch = db.batch();
+
+        // 1. Kembalikan stok produk jika dipilih
+        if (pulihkanStok && order.items && Array.isArray(order.items)) {
+          order.items.forEach(it => {
+            if (it.id) {
+              const refProd = db.collection("pos_produk").doc(it.id);
+              batch.update(refProd, {
+                stok: firebase.firestore.FieldValue.increment(it.qty)
+              });
+            }
+          });
+        }
+
+        // 2. Hapus dokumen transaksi dari Firestore
+        const refTrans = db.collection("pos_transaksi").doc(transaksiId);
+        batch.delete(refTrans);
+
+        await batch.commit();
+        alert(`✅ Transaksi ${order.noFaktur} berhasil dihapus dari Cloud dan stok barang telah disesuaikan!`);
+      } catch (err) {
+        console.error("Gagal menghapus transaksi:", err);
+        alert("❌ Gagal menghapus transaksi: " + err.message);
+      }
     }
 
     let terakhirOrder = null;
