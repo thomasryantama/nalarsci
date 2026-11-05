@@ -50,8 +50,11 @@
         </div>
       </div>
       <div class="flex items-center gap-2">
-        <button onclick="muatMasterSiswaDariCloud()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold px-3 py-1.5 rounded-xl border border-slate-700 transition flex items-center gap-1.5" title="Sinkronkan Nama Siswa">
+        <button onclick="muatMasterSiswaDariCloud(true)" class="bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold px-3 py-1.5 rounded-xl border border-slate-700 transition flex items-center gap-1.5" title="Sinkronkan Nama Siswa">
           <i class="fa-solid fa-arrows-rotate text-emerald-400"></i> Sync Siswa
+        </button>
+        <button onclick="resetDataTampilan()" class="bg-rose-950/60 hover:bg-rose-900/80 text-rose-300 text-xs font-bold px-3 py-1.5 rounded-xl border border-rose-800/50 transition flex items-center gap-1.5" title="Bersihkan Data Lokal">
+          <i class="fa-solid fa-trash-can text-rose-400"></i> Bersihkan Log
         </button>
         <span class="text-xs bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 px-3 py-1.5 rounded-xl font-bold flex items-center gap-1.5">
           <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Mode Guru Piket
@@ -86,9 +89,8 @@
             </div>
             <input type="text" id="siswaNama" list="listDatalistSiswa" oninput="onNamaSiswaDiinput()" required placeholder="Ketik 2-3 huruf nama siswa..." class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-white font-bold outline-none focus:border-amber-400 text-sm">
             
-            <!-- DATALIST HTML5 UNTUK SUGGESTION NAMA -->
             <datalist id="listDatalistSiswa">
-              <!-- Diisi otomatis oleh JavaScript dari Sheet "Data_Siswa" -->
+              <!-- Diisi otomatis oleh JavaScript -->
             </datalist>
           </div>
 
@@ -174,9 +176,8 @@
 
   </main>
 
-  <!-- ================= LEMBAR CETAK SLIP RESMI (A5 / POTONG DUA) ================= -->
+  <!-- ================= LEMBAR CETAK SLIP RESMI ================= -->
   <div id="printArea" class="hidden print-box p-4 max-w-2xl mx-auto text-black bg-white">
-    <!-- SLIP BAGIAN 1: UNTUK GURU KELAS / MAPEL -->
     <div class="border border-black p-4 mb-4 rounded">
       <div class="border-b-2 border-black pb-2 mb-3 text-center">
         <h3 class="text-xs font-bold uppercase tracking-wider">SD METHODIST IMMANUEL BANDAR LAMPUNG</h3>
@@ -225,14 +226,12 @@
       </div>
     </div>
 
-    <!-- GARIS GUNTING PEMOTONG SLIP -->
     <div class="border-b-2 border-dashed border-gray-500 my-4 text-center relative">
       <span class="bg-white px-2 text-[9px] text-gray-500 absolute -top-2.5 left-1/2 -translate-x-1/2 font-mono">
         ✂️ Gunting di sini — Bagian bawah dibawa pulang untuk ditandatangani orang tua
       </span>
     </div>
 
-    <!-- SLIP BAGIAN 2: UNTUK DIBAWA PULANG KE ORANG TUA -->
     <div class="border border-black p-4 rounded bg-gray-50">
       <div class="border-b-2 border-black pb-2 mb-3 text-center">
         <h3 class="text-xs font-bold uppercase tracking-wider">SD METHODIST IMMANUEL BANDAR LAMPUNG</h3>
@@ -284,16 +283,13 @@
     Sistem Absensi Piket Gerbang • Terkoneksi ke Database Kesiswaan SD Methodist Immanuel
   </footer>
 
-  <!-- SCRIPT LOGIKA PIKET DENGAN AUTOCOMPLETE MASTER SISWA -->
   <script>
     const API_KESISWAAN_URL = "https://script.google.com/macros/s/AKfycbzYdXRIHIi1RGHWmb61__IRiR2DkdQYpjxj-xiEBiXAmSyyIRmCXLum6vJoAPQmWqcIDg/exec";
     const PIKET_ACCESS_KEY = "piket2026"; 
 
-    // Master Siswa Lokal (Diambil dari sheet "Data_Siswa")
     let masterSiswaList = JSON.parse(localStorage.getItem("master_siswa_cache") || "[]");
     let logLokalHariIni = JSON.parse(localStorage.getItem("piket_hari_ini") || "[]");
 
-    
     const PESAN_PERSUASIF_DEFAULT = "Bapak/Ibu yang terkasih, salam hangat dari sekolah. Ketepatan waktu sebelum pukul 07.15 WIB merupakan pembiasaan karakter disiplin dan kesiapan belajar ananda di pagi hari. Kami mohon bantuan Bapak/Ibu di rumah untuk bersama-sama mendampingi waktu istirahat dan keberangkatan ananda agar senantiasa bersemangat tiba di sekolah tepat waktu. Terima kasih atas kerja sama dan cinta yang tulus bagi ananda.";
 
     function resetPesanPersuasif() {
@@ -307,16 +303,19 @@
       renderLogHariIni();
       renderDatalistSiswa();
 
-      // Ambil data terbaru dari cloud jika belum ada
       if (masterSiswaList.length === 0) {
         muatMasterSiswaDariCloud();
       }
     }
 
-    function muatMasterSiswaDariCloud() {
+    function muatMasterSiswaDariCloud(force = false) {
       const statusText = document.getElementById('syncStatusText');
       statusText.innerText = "⏳ Sinkronisasi...";
       statusText.className = "text-[10px] text-amber-400 font-semibold";
+
+      if (force) {
+        localStorage.removeItem("master_siswa_cache");
+      }
 
       fetch(API_KESISWAAN_URL, {
         method: "POST",
@@ -331,6 +330,7 @@
           renderDatalistSiswa();
           statusText.innerText = `● ${masterSiswaList.length} Siswa Siap`;
           statusText.className = "text-[10px] text-emerald-400 font-semibold";
+          if (force) alert("✅ Database Siswa berhasil disinkronkan ulang!");
         } else {
           statusText.innerText = "● Gagal Sync";
         }
@@ -347,7 +347,6 @@
       `).join('');
     }
 
-    // Deteksi saat guru piket memilih / mengetik nama siswa
     function onNamaSiswaDiinput() {
       const val = document.getElementById('siswaNama').value.trim().toLowerCase();
       const match = masterSiswaList.find(s => s.nama.toLowerCase() === val);
@@ -441,6 +440,10 @@
         alert("Peringatan jaringan, slip tetap dicetak lokal.");
         
         const itemLokal = { nama, kelas, jam: jamFormat, tgl, alasan, guru, akumulasi: 1 };
+        logLokalHariIni.unshift(itemLokal);
+        localStorage.setItem("piket_hari_ini", JSON.stringify(logLokalHariIni));
+        renderLogHariIni();
+
         siapkanSlipCetak(itemLokal);
         window.print();
         document.getElementById('printArea').classList.add('hidden');
@@ -492,11 +495,32 @@
             </div>
             <p class="text-[10px] text-slate-400 mt-0.5">Tiba: <b class="text-rose-400">${item.jam}</b> • Ke-${item.akumulasi || 1}</p>
           </div>
-          <button onclick="cetakUlang(${idx})" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-[10px] font-bold border border-slate-700 transition" title="Cetak Ulang Slip">
-            🖨️ Cetak
-          </button>
+          <div class="flex items-center gap-1">
+            <button onclick="cetakUlang(${idx})" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-[10px] font-bold border border-slate-700 transition" title="Cetak Ulang Slip">
+              🖨️ Cetak
+            </button>
+            <button onclick="hapusSatuLog(${idx})" class="px-2 py-1 bg-rose-950/50 hover:bg-rose-900 text-rose-300 rounded-lg text-[10px] font-bold border border-rose-800/40 transition" title="Hapus dari Tampilan">
+              ✕
+            </button>
+          </div>
         </div>
       `).join('');
+    }
+
+    function hapusSatuLog(idx) {
+      if (confirm(`Hapus ${logLokalHariIni[idx].nama} dari daftar tampilan piket hari ini?`)) {
+        logLokalHariIni.splice(idx, 1);
+        localStorage.setItem("piket_hari_ini", JSON.stringify(logLokalHariIni));
+        renderLogHariIni();
+      }
+    }
+
+    function resetDataTampilan() {
+      if (confirm("Kosongkan daftar log piket di layar hari ini?")) {
+        logLokalHariIni = [];
+        localStorage.removeItem("piket_hari_ini");
+        renderLogHariIni();
+      }
     }
 
     function cetakUlang(idx) {
