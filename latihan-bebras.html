@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulator Latihan Tantangan Bebras SD - NalarSci</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-dark: #3730a3;
+            --primary-light: #818cf8;
+            --accent: #f59e0b;
+            --accent-green: #10b981;
+            --accent-red: #ef4444;
+            --bg-dark: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background: rgba(15, 23, 42, 0.9);
+            border-bottom: 1px solid var(--card-border);
+            padding: 1rem 1.5rem;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            backdrop-filter: blur(12px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #4f46e5, #06b6d4);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 1.25rem;
+        }
+
+        .brand-text h1 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        .brand-text p {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .timer-box {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #f87171;
+            padding: 6px 14px;
+            border-radius: 9999px;
+            font-weight: 700;
+            font-size: 0.95rem;
+        }
+
+        .timer-box.normal {
+            background: rgba(79, 70, 229, 0.15);
+            border-color: rgba(129, 140, 248, 0.3);
+            color: var(--primary-light);
+        }
+
+        main {
+            flex-grow: 1;
+            max-width: 1000px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 2rem 1.5rem 4rem;
+        }
+
+        .intro-card, .result-card, .quiz-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 2rem;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .intro-card h2, .result-card h2 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.75rem;
+            margin-bottom: 1rem;
+            color: #fff;
+        }
+
+        .rule-list {
+            list-style: none;
+            margin: 1.5rem 0 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .rule-list li {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.95rem;
+            color: #cbd5e1;
+        }
+
+        .rule-list li i {
+            color: var(--accent);
+            font-size: 1.1rem;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: #fff;
+            border: none;
+            padding: 12px 28px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(79, 70, 229, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: #f1f5f9;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: none;
+        }
+
+        /* Quiz Layout */
+        .question-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.25rem;
+            border-bottom: 1px solid var(--card-border);
+            padding-bottom: 1rem;
+        }
+
+        .category-badge {
+            background: rgba(245, 158, 11, 0.15);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            color: var(--accent);
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .question-title {
+            font-size: 1.35rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: #fff;
+            line-height: 1.4;
+        }
+
+        .question-narrative {
+            font-size: 1rem;
+            color: #cbd5e1;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        .graphic-container {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--card-border);
+            border-radius: 14px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 160px;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+            margin-bottom: 2rem;
+        }
+
+        .option-btn {
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 14px 18px;
+            text-align: left;
+            color: #f1f5f9;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .option-btn:hover {
+            border-color: var(--primary-light);
+            background: rgba(79, 70, 229, 0.15);
+        }
+
+        .option-btn.selected {
+            background: rgba(79, 70, 229, 0.3);
+            border-color: var(--primary-light);
+            box-shadow: 0 0 0 2px var(--primary-light);
+        }
+
+        .option-marker {
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.08);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+        }
+
+        .quiz-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Results Screen */
+        .score-box {
+            text-align: center;
+            padding: 2.5rem;
+            background: rgba(15, 23, 42, 0.7);
+            border-radius: 16px;
+            margin: 1.5rem 0 2rem;
+            border: 1px solid var(--card-border);
+        }
+
+        .score-number {
+            font-size: 3.5rem;
+            font-weight: 800;
+            color: var(--accent-green);
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .score-stats {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .stat-item span {
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .explanation-block {
+            margin-top: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .exp-item {
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 1.25rem;
+        }
+
+        .exp-item.correct {
+            border-left: 4px solid var(--accent-green);
+        }
+
+        .exp-item.incorrect {
+            border-left: 4px solid var(--accent-red);
+        }
+
+        .exp-item h4 {
+            font-size: 0.95rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .exp-item p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        .ct-concept {
+            display: inline-block;
+            background: rgba(6, 182, 212, 0.15);
+            color: #22d3ee;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-top: 6px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="brand">
+            <div class="brand-icon"><i class="fa-solid fa-brain"></i></div>
+            <div class="brand-text">
+                <h1>Simulator Tantangan Bebras SD</h1>
+                <p>NalarSci Lab &bull; Computational Thinking</p>
+            </div>
+        </div>
+        <div id="timerBox" class="timer-box normal" style="display: none;">
+            <i class="fa-solid fa-clock"></i> <span id="timerDisplay">20:00</span>
+        </div>
+    </header>
+
+    <main>
+        <!-- Intro Screen -->
+        <div id="introScreen" class="intro-card">
+            <h2>Latihan Mandiri & Pemanasan Bebras SD</h2>
+            <p style="color: var(--text-muted); line-height: 1.6;">
+                Selamat datang di platform simulasi latihan Computational Thinking (Berpikir Komputasional) tingkat SD kategori Siaga & SiKecil. Simulator ini dirancang untuk melatih logika penyelesaian masalah anak-anak sebelum kompetisi resmi.
+            </p>
+
+            <ul class="rule-list">
+                <li><i class="fa-solid fa-circle-check"></i> Total 5 Soal Tantangan Logika (Algoritma, Pola, & Dekomposisi).</li>
+                <li><i class="fa-solid fa-circle-check"></i> Waktu pengerjaan: 20 Menit.</li>
+                <li><i class="fa-solid fa-circle-check"></i> Sistem Nilai: Benar +4 | Salah -1 | Kosong 0 (sesuai aturan Bebras).</li>
+            </ul>
+
+            <button class="btn" onclick="startQuiz()">
+                <i class="fa-solid fa-play"></i> Mulai Latihan Sekarang
+            </button>
+        </div>
+
+        <!-- Quiz Screen -->
+        <div id="quizScreen" class="quiz-card" style="display: none;">
+            <div class="question-meta">
+                <span id="qCategory" class="category-badge">Kategori SiKecil</span>
+                <span id="qProgress" style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">Soal 1 dari 5</span>
+            </div>
+
+            <div id="qTitle" class="question-title">Judul Soal</div>
+            <div id="qNarrative" class="question-narrative">Cerita dan deskripsi tantangan...</div>
+
+            <div id="qGraphic" class="graphic-container">
+                <!-- SVG / Graphic content inserted dynamically -->
+            </div>
+
+            <div id="optionsContainer" class="options-grid">
+                <!-- Options inserted dynamically -->
+            </div>
+
+            <div class="quiz-nav">
+                <button id="prevBtn" class="btn btn-secondary" onclick="prevQuestion()" disabled>
+                    <i class="fa-solid fa-arrow-left"></i> Sebelumnya
+                </button>
+                <button id="clearBtn" class="btn btn-secondary" onclick="clearAnswer()">
+                    Kosongkan Jawaban
+                </button>
+                <button id="nextBtn" class="btn" onclick="nextQuestion()">
+                    Selanjutnya <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Result Screen -->
+        <div id="resultScreen" class="result-card" style="display: none;">
+            <h2>Hasil Latihan Tantangan Bebras</h2>
+            <p style="color: var(--text-muted);">Kerja bagus! Berikut rincian skor dan evaluasi kemampuan berpikir komputasionalmu:</p>
+
+            <div class="score-box">
+                <div id="finalScore" class="score-number">0</div>
+                <div class="score-stats">
+                    <div class="stat-item">Benar: <span id="correctCount" style="color: var(--accent-green);">0</span></div>
+                    <div class="stat-item">Salah: <span id="incorrectCount" style="color: var(--accent-red);">0</span></div>
+                    <div class="stat-item">Dilewati: <span id="emptyCount">0</span></div>
+                </div>
+            </div>
+
+            <h3>Pembahasan & Konsep Berpikir Komputasional</h3>
+            <div id="explanationContainer" class="explanation-block"></div>
+
+            <div style="margin-top: 2rem; text-align: center;">
+                <button class="btn" onclick="restartQuiz()">
+                    <i class="fa-solid fa-rotate-right"></i> Ulangi Latihan
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const questions = [
+            {
+                category: "Kategori SiKecil / Algoritma",
+                title: "Jalur Berang-berang Mengumpulkan Kayu",
+                narrative: "Seekor berang-berang ingin pulang ke sarangnya sambil mengumpulkan cabang kayu sebanyak mungkin. Ia hanya boleh berjalan ke Kanan (→) atau ke Bawah (↓). Berapa cabang kayu terbanyak yang bisa dikumpulkannya?",
+                svg: `<svg width="280" height="200" viewBox="0 0 280 200" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="280" height="200" fill="#1e293b" rx="10"/>
+                    <grid stroke="#334155" stroke-width="2"/>
+                    <!-- Grid 3x2 -->
+                    <rect x="20" y="20" width="70" height="70" fill="#334155" rx="6"/>
+                    <text x="55" y="60" fill="#fbbf24" font-size="20" text-anchor="middle">🪵 2</text>
+                    <text x="35" y="38" fill="#94a3b8" font-size="10">Mulai</text>
+
+                    <rect x="105" y="20" width="70" height="70" fill="#334155" rx="6"/>
+                    <text x="140" y="60" fill="#fbbf24" font-size="20" text-anchor="middle">🪵 5</text>
+
+                    <rect x="190" y="20" width="70" height="70" fill="#334155" rx="6"/>
+                    <text x="225" y="60" fill="#fbbf24" font-size="20" text-anchor="middle">🪵 1</text>
+
+                    <rect x="20" y="105" width="70" height="70" fill="#334155" rx="6"/>
+                    <text x="55" y="145" fill="#fbbf24" font-size="20" text-anchor="middle">🪵 4</text>
+
+                    <rect x="105" y="105" width="70" height="70" fill="#334155" rx="6"/>
+                    <text x="140" y="145" fill="#fbbf24" font-size="20" text-anchor="middle">🪵 3</text>
+
+                    <rect x="190" y="105" width="70" height="70" fill="#334155" rx="6"/>
+                    <text x="225" y="145" fill="#fbbf24" font-size="20" text-anchor="middle">🪵 6</text>
+                    <text x="225" y="165" fill="#4ade80" font-size="10" text-anchor="middle">Sarang 🏠</text>
+                </svg>`,
+                options: [
+                    "A. 14 Cabang Kayu",
+                    "B. 16 Cabang Kayu",
+                    "C. 15 Cabang Kayu",
+                    "D. 12 Cabang Kayu"
+                ],
+                correct: 1, // B: 2 + 5 + 3 + 6 = 16
+                explanation: "Jalur optimal adalah: Mulai (2) → Kanan (5) → Bawah (3) → Kanan (6). Total = 2 + 5 + 3 + 6 = 16 cabang kayu.",
+                ct: "Optimasi Jalur (Dynamic Programming / Algoritma)"
+            },
+            {
+                category: "Kategori SiKecil / Pola & Abstraksi",
+                title: "Kode Rahasia Manik-Manik",
+                narrative: "Tono menyusun kalung manik-manik dengan pola berulang: [Bintang, Lingkaran, Segitiga, Kotak, Bintang, Lingkaran, Segitiga, Kotak, ...]. Jika Tono ingin memasang 26 manik-manik, bentuk apakah manik-manik yang berada di urutan ke-26?",
+                svg: `<svg width="300" height="80" viewBox="0 0 300 80" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="300" height="80" fill="#1e293b" rx="10"/>
+                    <text x="40" y="50" font-size="28" text-anchor="middle">⭐</text>
+                    <text x="100" y="50" font-size="28" text-anchor="middle">⚪</text>
+                    <text x="160" y="50" font-size="28" text-anchor="middle">🔺</text>
+                    <text x="220" y="50" font-size="28" text-anchor="middle">🟦</text>
+                    <text x="270" y="48" fill="#94a3b8" font-size="16">...</text>
+                </svg>`,
+                options: [
+                    "A. Bintang (⭐)",
+                    "B. Lingkaran (⚪)",
+                    "C. Segitiga (🔺)",
+                    "D. Kotak (🟦)"
+                ],
+                correct: 1, // B
+                explanation: "Pola berulang setiap 4 bentuk. 26 dibagi 4 = 6 siklus penuh dengan sisa 2. Bentuk urutan ke-2 dalam pola adalah Lingkaran (⚪).",
+                ct: "Pengenalan Pola & Operasi Modulo"
+            },
+            {
+                category: "Kategori Siaga / Struktur Data",
+                title: "Tumpukan Kotak Hadiah (Stack)",
+                narrative: "Rani menumpuk 4 kotak hadiah dari bawah ke atas: Merah, Hijau, Biru, lalu Kuning di paling atas. Rani hanya boleh mengambil kotak yang paling atas. Jika Rani mengambil 2 kotak teratas, lalu meletakkan kotak Ungu di atasnya, kotak apa yang sekarang berada tepat di bawah kotak Ungu?",
+                svg: `<svg width="200" height="180" viewBox="0 0 200 180" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="200" height="180" fill="#1e293b" rx="10"/>
+                    <rect x="50" y="130" width="100" height="30" fill="#ef4444" rx="4"/>
+                    <text x="100" y="150" fill="#fff" font-size="12" font-weight="700" text-anchor="middle">Merah</text>
+                    <rect x="50" y="95" width="100" height="30" fill="#10b981" rx="4"/>
+                    <text x="100" y="115" fill="#fff" font-size="12" font-weight="700" text-anchor="middle">Hijau</text>
+                    <rect x="50" y="60" width="100" height="30" fill="#3b82f6" rx="4"/>
+                    <text x="100" y="80" fill="#fff" font-size="12" font-weight="700" text-anchor="middle">Biru</text>
+                    <rect x="50" y="25" width="100" height="30" fill="#eab308" rx="4"/>
+                    <text x="100" y="45" fill="#1e293b" font-size="12" font-weight="700" text-anchor="middle">Kuning</text>
+                </svg>`,
+                options: [
+                    "A. Kotak Merah",
+                    "B. Kotak Biru",
+                    "C. Kotak Hijau",
+                    "D. Kotak Kuning"
+                ],
+                correct: 2, // C
+                explanation: "Tumpukan awal (bawah ke atas): Merah, Hijau, Biru, Kuning. Rani mengambil 2 kotak teratas: Kuning dan Biru keluar. Sisa tumpukan: Merah, Hijau. Lalu diletakkan kotak Ungu di atasnya. Maka tepat di bawah Ungu adalah Hijau.",
+                ct: "Struktur Data Tumpukan (Stack - LIFO)"
+            },
+            {
+                category: "Kategori Siaga / Logika Percabangan",
+                title: "Robot Pemilah Buah",
+                narrative: "Sebuah sensor robot diprogram memilah buah dengan aturan berikut:\n- JIKA buah berwarna Merah DAN berbiji banyak, masukkan ke Keranjang X.\n- JIKA buah berwarna Merah DAN berbiji tunggal, masukkan ke Keranjang Y.\n- Selain itu, masukkan ke Keranjang Z.\n\nKe keranjang manakah Semangka Merah dimasukkan?",
+                svg: `<svg width="260" height="120" viewBox="0 0 260 120" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="260" height="120" fill="#1e293b" rx="10"/>
+                    <circle cx="60" cy="60" r="35" fill="#ef4444"/>
+                    <text x="60" y="68" font-size="28" text-anchor="middle">🍉</text>
+                    <text x="170" y="50" fill="#fff" font-size="14" font-weight="700">Warna: Merah</text>
+                    <text x="170" y="75" fill="#94a3b8" font-size="14">Biji: Banyak</text>
+                </svg>`,
+                options: [
+                    "A. Keranjang X",
+                    "B. Keranjang Y",
+                    "C. Keranjang Z",
+                    "D. Tidak masuk keranjang manapun"
+                ],
+                correct: 0, // A
+                explanation: "Semangka memiliki warna merah dan memiliki banyak biji. Sesuai kondisi pertama: 'Warna Merah DAN Biji Banyak', maka buah dimasukkan ke Keranjang X.",
+                ct: "Logika Boolean & Kondisional (IF-THEN)"
+            },
+            {
+                category: "Kategori Siaga / Dekomposisi & Graf",
+                title: "Pipa Air Kota Berang-Berang",
+                narrative: "Air mengalir dari Waduk Pusat (P). Ada katup A, B, dan C yang bisa dibuka atau ditutup. Jika katup B tertutup dan katup A serta C terbuka, rumah manakah yang TIDAK mendapatkan pasokan air?",
+                svg: `<svg width="320" height="150" viewBox="0 0 320 150" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="320" height="150" fill="#1e293b" rx="10"/>
+                    <!-- Nodes -->
+                    <circle cx="40" cy="75" r="22" fill="#0284c7"/>
+                    <text x="40" y="80" fill="#fff" font-size="12" font-weight="700" text-anchor="middle">P (Air)</text>
+
+                    <!-- Valves -->
+                    <rect x="110" y="30" width="35" height="24" fill="#10b981" rx="4"/>
+                    <text x="127" y="46" fill="#fff" font-size="11" text-anchor="middle">A [O]</text>
+
+                    <rect x="110" y="95" width="35" height="24" fill="#ef4444" rx="4"/>
+                    <text x="127" y="111" fill="#fff" font-size="11" text-anchor="middle">B [X]</text>
+
+                    <rect x="190" y="95" width="35" height="24" fill="#10b981" rx="4"/>
+                    <text x="207" y="111" fill="#fff" font-size="11" text-anchor="middle">C [O]</text>
+
+                    <!-- Houses -->
+                    <rect x="250" y="25" width="55" height="35" fill="#475569" rx="6"/>
+                    <text x="277" y="47" fill="#fff" font-size="11" text-anchor="middle">Rumah 1</text>
+
+                    <rect x="250" y="90" width="55" height="35" fill="#475569" rx="6"/>
+                    <text x="277" y="112" fill="#fff" font-size="11" text-anchor="middle">Rumah 2</text>
+
+                    <!-- Connectors -->
+                    <line x1="62" y1="75" x2="110" y2="42" stroke="#38bdf8" stroke-width="3"/>
+                    <line x1="62" y1="75" x2="110" y2="107" stroke="#94a3b8" stroke-width="3"/>
+                    <line x1="145" y1="42" x2="250" y2="42" stroke="#38bdf8" stroke-width="3"/>
+                    <line x1="145" y1="107" x2="190" y2="107" stroke="#ef4444" stroke-width="3" stroke-dasharray="4"/>
+                    <line x1="225" y1="107" x2="250" y2="107" stroke="#94a3b8" stroke-width="3"/>
+                </svg>`,
+                options: [
+                    "A. Rumah 1",
+                    "B. Rumah 2",
+                    "C. Kedua rumah tidak dapat air",
+                    "D. Kedua rumah tetap dapat air"
+                ],
+                correct: 1, // B
+                explanation: "Katup B berada di jalur menuju Rumah 2 dan tertutup (X). Meskipun katup C terbuka, aliran air dari pusat (P) sudah terputus di katup B. Sedangkan jalur katup A menuju Rumah 1 terbuka normal. Jadi Rumah 2 tidak mendapat air.",
+                ct: "Pemodelan Aliran Jaringan (Graf / Topologi)"
+            }
+        ];
+
+        let currentIndex = 0;
+        let userAnswers = new Array(questions.length).fill(null);
+        let timerSeconds = 20 * 60;
+        let timerInterval = null;
+
+        function startQuiz() {
+            document.getElementById('introScreen').style.display = 'none';
+            document.getElementById('quizScreen').style.display = 'block';
+            document.getElementById('timerBox').style.display = 'flex';
+            
+            loadQuestion(0);
+            startTimer();
+        }
+
+        function loadQuestion(index) {
+            currentIndex = index;
+            const q = questions[index];
+
+            document.getElementById('qCategory').textContent = q.category;
+            document.getElementById('qProgress').textContent = `Soal ${index + 1} dari ${questions.length}`;
+            document.getElementById('qTitle').textContent = q.title;
+            document.getElementById('qNarrative').innerHTML = q.narrative.replace(/\n/g, '<br>');
+            document.getElementById('qGraphic').innerHTML = q.svg;
+
+            const optContainer = document.getElementById('optionsContainer');
+            optContainer.innerHTML = '';
+
+            const markers = ['A', 'B', 'C', 'D'];
+            q.options.forEach((optText, i) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn' + (userAnswers[index] === i ? ' selected' : '');
+                btn.onclick = () => selectOption(i);
+
+                btn.innerHTML = `
+                    <div class="option-marker">${markers[i]}</div>
+                    <div>${optText.replace(/^[A-D]\.\s*/, '')}</div>
+                `;
+                optContainer.appendChild(btn);
+            });
+
+            document.getElementById('prevBtn').disabled = (index === 0);
+            const nextBtn = document.getElementById('nextBtn');
+            if (index === questions.length - 1) {
+                nextBtn.innerHTML = 'Selesai & Kumpulkan <i class="fa-solid fa-check"></i>';
+            } else {
+                nextBtn.innerHTML = 'Selanjutnya <i class="fa-solid fa-arrow-right"></i>';
+            }
+        }
+
+        function selectOption(optIndex) {
+            userAnswers[currentIndex] = optIndex;
+            loadQuestion(currentIndex);
+        }
+
+        function clearAnswer() {
+            userAnswers[currentIndex] = null;
+            loadQuestion(currentIndex);
+        }
+
+        function prevQuestion() {
+            if (currentIndex > 0) {
+                loadQuestion(currentIndex - 1);
+            }
+        }
+
+        function nextQuestion() {
+            if (currentIndex < questions.length - 1) {
+                loadQuestion(currentIndex + 1);
+            } else {
+                finishQuiz();
+            }
+        }
+
+        function startTimer() {
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                timerSeconds--;
+                if (timerSeconds <= 0) {
+                    clearInterval(timerInterval);
+                    finishQuiz();
+                    return;
+                }
+
+                const minutes = Math.floor(timerSeconds / 60);
+                const seconds = timerSeconds % 60;
+                document.getElementById('timerDisplay').textContent = 
+                    `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+                if (timerSeconds < 300) {
+                    document.getElementById('timerBox').classList.remove('normal');
+                }
+            }, 1000);
+        }
+
+        function finishQuiz() {
+            clearInterval(timerInterval);
+            document.getElementById('quizScreen').style.display = 'none';
+            document.getElementById('timerBox').style.display = 'none';
+            document.getElementById('resultScreen').style.display = 'block';
+
+            let score = 0;
+            let correct = 0;
+            let incorrect = 0;
+            let empty = 0;
+
+            const expContainer = document.getElementById('explanationContainer');
+            expContainer.innerHTML = '';
+
+            questions.forEach((q, i) => {
+                const userAns = userAnswers[i];
+                let isCorrect = false;
+                let statusText = '';
+                let itemClass = '';
+
+                if (userAns === null) {
+                    empty++;
+                    statusText = '<span style="color: var(--text-muted);">Tidak Dijawab (0 Poin)</span>';
+                    itemClass = 'exp-item';
+                } else if (userAns === q.correct) {
+                    correct++;
+                    score += 4;
+                    statusText = '<span style="color: var(--accent-green);"><i class="fa-solid fa-check"></i> Benar (+4 Poin)</span>';
+                    itemClass = 'exp-item correct';
+                } else {
+                    incorrect++;
+                    score -= 1;
+                    statusText = '<span style="color: var(--accent-red);"><i class="fa-solid fa-xmark"></i> Salah (-1 Poin)</span>';
+                    itemClass = 'exp-item incorrect';
+                }
+
+                const item = document.createElement('div');
+                item.className = itemClass;
+                item.innerHTML = `
+                    <h4>
+                        <span>${i + 1}. ${q.title}</span>
+                        <span>${statusText}</span>
+                    </h4>
+                    <p><strong>Kunci Jawaban:</strong> ${q.options[q.correct]}</p>
+                    <p style="margin-top: 4px;">${q.explanation}</p>
+                    <div class="ct-concept"><i class="fa-solid fa-lightbulb"></i> Konsep CT: ${q.ct}</div>
+                `;
+                expContainer.appendChild(item);
+            });
+
+            document.getElementById('finalScore').textContent = score;
+            document.getElementById('correctCount').textContent = correct;
+            document.getElementById('incorrectCount').textContent = incorrect;
+            document.getElementById('emptyCount').textContent = empty;
+        }
+
+        function restartQuiz() {
+            userAnswers = new Array(questions.length).fill(null);
+            timerSeconds = 20 * 60;
+            document.getElementById('resultScreen').style.display = 'none';
+            document.getElementById('introScreen').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
