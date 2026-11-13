@@ -97,19 +97,19 @@
 
     <!-- TAB FILTER KATEGORI -->
     <div class="flex flex-wrap justify-center gap-2" id="kategori-bar">
-      <button onclick="setKategori('semua')" class="tab-btn tab-active px-4 py-2 rounded-xl bg-slate-800 border border-slate-700 text-xs font-bold text-slate-300 transition">
+      <button onclick="setKategori('semua', this)" class="tab-btn tab-active px-4 py-2 rounded-xl bg-slate-800 border border-slate-700 text-xs font-bold text-slate-300 transition">
         🌟 Semua Modul
       </button>
-      <button onclick="setKategori('lab')" class="tab-btn px-4 py-2 rounded-xl bg-slate-800 border border-slate-700 text-xs font-bold text-slate-300 hover:bg-slate-700 transition">
+      <button onclick="setKategori('lab', this)" class="tab-btn px-4 py-2 rounded-xl bg-slate-800 border border-slate-700 text-xs font-bold text-slate-300 hover:bg-slate-700 transition">
         🎮 Lab Sains & KKA
       </button>
-      <button onclick="setKategori('literasi')" class="tab-btn px-4 py-2 rounded-xl bg-slate-800 border border-slate-700 text-xs font-bold text-slate-300 hover:bg-slate-700 transition">
+      <button onclick="setKategori('literasi', this)" class="tab-btn px-4 py-2 rounded-xl bg-slate-800 border border-slate-700 text-xs font-bold text-slate-300 hover:bg-slate-700 transition">
         📖 Literasi & Karakter
       </button>
-      <button onclick="setKategori('prestasi')" class="tab-btn px-4 py-2 rounded-xl bg-slate-800 border border-slate-700 text-xs font-bold text-slate-300 hover:bg-slate-700 transition">
+      <button onclick="setKategori('prestasi', this)" class="tab-btn px-4 py-2 rounded-xl bg-slate-800 border border-slate-700 text-xs font-bold text-slate-300 hover:bg-slate-700 transition">
         🏆 Papan Prestasi
       </button>
-      <button onclick="setKategori('wali')" class="tab-btn px-4 py-2 rounded-xl bg-slate-800 border border-slate-700 text-xs font-bold text-slate-300 hover:bg-slate-700 transition">
+      <button onclick="setKategori('wali', this)" class="tab-btn px-4 py-2 rounded-xl bg-slate-800 border border-slate-700 text-xs font-bold text-slate-300 hover:bg-slate-700 transition">
         💳 Layanan & Wali Murid
       </button>
     </div>
@@ -118,7 +118,22 @@
   <!-- GRID DAFTAR MODUL UTAMA -->
   <main class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 flex-grow mb-12" id="modul-grid">
 
-    <!-- 1. MODUL: BUKU PEMBIASAAN KARAKTER (MASUK KE /karakter/index.html) -->
+    <!-- 1. MODUL: TANTANGAN BEBRAS SD (ARENA LATIHAN CT) -->
+    <div class="modul-item glass-card rounded-3xl p-6 flex flex-col border border-orange-500/35 bg-gradient-to-br from-orange-500/10 via-amber-500/5 to-transparent" data-cat="lab">
+      <div class="flex justify-between items-start mb-3">
+        <div class="text-4xl">🦫</div>
+        <span class="bg-orange-500/20 text-orange-300 border border-orange-400/30 text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full">CT & Bebras SD</span>
+      </div>
+      <h3 class="font-title text-xl text-orange-300 mb-1">Latihan Tantangan Bebras</h3>
+      <p class="text-xs text-slate-300 leading-relaxed mb-4 flex-grow">
+        Arena latihan Computational Thinking standar Bebras Indonesia (24 soal SiKecil & Siaga termasuk tantangan HOTS) lengkap dengan timer, sistem penalti, dan pembahasan logis.
+      </p>
+      <a href="/latihan-bebras" class="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-title text-xs py-2.5 rounded-xl text-center font-bold transition shadow-md flex items-center justify-center gap-1.5">
+        🧠 Mulai Latihan Bebras
+      </a>
+    </div>
+
+    <!-- 2. MODUL: BUKU PEMBIASAAN KARAKTER (MASUK KE /karakter/index.html) -->
     <div class="modul-item glass-card rounded-3xl p-6 flex flex-col border border-amber-500/30 bg-gradient-to-br from-amber-500/10 via-transparent to-transparent" data-cat="literasi wali">
       <div class="flex justify-between items-start mb-3">
         <div class="text-4xl">📖</div>
@@ -133,7 +148,7 @@
       </a>
     </div>
 
-    <!-- 2. KUIS GERAK KAMERA (AI POSE) -->
+    <!-- 3. KUIS GERAK KAMERA (AI POSE) -->
     <div class="modul-item glass-card rounded-3xl p-6 flex flex-col" data-cat="lab">
       <div class="flex justify-between items-start mb-3">
         <div class="text-4xl">🏃‍♂️</div>
@@ -148,7 +163,7 @@
       </a>
     </div>
 
-    <!-- 3. CATUR MABAR ONLINE & AI -->
+    <!-- 4. CATUR MABAR ONLINE & AI -->
     <div class="modul-item glass-card rounded-3xl p-6 flex flex-col" data-cat="lab">
       <div class="flex justify-between items-start mb-3">
         <div class="text-4xl">♟️</div>
@@ -163,7 +178,7 @@
       </a>
     </div>
 
-    <!-- 4. DUEL PINTAR AI (MATEMATIKA & B. INGGRIS) -->
+    <!-- 5. DUEL PINTAR AI (MATEMATIKA & B. INGGRIS) -->
     <div class="modul-item glass-card rounded-3xl p-6 flex flex-col" data-cat="lab">
       <div class="flex justify-between items-start mb-3">
         <div class="text-4xl">⚡</div>
@@ -178,7 +193,7 @@
       </a>
     </div>
 
-    <!-- 5. DETEKTIF SANDI RAHASIA (KRIPTOGRAFI) -->
+    <!-- 6. DETEKTIF SANDI RAHASIA (KRIPTOGRAFI) -->
     <div class="modul-item glass-card rounded-3xl p-6 flex flex-col" data-cat="lab">
       <div class="flex justify-between items-start mb-3">
         <div class="text-4xl">🔐</div>
@@ -193,7 +208,7 @@
       </a>
     </div>
 
-    <!-- 6. FLAPPY ASTRONOT AI (MOTION POSE) -->
+    <!-- 7. FLAPPY ASTRONOT AI (MOTION POSE) -->
     <div class="modul-item glass-card rounded-3xl p-6 flex flex-col" data-cat="lab">
       <div class="flex justify-between items-start mb-3">
         <div class="text-4xl">🧑‍🚀</div>
@@ -208,7 +223,7 @@
       </a>
     </div>
 
-    <!-- 7. TEBAS BALON LASER AI (HAND TRACKER) -->
+    <!-- 8. TEBAS BALON LASER AI (HAND TRACKER) -->
     <div class="modul-item glass-card rounded-3xl p-6 flex flex-col" data-cat="lab">
       <div class="flex justify-between items-start mb-3">
         <div class="text-4xl">🎈</div>
@@ -223,7 +238,7 @@
       </a>
     </div>
 
-    <!-- 8. GALERI KARYA SISWA -->
+    <!-- 9. GALERI KARYA SISWA -->
     <div class="modul-item glass-card rounded-3xl p-6 flex flex-col" data-cat="lab">
       <div class="flex justify-between items-start mb-3">
         <div class="text-4xl">🎨</div>
@@ -238,7 +253,7 @@
       </a>
     </div>
 
-    <!-- 9. PAPAN PRESTASI SISWA -->
+    <!-- 10. PAPAN PRESTASI SISWA -->
     <div class="modul-item glass-card rounded-3xl p-6 flex flex-col" data-cat="prestasi">
       <div class="flex justify-between items-start mb-3">
         <div class="text-4xl">🏆</div>
@@ -253,7 +268,7 @@
       </a>
     </div>
 
-    <!-- 10. RUANG MATERI & REFLEKSI -->
+    <!-- 11. RUANG MATERI & REFLEKSI -->
     <div class="modul-item glass-card rounded-3xl p-6 flex flex-col" data-cat="lab">
       <div class="flex justify-between items-start mb-3">
         <div class="text-4xl">📚</div>
@@ -268,7 +283,7 @@
       </a>
     </div>
 
-    <!-- 11. ARENA CCA ALKITAB -->
+    <!-- 12. ARENA CCA ALKITAB -->
     <div class="modul-item glass-card rounded-3xl p-6 flex flex-col" data-cat="lab">
       <div class="flex justify-between items-start mb-3">
         <div class="text-4xl">📖</div>
@@ -283,7 +298,7 @@
       </a>
     </div>
 
-    <!-- 12. DETEKTIF SAMPAH -->
+    <!-- 13. DETEKTIF SAMPAH -->
     <div class="modul-item glass-card rounded-3xl p-6 flex flex-col" data-cat="lab">
       <div class="flex justify-between items-start mb-3">
         <div class="text-4xl">♻️</div>
@@ -298,7 +313,7 @@
       </a>
     </div>
 
-    <!-- 13. GAME SIAGA BENCANA -->
+    <!-- 14. GAME SIAGA BENCANA -->
     <div class="modul-item glass-card rounded-3xl p-6 flex flex-col" data-cat="lab">
       <div class="flex justify-between items-start mb-3">
         <div class="text-4xl">🌋</div>
@@ -313,7 +328,7 @@
       </a>
     </div>
 
-    <!-- 14. MISI ROVER & KRIPTO -->
+    <!-- 15. MISI ROVER & KRIPTO -->
     <div class="modul-item glass-card rounded-3xl p-6 flex flex-col" data-cat="lab">
       <div class="flex justify-between items-start mb-3">
         <div class="text-4xl">🤖</div>
@@ -328,7 +343,7 @@
       </a>
     </div>
 
-    <!-- 15. SUARA KITA (LAYANAN ASPIRASI) -->
+    <!-- 16. SUARA KITA (LAYANAN ASPIRASI) -->
     <div class="modul-item glass-card rounded-3xl p-6 flex flex-col" data-cat="wali">
       <div class="flex justify-between items-start mb-3">
         <div class="text-4xl">📬</div>
@@ -343,7 +358,7 @@
       </a>
     </div>
 
-    <!-- 16. PORTAL ASESMEN STS -->
+    <!-- 17. PORTAL ASESMEN STS -->
     <div class="modul-item glass-card rounded-3xl p-6 flex flex-col" data-cat="wali">
       <div class="flex justify-between items-start mb-3">
         <div class="text-4xl">📝</div>
@@ -379,9 +394,9 @@
 
   <!-- SCRIPT FILTER KATEGORI -->
   <script>
-    function setKategori(kat) {
+    function setKategori(kat, btnEl) {
       document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('tab-active'));
-      event.target.classList.add('tab-active');
+      if (btnEl) btnEl.classList.add('tab-active');
 
       const items = document.querySelectorAll('.modul-item');
       items.forEach(item => {
