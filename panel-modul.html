@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kelola Modul NalarSci Lab — Panel GitHub Visual</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: radial-gradient(circle at 50% 0%, #1e293b 0%, #0b0f19 75%);
+      color: #f8fafc;
+      min-height: 100vh;
+    }
+    .font-title { font-family: 'Fredoka', sans-serif; }
+  </style>
+</head>
+<body class="p-4 md:p-8 max-w-5xl mx-auto">
+
+  <!-- HEADER -->
+  <header class="flex flex-wrap justify-between items-center gap-4 bg-slate-900/90 border border-slate-800 p-4 rounded-2xl mb-6 backdrop-blur-md">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl bg-sky-500/20 border border-sky-400/30 flex items-center justify-center text-xl">⚙️</div>
+      <div>
+        <h1 class="font-title text-lg text-white">Kelola Modul <span class="text-sky-400">NalarSci Lab</span></h1>
+        <p class="text-[11px] text-slate-400">Tambah, Edit, Urutkan & Publish Otomatis ke GitHub</p>
+      </div>
+    </div>
+    <div class="flex items-center gap-2">
+      <a href="index.html" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold px-3.5 py-2 rounded-xl border border-slate-700 transition">
+        ← Kembali ke Beranda
+      </a>
+      <button onclick="logoutGitHub()" id="btnLogout" class="hidden bg-rose-600/20 hover:bg-rose-600 text-rose-300 hover:text-white text-xs font-bold px-3.5 py-2 rounded-xl border border-rose-500/30 transition">
+        Hapus Token
+      </button>
+    </div>
+  </header>
+
+  <!-- ================= LAYAR 1: KONEKSI TOKEN GITHUB ================= -->
+  <section id="loginBox" class="max-w-lg mx-auto bg-slate-900/90 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-5 shadow-2xl">
+    <div class="text-center space-y-1.5">
+      <div class="w-14 h-14 mx-auto rounded-2xl bg-sky-500/15 border border-sky-400/30 flex items-center justify-center text-2xl">🔐</div>
+      <h2 class="font-title text-xl text-white">Hubungkan ke Repositori GitHub</h2>
+      <p class="text-xs text-slate-400 leading-relaxed">
+        Cukup masukkan detail repo dan <b>GitHub Personal Access Token</b> sekali saja (tersimpan aman di browser ini). Selanjutnya setiap perubahan langsung otomatis ter-publish ke website!
+      </p>
+    </div>
+
+    <div class="space-y-3 text-xs">
+      <div class="grid grid-cols-2 gap-2.5">
+        <div>
+          <label class="block text-slate-400 font-bold mb-1">Username GitHub</label>
+          <input type="text" id="ghOwner" placeholder="misal: thomryantama" class="w-full bg-slate-950 border border-slate-700 focus:border-sky-400 rounded-xl px-3.5 py-2.5 text-white outline-none">
+        </div>
+        <div>
+          <label class="block text-slate-400 font-bold mb-1">Nama Repositori</label>
+          <input type="text" id="ghRepo" placeholder="misal: nalarsci" class="w-full bg-slate-950 border border-slate-700 focus:border-sky-400 rounded-xl px-3.5 py-2.5 text-white outline-none">
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-2.5">
+        <div>
+          <label class="block text-slate-400 font-bold mb-1">Branch</label>
+          <input type="text" id="ghBranch" value="main" class="w-full bg-slate-950 border border-slate-700 focus:border-sky-400 rounded-xl px-3.5 py-2.5 text-white outline-none">
+        </div>
+        <div>
+          <label class="block text-slate-400 font-bold mb-1">File Target</label>
+          <input type="text" id="ghPath" value="modules.json" class="w-full bg-slate-950 border border-slate-700 focus:border-sky-400 rounded-xl px-3.5 py-2.5 text-white outline-none">
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-slate-400 font-bold mb-1">GitHub Personal Access Token</label>
+        <input type="password" id="ghToken" placeholder="github_pat_... atau ghp_..." class="w-full bg-slate-950 border border-slate-700 focus:border-sky-400 rounded-xl px-3.5 py-2.5 text-white outline-none">
+        <p class="text-[11px] text-slate-500 mt-1">Izin yang dibutuhkan hanya <b>Contents: Read & Write</b> pada repo NalarSci.</p>
+      </div>
+
+      <button onclick="hubungkanGitHub()" id="btnConnect" class="w-full py-3 bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white font-title text-sm font-bold rounded-xl shadow-lg transition">
+        🚀 Masuk & Muat Data Modul
+      </button>
+    </div>
+  </section>
+
+  <!-- ================= LAYAR 2: EDITOR VISUAL MODUL ================= -->
+  <section id="dashboardBox" class="hidden space-y-6">
+
+    <!-- Status Bar & Tombol Publish -->
+    <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 flex flex-wrap items-center justify-between gap-3">
+      <div class="text-xs">
+        <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 mr-1.5"></span>
+        <span class="text-slate-300 font-bold" id="repoLabel">Terhubung</span>
+        <span class="text-slate-500 ml-2" id="unsavedBadge"></span>
+      </div>
+      <div class="flex flex-wrap items-center gap-2">
+        <button onclick="bukaFormModul()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-4 py-2 rounded-xl transition flex items-center gap-1.5">
+          ➕ Tambah Aplikasi Baru
+        </button>
+        <button onclick="simpanKeGitHub()" id="btnPublish" class="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-title text-xs font-bold px-5 py-2 rounded-xl shadow-md transition flex items-center gap-1.5">
+          ☁️ Simpan & Publish ke Web
+        </button>
+      </div>
+    </div>
+
+    <!-- Daftar Modul Aktif -->
+    <div class="bg-slate-900/80 border border-slate-800 rounded-3xl overflow-hidden">
+      <div class="p-4 border-b border-slate-800 flex justify-between items-center">
+        <h2 class="font-title text-base text-white">Daftar Aplikasi di Beranda (<span id="totalCount">0</span>)</h2>
+        <span class="text-[11px] text-slate-400">Gunakan panah ▲▼ untuk mengatur urutan tampilan</span>
+      </div>
+      <div id="listModulAdmin" class="divide-y divide-slate-800/80"></div>
+    </div>
+
+  </section>
+
+  <!-- MODAL TAMBAH / EDIT MODUL -->
+  <div id="modalForm" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-700 rounded-3xl max-w-lg w-full p-6 space-y-4 shadow-2xl max-h-[90vh] overflow-y-auto">
+      <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+        <h3 class="font-title text-lg text-white" id="modalTitle">Tambah Aplikasi Baru</h3>
+        <button onclick="tutupFormModul()" class="text-slate-400 hover:text-white font-bold">✕</button>
+      </div>
+
+      <input type="hidden" id="editIndex" value="-1">
+
+      <div class="space-y-3 text-xs">
+        <div>
+          <label class="block text-slate-400 font-bold mb-1">Judul Aplikasi / Modul</label>
+          <input type="text" id="fTitle" placeholder="Contoh: Latihan Tantangan Bebras" class="w-full bg-slate-950 border border-slate-700 focus:border-sky-400 rounded-xl px-3.5 py-2.5 text-white outline-none">
+        </div>
+
+        <div class="grid grid-cols-2 gap-2.5">
+          <div>
+            <label class="block text-slate-400 font-bold mb-1">Link URL / Nama File</label>
+            <input type="text" id="fUrl" placeholder="Contoh: latihan-bebras.html" class="w-full bg-slate-950 border border-slate-700 focus:border-sky-400 rounded-xl px-3.5 py-2.5 text-white outline-none">
+          </div>
+          <div>
+            <label class="block text-slate-400 font-bold mb-1">Label Kecil (Badge)</label>
+            <input type="text" id="fBadge" placeholder="Contoh: CT & Bebras SD" class="w-full bg-slate-950 border border-slate-700 focus:border-sky-400 rounded-xl px-3.5 py-2.5 text-white outline-none">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2.5">
+          <div>
+            <label class="block text-slate-400 font-bold mb-1">Emoji Ikon</label>
+            <input type="text" id="fIcon" value="🚀" class="w-full bg-slate-950 border border-slate-700 focus:border-sky-400 rounded-xl px-3.5 py-2.5 text-white outline-none">
+          </div>
+          <div>
+            <label class="block text-slate-400 font-bold mb-1">Warna Tema Ikon</label>
+            <select id="fTheme" class="w-full bg-slate-950 border border-slate-700 focus:border-sky-400 rounded-xl px-3.5 py-2.5 text-white outline-none">
+              <option value="orange">Oranye (Orange)</option>
+              <option value="amber">Kuning Emas (Amber)</option>
+              <option value="sky">Biru Langit (Sky)</option>
+              <option value="emerald">Hijau (Emerald)</option>
+              <option value="indigo">Indigo</option>
+              <option value="purple">Ungu (Purple)</option>
+              <option value="teal">Toska (Teal)</option>
+              <option value="cyan">Cyan</option>
+              <option value="rose">Merah Muda (Rose)</option>
+              <option value="blue">Biru Tua (Blue)</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-slate-400 font-bold mb-1">Kategori Tab</label>
+          <div class="flex flex-wrap gap-3 bg-slate-950 border border-slate-800 p-2.5 rounded-xl">
+            <label class="inline-flex items-center gap-1.5 cursor-pointer"><input type="checkbox" class="fCat accent-sky-500" value="lab" checked> Lab & Game</label>
+            <label class="inline-flex items-center gap-1.5 cursor-pointer"><input type="checkbox" class="fCat accent-sky-500" value="literasi"> Literasi</label>
+            <label class="inline-flex items-center gap-1.5 cursor-pointer"><input type="checkbox" class="fCat accent-sky-500" value="prestasi"> Prestasi</label>
+            <label class="inline-flex items-center gap-1.5 cursor-pointer"><input type="checkbox" class="fCat accent-sky-500" value="wali"> Layanan</label>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-slate-400 font-bold mb-1">Deskripsi Singkat</label>
+          <textarea id="fDesc" rows="2" placeholder="Penjelasan singkat tentang modul ini..." class="w-full bg-slate-950 border border-slate-700 focus:border-sky-400 rounded-xl px-3.5 py-2 text-white outline-none"></textarea>
+        </div>
+
+        <div class="flex items-center justify-between bg-slate-950 border border-slate-800 p-3 rounded-xl">
+          <label class="inline-flex items-center gap-2 cursor-pointer font-bold text-amber-300">
+            <input type="checkbox" id="fFeatured" class="accent-amber-500"> ⭐ Jadikan Program Unggulan (Atas)
+          </label>
+          <label class="inline-flex items-center gap-2 cursor-pointer font-bold text-emerald-300">
+            <input type="checkbox" id="fActive" checked class="accent-emerald-500"> 👁️ Tampilkan di Web
+          </label>
+        </div>
+      </div>
+
+      <div class="flex justify-end gap-2 pt-2">
+        <button onclick="tutupFormModul()" class="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 text-xs font-bold">Batal</button>
+        <button onclick="simpanItemLokal()" class="px-5 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-title text-xs font-bold">Terapkan Perubahan</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let modulesData = [];
+    let currentFileSha = "";
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const saved = JSON.parse(localStorage.getItem('nalarsci_gh_cfg') || 'null');
+      if (saved && saved.token) {
+        document.getElementById('ghOwner').value = saved.owner;
+        document.getElementById('ghRepo').value = saved.repo;
+        document.getElementById('ghBranch').value = saved.branch || 'main';
+        document.getElementById('ghPath').value = saved.path || 'modules.json';
+        document.getElementById('ghToken').value = saved.token;
+        hubungkanGitHub();
+      }
+    });
+
+    function getCfg() {
+      return {
+        owner: document.getElementById('ghOwner').value.trim(),
+        repo: document.getElementById('ghRepo').value.trim(),
+        branch: document.getElementById('ghBranch').value.trim() || 'main',
+        path: document.getElementById('ghPath').value.trim() || 'modules.json',
+        token: document.getElementById('ghToken').value.trim()
+      };
+    }
+
+    async function hubungkanGitHub() {
+      const cfg = getCfg();
+      if (!cfg.owner || !cfg.repo || !cfg.token) {
+        alert("Mohon lengkapi Username GitHub, Nama Repo, dan Token.");
+        return;
+      }
+
+      const btn = document.getElementById('btnConnect');
+      btn.innerText = "⏳ Menghubungkan ke GitHub...";
+      btn.disabled = true;
+
+      try {
+        const url = `https://api.github.com/repos/${cfg.owner}/${cfg.repo}/contents/${cfg.path}?ref=${cfg.branch}&t=${Date.now()}`;
+        const res = await fetch(url, {
+          headers: {
+            "Authorization": `Bearer ${cfg.token}`,
+            "Accept": "application/vnd.github+json"
+          }
+        });
+
+        if (!res.ok) {
+          throw new Error(`Gagal mengakses repo (${res.status}). Pastikan nama repo, branch, file modules.json, dan token sudah benar.`);
+        }
+
+        const data = await res.json();
+        currentFileSha = data.sha;
+        const decoded = decodeURIComponent(escape(atob(data.content.replace(/\n/g, ''))));
+        modulesData = JSON.parse(decoded);
+
+        localStorage.setItem('nalarsci_gh_cfg', JSON.stringify(cfg));
+
+        document.getElementById('loginBox').classList.add('hidden');
+        document.getElementById('dashboardBox').classList.remove('hidden');
+        document.getElementById('btnLogout').classList.remove('hidden');
+        document.getElementById('repoLabel').innerText = `${cfg.owner}/${cfg.repo} (${cfg.branch})`;
+
+        renderAdminList();
+      } catch (err) {
+        alert(err.message);
+      } finally {
+        btn.innerText = "🚀 Masuk & Muat Data Modul";
+        btn.disabled = false;
+      }
+    }
+
+    function logoutGitHub() {
+      if (confirm("Hapus token GitHub tersimpan dari browser ini?")) {
+        localStorage.removeItem('nalarsci_gh_cfg');
+        location.reload();
+      }
+    }
+
+    function tandaiBelumSimpan() {
+      document.getElementById('unsavedBadge').innerHTML = `<span class="bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded-md font-bold">● Ada perubahan belum di-publish</span>`;
+    }
+
+    function renderAdminList() {
+      const container = document.getElementById('listModulAdmin');
+      document.getElementById('totalCount').innerText = modulesData.length;
+
+      container.innerHTML = modulesData.map((m, idx) => `
+        <div class="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-white/[0.02] transition ${m.active === false ? 'opacity-50' : ''}">
+          <div class="flex items-center gap-3 min-w-0">
+            <div class="w-11 h-11 rounded-xl bg-slate-800 flex items-center justify-center text-2xl shrink-0">${m.icon || '📌'}</div>
+            <div class="min-w-0">
+              <div class="flex flex-wrap items-center gap-1.5">
+                <h4 class="font-title text-sm text-white truncate">${m.title}</h4>
+                ${m.featured ? '<span class="text-[9px] bg-amber-500/20 text-amber-300 px-1.5 py-0.5 rounded font-bold">⭐ Unggulan</span>' : ''}
+                ${m.active === false ? '<span class="text-[9px] bg-rose-500/20 text-rose-300 px-1.5 py-0.5 rounded font-bold">Disembunyikan</span>' : ''}
+              </div>
+              <p class="text-[11px] text-slate-400 truncate">${m.url} • <span class="text-sky-400">${m.badge || ''}</span></p>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-1.5 self-end sm:self-center shrink-0">
+            <button onclick="geserUrutan(${idx}, -1)" ${idx === 0 ? 'disabled' : ''} class="px-2 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 disabled:opacity-30 text-xs" title="Naikkan urutan">▲</button>
+            <button onclick="geserUrutan(${idx}, 1)" ${idx === modulesData.length - 1 ? 'disabled' : ''} class="px-2 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 disabled:opacity-30 text-xs" title="Turunkan urutan">▼</button>
+            <button onclick="toggleAktif(${idx})" class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-bold">
+              ${m.active === false ? '👁️ Tampilkan' : '🙈 Sembunyikan'}
+            </button>
+            <button onclick="bukaFormModul(${idx})" class="px-2.5 py-1.5 rounded-lg bg-sky-600/20 hover:bg-sky-600 text-sky-300 hover:text-white text-xs font-bold">✏️ Edit</button>
+            <button onclick="hapusModul(${idx})" class="px-2.5 py-1.5 rounded-lg bg-rose-600/20 hover:bg-rose-600 text-rose-300 hover:text-white text-xs font-bold">🗑️</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function geserUrutan(idx, arah) {
+      const target = idx + arah;
+      if (target < 0 || target >= modulesData.length) return;
+      [modulesData[idx], modulesData[target]] = [modulesData[target], modulesData[idx]];
+      tandaiBelumSimpan();
+      renderAdminList();
+    }
+
+    function toggleAktif(idx) {
+      modulesData[idx].active = (modulesData[idx].active === false) ? true : false;
+      tandaiBelumSimpan();
+      renderAdminList();
+    }
+
+    function hapusModul(idx) {
+      if (confirm(`Hapus "${modulesData[idx].title}" dari daftar beranda?`)) {
+        modulesData.splice(idx, 1);
+        tandaiBelumSimpan();
+        renderAdminList();
+      }
+    }
+
+    function bukaFormModul(idx = -1) {
+      document.getElementById('editIndex').value = idx;
+      document.getElementById('modalForm').classList.remove('hidden');
+
+      if (idx >= 0) {
+        const m = modulesData[idx];
+        document.getElementById('modalTitle').innerText = "Edit Aplikasi";
+        document.getElementById('fTitle').value = m.title;
+        document.getElementById('fUrl').value = m.url;
+        document.getElementById('fBadge').value = m.badge || "";
+        document.getElementById('fIcon').value = m.icon || "🚀";
+        document.getElementById('fTheme').value = m.theme || "sky";
+        document.getElementById('fDesc').value = m.description || "";
+        document.getElementById('fFeatured').checked = !!m.featured;
+        document.getElementById('fActive').checked = (m.active !== false);
+        document.querySelectorAll('.fCat').forEach(cb => {
+          cb.checked = Array.isArray(m.categories) && m.categories.includes(cb.value);
+        });
+      } else {
+        document.getElementById('modalTitle').innerText = "Tambah Aplikasi Baru";
+        document.getElementById('fTitle').value = "";
+        document.getElementById('fUrl').value = "";
+        document.getElementById('fBadge').value = "";
+        document.getElementById('fIcon').value = "🚀";
+        document.getElementById('fTheme').value = "sky";
+        document.getElementById('fDesc').value = "";
+        document.getElementById('fFeatured').checked = false;
+        document.getElementById('fActive').checked = true;
+        document.querySelectorAll('.fCat').forEach(cb => cb.checked = (cb.value === 'lab'));
+      }
+    }
+
+    function tutupFormModul() {
+      document.getElementById('modalForm').classList.add('hidden');
+    }
+
+    function simpanItemLokal() {
+      const title = document.getElementById('fTitle').value.trim();
+      const url = document.getElementById('fUrl').value.trim();
+      if (!title || !url) {
+        alert("Judul dan Link URL wajib diisi!");
+        return;
+      }
+
+      const cats = Array.from(document.querySelectorAll('.fCat:checked')).map(cb => cb.value);
+      const id = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+      const itemObj = {
+        id: id || `app-${Date.now()}`,
+        title: title,
+        description: document.getElementById('fDesc').value.trim() || "Modul pembelajaran interaktif NalarSci Lab.",
+        url: url,
+        icon: document.getElementById('fIcon').value.trim() || "🚀",
+        badge: document.getElementById('fBadge').value.trim() || "Modul",
+        categories: cats.length ? cats : ["lab"],
+        theme: document.getElementById('fTheme').value,
+        featured: document.getElementById('fFeatured').checked,
+        active: document.getElementById('fActive').checked
+      };
+
+      const idx = parseInt(document.getElementById('editIndex').value, 10);
+      if (idx >= 0) modulesData[idx] = itemObj;
+      else modulesData.unshift(itemObj);
+
+      tutupFormModul();
+      tandaiBelumSimpan();
+      renderAdminList();
+    }
+
+    async function simpanKeGitHub() {
+      const cfg = getCfg();
+      const btn = document.getElementById('btnPublish');
+      btn.innerText = "⏳ Menyimpan ke GitHub...";
+      btn.disabled = true;
+
+      try {
+        const jsonStr = JSON.stringify(modulesData, null, 2);
+        const encodedContent = btoa(unescape(encodeURIComponent(jsonStr)));
+
+        const url = `https://api.github.com/repos/${cfg.owner}/${cfg.repo}/contents/${cfg.path}`;
+        const res = await fetch(url, {
+          method: "PUT",
+          headers: {
+            "Authorization": `Bearer ${cfg.token}`,
+            "Accept": "application/vnd.github+json",
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            message: "Update daftar aplikasi NalarSci Lab via Panel Modul",
+            content: encodedContent,
+            sha: currentFileSha,
+            branch: cfg.branch
+          })
+        });
+
+        if (!res.ok) {
+          const errData = await res.json();
+          throw new Error(errData.message || `Gagal menyimpan (${res.status})`);
+        }
+
+        const result = await res.json();
+        currentFileSha = result.content.sha;
+        document.getElementById('unsavedBadge').innerHTML = `<span class="text-emerald-400 font-bold">✓ Berhasil dipublikasikan!</span>`;
+        alert("✅ Berhasil! Daftar modul baru sudah tersimpan ke GitHub dan langsung tampil di beranda NalarSci Lab.");
+      } catch (err) {
+        alert("Gagal menyimpan ke GitHub: " + err.message);
+      } finally {
+        btn.innerText = "☁️ Simpan & Publish ke Web";
+        btn.disabled = false;
+      }
+    }
+  </script>
+</body>
+</html>

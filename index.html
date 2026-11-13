@@ -31,17 +31,17 @@
       min-height: 100vh;
     }
     .font-title { font-family: 'Fredoka', sans-serif; }
-    .glass-card {
-      background: rgba(255, 255, 255, 0.04);
+    .app-tile {
+      transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .app-tile:hover {
+      transform: translateY(-4px) scale(1.02);
+    }
+    .glass-panel {
+      background: rgba(255, 255, 255, 0.035);
       backdrop-filter: blur(14px);
       -webkit-backdrop-filter: blur(14px);
       border: 1px solid rgba(255, 255, 255, 0.08);
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    .glass-card:hover {
-      transform: translateY(-5px);
-      border-color: rgba(56, 189, 248, 0.4);
-      box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.6);
     }
     .tab-active {
       background: #0284c7 !important;
@@ -62,8 +62,8 @@
 <body class="p-4 md:p-8 flex flex-col justify-between max-w-6xl mx-auto min-h-screen">
 
   <!-- NAVBAR ATAS -->
-  <header class="mb-8">
-    <nav class="flex flex-wrap justify-between items-center gap-4 bg-slate-900/80 border border-slate-800 p-4 rounded-2xl mb-8 backdrop-blur-md">
+  <header class="mb-6">
+    <nav class="flex flex-wrap justify-between items-center gap-4 bg-slate-900/80 border border-slate-800 p-4 rounded-2xl mb-6 backdrop-blur-md">
       <div class="flex items-center gap-3">
         <div class="relative flex items-center justify-center w-11 h-11 rounded-2xl bg-white p-1 border-2 border-sky-400 shadow-[0_0_15px_rgba(56,189,248,0.35)] flex-shrink-0">
           <img src="icon-192.png" alt="Logo NalarSci Lab" class="w-full h-full object-contain" onerror="this.src='icon-152.png'">
@@ -84,299 +84,74 @@
       </div>
     </nav>
 
-    <!-- BANNER HERO -->
-    <div class="text-center max-w-2xl mx-auto mb-8">
-      <div class="inline-flex items-center gap-2 bg-sky-500/10 border border-sky-400/20 text-sky-400 px-3.5 py-1 rounded-full text-xs font-black uppercase tracking-wider mb-3">
-        Wadah Eksplorasi Digital & Karakter Siswa
-      </div>
-      <h2 class="font-title text-3xl sm:text-4xl text-white mb-2">Pusat Layanan & Pembelajaran Interaktif</h2>
+    <!-- HERO COMPACT & PENCARIAN -->
+    <div class="text-center max-w-2xl mx-auto mb-5">
+      <h2 class="font-title text-2xl sm:text-3xl text-white mb-1.5">Pusat Layanan & Pembelajaran Interaktif</h2>
       <p class="text-slate-400 text-xs sm:text-sm">
-        Jelajahi laboratorium komputasi, pameran hasil karya siswa, catatan prestasi juara, arena duel catur, game gerak kamera, dan fasilitas belajar digital.
+        Pilih aplikasi pembelajaran, arena kompetisi, literasi karakter, atau layanan sekolah di bawah ini.
       </p>
     </div>
 
-    <!-- TAB FILTER KATEGORI -->
-    <div class="flex flex-wrap justify-center gap-2" id="kategori-bar">
-      <button onclick="setKategori('semua', this)" class="tab-btn tab-active px-4 py-2 rounded-xl bg-slate-800 border border-slate-700 text-xs font-bold text-slate-300 transition">
-        🌟 Semua Modul
-      </button>
-      <button onclick="setKategori('lab', this)" class="tab-btn px-4 py-2 rounded-xl bg-slate-800 border border-slate-700 text-xs font-bold text-slate-300 hover:bg-slate-700 transition">
-        🎮 Lab Sains & KKA
-      </button>
-      <button onclick="setKategori('literasi', this)" class="tab-btn px-4 py-2 rounded-xl bg-slate-800 border border-slate-700 text-xs font-bold text-slate-300 hover:bg-slate-700 transition">
-        📖 Literasi & Karakter
-      </button>
-      <button onclick="setKategori('prestasi', this)" class="tab-btn px-4 py-2 rounded-xl bg-slate-800 border border-slate-700 text-xs font-bold text-slate-300 hover:bg-slate-700 transition">
-        🏆 Papan Prestasi
-      </button>
-      <button onclick="setKategori('wali', this)" class="tab-btn px-4 py-2 rounded-xl bg-slate-800 border border-slate-700 text-xs font-bold text-slate-300 hover:bg-slate-700 transition">
-        💳 Layanan & Wali Murid
-      </button>
+    <!-- KOTAK PENCARIAN & FILTER -->
+    <div class="flex flex-col sm:flex-row items-center justify-center gap-3 mb-5">
+      <div class="relative w-full sm:w-80">
+        <input type="text" id="searchModul" oninput="renderLauncher()" placeholder="🔍 Ketik nama aplikasi / materi..." class="w-full bg-slate-900/90 border border-slate-700 focus:border-sky-400 rounded-xl px-4 py-2 text-xs text-white placeholder-slate-500 outline-none transition">
+      </div>
+
+      <div class="flex flex-wrap justify-center gap-1.5" id="kategori-bar">
+        <button onclick="setKategori('semua', this)" class="tab-btn tab-active px-3 py-1.5 rounded-xl bg-slate-800 border border-slate-700 text-[11px] font-bold text-slate-300 transition">
+          🌟 Semua
+        </button>
+        <button onclick="setKategori('lab', this)" class="tab-btn px-3 py-1.5 rounded-xl bg-slate-800 border border-slate-700 text-[11px] font-bold text-slate-300 hover:bg-slate-700 transition">
+          🎮 Lab & Game
+        </button>
+        <button onclick="setKategori('literasi', this)" class="tab-btn px-3 py-1.5 rounded-xl bg-slate-800 border border-slate-700 text-[11px] font-bold text-slate-300 hover:bg-slate-700 transition">
+          📖 Literasi
+        </button>
+        <button onclick="setKategori('prestasi', this)" class="tab-btn px-3 py-1.5 rounded-xl bg-slate-800 border border-slate-700 text-[11px] font-bold text-slate-300 hover:bg-slate-700 transition">
+          🏆 Prestasi
+        </button>
+        <button onclick="setKategori('wali', this)" class="tab-btn px-3 py-1.5 rounded-xl bg-slate-800 border border-slate-700 text-[11px] font-bold text-slate-300 hover:bg-slate-700 transition">
+          💳 Layanan
+        </button>
+      </div>
     </div>
   </header>
 
-  <!-- GRID DAFTAR MODUL UTAMA -->
-  <main class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 flex-grow mb-12" id="modul-grid">
+  <!-- ================= KONTEN UTAMA: APP LAUNCHER DOCK ================= -->
+  <main class="flex-grow space-y-8 mb-12">
 
-    <!-- 1. MODUL: TANTANGAN BEBRAS SD (ARENA LATIHAN CT) -->
-    <div class="modul-item glass-card rounded-3xl p-6 flex flex-col border border-orange-500/35 bg-gradient-to-br from-orange-500/10 via-amber-500/5 to-transparent" data-cat="lab">
-      <div class="flex justify-between items-start mb-3">
-        <div class="text-4xl">🦫</div>
-        <span class="bg-orange-500/20 text-orange-300 border border-orange-400/30 text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full">CT & Bebras SD</span>
+    <!-- 1. PROGRAM UNGGULAN (PINNED SPOTLIGHT) -->
+    <section id="sectionFeatured" class="space-y-2.5">
+      <div class="flex items-center justify-between px-1">
+        <h3 class="font-title text-xs uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
+          <span>⭐</span> Program Unggulan Minggu Ini
+        </h3>
+        <span class="text-[11px] text-slate-500" id="countTotalApp">Memuat...</span>
       </div>
-      <h3 class="font-title text-xl text-orange-300 mb-1">Latihan Tantangan Bebras</h3>
-      <p class="text-xs text-slate-300 leading-relaxed mb-4 flex-grow">
-        Arena latihan Computational Thinking standar Bebras Indonesia (24 soal SiKecil & Siaga termasuk tantangan HOTS) lengkap dengan timer, sistem penalti, dan pembahasan logis.
-      </p>
-      <a href="/latihan-bebras" class="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-title text-xs py-2.5 rounded-xl text-center font-bold transition shadow-md flex items-center justify-center gap-1.5">
-        🧠 Mulai Latihan Bebras
-      </a>
-    </div>
+      <div id="featured-grid" class="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+        <!-- Diisi otomatis dari modules.json -->
+      </div>
+    </section>
 
-    <!-- 2. MODUL: BUKU PEMBIASAAN KARAKTER (MASUK KE /karakter/index.html) -->
-    <div class="modul-item glass-card rounded-3xl p-6 flex flex-col border border-amber-500/30 bg-gradient-to-br from-amber-500/10 via-transparent to-transparent" data-cat="literasi wali">
-      <div class="flex justify-between items-start mb-3">
-        <div class="text-4xl">📖</div>
-        <span class="bg-amber-500/20 text-amber-300 border border-amber-400/30 text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full">12 Jenjang Kelas</span>
+    <!-- 2. DIREKTORI APLIKASI (ICON LAUNCHER GRID PADAT) -->
+    <section class="space-y-3">
+      <div class="flex items-center justify-between px-1">
+        <h3 class="font-title text-xs uppercase tracking-wider text-sky-400 flex items-center gap-1.5">
+          <span>📱</span> Direktori Aplikasi & Modul Belajar
+        </h3>
+        <span class="text-[11px] text-slate-500 hidden sm:inline">Arahkan kursor untuk melihat deskripsi singkat</span>
       </div>
-      <h3 class="font-title text-xl text-amber-300 mb-1">Buku Pembiasaan Karakter</h3>
-      <p class="text-xs text-slate-300 leading-relaxed mb-4 flex-grow">
-        Rak buku digital panduan harian wali kelas (Fase A, B, & C / Kelas 1–6 Semester 1 & 2). Baca lembar per lembar langsung di Smart TV kelas atau ponsel.
-      </p>
-      <a href="karakter/index.html" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-title text-xs py-2.5 rounded-xl text-center font-bold transition shadow-md flex items-center justify-center gap-1.5">
-        📚 Buka Rak Buku (12 Kelas)
-      </a>
-    </div>
 
-    <!-- 3. KUIS GERAK KAMERA (AI POSE) -->
-    <div class="modul-item glass-card rounded-3xl p-6 flex flex-col" data-cat="lab">
-      <div class="flex justify-between items-start mb-3">
-        <div class="text-4xl">🏃‍♂️</div>
-        <span class="bg-amber-500/20 text-amber-300 border border-amber-400/30 text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full">AI Motion</span>
+      <div id="launcher-grid" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-3 sm:gap-4">
+        <div class="col-span-full text-center py-10 text-slate-400 text-xs">Memuat direktori aplikasi...</div>
       </div>
-      <h3 class="font-title text-xl text-amber-300 mb-1">Kuis Gerak Kamera</h3>
-      <p class="text-xs text-slate-300 leading-relaxed mb-4 flex-grow">
-        Game interaktif seru berteknologi AI pose tracking! Jawab soal pengetahuan umum dengan melompat dan menggeser badan ke kiri atau kanan di depan webcam.
-      </p>
-      <a href="gerak.html" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-title text-xs py-2.5 rounded-xl text-center font-bold transition shadow-md flex items-center justify-center gap-1.5">
-        ⚡ Mainkan Game Gerak
-      </a>
-    </div>
-
-    <!-- 4. CATUR MABAR ONLINE & AI -->
-    <div class="modul-item glass-card rounded-3xl p-6 flex flex-col" data-cat="lab">
-      <div class="flex justify-between items-start mb-3">
-        <div class="text-4xl">♟️</div>
-        <span class="bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full">Strategi P2P</span>
-      </div>
-      <h3 class="font-title text-xl text-emerald-300 mb-1">Catur Mabar & AI</h3>
-      <p class="text-xs text-slate-300 leading-relaxed mb-4 flex-grow">
-        Arena duel catur klasik interaktif: mabar antar teman beda laptop secara online (P2P real-time), main 1 perangkat lokal, atau asah logika lawan bot AI.
-      </p>
-      <a href="catur.html" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-title text-xs py-2.5 rounded-xl text-center font-bold transition shadow-md flex items-center justify-center gap-1.5">
-        ⚔️ Buka Papan Catur
-      </a>
-    </div>
-
-    <!-- 5. DUEL PINTAR AI (MATEMATIKA & B. INGGRIS) -->
-    <div class="modul-item glass-card rounded-3xl p-6 flex flex-col" data-cat="lab">
-      <div class="flex justify-between items-start mb-3">
-        <div class="text-4xl">⚡</div>
-        <span class="bg-amber-500/20 text-amber-300 border border-amber-400/30 text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full">Duel AI 2P</span>
-      </div>
-      <h3 class="font-title text-xl text-amber-300 mb-1">Duel Pintar AI</h3>
-      <p class="text-xs text-slate-300 leading-relaxed mb-4 flex-grow">
-        Adu cepat 2 pemain di depan webcam! Angkat tangan menyentuh balon di udara untuk menjawab tantangan Matematika hitung cepat dan kosakata Bahasa Inggris.
-      </p>
-      <a href="game-duel-pintar.html" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-title text-xs py-2.5 rounded-xl text-center font-bold transition shadow-md flex items-center justify-center gap-1.5">
-        🤝 Mulai Duel 2 Pemain
-      </a>
-    </div>
-
-    <!-- 6. DETEKTIF SANDI RAHASIA (KRIPTOGRAFI) -->
-    <div class="modul-item glass-card rounded-3xl p-6 flex flex-col" data-cat="lab">
-      <div class="flex justify-between items-start mb-3">
-        <div class="text-4xl">🔐</div>
-        <span class="bg-indigo-500/20 text-indigo-300 border border-indigo-400/30 text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full">Kriptografi</span>
-      </div>
-      <h3 class="font-title text-xl text-indigo-300 mb-1">Detektif Sandi Rahasia</h3>
-      <p class="text-xs text-slate-300 leading-relaxed mb-4 flex-grow">
-        Asah logika dekripsi dan berpikir komputasional: pecahkan sandi rahasia, sandi biner komputer, dan sandi geser Caesar.
-      </p>
-      <a href="game-sandi.html" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-title text-xs py-2.5 rounded-xl text-center font-bold transition shadow-md flex items-center justify-center gap-1.5">
-        🔍 Pecahkan Sandi
-      </a>
-    </div>
-
-    <!-- 7. FLAPPY ASTRONOT AI (MOTION POSE) -->
-    <div class="modul-item glass-card rounded-3xl p-6 flex flex-col" data-cat="lab">
-      <div class="flex justify-between items-start mb-3">
-        <div class="text-4xl">🧑‍🚀</div>
-        <span class="bg-sky-500/20 text-sky-300 border border-sky-400/30 text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full">AI Sensor</span>
-      </div>
-      <h3 class="font-title text-xl text-sky-300 mb-1">Flappy Astronot AI</h3>
-      <p class="text-xs text-slate-300 leading-relaxed mb-4 flex-grow">
-        Game terbang seru tanpa sentuh layar! Gerakkan kepala naik atau turun di depan webcam untuk memandu astronot melewati rintangan laser.
-      </p>
-      <a href="game-flappy.html" class="w-full bg-sky-600 hover:bg-sky-500 text-white font-title text-xs py-2.5 rounded-xl text-center font-bold transition shadow-md flex items-center justify-center gap-1.5">
-        🚀 Mulai Terbang
-      </a>
-    </div>
-
-    <!-- 8. TEBAS BALON LASER AI (HAND TRACKER) -->
-    <div class="modul-item glass-card rounded-3xl p-6 flex flex-col" data-cat="lab">
-      <div class="flex justify-between items-start mb-3">
-        <div class="text-4xl">🎈</div>
-        <span class="bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full">Hand Laser</span>
-      </div>
-      <h3 class="font-title text-xl text-emerald-300 mb-1">Tebas Balon Laser AI</h3>
-      <p class="text-xs text-slate-300 leading-relaxed mb-4 flex-grow">
-        Kibaskan tangan di udara! Ujung telunjukmu bertindak sebagai pedang laser virtual untuk menebas balon melayang dan hindari bom.
-      </p>
-      <a href="game-tebas.html" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-title text-xs py-2.5 rounded-xl text-center font-bold transition shadow-md flex items-center justify-center gap-1.5">
-        ⚔️ Mainkan Tebas Balon
-      </a>
-    </div>
-
-    <!-- 9. GALERI KARYA SISWA -->
-    <div class="modul-item glass-card rounded-3xl p-6 flex flex-col" data-cat="lab">
-      <div class="flex justify-between items-start mb-3">
-        <div class="text-4xl">🎨</div>
-        <span class="bg-sky-500/20 text-sky-300 border border-sky-400/30 text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full">Showcase</span>
-      </div>
-      <h3 class="font-title text-xl text-sky-300 mb-1">Galeri Karya Siswa</h3>
-      <p class="text-xs text-slate-300 leading-relaxed mb-4 flex-grow">
-        Etalase pameran berisi proyek game Scratch, video demonstrasi sains, dan poster digital hasil kreasi siswa.
-      </p>
-      <a href="galeri-karya.html" class="w-full bg-sky-600 hover:bg-sky-500 text-white font-title text-xs py-2.5 rounded-xl text-center font-bold transition">
-        Buka Galeri Karya
-      </a>
-    </div>
-
-    <!-- 10. PAPAN PRESTASI SISWA -->
-    <div class="modul-item glass-card rounded-3xl p-6 flex flex-col" data-cat="prestasi">
-      <div class="flex justify-between items-start mb-3">
-        <div class="text-4xl">🏆</div>
-        <span class="bg-amber-500/20 text-amber-300 border border-amber-400/30 text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full">Hall of Fame</span>
-      </div>
-      <h3 class="font-title text-xl text-amber-300 mb-1">Papan Prestasi Juara</h3>
-      <p class="text-xs text-slate-300 leading-relaxed mb-4 flex-grow">
-        Rekam jejak piala, piagam penghargaan, dan dedikasi prestasi lomba siswa di tingkat Kota, Provinsi hingga Nasional.
-      </p>
-      <a href="prestasi-siswa.html" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-title text-xs py-2.5 rounded-xl text-center font-bold transition">
-        Lihat Rekap Juara
-      </a>
-    </div>
-
-    <!-- 11. RUANG MATERI & REFLEKSI -->
-    <div class="modul-item glass-card rounded-3xl p-6 flex flex-col" data-cat="lab">
-      <div class="flex justify-between items-start mb-3">
-        <div class="text-4xl">📚</div>
-        <span class="bg-indigo-500/20 text-indigo-300 border border-indigo-400/30 text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full">Belajar Aktif</span>
-      </div>
-      <h3 class="font-title text-xl text-indigo-300 mb-1">Ruang Materi & Refleksi</h3>
-      <p class="text-xs text-slate-300 leading-relaxed mb-4 flex-grow">
-        Unduh slide presentasi materi pembelajaran, kantung pengumpulan tugas proyek, dan evaluasi refleksi sesi belajar.
-      </p>
-      <a href="ruang-materi.html" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-title text-xs py-2.5 rounded-xl text-center font-bold transition">
-        Buka Ruang Materi
-      </a>
-    </div>
-
-    <!-- 12. ARENA CCA ALKITAB -->
-    <div class="modul-item glass-card rounded-3xl p-6 flex flex-col" data-cat="lab">
-      <div class="flex justify-between items-start mb-3">
-        <div class="text-4xl">📖</div>
-        <span class="bg-purple-500/20 text-purple-300 border border-purple-400/30 text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full">CBT Cerdas Cermat</span>
-      </div>
-      <h3 class="font-title text-xl text-purple-300 mb-1">Arena CCA Alkitab</h3>
-      <p class="text-xs text-slate-300 leading-relaxed mb-4 flex-grow">
-        Tantangan cerdas cermat Alkitab berbasis CBT dengan pengatur waktu kecepatan, evaluasi instan, dan papan peringkat juara.
-      </p>
-      <a href="cca-alkitab.html" class="w-full bg-purple-600 hover:bg-purple-500 text-white font-title text-xs py-2.5 rounded-xl text-center font-bold transition shadow-md flex items-center justify-center gap-1.5">
-        ⚔️ Masuk Arena CCA
-      </a>
-    </div>
-
-    <!-- 13. DETEKTIF SAMPAH -->
-    <div class="modul-item glass-card rounded-3xl p-6 flex flex-col" data-cat="lab">
-      <div class="flex justify-between items-start mb-3">
-        <div class="text-4xl">♻️</div>
-        <span class="bg-teal-500/20 text-teal-300 border border-teal-400/30 text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full">Edukasi Sains</span>
-      </div>
-      <h3 class="font-title text-xl text-teal-300 mb-1">Detektif Sampah</h3>
-      <p class="text-xs text-slate-300 leading-relaxed mb-4 flex-grow">
-        Game edukasi interaktif memilah jenis sampah organik, anorganik, dan limbah B3 untuk mengasah kepedulian lingkungan.
-      </p>
-      <a href="game-pilah.html" class="w-full bg-teal-600 hover:bg-teal-500 text-white font-title text-xs py-2.5 rounded-xl text-center font-bold transition">
-        Mainkan Game
-      </a>
-    </div>
-
-    <!-- 14. GAME SIAGA BENCANA -->
-    <div class="modul-item glass-card rounded-3xl p-6 flex flex-col" data-cat="lab">
-      <div class="flex justify-between items-start mb-3">
-        <div class="text-4xl">🌋</div>
-        <span class="bg-orange-500/20 text-orange-300 border border-orange-400/30 text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full">Simulasi</span>
-      </div>
-      <h3 class="font-title text-xl text-orange-300 mb-1">Game Siaga Bencana</h3>
-      <p class="text-xs text-slate-300 leading-relaxed mb-4 flex-grow">
-        Simulasi mitigasi gempa bumi, penentuan jalur evakuasi tsunami, dan pemetaan bahaya erupsi gunung api.
-      </p>
-      <a href="game-siaga.html" class="w-full bg-orange-600 hover:bg-orange-500 text-white font-title text-xs py-2.5 rounded-xl text-center font-bold transition">
-        Mulai Simulasi
-      </a>
-    </div>
-
-    <!-- 15. MISI ROVER & KRIPTO -->
-    <div class="modul-item glass-card rounded-3xl p-6 flex flex-col" data-cat="lab">
-      <div class="flex justify-between items-start mb-3">
-        <div class="text-4xl">🤖</div>
-        <span class="bg-cyan-500/20 text-cyan-300 border border-cyan-400/30 text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full">Algoritma</span>
-      </div>
-      <h3 class="font-title text-xl text-cyan-300 mb-1">Misi Rover & Kripto</h3>
-      <p class="text-xs text-slate-300 leading-relaxed mb-4 flex-grow">
-        Latihan berpikir komputasional: susun balok perintah robot penjelajah dan pecahkan sandi kriptografi rahasia.
-      </p>
-      <a href="game-rover.html" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-title text-xs py-2.5 rounded-xl text-center font-bold transition">
-        Jelajahi Lab KKA
-      </a>
-    </div>
-
-    <!-- 16. SUARA KITA (LAYANAN ASPIRASI) -->
-    <div class="modul-item glass-card rounded-3xl p-6 flex flex-col" data-cat="wali">
-      <div class="flex justify-between items-start mb-3">
-        <div class="text-4xl">📬</div>
-        <span class="bg-rose-500/20 text-rose-300 border border-rose-400/30 text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full">Layanan Aduan</span>
-      </div>
-      <h3 class="font-title text-xl text-rose-300 mb-1">Suara Kita (Kotak Curhat)</h3>
-      <p class="text-xs text-slate-300 leading-relaxed mb-4 flex-grow">
-        Kanal pengaduan aman dan terenkripsi untuk pencegahan perundungan, bimbingan konseling, dan aspirasi wali murid.
-      </p>
-      <a href="suara-kita.html" class="w-full bg-rose-600 hover:bg-rose-500 text-white font-title text-xs py-2.5 rounded-xl text-center font-bold transition">
-        Kirim Pesan / Curhat
-      </a>
-    </div>
-
-    <!-- 17. PORTAL ASESMEN STS -->
-    <div class="modul-item glass-card rounded-3xl p-6 flex flex-col" data-cat="wali">
-      <div class="flex justify-between items-start mb-3">
-        <div class="text-4xl">📝</div>
-        <span class="bg-blue-500/20 text-blue-300 border border-blue-400/30 text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full">Ujian</span>
-      </div>
-      <h3 class="font-title text-xl text-blue-300 mb-1">Portal Asesmen STS</h3>
-      <p class="text-xs text-slate-300 leading-relaxed mb-4 flex-grow">
-        Akses ujian sumatif tengah semester berbasis komputer dengan protokol penegakan kejujuran siswa secara terpadu.
-      </p>
-      <a href="ujian-sdmethodistimmanuel.html" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-title text-xs py-2.5 rounded-xl text-center font-bold transition">
-        Buka Portal Asesmen
-      </a>
-    </div>
+    </section>
 
   </main>
 
   <!-- FOOTER -->
-  <footer class="border-t border-slate-800/80 pt-6 mt-8">
+  <footer class="border-t border-slate-800/80 pt-5 mt-6">
     <div class="flex flex-col sm:flex-row justify-between items-center text-xs text-slate-400 gap-3">
       <div class="text-center sm:text-left">
         <p class="font-semibold text-slate-300">
@@ -386,28 +161,129 @@
           Pendidik Informatika, SysAdmin & Pengembang Ekosistem Pembelajaran Digital
         </p>
       </div>
-      <a href="admin.html" class="text-slate-600 hover:text-rose-400 text-[11px] font-mono transition flex items-center gap-1">
-        🔒 Panel Kendali
-      </a>
+      <div class="flex items-center gap-4">
+        <a href="panel-modul.html" class="text-slate-500 hover:text-sky-400 text-[11px] font-mono transition flex items-center gap-1">
+          ⚙️ Kelola Modul
+        </a>
+        <a href="admin.html" class="text-slate-600 hover:text-rose-400 text-[11px] font-mono transition flex items-center gap-1">
+          🔒 Panel Kendali
+        </a>
+      </div>
     </div>
   </footer>
 
-  <!-- SCRIPT FILTER KATEGORI -->
+  <!-- ENGINE LAUNCHER DINAMIS -->
   <script>
+    const ICON_GRADIENTS = {
+      orange:  "from-orange-500 to-amber-600 shadow-orange-500/20",
+      amber:   "from-amber-400 to-yellow-600 shadow-amber-500/20",
+      emerald: "from-emerald-500 to-teal-600 shadow-emerald-500/20",
+      indigo:  "from-indigo-500 to-blue-700 shadow-indigo-500/20",
+      sky:     "from-sky-400 to-blue-600 shadow-sky-500/20",
+      purple:  "from-purple-500 to-fuchsia-700 shadow-purple-500/20",
+      teal:    "from-teal-400 to-emerald-600 shadow-teal-500/20",
+      cyan:    "from-cyan-400 to-sky-600 shadow-cyan-500/20",
+      rose:    "from-rose-500 to-pink-600 shadow-rose-500/20",
+      blue:    "from-blue-500 to-indigo-700 shadow-blue-500/20"
+    };
+
+    const TEXT_ACCENTS = {
+      orange: "text-orange-300", amber: "text-amber-300", emerald: "text-emerald-300",
+      indigo: "text-indigo-300", sky: "text-sky-300", purple: "text-purple-300",
+      teal: "text-teal-300", cyan: "text-cyan-300", rose: "text-rose-300", blue: "text-blue-300"
+    };
+
+    let allModules = [];
+    let activeCategory = 'semua';
+
+    async function muatDaftarModul() {
+      const grid = document.getElementById('launcher-grid');
+      try {
+        const res = await fetch(`modules.json?v=${Date.now()}`);
+        if (!res.ok) throw new Error("Gagal memuat modules.json");
+        const data = await res.json();
+        allModules = data.filter(m => m.active !== false);
+        renderLauncher();
+      } catch (err) {
+        grid.innerHTML = `<div class="col-span-full text-center py-8 bg-rose-950/40 border border-rose-500/30 rounded-2xl text-rose-300 text-xs">⚠️ Pastikan file <code>modules.json</code> sudah diunggah sejajar dengan <code>index.html</code> di GitHub.</div>`;
+      }
+    }
+
+    function renderLauncher() {
+      const featuredSection = document.getElementById('sectionFeatured');
+      const featuredGrid = document.getElementById('featured-grid');
+      const launcherGrid = document.getElementById('launcher-grid');
+      const countEl = document.getElementById('countTotalApp');
+      const keyword = (document.getElementById('searchModul')?.value || '').toLowerCase().trim();
+
+      const filtered = allModules.filter(m => {
+        const matchCat = (activeCategory === 'semua') || (Array.isArray(m.categories) && m.categories.includes(activeCategory));
+        const matchSearch = !keyword ||
+          m.title.toLowerCase().includes(keyword) ||
+          m.description.toLowerCase().includes(keyword) ||
+          (m.badge && m.badge.toLowerCase().includes(keyword));
+        return matchCat && matchSearch;
+      });
+
+      countEl.innerText = `${filtered.length} Aplikasi Tersedia`;
+
+      const featuredItems = filtered.filter(m => m.featured === true);
+      if (activeCategory === 'semua' && !keyword && featuredItems.length > 0) {
+        featuredSection.classList.remove('hidden');
+        featuredGrid.innerHTML = featuredItems.map(m => {
+          const grad = ICON_GRADIENTS[m.theme] || ICON_GRADIENTS.sky;
+          const txt = TEXT_ACCENTS[m.theme] || TEXT_ACCENTS.sky;
+          return `
+            <a href="${m.url}" class="app-tile glass-panel rounded-2xl p-4 flex items-center gap-4 hover:border-amber-400/50 group">
+              <div class="w-14 h-14 rounded-2xl bg-gradient-to-br ${grad} flex items-center justify-center text-3xl shadow-lg shrink-0 group-hover:scale-105 transition">
+                ${m.icon || '⭐'}
+              </div>
+              <div class="min-w-0 flex-1">
+                <div class="flex items-center gap-2 mb-0.5">
+                  <h4 class="font-title text-base ${txt} truncate">${m.title}</h4>
+                  <span class="text-[9px] font-black uppercase px-2 py-0.5 rounded-full bg-white/10 text-slate-300 shrink-0">${m.badge || 'Unggulan'}</span>
+                </div>
+                <p class="text-xs text-slate-400 line-clamp-2 leading-snug">${m.description}</p>
+              </div>
+              <span class="text-slate-500 group-hover:text-white text-sm font-bold pr-1">➔</span>
+            </a>
+          `;
+        }).join('');
+      } else {
+        featuredSection.classList.add('hidden');
+      }
+
+      if (filtered.length === 0) {
+        launcherGrid.innerHTML = `<div class="col-span-full text-center py-10 text-slate-400 text-xs">Tidak ada aplikasi yang cocok dengan pencarian tersebut.</div>`;
+        return;
+      }
+
+      launcherGrid.innerHTML = filtered.map(m => {
+        const grad = ICON_GRADIENTS[m.theme] || ICON_GRADIENTS.sky;
+        return `
+          <a href="${m.url}" title="${m.title} — ${m.description}" class="app-tile glass-panel rounded-2xl p-3.5 flex flex-col items-center text-center hover:border-sky-400/50 hover:bg-white/[0.07] group">
+            <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br ${grad} flex items-center justify-center text-3xl sm:text-4xl shadow-lg mb-2.5 group-hover:scale-105 transition">
+              ${m.icon || '📌'}
+            </div>
+            <h4 class="font-title text-xs sm:text-sm text-slate-100 group-hover:text-sky-300 leading-tight line-clamp-2 mb-1">
+              ${m.title}
+            </h4>
+            <span class="text-[10px] font-bold text-slate-400 bg-slate-800/80 px-2 py-0.5 rounded-md truncate max-w-full">
+              ${m.badge || 'Modul'}
+            </span>
+          </a>
+        `;
+      }).join('');
+    }
+
     function setKategori(kat, btnEl) {
+      activeCategory = kat;
       document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('tab-active'));
       if (btnEl) btnEl.classList.add('tab-active');
-
-      const items = document.querySelectorAll('.modul-item');
-      items.forEach(item => {
-        const itemCats = item.dataset.cat.split(' ');
-        if (kat === 'semua' || itemCats.includes(kat)) {
-          item.classList.remove('hidden');
-        } else {
-          item.classList.add('hidden');
-        }
-      });
+      renderLauncher();
     }
+
+    muatDaftarModul();
   </script>
 </body>
 </html>
