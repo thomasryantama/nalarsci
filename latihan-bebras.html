@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tantangan Bebras SD — Latihan Computational Thinking (SiKecil & Siaga)</title>
+  <title>Tantangan Bebras SD — Latihan Computational Thinking (SiKecil & Siaga HOTS)</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Google Fonts & Font Awesome -->
@@ -91,7 +91,7 @@
         </div>
         <div>
           <span class="font-title font-bold text-lg text-amber-950 tracking-tight flex items-center gap-1.5">
-            BEBRAS <span class="bg-amber-500 text-white text-xs px-2 py-0.5 rounded-lg shadow-sm">SD EDISI</span>
+            BEBRAS <span class="bg-amber-500 text-white text-xs px-2 py-0.5 rounded-lg shadow-sm">SD HOTS PRO</span>
           </span>
           <p class="text-[11px] text-amber-700 font-bold -mt-0.5">Arena Latihan SiKecil (Kls 1-3) & Siaga (Kls 4-6)</p>
           <p class="text-[10px] text-slate-500 font-semibold hidden sm:block">Oleh: Thomas Ryantama, M.Kom., Gr. • NalarSci Lab</p>
@@ -105,7 +105,7 @@
         </button>
         <div class="flex items-center gap-1.5 sm:gap-2 bg-amber-50 border border-amber-300 px-3 py-1.5 rounded-xl shadow-inner">
           <i class="fa-regular fa-clock text-amber-600 animate-spin text-sm" style="animation-duration: 5s;"></i>
-          <span id="timerDisplay" class="font-title font-bold text-sm sm:text-base text-amber-950">30:00</span>
+          <span id="timerDisplay" class="font-title font-bold text-sm sm:text-base text-amber-950">35:00</span>
         </div>
         <button onclick="selesaikanUjianKonfirmasi()" class="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white text-xs font-bold px-3 py-1.5 rounded-xl shadow-sm transition flex items-center gap-1.5">
           <i class="fa-solid fa-check"></i> <span class="hidden sm:inline">Kumpulkan</span>
@@ -131,13 +131,13 @@
       <div class="absolute -right-10 -bottom-10 w-48 h-48 bg-white/10 rounded-full blur-2xl pointer-events-none"></div>
       <div class="relative z-10 max-w-2xl space-y-3">
         <span class="inline-block bg-white/20 backdrop-blur-md px-3.5 py-1 rounded-full text-xs font-black uppercase tracking-wider text-amber-100 border border-white/25">
-          🎉 Khusus Siswa Sekolah Dasar (SD)
+          🎉 Edisi 24 Soal Lengkap • Termasuk Tantangan HOTS & Jebakan Logika!
         </span>
         <h1 class="font-title text-2xl sm:text-4xl font-extrabold leading-snug">
           Yuk Latihan Logika Komputasional Bersama Si Bebras!
         </h1>
         <p class="text-amber-100 text-xs sm:text-sm leading-relaxed font-semibold">
-          Belajar memecahkan teka-teki seru, kode rahasia, susunan balok, dan rute hutan. Tanpa koding rumit, cukup gunakan ketelitian dan logika terbaikmu!
+          Dilengkapi <b>12 soal SiKecil</b> dan <b>12 soal Siaga</b> mulai dari tingkat Dasar, Menengah, hingga <b>Sulit / Menjebak (HOTS)</b>. Baca aturan soal dengan teliti agar tidak masuk jebakan!
         </p>
         <div class="pt-2 flex items-center gap-2 text-[11px] text-amber-200 font-bold">
           <i class="fa-solid fa-chalkboard-user"></i>
@@ -163,7 +163,7 @@
             Pilihan Ganda (MC)
           </div>
           <p class="text-slate-600 leading-relaxed">
-            Jawaban <b>Benar: +100</b> poin. Jika <b>Salah</b> dikenakan <b>Penalti (-25 Poin)</b>. Jika tidak tahu, kosongkan saja jawabanmu agar nilaimu aman!
+            Jawaban <b>Benar: +100</b> poin. Jika <b>Salah</b> dikenakan <b>Penalti (-25 Poin)</b>. Jika ragu pada soal jebakan, kosongkan saja agar nilaimu aman!
           </p>
           <div class="text-[10px] bg-amber-200/80 text-amber-900 font-bold px-2 py-0.5 rounded-md inline-block">
             ⚠️ Hati-hati jangan asal tebak!
@@ -207,43 +207,50 @@
           <button type="button" onclick="pilihKategoriSD('sikecil', this)" class="kat-sd-btn active border-2 border-amber-500 bg-white p-3.5 rounded-2xl text-left shadow-sm transition flex flex-col justify-between">
             <div class="space-y-0.5">
               <span class="inline-block bg-emerald-100 text-emerald-800 text-[10px] font-black px-2 py-0.5 rounded-md">Kelas 1, 2, & 3 SD</span>
-              <p class="font-title font-bold text-sm sm:text-base text-amber-950">🌱 SiKecil</p>
-              <p class="text-[11px] text-slate-500 font-medium">Pola gambar, urutan, & cerita logika dasar (6 Soal).</p>
+              <p class="font-title font-bold text-sm sm:text-base text-amber-950">🌱 SiKecil (12 Soal)</p>
+              <p class="text-[11px] text-slate-500 font-medium">Pola, urutan, grid berbatas, & teka-teki jebakan anak (Mudah s.d. HOTS).</p>
             </div>
-            <span class="text-[11px] font-title font-bold bg-amber-100 text-amber-900 px-2 py-1 rounded-xl mt-2 self-start">30 Menit</span>
+            <span class="text-[11px] font-title font-bold bg-amber-100 text-amber-900 px-2 py-1 rounded-xl mt-2 self-start">35 Menit</span>
           </button>
 
           <!-- Kategori Siaga -->
           <button type="button" onclick="pilihKategoriSD('siaga', this)" class="kat-sd-btn border-2 border-slate-200 bg-white hover:border-amber-300 p-3.5 rounded-2xl text-left transition flex flex-col justify-between">
             <div class="space-y-0.5">
               <span class="inline-block bg-orange-100 text-orange-800 text-[10px] font-black px-2 py-0.5 rounded-md">Kelas 4, 5, & 6 SD</span>
-              <p class="font-title font-bold text-sm sm:text-base text-slate-900">🍂 Siaga</p>
-              <p class="text-[11px] text-slate-500 font-medium">Struktur data tumpukan, graf, & sandi ranting (6 Soal).</p>
+              <p class="font-title font-bold text-sm sm:text-base text-slate-900">🍂 Siaga (12 Soal)</p>
+              <p class="text-[11px] text-slate-500 font-medium">Stack, graf rute terpendek, logika boolean, & sandi jebakan (Mudah s.d. HOTS).</p>
             </div>
-            <span class="text-[11px] font-title font-bold bg-slate-100 text-slate-600 px-2 py-1 rounded-xl mt-2 self-start">40 Menit</span>
+            <span class="text-[11px] font-title font-bold bg-slate-100 text-slate-600 px-2 py-1 rounded-xl mt-2 self-start">45 Menit</span>
           </button>
 
           <!-- Kategori Lengkap -->
           <button type="button" onclick="pilihKategoriSD('lengkap', this)" class="kat-sd-btn border-2 border-slate-200 bg-white hover:border-amber-300 p-3.5 rounded-2xl text-left transition flex flex-col justify-between">
             <div class="space-y-0.5">
               <span class="inline-block bg-indigo-100 text-indigo-800 text-[10px] font-black px-2 py-0.5 rounded-md">Gladi Resik Akbar</span>
-              <p class="font-title font-bold text-sm sm:text-base text-slate-900">🏆 Paket Lengkap</p>
-              <p class="text-[11px] text-slate-500 font-medium">Gabungan SiKecil & Siaga untuk pemanasan maksimal (12 Soal).</p>
+              <p class="font-title font-bold text-sm sm:text-base text-slate-900">🏆 Paket Lengkap (24 Soal)</p>
+              <p class="text-[11px] text-slate-500 font-medium">Gabungan seluruh 24 soal SiKecil & Siaga untuk latihan maraton!</p>
             </div>
-            <span class="text-[11px] font-title font-bold bg-indigo-100 text-indigo-900 px-2 py-1 rounded-xl mt-2 self-start">45 Menit</span>
+            <span class="text-[11px] font-title font-bold bg-indigo-100 text-indigo-900 px-2 py-1 rounded-xl mt-2 self-start">75 Menit</span>
           </button>
         </div>
 
-        <!-- Mode Waktu: Resmi vs Belajar Santai -->
-        <div class="pt-2 flex flex-wrap items-center gap-4 text-xs font-bold text-slate-700">
-          <span class="text-slate-500">Pilihan Mode:</span>
-          <label class="inline-flex items-center gap-1.5 cursor-pointer">
-            <input type="radio" name="modeWaktu" value="ujian" checked class="accent-amber-500">
-            <span>Mode Ujian Resmi (Dengan Waktu Mundur)</span>
-          </label>
-          <label class="inline-flex items-center gap-1.5 cursor-pointer">
-            <input type="radio" name="modeWaktu" value="santai" class="accent-amber-500">
-            <span>Mode Belajar Santai (Tanpa Batas Waktu)</span>
+        <!-- Opsi Tambahan: Mode Waktu & Acak Urutan -->
+        <div class="pt-2 flex flex-wrap items-center justify-between gap-3 text-xs font-bold text-slate-700 border-t border-amber-200/60">
+          <div class="flex flex-wrap items-center gap-4">
+            <span class="text-slate-500">Mode Waktu:</span>
+            <label class="inline-flex items-center gap-1.5 cursor-pointer">
+              <input type="radio" name="modeWaktu" value="ujian" checked class="accent-amber-500">
+              <span>Ujian Resmi (Timer)</span>
+            </label>
+            <label class="inline-flex items-center gap-1.5 cursor-pointer">
+              <input type="radio" name="modeWaktu" value="santai" class="accent-amber-500">
+              <span>Belajar Santai (Tanpa Timer)</span>
+            </label>
+          </div>
+
+          <label class="inline-flex items-center gap-2 cursor-pointer bg-white px-3 py-1.5 rounded-xl border border-amber-200">
+            <input type="checkbox" id="chkAcakSoal" class="accent-amber-500 rounded">
+            <span class="text-amber-900"><i class="fa-solid fa-shuffle text-amber-500 mr-1"></i>Acak Urutan Soal & Opsi</span>
           </label>
         </div>
       </div>
@@ -275,8 +282,8 @@
               <p class="text-[11px] text-slate-400 font-semibold" id="taskIdAndDomain">2012-DE-05 • Algoritma & Urutan</p>
             </div>
           </div>
-          <div class="flex items-center gap-1.5" id="badgeTipeSoal">
-            <!-- Tipe soal dinamis -->
+          <div class="flex flex-wrap items-center gap-1.5" id="badgeTipeSoal">
+            <!-- Tipe soal & level kesulitan dinamis -->
           </div>
         </div>
 
@@ -286,7 +293,7 @@
         </div>
 
         <!-- WADAH MEDIA / GRAFIS SOAL (SVG MURNI FULL RESPONSIVE) -->
-        <div class="bg-amber-50/50 border border-amber-200/70 rounded-2xl p-4 flex items-center justify-center min-h-[170px] overflow-x-auto" id="taskMediaContainer">
+        <div class="bg-amber-50/50 border border-amber-200/70 rounded-2xl p-4 flex items-center justify-center min-h-[160px] overflow-x-auto" id="taskMediaContainer">
           <!-- Grafis SVG interaktif -->
         </div>
 
@@ -324,7 +331,7 @@
           <span class="text-[10px] text-slate-400 font-bold" id="labelTotalDijawab">0/12 Terjawab</span>
         </div>
 
-        <!-- Grid Tombol Nomor Soal (1 s/d 12) -->
+        <!-- Grid Tombol Nomor Soal -->
         <div class="grid grid-cols-4 sm:grid-cols-6 lg:grid-cols-4 gap-2" id="gridNomorSoal">
           <!-- Tombol nomor soal dinamis -->
         </div>
@@ -374,7 +381,7 @@
       <div class="max-w-xs mx-auto p-4 rounded-2xl bg-amber-50/80 border border-amber-200 shadow-inner">
         <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Total Skor Akhir</span>
         <div class="font-title text-4xl sm:text-5xl font-black text-amber-900 mt-1" id="resTotalSkor">0</div>
-        <p class="text-[11px] text-slate-500 mt-1" id="resKetPenalti">Skor dihitung dengan aturan resmi Bebras Indonesia</p>
+        <p class="text-[11px] text-slate-500 mt-1" id="resKetPenalti">Skor maksimal paket ini: 1200 poin</p>
       </div>
 
       <!-- Ringkasan Statistik Soal -->
@@ -410,11 +417,14 @@
 
     <!-- PEMBAHASAN 4 PILAR COMPUTATIONAL THINKING RAMAH ANAK -->
     <div class="space-y-4">
-      <div class="flex items-center justify-between border-b border-slate-200 pb-2">
+      <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 pb-2">
         <h3 class="font-title text-lg font-bold text-slate-900 flex items-center gap-2">
-          <i class="fa-solid fa-brain text-amber-500"></i> Pembahasan Langkah Logis & 4 Pilar CT
+          <i class="fa-solid fa-brain text-amber-500"></i> Pembahasan Langkah Logis & Analisis Jebakan
         </h3>
-        <span class="text-xs text-slate-500">Evaluasi Pembelajaran Mandiri</span>
+        <div class="flex gap-1.5 no-print">
+          <button onclick="filterPembahasan('semua')" class="px-2.5 py-1 rounded-lg bg-slate-200 hover:bg-slate-300 text-[11px] font-bold text-slate-800">Semua</button>
+          <button onclick="filterPembahasan('salah')" class="px-2.5 py-1 rounded-lg bg-rose-100 hover:bg-rose-200 text-[11px] font-bold text-rose-800">Hanya yang Salah/Kosong</button>
+        </div>
       </div>
 
       <div id="wadahPembahasanList" class="space-y-4">
@@ -477,33 +487,35 @@
     }
 
     /* -------------------------------------------------------------
-       BANK 12 SOAL BEBRAS KHUSUS SD (SIKECIL & SIAGA)
+       BANK 24 SOAL BEBRAS KHUSUS SD (12 SIKECIL + 12 SIAGA)
+       Mencakup tingkat Mudah, Menengah, hingga Sulit/Menjebak (HOTS)
     ------------------------------------------------------------- */
     const SOAL_DATABASE_SD = [
-      // 1. Menanam Bunga (2012-DE-05)
+      /* ===========================================================
+         KATEGORI 1: SIKECIL (KELAS 1, 2, & 3 SD) — 12 SOAL
+      =========================================================== */
+      // SK-01 (Mudah)
       {
         id: "2012-DE-05",
         level: "sikecil",
+        kesulitan: "Mudah",
         judul: "Menanam Bunga",
         domain: "Algoritma & Pengenalan Pola",
         pilarCT: "Algoritma & Pengenalan Pola",
         tipe: "mc",
-        pilihanCount: 4,
         poinBenar: 100,
         penaltiSalah: 25,
-        cerita: "Seekor <b>Bebras Besar</b> dan seekor <b>Bebras Kecil</b> menanam bunga di kebun. Bebras kecil langkah kakinya lebih pendek sehingga bunga yang ditanam lebih berdekatan dan rapat ke tubuhnya.<br><br>Mereka berdiri saling membelakangi, lalu mengikuti perintah yang sama:<br><code class='bg-amber-100 text-amber-900 px-2 py-0.5 rounded font-mono text-xs'>Ulangi 2 kali:<br>&nbsp;&nbsp;Tanam bunga di kanan, maju 1 langkah.<br>&nbsp;&nbsp;Tanam bunga di kiri, maju 1 langkah.</code>",
+        cerita: "Seekor <b>Bebras Besar</b> dan seekor <b>Bebras Kecil</b> menanam bunga di kebun. Bebras kecil langkah kakinya lebih pendek sehingga bunga yang ditanam lebih berdekatan.<br><br>Mereka berdiri saling membelakangi, lalu mengikuti perintah yang sama:<br><code class='bg-amber-100 text-amber-900 px-2 py-0.5 rounded font-mono text-xs'>Ulangi 2 kali:<br>&nbsp;&nbsp;Tanam bunga di kanan, maju 1 langkah.<br>&nbsp;&nbsp;Tanam bunga di kiri, maju 1 langkah.</code>",
         mediaSvg: `
           <svg viewBox="0 0 540 160" class="w-full max-w-lg bg-emerald-600 rounded-2xl p-2 shadow-inner">
             <line x1="270" y1="15" x2="270" y2="145" stroke="#FFFFFF" stroke-dasharray="4" stroke-width="1.5" opacity="0.6"/>
             <text x="270" y="14" fill="#FFFFFF" font-size="10" text-anchor="middle" font-weight="bold">Posisi Awal Saling Membelakangi</text>
             <text x="135" y="24" fill="#A7F3D0" font-size="11" font-weight="bold" text-anchor="middle">← Jejak Bergerak ke Kiri</text>
             <text x="405" y="24" fill="#A7F3D0" font-size="11" font-weight="bold" text-anchor="middle">Jejak Bergerak ke Kanan →</text>
-            <!-- Bunga Kiri (Rapat) -->
             <g transform="translate(190, 60)"><circle cx="0" cy="0" r="9" fill="#FDE047" stroke="#FFFFFF" stroke-width="2"/><circle cx="0" cy="0" r="3.5" fill="#EA580C"/></g>
             <g transform="translate(150, 105)"><circle cx="0" cy="0" r="9" fill="#FDE047" stroke="#FFFFFF" stroke-width="2"/><circle cx="0" cy="0" r="3.5" fill="#EA580C"/></g>
             <g transform="translate(110, 60)"><circle cx="0" cy="0" r="9" fill="#FDE047" stroke="#FFFFFF" stroke-width="2"/><circle cx="0" cy="0" r="3.5" fill="#EA580C"/></g>
             <g transform="translate(70, 105)"><circle cx="0" cy="0" r="9" fill="#FDE047" stroke="#FFFFFF" stroke-width="2"/><circle cx="0" cy="0" r="3.5" fill="#EA580C"/></g>
-            <!-- Bunga Kanan (Lebar) -->
             <g transform="translate(340, 45)"><circle cx="0" cy="0" r="11" fill="#FDE047" stroke="#FFFFFF" stroke-width="2"/><circle cx="0" cy="0" r="4.5" fill="#EA580C"/></g>
             <g transform="translate(400, 120)"><circle cx="0" cy="0" r="11" fill="#FDE047" stroke="#FFFFFF" stroke-width="2"/><circle cx="0" cy="0" r="4.5" fill="#EA580C"/></g>
             <g transform="translate(460, 45)"><circle cx="0" cy="0" r="11" fill="#FDE047" stroke="#FFFFFF" stroke-width="2"/><circle cx="0" cy="0" r="4.5" fill="#EA580C"/></g>
@@ -512,24 +524,24 @@
         `,
         pertanyaan: "Bagaimanakah letak pola bunga yang ditanam oleh kedua bebras?",
         opsi: [
-          { key: "A", teks: "Sisi bebras kecil bunganya berjarak rapat dan dekat, sedangkan sisi bebras besar jarak antar-bunga lebih jauh dan melebar berselang-seling kanan-kiri." },
+          { key: "A", teks: "Sisi bebras kecil bunganya berjarak rapat, sedangkan sisi bebras besar jarak antar-bunga lebih jauh berselang-seling kanan-kiri." },
           { key: "B", teks: "Semua bunga membentuk satu garis lurus tanpa zig-zag sama sekali." },
           { key: "C", teks: "Bebras kecil menanam 8 bunga, sedangkan bebras besar hanya menanam 2 bunga." },
           { key: "D", teks: "Bunga bebras besar semuanya menumpuk di tempat awal mereka berdiri." }
         ],
         kunci: "A",
-        penjelasan: "<b>Jawaban: A.</b><br>• <b>Pengenalan Pola & Algoritma:</b> Perulangan 2 kali dari perintah tanam kanan lalu tanam kiri menghasilkan pola berselang-seling sebanyak 4 bunga tiap bebras.<br>• Karena langkah bebras kecil pendek, posisi bunganya lebih rapat dibanding bebras besar yang langkahnya panjang."
+        penjelasan: "<b>Jawaban: A.</b><br>• <b>Pengenalan Pola & Algoritma:</b> Perulangan 2 kali dari perintah tanam kanan lalu kiri menghasilkan 4 bunga zig-zag tiap bebras.<br>• Karena langkah bebras kecil pendek, posisi bunganya lebih rapat dibanding bebras besar."
       },
 
-      // 2. Susunan Kayu Bendungan
+      // SK-02 (Mudah)
       {
         id: "2021-ID-03",
         level: "sikecil",
+        kesulitan: "Mudah",
         judul: "Susunan Kayu Bendungan",
         domain: "Dekomposisi & Pengurutan",
         pilarCT: "Dekomposisi & Pengurutan (Sorting)",
         tipe: "mc",
-        pilihanCount: 4,
         poinBenar: 100,
         penaltiSalah: 25,
         cerita: "Pak Bebras memiliki 4 batang kayu dengan panjang berbeda: <b>[Kayu 1: 4m]</b>, <b>[Kayu 2: 7m]</b>, <b>[Kayu 3: 2m]</b>, dan <b>[Kayu 4: 5m]</b>.<br>Agar bendungan kuat, kayu diletakkan bertumpuk satu per satu mulai dari kayu yang <b>paling panjang di bagian bawah (dasar)</b> hingga kayu <b>paling pendek di bagian paling atas (puncak)</b>.",
@@ -553,34 +565,31 @@
           { key: "D", teks: "Kayu 2 → Kayu 1 → Kayu 4 → Kayu 3" }
         ],
         kunci: "A",
-        penjelasan: "<b>Jawaban: A.</b><br>• <b>Dekomposisi & Sorting:</b> Urutkan panjang kayu dari yang paling panjang:<br>7m (Kayu 2) → 5m (Kayu 4) → 4m (Kayu 1) → 2m (Kayu 3). Maka susunannya dari bawah adalah 2 - 4 - 1 - 3."
+        penjelasan: "<b>Jawaban: A.</b><br>• <b>Dekomposisi & Sorting:</b> Urutkan dari yang paling panjang: 7m (Kayu 2) → 5m (Kayu 4) → 4m (Kayu 1) → 2m (Kayu 3)."
       },
 
-      // 3. Rute Berang-berang ke Sarang
+      // SK-03 (Mudah)
       {
         id: "2023-SD-01",
         level: "sikecil",
+        kesulitan: "Mudah",
         judul: "Rute Berang-berang ke Sarang",
         domain: "Algoritma Lintasan & Grid",
         pilarCT: "Algoritma Lintasan",
         tipe: "mc",
-        pilihanCount: 4,
         poinBenar: 100,
         penaltiSalah: 25,
         cerita: "Bimi si anak berang-berang ingin pulang ke sarangnya di kotak bintang (⭐). Bimi berada di kotak kiri-bawah (🏁). Bimi <b>tidak boleh</b> melewati kotak batu karang (🪨) dan hanya bisa bergerak ke kanan atau ke atas.",
         mediaSvg: `
-          <svg viewBox="0 0 220 220" class="w-52 h-52 bg-white rounded-2xl p-2 border-2 border-amber-300">
-            <!-- Grid 3x3 -->
+          <svg viewBox="0 0 220 220" class="w-48 h-48 bg-white rounded-2xl p-2 border-2 border-amber-300">
             <rect x="10" y="10" width="60" height="60" fill="#FEF3C7" stroke="#D97706" stroke-width="1.5"/>
             <rect x="75" y="10" width="60" height="60" fill="#FEF3C7" stroke="#D97706" stroke-width="1.5"/>
             <rect x="140" y="10" width="60" height="60" fill="#FEF08A" stroke="#CA8A04" stroke-width="2"/>
             <text x="170" y="47" font-size="24" text-anchor="middle">⭐</text>
-
             <rect x="10" y="75" width="60" height="60" fill="#FEF3C7" stroke="#D97706" stroke-width="1.5"/>
             <rect x="75" y="75" width="60" height="60" fill="#CBD5E1" stroke="#64748B" stroke-width="2"/>
             <text x="105" y="112" font-size="24" text-anchor="middle">🪨</text>
             <rect x="140" y="75" width="60" height="60" fill="#FEF3C7" stroke="#D97706" stroke-width="1.5"/>
-
             <rect x="10" y="140" width="60" height="60" fill="#DCFCE7" stroke="#16A34A" stroke-width="2"/>
             <text x="40" y="177" font-size="24" text-anchor="middle">🏁</text>
             <rect x="75" y="140" width="60" height="60" fill="#FEF3C7" stroke="#D97706" stroke-width="1.5"/>
@@ -590,30 +599,29 @@
         pertanyaan: "Instruksi langkah manakah yang aman membawa Bimi ke sarang (⭐) tanpa menabrak batu karang?",
         opsi: [
           { key: "A", teks: "Kanan → Kanan → Atas → Atas" },
-          { key: "B", teks: "Atas → Kanan → Kanan → Atas (Melewati batu 🪨)" },
+          { key: "B", teks: "Atas → Kanan → Kanan → Atas" },
           { key: "C", teks: "Kanan → Atas → Kanan → Bawah" },
           { key: "D", teks: "Atas → Atas → Kiri → Kiri" }
         ],
         kunci: "A",
-        penjelasan: "<b>Jawaban: A.</b><br>• <b>Algoritma Grid:</b> Batu karang berada di kotak tengah. Dari titik 🏁 (kiri-bawah), jalan yang aman adalah bergerak menyusuri tepi: Maju 2 kali ke Kanan, lalu 2 kali ke Atas menuju sarang ⭐."
+        penjelasan: "<b>Jawaban: A.</b><br>• <b>Algoritma Grid:</b> Batu berada di tengah. Jalan yang aman adalah menyusuri tepi: Kanan 2 kali lalu Atas 2 kali."
       },
 
-      // 4. Kalung Manik Pola Berulang
+      // SK-04 (Menengah)
       {
         id: "2019-SD-04",
         level: "sikecil",
+        kesulitan: "Menengah",
         judul: "Kalung Manik Berang-berang",
         domain: "Pengenalan Pola (Pattern Recognition)",
         pilarCT: "Pengenalan Pola Berulang",
         tipe: "mc",
-        pilihanCount: 4,
         poinBenar: 100,
         penaltiSalah: 25,
         cerita: "Ibu Bebras merangkai kalung manik dengan pola warna berulang teratur:<br><b>[🔴 Merah] → [🔵 Biru] → [🟡 Kuning] → [🔴 Merah] → [🔵 Biru] → [🟡 Kuning] → ...</b><br>Seorang anak memotong tali di bagian manik ke-8 dan ke-9.",
         mediaSvg: `
           <svg viewBox="0 0 340 70" class="w-full max-w-sm bg-white rounded-xl border border-slate-200 p-2">
             <line x1="20" y1="35" x2="320" y2="35" stroke="#94A3B8" stroke-width="3"/>
-            <!-- Manik 1-7 -->
             <circle cx="35" cy="35" r="12" fill="#EF4444"/><text x="35" y="39" fill="#FFF" font-size="9" text-anchor="middle" font-weight="bold">1</text>
             <circle cx="70" cy="35" r="12" fill="#3B82F6"/><text x="70" y="39" fill="#FFF" font-size="9" text-anchor="middle" font-weight="bold">2</text>
             <circle cx="105" cy="35" r="12" fill="#EAB308"/><text x="105" y="39" fill="#FFF" font-size="9" text-anchor="middle" font-weight="bold">3</text>
@@ -621,9 +629,8 @@
             <circle cx="175" cy="35" r="12" fill="#3B82F6"/><text x="175" y="39" fill="#FFF" font-size="9" text-anchor="middle" font-weight="bold">5</text>
             <circle cx="210" cy="35" r="12" fill="#EAB308"/><text x="210" y="39" fill="#FFF" font-size="9" text-anchor="middle" font-weight="bold">6</text>
             <circle cx="245" cy="35" r="12" fill="#EF4444"/><text x="245" y="39" fill="#FFF" font-size="9" text-anchor="middle" font-weight="bold">7</text>
-            <!-- Tanda Tanya ke 8 & 9 -->
-            <circle cx="280" cy="35" r="12" fill="#CBD5E1" stroke="#64748B" stroke-dasharray="2"/><text x="280" y="39" fill="#334155" font-size="10" font-weight="bold" text-anchor="middle">?</text>
-            <circle cx="315" cy="35" r="12" fill="#CBD5E1" stroke="#64748B" stroke-dasharray="2"/><text x="315" y="39" fill="#334155" font-size="10" font-weight="bold" text-anchor="middle">?</text>
+            <circle cx="280" cy="35" r="12" fill="#CBD5E1" stroke="#64748B" stroke-dasharray="2"/><text x="280" y="39" fill="#334155" font-size="10" font-weight="bold" text-anchor="middle">8?</text>
+            <circle cx="315" cy="35" r="12" fill="#CBD5E1" stroke="#64748B" stroke-dasharray="2"/><text x="315" y="39" fill="#334155" font-size="10" font-weight="bold" text-anchor="middle">9?</text>
           </svg>
         `,
         pertanyaan: "Apakah warna manik ke-8 dan manik ke-9 secara berturut-turut?",
@@ -634,24 +641,23 @@
           { key: "D", teks: "🔵 Biru lalu 🔴 Merah" }
         ],
         kunci: "A",
-        penjelasan: "<b>Jawaban: A.</b><br>• <b>Pengenalan Pola:</b> Polanya berulang setiap 3 manik: (1=Merah, 2=Biru, 3=Kuning), (4=Merah, 5=Biru, 6=Kuning), (7=Merah, maka 8=Biru, 9=Kuning)."
+        penjelasan: "<b>Jawaban: A.</b><br>• <b>Pengenalan Pola:</b> Pola berulang setiap 3 manik: (1=Merah, 2=Biru, 3=Kuning), (4=Merah, 5=Biru, 6=Kuning), (7=Merah, maka 8=Biru, 9=Kuning)."
       },
 
-      // 5. Timbangan Wortel & Apel
+      // SK-05 (Menengah)
       {
         id: "2022-SD-02",
         level: "sikecil",
+        kesulitan: "Menengah",
         judul: "Timbangan Buah di Dapur",
         domain: "Logika Relasional & Abstraksi",
         pilarCT: "Abstraksi & Relasi Nilai",
         tipe: "mc",
-        pilihanCount: 4,
         poinBenar: 100,
         penaltiSalah: 25,
         cerita: "Di pasar bebras, dilakukan penimbangan menggunakan timbangan neraca sederhana:<br>• <b>Timbangan 1:</b> 1 Semangka seimbang dengan 2 Apel.<br>• <b>Timbangan 2:</b> 1 Apel seimbang dengan 3 Strawberry.",
         mediaSvg: `
           <svg viewBox="0 0 320 110" class="w-full max-w-sm bg-amber-50 rounded-xl p-2 border border-amber-200">
-            <!-- Timbangan 1 -->
             <g transform="translate(10, 10)">
               <rect x="15" y="35" width="110" height="4" fill="#64748B"/>
               <polygon points="70,39 60,65 80,65" fill="#475569"/>
@@ -659,7 +665,6 @@
               <text x="100" y="30" font-size="16" text-anchor="middle">🍎🍎</text>
               <text x="70" y="80" font-size="9" font-weight="bold" fill="#334155" text-anchor="middle">1 Semangka = 2 Apel</text>
             </g>
-            <!-- Timbangan 2 -->
             <g transform="translate(170, 10)">
               <rect x="15" y="35" width="110" height="4" fill="#64748B"/>
               <polygon points="70,39 60,65 80,65" fill="#475569"/>
@@ -677,23 +682,23 @@
           { key: "D", teks: "3 Strawberry" }
         ],
         kunci: "A",
-        penjelasan: "<b>Jawaban: A.</b><br>• <b>Abstraksi & Substitusi:</b><br>1 Semangka = 2 Apel.<br>Karena 1 Apel = 3 Strawberry, maka 2 Apel = 2 × 3 = 6 Strawberry."
+        penjelasan: "<b>Jawaban: A.</b><br>• <b>Abstraksi & Substitusi:</b> 1 Semangka = 2 Apel. Karena 1 Apel = 3 Strawberry, maka 2 Apel = 2 × 3 = 6 Strawberry."
       },
 
-      // 6. Balon Warna-warni SiKecil
+      // SK-06 (Menengah)
       {
         id: "2024-SD-01",
         level: "sikecil",
+        kesulitan: "Menengah",
         judul: "Pesta Balon Berang-berang",
         domain: "Pengelompokan & Logika Himpunan",
         pilarCT: "Abstraksi & Klasifikasi Ciri",
-        tipe: "sa", // Isian singkat (tanpa penalti)
+        tipe: "sa",
         poinBenar: 100,
         penaltiSalah: 0,
         cerita: "Kiki membawa seikat balon ke pesta. Ada balon berbentuk <b>Bintang</b> dan <b>Bulat</b>. Warnanya ada <b>Kuning</b> dan <b>Biru</b>.<br><br>Ibu meminta: <i>'Kiki, tolong hitung berapa balon yang <b>berbentuk BINTANG</b> DAN <b>berwarna KUNING</b> saja!'</i>",
         mediaSvg: `
           <svg viewBox="0 0 300 110" class="w-full max-w-sm bg-sky-100 rounded-xl p-2 border border-sky-300">
-            <!-- Balon-balon -->
             <g transform="translate(30, 45)"><text x="0" y="0" font-size="28" text-anchor="middle">⭐</text><line x1="0" y1="5" x2="0" y2="40" stroke="#64748B"/><text x="0" y="52" font-size="8" fill="#475569" text-anchor="middle">Kuning</text></g>
             <g transform="translate(80, 45)"><circle cx="0" cy="-6" r="14" fill="#3B82F6"/><line x1="0" y1="8" x2="0" y2="40" stroke="#64748B"/><text x="0" y="52" font-size="8" fill="#475569" text-anchor="middle">Bulat Biru</text></g>
             <g transform="translate(130, 45)"><text x="0" y="0" font-size="28" text-anchor="middle">⭐</text><line x1="0" y1="5" x2="0" y2="40" stroke="#64748B"/><text x="0" y="52" font-size="8" fill="#475569" text-anchor="middle">Kuning</text></g>
@@ -705,27 +710,215 @@
         pertanyaan: "Ketik ANGKA saja: Berapakah jumlah balon yang berbentuk BINTANG berwarna KUNING?",
         inputPlaceholder: "Ketik angka (misal: 2)...",
         kunci: "3",
-        penjelasan: "<b>Jawaban: 3.</b><br>• <b>Klasifikasi Karakteristik:</b> Kita menyaring objek dengan dua kondisi: Bentuk = Bintang DAN Warna = Kuning. Pada gambar terdapat 3 bintang kuning."
+        penjelasan: "<b>Jawaban: 3.</b><br>• <b>Klasifikasi Karakteristik:</b> Terdapat 4 balon bintang, namun 1 di antaranya berwarna biru. Jadi yang berbentuk Bintang DAN berwarna Kuning hanya ada 3."
       },
 
-      // 7. Menara Balok Warna (LIFO / Stack)
+      // SK-07 (Sulit / Jebakan Logika Negasi)
+      {
+        id: "2024-SK-07",
+        level: "sikecil",
+        kesulitan: "Sulit • Jebakan",
+        judul: "Kotak Bekal Ajaib Kiki",
+        domain: "Logika Negasi & Eliminasi",
+        pilarCT: "Abstraksi & Logika Negasi (BUKAN)",
+        tipe: "mc",
+        poinBenar: 100,
+        penaltiSalah: 25,
+        cerita: "Ibu menyiapkan 4 kotak bekal bertutup: <b>Kotak A, B, C, dan D</b>. Hanya ada <b>1 kotak</b> yang berisi <b>Kue Cokelat</b>. Ibu memberi 3 petunjuk:<br>1. Kue Cokelat <b>tidak</b> berada di ujung paling kiri maupun ujung paling kanan.<br>2. Kotak yang berisi Kue Cokelat <b>bukan</b> berwarna Biru.<br>3. Kotak C berwarna Biru.",
+        mediaSvg: `
+          <svg viewBox="0 0 360 105" class="w-full max-w-md bg-white rounded-xl border border-slate-200 p-2">
+            <rect x="20" y="25" width="65" height="50" rx="10" fill="#EF4444"/><text x="52" y="54" fill="#FFF" font-size="13" font-weight="bold" text-anchor="middle">Kotak A</text><text x="52" y="90" fill="#64748B" font-size="9" text-anchor="middle">Merah (Ujung Kiri)</text>
+            <rect x="105" y="25" width="65" height="50" rx="10" fill="#10B981"/><text x="137" y="54" fill="#FFF" font-size="13" font-weight="bold" text-anchor="middle">Kotak B</text><text x="137" y="90" fill="#64748B" font-size="9" text-anchor="middle">Hijau</text>
+            <rect x="190" y="25" width="65" height="50" rx="10" fill="#3B82F6"/><text x="222" y="54" fill="#FFF" font-size="13" font-weight="bold" text-anchor="middle">Kotak C</text><text x="222" y="90" fill="#64748B" font-size="9" text-anchor="middle">Biru</text>
+            <rect x="275" y="25" width="65" height="50" rx="10" fill="#F59E0B"/><text x="307" y="54" fill="#FFF" font-size="13" font-weight="bold" text-anchor="middle">Kotak D</text><text x="307" y="90" fill="#64748B" font-size="9" text-anchor="middle">Kuning (Ujung Kanan)</text>
+          </svg>
+        `,
+        pertanyaan: "Di kotak manakah Kue Cokelat berada?",
+        opsi: [
+          { key: "A", teks: "Kotak B (Hijau)" },
+          { key: "B", teks: "Kotak C (Biru)" },
+          { key: "C", teks: "Kotak A (Merah)" },
+          { key: "D", teks: "Kotak D (Kuning)" }
+        ],
+        kunci: "A",
+        penjelasan: "<b>Jawaban: A (Kotak B).</b><br>• <b>Analisis Jebakan:</b> Petunjuk 1 mencoret Kotak A (ujung kiri) dan Kotak D (ujung kanan), tersisa B dan C.<br>• Petunjuk 2 & 3 menyatakan bukan kotak biru (Kotak C dicoret). Maka satu-satunya pilihan yang tersisa adalah <b>Kotak B</b>."
+      },
+
+      // SK-08 (Sulit / Jebakan Posisi & Urutan Cermin)
+      {
+        id: "2024-SK-08",
+        level: "sikecil",
+        kesulitan: "Sulit • Jebakan",
+        judul: "Antrean Perosotan Taman",
+        domain: "Logika Posisi Relatif",
+        pilarCT: "Dekomposisi & Penalaran Spasial",
+        tipe: "mc",
+        poinBenar: 100,
+        penaltiSalah: 25,
+        cerita: "Ada 4 anak berang-berang sedang mengantre naik perosotan menghadap ke <b>KIRI</b> (ke arah tangga perosotan):<br>• <b>Bobi</b> berdiri tepat di belakang <b>Ani</b>.<br>• <b>Cici</b> berdiri paling depan (paling dekat tangga perosotan di sebelah kiri).<br>• <b>Dodi</b> berdiri di antara <b>Cici</b> dan <b>Ani</b>.",
+        mediaSvg: `
+          <svg viewBox="0 0 360 100" class="w-full max-w-md bg-amber-50 rounded-xl border border-amber-200 p-2">
+            <polygon points="15,85 55,20 75,20 75,85" fill="#F97316"/>
+            <text x="50" y="96" fill="#9A3412" font-size="9" font-weight="bold" text-anchor="middle">Tangga (DEPAN)</text>
+            <circle cx="115" cy="52" r="18" fill="#FEF08A" stroke="#CA8A04" stroke-width="2"/><text x="115" y="56" font-size="11" font-weight="bold" text-anchor="middle">1</text>
+            <circle cx="175" cy="52" r="18" fill="#FEF08A" stroke="#CA8A04" stroke-width="2"/><text x="175" y="56" font-size="11" font-weight="bold" text-anchor="middle">2</text>
+            <circle cx="235" cy="52" r="18" fill="#FEF08A" stroke="#CA8A04" stroke-width="2"/><text x="235" y="56" font-size="11" font-weight="bold" text-anchor="middle">3</text>
+            <circle cx="295" cy="52" r="18" fill="#FEF08A" stroke="#CA8A04" stroke-width="2"/><text x="295" y="56" font-size="11" font-weight="bold" text-anchor="middle">4</text>
+            <text x="315" y="96" fill="#64748B" font-size="9" font-weight="bold" text-anchor="middle">(BELAKANG)</text>
+          </svg>
+        `,
+        pertanyaan: "Siapakah yang berdiri di urutan ke-3 dari depan (lingkaran nomor 3)?",
+        opsi: [
+          { key: "A", teks: "Ani" },
+          { key: "B", teks: "Dodi" },
+          { key: "C", teks: "Bobi" },
+          { key: "D", teks: "Cici" }
+        ],
+        kunci: "A",
+        penjelasan: "<b>Jawaban: A (Ani).</b><br>• <b>Analisis Jebakan:</b> Banyak siswa terjebak membayangkan posisi dari kanan ke kiri, padahal arah hadap ke KIRI:<br>1 (Depan) = Cici<br>2 = Dodi (di antara Cici & Ani)<br>3 = <b>Ani</b><br>4 (Belakang) = Bobi (di belakang Ani)."
+      },
+
+      // SK-09 (Sulit / Jebakan Menghitung Langkah Mundur)
+      {
+        id: "2024-SK-09",
+        level: "sikecil",
+        kesulitan: "Sulit • Jebakan",
+        judul: "Katak Lompat di Batu Sungai",
+        domain: "Simulasi State & Algoritma",
+        pilarCT: "Pelacakan State (State Tracing)",
+        tipe: "sa",
+        poinBenar: 100,
+        penaltiSalah: 0,
+        cerita: "Terdapat deretan batu bernomor <b>1 sampai 10</b> dari kiri ke kanan. Seekor katak mulai berdiri di <b>Batu Nomor 2</b>.<br>Katak melakukan 3 perintah berturut-turut:<br>1. Lompat maju <b>5 batu</b> ke kanan.<br>2. Karena licin, terpeleset mundur <b>3 batu</b> ke kiri.<br>3. Lompat maju lagi <b>4 batu</b> ke kanan.",
+        mediaSvg: `
+          <svg viewBox="0 0 380 75" class="w-full max-w-md bg-sky-900 rounded-xl p-2">
+            ${[1,2,3,4,5,6,7,8,9,10].map((n, i) => `
+              <rect x="${12 + i*36}" y="22" width="30" height="30" rx="8" fill="${n===2 ? '#10B981' : '#E2E8F0'}"/>
+              <text x="${27 + i*36}" y="41" fill="${n===2 ? '#FFF' : '#1E293B'}" font-size="11" font-weight="bold" text-anchor="middle">${n}</text>
+            `).join('')}
+            <text x="45" y="14" fill="#6EE7B7" font-size="9" font-weight="bold" text-anchor="middle">Start (Batu 2)</text>
+          </svg>
+        `,
+        pertanyaan: "Ketik ANGKA saja: Di batu nomor berapakah katak berhenti sekarang?",
+        inputPlaceholder: "Ketik nomor batu (1-10)...",
+        kunci: "8",
+        penjelasan: "<b>Jawaban: 8.</b><br>• <b>Analisis Jebakan:</b> Siswa yang terburu-buru sering menghitung 5 - 3 + 4 = 6 (lupa bahwa posisi awal adalah Batu 2, bukan 0!).<br>• Perhitungan benar: 2 + 5 = 7 → 7 - 3 = 4 → 4 + 4 = <b>8</b>."
+      },
+
+      // SK-10 (Sulit / Jebakan Aturan Tukar Stiker)
+      {
+        id: "2024-SK-10",
+        level: "sikecil",
+        kesulitan: "Sulit • Jebakan",
+        judul: "Mesin Penukar Stiker",
+        domain: "Aturan Transformasi & Komposisi",
+        pilarCT: "Algoritma & Pemrosesan Berurutan",
+        tipe: "mc",
+        poinBenar: 100,
+        penaltiSalah: 25,
+        cerita: "Mesin penukar stiker bekerja dengan aturan:<br>• Masukkan <b>1 Stiker Bulan (🌙)</b> → keluar <b>2 Stiker Bintang (⭐)</b>.<br>• Masukkan <b>1 Stiker Bintang (⭐)</b> → keluar <b>1 Stiker Hati (❤️) + 1 Stiker Bintang (⭐)</b>.<br><br>Rina awalnya punya <b>1 Stiker Bulan (🌙)</b>. Ia memasukkan seluruh stiker yang dimilikinya ke mesin sesuai aturan di atas (setiap stiker hanya boleh dimasukkan <b>1 kali</b> ke mesin).",
+        mediaSvg: `
+          <svg viewBox="0 0 340 95" class="w-full max-w-sm bg-purple-50 rounded-xl border border-purple-200 p-2">
+            <rect x="15" y="18" width="140" height="58" rx="10" fill="#7C3AED"/>
+            <text x="85" y="42" fill="#FFF" font-size="11" font-weight="bold" text-anchor="middle">1 🌙  ➔  2 ⭐</text>
+            <text x="85" y="60" fill="#DDD6FE" font-size="9" text-anchor="middle">Aturan 1</text>
+            <rect x="185" y="18" width="140" height="58" rx="10" fill="#DB2777"/>
+            <text x="255" y="42" fill="#FFF" font-size="11" font-weight="bold" text-anchor="middle">1 ⭐  ➔  1 ❤️ + 1 ⭐</text>
+            <text x="255" y="60" fill="#FCE7F3" font-size="9" text-anchor="middle">Aturan 2</text>
+          </svg>
+        `,
+        pertanyaan: "Setelah semua stiker diproses 1 kali, total ada berapa BUAH stiker yang dipegang Rina sekarang?",
+        opsi: [
+          { key: "A", teks: "4 stiker (2 Stiker Hati + 2 Stiker Bintang)" },
+          { key: "B", teks: "2 stiker (2 Stiker Hati saja)" },
+          { key: "C", teks: "3 stiker (1 Bulan + 2 Bintang)" },
+          { key: "D", teks: "5 stiker" }
+        ],
+        kunci: "A",
+        penjelasan: "<b>Jawaban: A (4 stiker).</b><br>• <b>Analisis Jebakan:</b><br>1. 1 Bulan (🌙) masuk mesin → ditukar menjadi 2 Bintang (⭐) (Bulan sudah hilang).<br>2. Masing-masing dari 2 Bintang (⭐) itu dimasukkan lagi 1 kali: Bintang pertama jadi (1❤️ + 1⭐), Bintang kedua jadi (1❤️ + 1⭐).<br>3. Total akhir = 2❤️ + 2⭐ = <b>4 stiker</b>."
+      },
+
+      // SK-11 (Sulit / Jebakan Peta Arah Mata Angin)
+      {
+        id: "2024-SK-11",
+        level: "sikecil",
+        kesulitan: "Sulit • Jebakan",
+        judul: "Kompas Robot Kebun",
+        domain: "Orientasi Arah Relatif",
+        pilarCT: "Algoritma & Transformasi Arah",
+        tipe: "mc",
+        poinBenar: 100,
+        penaltiSalah: 25,
+        cerita: "Robot kebun awalnya menghadap ke arah <b>UTARA (Atas)</b>.<br>Ia menjalankan perintah:<br>1. <b>Putar Kanan 90°</b><br>2. <b>Putar Kanan 90°</b><br>3. <b>Putar Kiri 90°</b><br>4. <b>Balik Arah (180°)</b>",
+        mediaSvg: `
+          <svg viewBox="0 0 220 130" class="w-48 h-32 bg-slate-900 rounded-xl p-2">
+            <circle cx="110" cy="65" r="42" fill="none" stroke="#64748B" stroke-width="2"/>
+            <text x="110" y="18" fill="#FDE047" font-size="11" font-weight="bold" text-anchor="middle">UTARA</text>
+            <text x="110" y="122" fill="#94A3B8" font-size="10" font-weight="bold" text-anchor="middle">SELATAN</text>
+            <text x="175" y="69" fill="#94A3B8" font-size="10" font-weight="bold" text-anchor="middle">TIMUR</text>
+            <text x="45" y="69" fill="#94A3B8" font-size="10" font-weight="bold" text-anchor="middle">BARAT</text>
+            <polygon points="110,32 103,65 117,65" fill="#EF4444"/>
+            <polygon points="110,98 103,65 117,65" fill="#CBD5E1"/>
+          </svg>
+        `,
+        pertanyaan: "Ke arah manakah robot kebun menghadap sekarang?",
+        opsi: [
+          { key: "A", teks: "BARAT" },
+          { key: "B", teks: "TIMUR" },
+          { key: "C", teks: "SELATAN" },
+          { key: "D", teks: "UTARA" }
+        ],
+        kunci: "A",
+        penjelasan: "<b>Jawaban: A (BARAT).</b><br>• <b>Pelacakan Arah:</b><br>Awal: Utara<br>1. Putar Kanan → Timur<br>2. Putar Kanan → Selatan<br>3. Putar Kiri → kembali ke Timur<br>4. Balik Arah 180° dari Timur → <b>BARAT</b>."
+      },
+
+      // SK-12 (Menengah-Sulit / Matching Logika)
+      {
+        id: "2024-SK-12",
+        level: "sikecil",
+        kesulitan: "Sulit • Logika",
+        judul: "Topi Kesukaan Tiga Sahabat",
+        domain: "Deduksi Logika & Eliminasi",
+        pilarCT: "Abstraksi & Penalaran Deduktif",
+        tipe: "matching",
+        poinBenar: 100,
+        penaltiSalah: 0,
+        cerita: "Tiga sahabat bebras (<b>Lala, Mimi, Nono</b>) masing-masing memakai 1 topi berbeda warna: <b>Merah, Hijau, atau Ungu</b>.<br>• <b>Lala</b> tidak suka warna Merah dan tidak memakai topi Ungu.<br>• <b>Mimi</b> bukan pemakai topi Merah.",
+        mediaSvg: `
+          <div class="flex justify-center gap-4 py-1 text-xs font-bold">
+            <span class="px-3 py-1.5 rounded-xl bg-rose-100 text-rose-800 border border-rose-300">🎩 Topi Merah</span>
+            <span class="px-3 py-1.5 rounded-xl bg-emerald-100 text-emerald-800 border border-emerald-300">🎩 Topi Hijau</span>
+            <span class="px-3 py-1.5 rounded-xl bg-purple-100 text-purple-800 border border-purple-300">🎩 Topi Ungu</span>
+          </div>
+        `,
+        pertanyaan: "Pasangkan masing-masing sahabat dengan warna topi yang tepat:",
+        pasangan: [
+          { item: "Lala", opsi: ["Topi Merah", "Topi Hijau", "Topi Ungu"], kunci: "Topi Hijau" },
+          { item: "Mimi", opsi: ["Topi Merah", "Topi Hijau", "Topi Ungu"], kunci: "Topi Ungu" },
+          { item: "Nono", opsi: ["Topi Merah", "Topi Hijau", "Topi Ungu"], kunci: "Topi Merah" }
+        ],
+        penjelasan: "<b>Jawaban Benar:</b><br>• Lala bukan Merah & bukan Ungu → Lala = <b>Topi Hijau</b>.<br>• Tersisa Merah & Ungu. Mimi bukan Merah → Mimi = <b>Topi Ungu</b>.<br>• Sisanya Nono = <b>Topi Merah</b>."
+      },
+
+
+      /* ===========================================================
+         KATEGORI 2: SIAGA (KELAS 4, 5, & 6 SD) — 12 SOAL
+      =========================================================== */
+      // SG-01 (Mudah)
       {
         id: "2020-SD-07",
         level: "siaga",
-        judul: "Menara Balok Mainan",
+        kesulitan: "Mudah",
+        judul: "Menara Balok Mainan (Stack)",
         domain: "Struktur Data Tumpukan (Stack)",
         pilarCT: "Struktur Data (LIFO - Stack)",
         tipe: "mc",
-        pilihanCount: 4,
         poinBenar: 100,
         penaltiSalah: 25,
         cerita: "Timi menumpuk 4 balok kayu ke dalam kotak silinder sempit dari bawah ke atas dengan urutan: <b>[1. Hijau]</b> dimasukkan paling dulu, lalu <b>[2. Merah]</b>, lalu <b>[3. Biru]</b>, dan terakhir <b>[4. Kuning]</b>.<br>Karena kotaknya sempit, Timi hanya bisa mengambil balok dari <b>paling atas satu per satu</b>.",
         mediaSvg: `
           <svg viewBox="0 0 200 160" class="w-48 h-44 bg-white rounded-xl border border-slate-300 p-2">
-            <!-- Silinder Kotak -->
-            <rect x="50" y="15" width="100" height="135" fill="#F8FAFC" stroke="#475569" stroke-width="3" stroke-dasharray="0"/>
-            <line x1="50" y1="15" x2="150" y2="15" stroke="transparent"/>
-            <!-- Balok Ditumpuk -->
+            <rect x="50" y="15" width="100" height="135" fill="#F8FAFC" stroke="#475569" stroke-width="3"/>
             <rect x="55" y="115" width="90" height="28" rx="4" fill="#22C55E"/><text x="100" y="133" fill="#FFF" font-size="10" font-weight="bold" text-anchor="middle">1. Hijau (Bawah)</text>
             <rect x="55" y="83" width="90" height="28" rx="4" fill="#EF4444"/><text x="100" y="101" fill="#FFF" font-size="10" font-weight="bold" text-anchor="middle">2. Merah</text>
             <rect x="55" y="51" width="90" height="28" rx="4" fill="#3B82F6"/><text x="100" y="69" fill="#FFF" font-size="10" font-weight="bold" text-anchor="middle">3. Biru</text>
@@ -740,39 +933,34 @@
           { key: "D", teks: "Tidak ada, balok Merah bisa ditarik langsung dari tengah" }
         ],
         kunci: "A",
-        penjelasan: "<b>Jawaban: A.</b><br>• <b>Konsep Stack (LIFO - Last In First Out):</b> Balok yang paling atas adalah balok nomor 4 (Kuning) dan nomor 3 (Biru). Untuk menyentuh balok nomor 2 (Merah), Timi harus memindahkan 2 balok di atasnya terlebih dahulu."
+        penjelasan: "<b>Jawaban: A.</b><br>• <b>Konsep Stack (LIFO):</b> Di atas balok Merah ada balok Biru dan balok Kuning, sehingga 2 balok harus dikeluarkan lebih dulu."
       },
 
-      // 8. Graf dari Sebuah Peta (2010-AT-06)
+      // SG-02 (Mudah)
       {
         id: "2010-AT-06",
         level: "siaga",
+        kesulitan: "Mudah",
         judul: "Graf Peta Wilayah Bebras",
         domain: "Struktur Data & Abstraksi Graf",
-        pilarCT: "Abstraksi Graf & Hubungan Ketetanggaan",
+        pilarCT: "Abstraksi Graf & Ketetanggaan",
         tipe: "mc",
-        pilihanCount: 4,
         poinBenar: 100,
         penaltiSalah: 25,
-        cerita: "Peta wilayah dapat digambarkan menjadi sebuah <b>Graf</b>. Setiap negara dilambangkan oleh sebuah <b>lingkaran (simpul)</b>, dan batas negara tetangga dilambangkan dengan <b>garis hubung</b>.<br>Perhatikan graf wilayah berikut di mana ada satu wilayah di tengah yang terhubung dengan wilayah-wilayah di sekelilingnya.",
+        cerita: "Peta wilayah dapat digambarkan menjadi sebuah <b>Graf</b>. Setiap negara dilambangkan oleh sebuah <b>lingkaran (simpul)</b>, dan batas negara tetangga dilambangkan dengan <b>garis hubung</b>.",
         mediaSvg: `
-          <svg viewBox="0 0 240 180" class="w-56 h-44 bg-slate-900 rounded-2xl p-2 shadow-inner">
-            <line x1="120" y1="90" x2="70" y2="40" stroke="#94A3B8" stroke-width="2"/>
-            <line x1="120" y1="90" x2="170" y2="40" stroke="#94A3B8" stroke-width="2"/>
-            <line x1="120" y1="90" x2="200" y2="90" stroke="#94A3B8" stroke-width="2"/>
-            <line x1="120" y1="90" x2="170" y2="145" stroke="#94A3B8" stroke-width="2"/>
-            <line x1="120" y1="90" x2="70" y2="145" stroke="#94A3B8" stroke-width="2"/>
-            <line x1="120" y1="90" x2="40" y2="90" stroke="#94A3B8" stroke-width="2"/>
-            <!-- Simpul Pusat -->
-            <circle cx="120" cy="90" r="16" fill="#F59E0B" stroke="#FFF" stroke-width="2"/>
-            <text x="120" y="94" font-size="9" font-weight="bold" fill="#000" text-anchor="middle">Pusat</text>
-            <!-- Simpul Luar -->
-            <circle cx="70" cy="40" r="10" fill="#38BDF8"/>
-            <circle cx="170" cy="40" r="10" fill="#38BDF8"/>
-            <circle cx="200" cy="90" r="10" fill="#38BDF8"/>
-            <circle cx="170" cy="145" r="10" fill="#38BDF8"/>
-            <circle cx="70" cy="145" r="10" fill="#38BDF8"/>
-            <circle cx="40" cy="90" r="10" fill="#38BDF8"/>
+          <svg viewBox="0 0 240 175" class="w-56 h-40 bg-slate-900 rounded-2xl p-2 shadow-inner">
+            <line x1="120" y1="88" x2="70" y2="38" stroke="#94A3B8" stroke-width="2"/>
+            <line x1="120" y1="88" x2="170" y2="38" stroke="#94A3B8" stroke-width="2"/>
+            <line x1="120" y1="88" x2="200" y2="88" stroke="#94A3B8" stroke-width="2"/>
+            <line x1="120" y1="88" x2="170" y2="140" stroke="#94A3B8" stroke-width="2"/>
+            <line x1="120" y1="88" x2="70" y2="140" stroke="#94A3B8" stroke-width="2"/>
+            <line x1="120" y1="88" x2="40" y2="88" stroke="#94A3B8" stroke-width="2"/>
+            <circle cx="120" cy="88" r="16" fill="#F59E0B" stroke="#FFF" stroke-width="2"/>
+            <text x="120" y="92" font-size="9" font-weight="bold" fill="#000" text-anchor="middle">Pusat</text>
+            <circle cx="70" cy="38" r="10" fill="#38BDF8"/><circle cx="170" cy="38" r="10" fill="#38BDF8"/>
+            <circle cx="200" cy="88" r="10" fill="#38BDF8"/><circle cx="170" cy="140" r="10" fill="#38BDF8"/>
+            <circle cx="70" cy="140" r="10" fill="#38BDF8"/><circle cx="40" cy="88" r="10" fill="#38BDF8"/>
           </svg>
         `,
         pertanyaan: "Berdasarkan graf di atas, berapakah banyak negara tetangga yang berbatasan langsung dengan negara 'Pusat'?",
@@ -783,37 +971,34 @@
           { key: "D", teks: "4 negara tetangga" }
         ],
         kunci: "A",
-        penjelasan: "<b>Jawaban: A.</b><br>• <b>Abstraksi Graf:</b> Derajat simpul dihitung dari banyaknya garis yang terhubung padanya. Simpul 'Pusat' terhubung dengan 6 garis lurus menuju 6 lingkaran di sekelilingnya, artinya berbatasan dengan 6 tetangga."
+        penjelasan: "<b>Jawaban: A.</b><br>• <b>Derajat Simpul Graf:</b> Simpul 'Pusat' memiliki 6 garis penghubung ke 6 lingkaran tetangganya."
       },
 
-      // 9. Pipa Air Pintar Lembah Bebras (2020-CA-04)
+      // SG-03 (Menengah)
       {
         id: "2020-CA-04",
         level: "siaga",
+        kesulitan: "Menengah",
         judul: "Pipa Air Lembah Bebras",
         domain: "Logika Boolean & Kondisional",
         pilarCT: "Logika Kondisional (IF-ELSE)",
-        tipe: "sa", // Isian Singkat
+        tipe: "sa",
         poinBenar: 100,
         penaltiSalah: 0,
-        cerita: "Air mengalir melewati katup angka pintar:<br>• Jika angka pada katup bernilai <b>GENAP</b>, air mengalir ke pipa <b>KIRI</b>.<br>• Jika angka pada katup bernilai <b>GANJIL</b>, air mengalir ke pipa <b>KANAN</b>.<br><br>Katup tingkat 1 bernilai <b>14</b>. Jika ke kiri masuk katup <b>9</b>, jika ke kanan masuk katup <b>12</b>.<br>Tersedia 4 kolam penampungan di bawah dari kiri ke kanan: <b>A, B, C, D</b>.",
+        cerita: "Air mengalir melewati katup angka pintar:<br>• Jika angka pada katup bernilai <b>GENAP</b>, air mengalir ke pipa <b>KIRI</b>.<br>• Jika angka pada katup bernilai <b>GANJIL</b>, air mengalir ke pipa <b>KANAN</b>.<br><br>Katup tingkat 1 bernilai <b>14</b>. Jika ke kiri masuk katup <b>9</b>, jika ke kanan masuk katup <b>12</b>.",
         mediaSvg: `
-          <svg viewBox="0 0 320 160" class="w-full max-w-sm bg-sky-950 rounded-2xl p-2 shadow-inner">
+          <svg viewBox="0 0 320 155" class="w-full max-w-sm bg-sky-950 rounded-2xl p-2 shadow-inner">
             <circle cx="160" cy="18" r="12" fill="#0EA5E9"/><text x="160" y="22" fill="#FFF" font-size="8" font-weight="bold" text-anchor="middle">SUMBER</text>
             <line x1="160" y1="30" x2="160" y2="45" stroke="#38BDF8" stroke-width="3"/>
-            <!-- Katup 14 -->
             <rect x="140" y="45" width="40" height="20" rx="4" fill="#F59E0B"/><text x="160" y="59" fill="#FFF" font-size="10" font-weight="bold" text-anchor="middle">14</text>
             <line x1="140" y1="65" x2="90" y2="85" stroke="#38BDF8" stroke-width="2.5"/>
             <line x1="180" y1="65" x2="230" y2="85" stroke="#38BDF8" stroke-width="2.5"/>
-            <!-- Katup 9 & 12 -->
             <rect x="70" y="85" width="40" height="20" rx="4" fill="#F59E0B"/><text x="90" y="99" fill="#FFF" font-size="10" font-weight="bold" text-anchor="middle">9</text>
             <rect x="210" y="85" width="40" height="20" rx="4" fill="#F59E0B"/><text x="230" y="99" fill="#FFF" font-size="10" font-weight="bold" text-anchor="middle">12</text>
-            <!-- Cabang ke A, B, C, D -->
             <line x1="75" y1="105" x2="40" y2="125" stroke="#38BDF8" stroke-width="2"/>
             <line x1="105" y1="105" x2="120" y2="125" stroke="#38BDF8" stroke-width="2"/>
             <line x1="215" y1="105" x2="200" y2="125" stroke="#38BDF8" stroke-width="2"/>
             <line x1="245" y1="105" x2="280" y2="125" stroke="#38BDF8" stroke-width="2"/>
-            <!-- Kolam A B C D -->
             <rect x="25" y="125" width="30" height="22" rx="3" fill="#0284C7"/><text x="40" y="140" fill="#FFF" font-size="10" font-weight="bold" text-anchor="middle">A</text>
             <rect x="105" y="125" width="30" height="22" rx="3" fill="#0284C7"/><text x="120" y="140" fill="#FFF" font-size="10" font-weight="bold" text-anchor="middle">B</text>
             <rect x="185" y="125" width="30" height="22" rx="3" fill="#0284C7"/><text x="200" y="140" fill="#FFF" font-size="10" font-weight="bold" text-anchor="middle">C</text>
@@ -823,27 +1008,27 @@
         pertanyaan: "Ketik 1 HURUF SAJA (A, B, C, atau D): Di kolam manakah air akan bermuara?",
         inputPlaceholder: "Ketik A, B, C, atau D...",
         kunci: "B",
-        penjelasan: "<b>Jawaban: B.</b><br>• <b>Logika Percabangan IF-ELSE:</b><br>1. Katup pertama adalah 14 (GENAP) → Air belok ke arah KIRI menuju katup 9.<br>2. Katup kedua adalah 9 (GANJIL) → Air belok ke arah KANAN.<br>3. Pipa kanan katup 9 jatuh tepat di Kolam B."
+        penjelasan: "<b>Jawaban: B.</b><br>• 14 adalah Genap → belok Kiri ke katup 9.<br>• 9 adalah Ganjil → belok Kanan menuju <b>Kolam B</b>."
       },
 
-      // 10. Robot Pemotong Rumput (Loop Instruksi)
+      // SG-04 (Menengah)
       {
         id: "2019-KR-02",
         level: "siaga",
+        kesulitan: "Menengah",
         judul: "Robot Pemotong Rumput",
         domain: "Algoritma Perulangan (Loops)",
         pilarCT: "Algoritma Pemrograman Visual",
         tipe: "mc",
-        pilihanCount: 4,
         poinBenar: 100,
         penaltiSalah: 25,
         cerita: "Robot bebras memiliki program perulangan: <br><code class='bg-amber-100 text-amber-900 px-2 py-0.5 rounded font-mono text-xs'>Ulangi 4 kali:<br>&nbsp;&nbsp;Maju 3 meter.<br>&nbsp;&nbsp;Putar Kanan 90 derajat.</code>",
         mediaSvg: `
-          <svg viewBox="0 0 240 140" class="w-56 h-32 bg-slate-900 rounded-xl p-2">
-            <rect x="70" y="25" width="90" height="90" fill="none" stroke="#F59E0B" stroke-width="2.5" stroke-dasharray="4"/>
-            <circle cx="70" cy="115" r="6" fill="#10B981"/>
-            <text x="70" y="130" fill="#A7F3D0" font-size="9" font-weight="bold" text-anchor="middle">Mulai</text>
-            <text x="115" y="75" fill="#FFFFFF" font-size="11" font-weight="bold" text-anchor="middle">Bujur Sangkar</text>
+          <svg viewBox="0 0 240 135" class="w-56 h-32 bg-slate-900 rounded-xl p-2">
+            <rect x="75" y="22" width="85" height="85" fill="none" stroke="#F59E0B" stroke-width="2.5" stroke-dasharray="4"/>
+            <circle cx="75" cy="107" r="6" fill="#10B981"/>
+            <text x="75" y="123" fill="#A7F3D0" font-size="9" font-weight="bold" text-anchor="middle">Mulai</text>
+            <text x="117" y="68" fill="#FFFFFF" font-size="11" font-weight="bold" text-anchor="middle">Bujur Sangkar</text>
           </svg>
         `,
         pertanyaan: "Bentuk lintasan apakah yang dibuat oleh robot pemotong rumput tersebut setelah selesai?",
@@ -854,31 +1039,27 @@
           { key: "D", teks: "Bintang bersudut lima" }
         ],
         kunci: "A",
-        penjelasan: "<b>Jawaban: A.</b><br>• <b>Algoritma Geometri & Loop:</b> Perintah maju dengan panjang yang sama diselingi belok kanan 90 derajat sebanyak 4 kali membentuk 4 sisi tertutup bujur sangkar (persegi)."
+        penjelasan: "<b>Jawaban: A.</b><br>• Maju sama panjang lalu berbelok 90° sebanyak 4 kali membentuk bangun persegi tertutup."
       },
 
-      // 11. Kode Rahasia Jejak Kaki (Cipher Substitusi)
+      // SG-05 (Menengah)
       {
         id: "2023-SD-11",
         level: "siaga",
+        kesulitan: "Menengah",
         judul: "Sandi Ranting Pohon",
         domain: "Kriptografi & Substitusi Simbol",
         pilarCT: "Dekripsi & Pemetaan Simbol",
         tipe: "mc",
-        pilihanCount: 4,
         poinBenar: 100,
         penaltiSalah: 25,
-        cerita: "Dua kelompok bebras mengirim pesan rahasia dengan kode ranting:<br>• <b>[|] = A</b><br>• <b>[||] = B</b><br>• <b>[△] = I</b><br>• <b>[□] = U</b><br>Pesan yang terkirim di atas daun adalah: <b>[||] - [|] - [△] - [|]</b>.",
+        cerita: "Dua kelompok bebras mengirim pesan rahasia dengan kode ranting:<br>• <b>[|] = A</b> &nbsp;&nbsp;• <b>[||] = B</b> &nbsp;&nbsp;• <b>[△] = I</b> &nbsp;&nbsp;• <b>[□] = U</b><br>Pesan yang terkirim di atas daun adalah: <b>[||] - [|] - [△] - [|]</b>.",
         mediaSvg: `
           <svg viewBox="0 0 300 70" class="w-full max-w-sm bg-emerald-950 rounded-xl p-2">
-            <rect x="25" y="15" width="55" height="40" rx="8" fill="#1E293B"/>
-            <text x="52" y="40" fill="#FDE047" font-size="16" font-weight="bold" text-anchor="middle">||</text>
-            <rect x="90" y="15" width="55" height="40" rx="8" fill="#1E293B"/>
-            <text x="117" y="40" fill="#FDE047" font-size="16" font-weight="bold" text-anchor="middle">|</text>
-            <rect x="155" y="15" width="55" height="40" rx="8" fill="#1E293B"/>
-            <text x="182" y="40" fill="#FDE047" font-size="16" font-weight="bold" text-anchor="middle">△</text>
-            <rect x="220" y="15" width="55" height="40" rx="8" fill="#1E293B"/>
-            <text x="247" y="40" fill="#FDE047" font-size="16" font-weight="bold" text-anchor="middle">|</text>
+            <rect x="25" y="15" width="55" height="40" rx="8" fill="#1E293B"/><text x="52" y="40" fill="#FDE047" font-size="16" font-weight="bold" text-anchor="middle">||</text>
+            <rect x="90" y="15" width="55" height="40" rx="8" fill="#1E293B"/><text x="117" y="40" fill="#FDE047" font-size="16" font-weight="bold" text-anchor="middle">|</text>
+            <rect x="155" y="15" width="55" height="40" rx="8" fill="#1E293B"/><text x="182" y="40" fill="#FDE047" font-size="16" font-weight="bold" text-anchor="middle">△</text>
+            <rect x="220" y="15" width="55" height="40" rx="8" fill="#1E293B"/><text x="247" y="40" fill="#FDE047" font-size="16" font-weight="bold" text-anchor="middle">|</text>
           </svg>
         `,
         pertanyaan: "Apakah arti kata rahasia yang tertulis pada daun tersebut?",
@@ -889,13 +1070,14 @@
           { key: "D", teks: "BIBI" }
         ],
         kunci: "A",
-        penjelasan: "<b>Jawaban: A.</b><br>• <b>Pemetaan Simbol (Cipher):</b><br>[||] = B<br>[|] = A<br>[△] = I<br>[|] = A<br>Digabungkan menjadi kata: BAIA."
+        penjelasan: "<b>Jawaban: A.</b><br>• [||]=B, [|]=A, [△]=I, [|]=A → digabungkan menjadi <b>BAIA</b>."
       },
 
-      // 12. Jejak Kaki Sahabat Hutan (Matching)
+      // SG-06 (Menengah)
       {
         id: "2018-JP-01",
         level: "siaga",
+        kesulitan: "Menengah",
         judul: "Jejak Satwa di Pasir Sungai",
         domain: "Pencocokan Ciri & Pola",
         pilarCT: "Pengenalan Karakteristik Khusus",
@@ -905,18 +1087,9 @@
         cerita: "Di tepi sungai pasir, ditemukan jejak kaki hewan-hewan hutan. Pasangkan jenis hewan dengan ciri jejak kaki yang paling sesuai!",
         mediaSvg: `
           <div class="grid grid-cols-3 gap-2 w-full max-w-sm mx-auto text-center py-1">
-            <div class="p-2 bg-white rounded-lg border border-slate-200 shadow-sm">
-              <span class="text-[9px] font-bold text-slate-400">Jejak 1</span>
-              <p class="text-xs font-black text-amber-700">3 Jari Selaput Tipis</p>
-            </div>
-            <div class="p-2 bg-white rounded-lg border border-slate-200 shadow-sm">
-              <span class="text-[9px] font-bold text-slate-400">Jejak 2</span>
-              <p class="text-xs font-black text-amber-700">5 Jari + Garis Ekor Pipih</p>
-            </div>
-            <div class="p-2 bg-white rounded-lg border border-slate-200 shadow-sm">
-              <span class="text-[9px] font-bold text-slate-400">Jejak 3</span>
-              <p class="text-xs font-black text-amber-700">Tapak Lebar Cakar Kuat</p>
-            </div>
+            <div class="p-2 bg-white rounded-lg border border-slate-200 shadow-sm"><span class="text-[9px] font-bold text-slate-400">Jejak 1</span><p class="text-xs font-black text-amber-700">3 Jari Selaput Tipis</p></div>
+            <div class="p-2 bg-white rounded-lg border border-slate-200 shadow-sm"><span class="text-[9px] font-bold text-slate-400">Jejak 2</span><p class="text-xs font-black text-amber-700">5 Jari + Garis Ekor Pipih</p></div>
+            <div class="p-2 bg-white rounded-lg border border-slate-200 shadow-sm"><span class="text-[9px] font-bold text-slate-400">Jejak 3</span><p class="text-xs font-black text-amber-700">Tapak Lebar Cakar Kuat</p></div>
           </div>
         `,
         pertanyaan: "Pilih pasangan jejak kaki yang sesuai untuk masing-masing satwa:",
@@ -925,7 +1098,200 @@
           { item: "Berang-berang (Bebras)", opsi: ["Jejak 1 (3 Jari Selaput Tipis)", "Jejak 2 (5 Jari + Garis Ekor Pipih)", "Jejak 3 (Tapak Lebar Cakar Kuat)"], kunci: "Jejak 2 (5 Jari + Garis Ekor Pipih)" },
           { item: "Beruang Rimba", opsi: ["Jejak 1 (3 Jari Selaput Tipis)", "Jejak 2 (5 Jari + Garis Ekor Pipih)", "Jejak 3 (Tapak Lebar Cakar Kuat)"], kunci: "Jejak 3 (Tapak Lebar Cakar Kuat)" }
         ],
-        penjelasan: "<b>Jawaban Benar:</b><br>• Bebek Air = Jejak 1 (3 jari selaput renang)<br>• Bebras = Jejak 2 (5 jari dayung dan bekas seretan ekor pipih)<br>• Beruang = Jejak 3 (tapak lebar berkuku cakar kuat tanpa selaput)."
+        penjelasan: "<b>Jawaban Benar:</b> Bebek Air = Jejak 1, Bebras = Jejak 2, Beruang = Jejak 3."
+      },
+
+      // SG-07 (Sulit / Jebakan Shortest Path vs Jumlah Kota)
+      {
+        id: "2024-SG-07",
+        level: "siaga",
+        kesulitan: "Sulit • HOTS",
+        judul: "Rute Kurir Paket Cepat",
+        domain: "Algoritma Graf Berbobot (Shortest Path)",
+        pilarCT: "Optimasi Jalur & Pencarian Terpendek",
+        tipe: "mc",
+        poinBenar: 100,
+        penaltiSalah: 25,
+        cerita: "Kurir Bebras harus mengantar paket dari <b>Kota A</b> ke <b>Kota D</b>. Angka pada setiap jalur jalan menunjukkan <b>waktu tempuh (dalam menit)</b>. Jalur melalui B ke D langsung sedang ditutup karena jembatan rusak.",
+        mediaSvg: `
+          <svg viewBox="0 0 340 165" class="w-full max-w-md bg-slate-900 rounded-2xl p-2">
+            <!-- Edges -->
+            <line x1="50" y1="82" x2="160" y2="32" stroke="#38BDF8" stroke-width="2.5"/>
+            <text x="95" y="48" fill="#FDE047" font-size="11" font-weight="bold">12 mnt</text>
+
+            <line x1="50" y1="82" x2="160" y2="132" stroke="#38BDF8" stroke-width="2.5"/>
+            <text x="95" y="122" fill="#FDE047" font-size="11" font-weight="bold">5 mnt</text>
+
+            <line x1="160" y1="32" x2="160" y2="132" stroke="#34D399" stroke-width="2.5"/>
+            <text x="188" y="86" fill="#6EE7B7" font-size="11" font-weight="bold">4 mnt</text>
+
+            <line x1="160" y1="32" x2="290" y2="82" stroke="#EF4444" stroke-width="2" stroke-dasharray="4"/>
+            <text x="235" y="45" fill="#FCA5A5" font-size="10" font-weight="bold">RUSAK (6 mnt)</text>
+
+            <line x1="160" y1="132" x2="290" y2="82" stroke="#38BDF8" stroke-width="2.5"/>
+            <text x="235" y="122" fill="#FDE047" font-size="11" font-weight="bold">11 mnt</text>
+
+            <!-- Nodes -->
+            <circle cx="50" cy="82" r="16" fill="#F59E0B"/><text x="50" y="86" fill="#000" font-size="12" font-weight="bold" text-anchor="middle">A</text>
+            <circle cx="160" cy="32" r="16" fill="#0EA5E9"/><text x="160" y="36" fill="#FFF" font-size="12" font-weight="bold" text-anchor="middle">B</text>
+            <circle cx="160" cy="132" r="16" fill="#0EA5E9"/><text x="160" y="136" fill="#FFF" font-size="12" font-weight="bold" text-anchor="middle">C</text>
+            <circle cx="290" cy="82" r="16" fill="#10B981"/><text x="290" y="86" fill="#FFF" font-size="12" font-weight="bold" text-anchor="middle">D</text>
+          </svg>
+        `,
+        pertanyaan: "Berapa menit waktu tempuh PALING CEPAT yang sah untuk sampai dari Kota A ke Kota D?",
+        opsi: [
+          { key: "A", teks: "16 menit (Rute A → C → D)" },
+          { key: "B", teks: "18 menit (Rute A → B → D)" },
+          { key: "C", teks: "20 menit (Rute A → C → B → D)" },
+          { key: "D", teks: "27 menit (Rute A → B → C → D)" }
+        ],
+        kunci: "A",
+        penjelasan: "<b>Jawaban: A (16 menit).</b><br>• <b>Analisis Jebakan:</b> Jalur A → B → D (18 mnt) dan A → C → B → D (15 mnt) terlihat menggoda, tetapi soal menyebutkan <b>jalur B ke D rusak</b>!<br>• Satu-satunya jalur menuju D yang terbuka adalah melalui C → D (11 menit). Maka rute tercepat yang sah adalah A → C (5 mnt) + C → D (11 mnt) = <b>16 menit</b>."
+      },
+
+      // SG-08 (Sulit / Jebakan Variabel & Assignment Swap)
+      {
+        id: "2024-SG-08",
+        level: "siaga",
+        kesulitan: "Sulit • Jebakan",
+        judul: "Tukar Isi Tiga Gelas Jus",
+        domain: "Variabel & Pelacakan Memori",
+        pilarCT: "Algoritma Pertukaran Variabel (Swap)",
+        tipe: "mc",
+        poinBenar: 100,
+        penaltiSalah: 25,
+        cerita: "Tersedia 3 gelas: <b>Gelas X</b> berisi <b>Jus Jeruk</b>, <b>Gelas Y</b> berisi <b>Jus Apel</b>, dan <b>Gelas Z</b> dalam keadaan <b>KOSONG</b>.<br>Dijalankan 3 instruksi berurutan:<br>1. Tuang seluruh isi <b>Gelas X</b> ke <b>Gelas Z</b>.<br>2. Tuang seluruh isi <b>Gelas Y</b> ke <b>Gelas X</b>.<br>3. Tuang seluruh isi <b>Gelas Z</b> ke <b>Gelas Y</b>.",
+        mediaSvg: `
+          <svg viewBox="0 0 320 95" class="w-full max-w-sm bg-white rounded-xl border border-slate-200 p-2">
+            <rect x="30" y="20" width="60" height="50" rx="6" fill="#F97316"/><text x="60" y="49" fill="#FFF" font-size="11" font-weight="bold" text-anchor="middle">X: Jeruk</text>
+            <rect x="130" y="20" width="60" height="50" rx="6" fill="#EF4444"/><text x="160" y="49" fill="#FFF" font-size="11" font-weight="bold" text-anchor="middle">Y: Apel</text>
+            <rect x="230" y="20" width="60" height="50" rx="6" fill="#E2E8F0" stroke="#94A3B8" stroke-dasharray="3"/><text x="260" y="49" fill="#475569" font-size="11" font-weight="bold" text-anchor="middle">Z: Kosong</text>
+          </svg>
+        `,
+        pertanyaan: "Setelah langkah ke-3 selesai, apakah isi Gelas X, Gelas Y, dan Gelas Z secara berturut-turut?",
+        opsi: [
+          { key: "A", teks: "X = Jus Apel, Y = Jus Jeruk, Z = Kosong" },
+          { key: "B", teks: "X = Kosong, Y = Jus Apel, Z = Jus Jeruk" },
+          { key: "C", teks: "X = Jus Jeruk, Y = Kosong, Z = Jus Apel" },
+          { key: "D", teks: "X = Jus Apel, Y = Kosong, Z = Jus Jeruk" }
+        ],
+        kunci: "A",
+        penjelasan: "<b>Jawaban: A.</b><br>• <b>Algoritma Swap (Variabel Sementara):</b><br>Langkah 1: X→Kosong, Z→Jeruk.<br>Langkah 2: Y→Kosong, X→Apel.<br>Langkah 3: Z→Kosong, Y→Jeruk.<br>Hasil akhir: X berisi Apel, Y berisi Jeruk, dan Z kembali Kosong."
+      },
+
+      // SG-09 (Sulit / Jebakan Logika AND / OR / NOT)
+      {
+        id: "2024-SG-09",
+        level: "siaga",
+        kesulitan: "Sulit • Jebakan",
+        judul: "Gerbang Keamanan Benteng Bebras",
+        domain: "Logika Boolean (AND, OR, NOT)",
+        pilarCT: "Evaluasi Ekspresi Logika",
+        tipe: "mc",
+        poinBenar: 100,
+        penaltiSalah: 25,
+        cerita: "Gerbang benteng hanya akan terbuka jika pengunjung memenuhi syarat:<br><code class='bg-slate-800 text-amber-300 px-2.5 py-1 rounded block my-1 font-mono text-xs'>(Membawa Lencana Emas ATAU Hafal Kata Sandi) DAN (BUKAN Pemakai Jubah Hitam)</code><br>Empat pengembara datang melapor:<br>• <b>Tono:</b> Membawa Lencana Emas, lupa Kata Sandi, memakai Jubah Hitam.<br>• <b>Sari:</b> Tidak punya Lencana Emas, hafal Kata Sandi, memakai Jubah Hijau.<br>• <b>Budi:</b> Tidak punya Lencana Emas, lupa Kata Sandi, memakai Jubah Putih.<br>• <b>Dina:</b> Membawa Lencana Emas, hafal Kata Sandi, memakai Jubah Hitam.",
+        mediaSvg: `
+          <svg viewBox="0 0 320 75" class="w-full max-w-sm bg-amber-950 rounded-xl p-2">
+            <text x="160" y="30" fill="#FDE047" font-size="11" font-weight="bold" text-anchor="middle">Syarat 1: Lencana OR Sandi</text>
+            <text x="160" y="52" fill="#6EE7B7" font-size="11" font-weight="bold" text-anchor="middle">Syarat 2 (WAJIB): NOT Jubah Hitam</text>
+          </svg>
+        `,
+        pertanyaan: "Siapakah satu-satunya pengembara yang berhasil membuka gerbang benteng?",
+        opsi: [
+          { key: "A", teks: "Sari" },
+          { key: "B", teks: "Dina" },
+          { key: "C", teks: "Tono" },
+          { key: "D", teks: "Budi" }
+        ],
+        kunci: "A",
+        penjelasan: "<b>Jawaban: A (Sari).</b><br>• <b>Analisis Jebakan:</b> Dina dan Tono punya lencana/sandi, tetapi keduanya memakai Jubah Hitam sehingga gagal di syarat kedua (BUKAN Jubah Hitam). Budi gagal di syarat pertama. Hanya <b>Sari</b> yang memenuhi syarat pertama (hafal sandi) sekaligus syarat kedua (jubah hijau)."
+      },
+
+      // SG-10 (Sulit / HOTS Pencarian Biner / Penimbangan Koin Palsu)
+      {
+        id: "2024-SG-10",
+        level: "siaga",
+        kesulitan: "Sulit • HOTS",
+        judul: "Misteri Koin Emas Palsu",
+        domain: "Algoritma Divide & Conquer",
+        pilarCT: "Dekomposisi & Pencarian Optimal",
+        tipe: "sa",
+        poinBenar: 100,
+        penaltiSalah: 0,
+        cerita: "Terdapat <b>9 koin emas</b> yang bentuk dan ukurannya persis sama, tetapi <b>1 koin di antaranya palsu (lebih ringan)</b> dari 8 koin asli lainnya.<br>Kamu hanya memiliki sebuah <b>timbangan neraca dua lengan</b> (tanpa anak timbangan angka).",
+        mediaSvg: `
+          <svg viewBox="0 0 300 95" class="w-full max-w-sm bg-amber-50 rounded-xl border border-amber-200 p-2">
+            <line x1="70" y1="35" x2="230" y2="35" stroke="#475569" stroke-width="4"/>
+            <polygon points="150,35 135,75 165,75" fill="#64748B"/>
+            <rect x="55" y="25" width="40" height="8" fill="#D97706"/>
+            <rect x="205" y="25" width="40" height="8" fill="#D97706"/>
+            <text x="150" y="88" fill="#78350F" font-size="10" font-weight="bold" text-anchor="middle">9 Koin (1 Lebih Ringan) • Berapa kali timbang minimal?</text>
+          </svg>
+        `,
+        pertanyaan: "Ketik ANGKA saja: Berapa kali jumlah penimbangan PALING SEDIKIT yang pasti menemukan koin palsu tersebut?",
+        inputPlaceholder: "Ketik angka (misal: 3)...",
+        kunci: "2",
+        penjelasan: "<b>Jawaban: 2.</b><br>• <b>Analisis Jebakan (Divide & Conquer):</b> Banyak yang menjawab 4 atau 3 kali dengan membagi 2 kelompok. Strategi paling cerdas adalah membagi menjadi <b>3 kelompok (3 koin, 3 koin, 3 koin)</b>:<br>1. Timbang 3 koin vs 3 koin. Jika salah satu naik (lebih ringan), koin palsu ada di kelompok itu; jika seimbang, koin palsu pasti ada di kelompok ke-3 yang tidak ditimbang!<br>2. Dari 3 koin tersisa, timbang 1 koin vs 1 koin dengan cara yang sama. Hanya butuh <b>2 kali</b> menimbang!"
+      },
+
+      // SG-11 (Sulit / HOTS Kombinasi Antrean & Stack)
+      {
+        id: "2024-SG-11",
+        level: "siaga",
+        kesulitan: "Sulit • HOTS",
+        judul: "Langsir Gerbong Kereta Bebras",
+        domain: "Struktur Data Stack & Queue",
+        pilarCT: "Simulasi Algoritma & Struktur Data",
+        tipe: "mc",
+        poinBenar: 100,
+        penaltiSalah: 25,
+        cerita: "Tiga gerbong kereta datang dari jalur <b>KANAN</b> menuju <b>KIRI</b> dengan urutan depan-ke-belakang: <b>[1] - [2] - [3]</b>.<br>Di tengah rel terdapat sebuah <b>jalur buntu (kantong langsir)</b> di bawah yang bisa menampung gerbong (sistem tumpukan: gerbong yang masuk paling akhir harus keluar paling dulu).<br>Stasiun tujuan di sebelah KIRI menginginkan urutan gerbong tiba menjadi: <b>[2] - [3] - [1]</b>.",
+        mediaSvg: `
+          <svg viewBox="0 0 340 125" class="w-full max-w-md bg-slate-800 rounded-2xl p-2">
+            <line x1="15" y1="35" x2="325" y2="35" stroke="#94A3B8" stroke-width="4"/>
+            <path d="M 170 35 L 170 110" stroke="#94A3B8" stroke-width="4"/>
+            <text x="55" y="22" fill="#6EE7B7" font-size="10" font-weight="bold" text-anchor="middle">← Tujuan (Kiri)</text>
+            <text x="265" y="22" fill="#FDE047" font-size="10" font-weight="bold" text-anchor="middle">Asal: [1] [2] [3]</text>
+            <rect x="142" y="65" width="56" height="45" rx="6" fill="none" stroke="#F59E0B" stroke-dasharray="3"/>
+            <text x="245" y="92" fill="#FCD34D" font-size="9" font-weight="bold">Jalur Buntu Langsir</text>
+          </svg>
+        `,
+        pertanyaan: "Urutan langkah manakah yang berhasil menyusun kereta menjadi [2] - [3] - [1] di jalur kiri?",
+        opsi: [
+          { key: "A", teks: "Masukkan [1] ke jalur buntu → Lewatkan [2] ke kiri → Lewatkan [3] ke kiri → Keluarkan [1] ke kiri" },
+          { key: "B", teks: "Masukkan [1] dan [2] ke jalur buntu → Lewatkan [3] ke kiri → Keluarkan [2] lalu [1]" },
+          { key: "C", teks: "Lewatkan [1] ke kiri → Masukkan [2] ke jalur buntu → Lewatkan [3] ke kiri → Keluarkan [2]" },
+          { key: "D", teks: "Susunan [2] - [3] - [1] mustahil dibentuk" }
+        ],
+        kunci: "A",
+        penjelasan: "<b>Jawaban: A.</b><br>• <b>Simulasi Stack:</b> Jika [1] ditahan dulu di jalur buntu, maka [2] dan [3] bisa melintas lurus ke kiri lebih dulu. Setelah keduanya lewat, [1] dikeluarkan dari jalur buntu di urutan paling belakang sehingga terbentuk <b>[2] - [3] - [1]</b>."
+      },
+
+      // SG-12 (Sulit / HOTS Pola Bilangan Biner 4 Lampu)
+      {
+        id: "2024-SG-12",
+        level: "siaga",
+        kesulitan: "Sulit • HOTS",
+        judul: "Kode Lampu Biner Menara",
+        domain: "Representasi Data Biner",
+        pilarCT: "Abstraksi & Sistem Bilangan Biner",
+        tipe: "sa",
+        poinBenar: 100,
+        penaltiSalah: 0,
+        cerita: "Menara sinyal Bebras memiliki 4 lampu dari kiri ke kanan dengan nilai bobot masing-masing: <b>[8] - [4] - [2] - [1]</b>.<br>Untuk mengirim angka rahasia, penjaga menara <b>menyalakan (🟡)</b> beberapa lampu dan <b>mematikan (⚫)</b> sisanya, lalu menjumlahkan nilai lampu yang menyala saja.<br><br>Malam ini pola lampu dari kiri ke kanan adalah: <b>[🟡 Menyala] - [⚫ Mati] - [🟡 Menyala] - [🟡 Menyala]</b>.",
+        mediaSvg: `
+          <svg viewBox="0 0 320 100" class="w-full max-w-sm bg-slate-900 rounded-2xl p-2">
+            <g transform="translate(45, 42)"><circle cx="0" cy="0" r="18" fill="#FACC15"/><text x="0" y="5" fill="#000" font-size="12" font-weight="bold" text-anchor="middle">8</text><text x="0" y="34" fill="#FDE047" font-size="9" text-anchor="middle">NYALA</text></g>
+            <g transform="translate(120, 42)"><circle cx="0" cy="0" r="18" fill="#334155" stroke="#64748B" stroke-width="2"/><text x="0" y="5" fill="#94A3B8" font-size="12" font-weight="bold" text-anchor="middle">4</text><text x="0" y="34" fill="#94A3B8" font-size="9" text-anchor="middle">MATI</text></g>
+            <g transform="translate(195, 42)"><circle cx="0" cy="0" r="18" fill="#FACC15"/><text x="0" y="5" fill="#000" font-size="12" font-weight="bold" text-anchor="middle">2</text><text x="0" y="34" fill="#FDE047" font-size="9" text-anchor="middle">NYALA</text></g>
+            <g transform="translate(270, 42)"><circle cx="0" cy="0" r="18" fill="#FACC15"/><text x="0" y="5" fill="#000" font-size="12" font-weight="bold" text-anchor="middle">1</text><text x="0" y="34" fill="#FDE047" font-size="9" text-anchor="middle">NYALA</text></g>
+          </svg>
+        `,
+        pertanyaan: "Ketik ANGKA saja: Berapakah nilai angka rahasia yang dikirim menara sinyal malam ini?",
+        inputPlaceholder: "Ketik angka (0-15)...",
+        kunci: "11",
+        penjelasan: "<b>Jawaban: 11.</b><br>• <b>Representasi Biner (1011₂):</b> Lampu yang menyala bernilai 8, 2, dan 1 (lampu 4 mati sehingga bernilai 0). Total = 8 + 0 + 2 + 1 = <b>11</b>."
       }
     ];
 
@@ -936,7 +1302,7 @@
     let isModeSantai = false;
     let isExamRunning = false;
     let daftarSoalAktif = [];
-    let currentDurationSec = 30 * 60;
+    let currentDurationSec = 35 * 60;
     let timerInterval = null;
     let waktuTersisa = currentDurationSec;
     let namaPesertaSD = "";
@@ -944,6 +1310,7 @@
     let currentIndex = 0;
     let userAnswers = {};
     let userDoubt = {};
+    let lastRincianEvaluasi = [];
 
     // Proteksi agar siswa tidak sengaja me-refresh halaman saat latihan
     window.addEventListener('beforeunload', function(e) {
@@ -952,6 +1319,15 @@
         e.returnValue = 'Latihan sedang berlangsung. Yakin ingin keluar?';
       }
     });
+
+    function shuffleArray(arr) {
+      const copy = [...arr];
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    }
 
     function pilihKategoriSD(kat, btnEl) {
       currentKategoriSD = kat;
@@ -973,24 +1349,39 @@
 
       const modeRadio = document.querySelector('input[name="modeWaktu"]:checked').value;
       isModeSantai = (modeRadio === 'santai');
+      const isAcak = document.getElementById('chkAcakSoal').checked;
 
-      // Tentukan paket soal & durasi sesuai pilihan
+      // Filter paket soal & durasi sesuai pilihan
+      let baseList = [];
       if (currentKategoriSD === 'sikecil') {
-        daftarSoalAktif = SOAL_DATABASE_SD.filter(s => s.level === 'sikecil');
-        currentDurationSec = 30 * 60; // 30 menit
+        baseList = SOAL_DATABASE_SD.filter(s => s.level === 'sikecil');
+        currentDurationSec = 35 * 60;
       } else if (currentKategoriSD === 'siaga') {
-        daftarSoalAktif = SOAL_DATABASE_SD.filter(s => s.level === 'siaga');
-        currentDurationSec = 40 * 60; // 40 menit
+        baseList = SOAL_DATABASE_SD.filter(s => s.level === 'siaga');
+        currentDurationSec = 45 * 60;
       } else {
-        daftarSoalAktif = [...SOAL_DATABASE_SD];
-        currentDurationSec = 45 * 60; // 45 menit paket lengkap 12 soal
+        baseList = [...SOAL_DATABASE_SD];
+        currentDurationSec = 75 * 60;
       }
-      waktuTersisa = currentDurationSec;
 
-      // Status Ujian Berjalan
+      // Clone dan acak opsi jika mode acak aktif
+      daftarSoalAktif = (isAcak ? shuffleArray(baseList) : baseList).map(soal => {
+        if (soal.tipe === 'mc' && isAcak) {
+          const letters = ['A', 'B', 'C', 'D'];
+          const kunciTeks = soal.opsi.find(o => o.key === soal.kunci).teks;
+          const shuffledOpsi = shuffleArray(soal.opsi).map((o, idx) => ({
+            key: letters[idx],
+            teks: o.teks
+          }));
+          const newKunci = shuffledOpsi.find(o => o.teks === kunciTeks).key;
+          return { ...soal, opsi: shuffledOpsi, kunci: newKunci };
+        }
+        return soal;
+      });
+
+      waktuTersisa = currentDurationSec;
       isExamRunning = true;
 
-      // Ganti Tampilan Layar
       document.getElementById('screenIntro').classList.add('hidden');
       document.getElementById('screenResult').classList.add('hidden');
       document.getElementById('screenExam').classList.remove('hidden');
@@ -1012,7 +1403,8 @@
       if (!document.getElementById('screenExam').classList.contains('hidden')) {
         if (!confirm("Latihan sedang berjalan. Yakin ingin kembali ke menu utama?")) return;
       }
-      clearInterval(timerInterval); isExamRunning = false;
+      clearInterval(timerInterval);
+      isExamRunning = false;
       document.getElementById('screenExam').classList.add('hidden');
       document.getElementById('screenResult').classList.add('hidden');
       document.getElementById('screenIntro').classList.remove('hidden');
@@ -1061,30 +1453,30 @@
       document.getElementById('taskJudul').innerText = soal.judul;
       document.getElementById('taskIdAndDomain').innerText = `${soal.id} • ${soal.domain}`;
 
-      // Badge Tipe Soal
+      // Badge Kesulitan & Tipe Soal
       const badgeBox = document.getElementById('badgeTipeSoal');
+      let diffColor = "bg-slate-100 text-slate-700 border-slate-300";
+      if (soal.kesulitan.includes("Sulit")) diffColor = "bg-purple-100 text-purple-900 border-purple-300";
+      else if (soal.kesulitan === "Menengah") diffColor = "bg-blue-100 text-blue-900 border-blue-300";
+      else diffColor = "bg-teal-100 text-teal-900 border-teal-300";
+
+      let htmlBadges = `<span class="text-[10px] ${diffColor} border px-2 py-0.5 rounded-md font-extrabold">${soal.kesulitan}</span>`;
+
       if (soal.tipe === 'mc') {
-        badgeBox.innerHTML = `
-          <span class="text-[10px] bg-amber-100 text-amber-900 border border-amber-300 px-2 py-0.5 rounded-md font-bold">
-            Pilihan Ganda
-          </span>
-          <span class="text-[10px] bg-rose-100 text-rose-800 border border-rose-300 px-1.5 py-0.5 rounded-md font-bold" title="Penalti salah -${soal.penaltiSalah}">
-            Penalti -${soal.penaltiSalah}
-          </span>
+        htmlBadges += `
+          <span class="text-[10px] bg-amber-100 text-amber-900 border border-amber-300 px-2 py-0.5 rounded-md font-bold">Pilihan Ganda</span>
+          <span class="text-[10px] bg-rose-100 text-rose-800 border border-rose-300 px-1.5 py-0.5 rounded-md font-bold">Penalti -${soal.penaltiSalah}</span>
         `;
       } else if (soal.tipe === 'sa') {
-        badgeBox.innerHTML = `
-          <span class="text-[10px] bg-emerald-100 text-emerald-900 border border-emerald-300 px-2 py-0.5 rounded-md font-bold">
-            Isian Singkat (Bebas Penalti)
-          </span>
+        htmlBadges += `
+          <span class="text-[10px] bg-emerald-100 text-emerald-900 border border-emerald-300 px-2 py-0.5 rounded-md font-bold">Isian Singkat (0 Penalti)</span>
         `;
       } else {
-        badgeBox.innerHTML = `
-          <span class="text-[10px] bg-sky-100 text-sky-900 border border-sky-300 px-2 py-0.5 rounded-md font-bold">
-            Menjodohkan (Bebas Penalti)
-          </span>
+        htmlBadges += `
+          <span class="text-[10px] bg-sky-100 text-sky-900 border border-sky-300 px-2 py-0.5 rounded-md font-bold">Menjodohkan (0 Penalti)</span>
         `;
       }
+      badgeBox.innerHTML = htmlBadges;
 
       document.getElementById('taskUraianCerita').innerHTML = soal.cerita;
       document.getElementById('taskMediaContainer').innerHTML = soal.mediaSvg;
@@ -1126,7 +1518,7 @@
           const row = document.createElement('div');
           row.className = "p-3 bg-slate-50 border border-slate-200 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-2";
           
-          let selectOptions = `<option value="">-- Pilih Ciri Jejak --</option>`;
+          let selectOptions = `<option value="">-- Pilih Pasangan --</option>`;
           p.opsi.forEach(opt => {
             const isMatch = saved[p.item] === opt;
             selectOptions += `<option value="${opt}" ${isMatch ? 'selected' : ''}>${opt}</option>`;
@@ -1142,7 +1534,6 @@
         });
       }
 
-      // Navigasi Button Status
       document.getElementById('btnPrevSoal').disabled = (idx === 0);
       document.getElementById('btnNextSoal').innerHTML = (idx === daftarSoalAktif.length - 1)
         ? `Selesai <i class="fa-solid fa-flag-checkered"></i>`
@@ -1170,6 +1561,7 @@
       if (!userAnswers[qIdx]) userAnswers[qIdx] = {};
       if (selectedVal === "") delete userAnswers[qIdx][itemKey];
       else userAnswers[qIdx][itemKey] = selectedVal;
+      if (Object.keys(userAnswers[qIdx]).length === 0) delete userAnswers[qIdx];
       renderGridNomor();
       updateInfoDijawab();
     }
@@ -1217,6 +1609,14 @@
       }
     }
 
+    function isSoalTerjawab(idx) {
+      const val = userAnswers[idx];
+      if (val === undefined || val === null) return false;
+      if (typeof val === 'string') return val.trim().length > 0;
+      if (typeof val === 'object') return Object.keys(val).length > 0;
+      return false;
+    }
+
     function renderGridNomor() {
       const grid = document.getElementById('gridNomorSoal');
       grid.innerHTML = "";
@@ -1224,7 +1624,7 @@
       daftarSoalAktif.forEach((s, i) => {
         const btn = document.createElement('button');
         const isCurrent = (i === currentIndex);
-        const hasAnswer = (userAnswers[i] !== undefined && Object.keys(userAnswers[i]).length > 0);
+        const hasAnswer = isSoalTerjawab(i);
         const isDoubt = !!userDoubt[i];
 
         let bgStyle = "bg-slate-100 text-slate-700 border-slate-200";
@@ -1243,10 +1643,7 @@
     }
 
     function updateInfoDijawab() {
-      const answeredCount = Object.keys(userAnswers).filter(k => {
-        const val = userAnswers[k];
-        return val !== undefined && Object.keys(val).length > 0;
-      }).length;
+      const answeredCount = daftarSoalAktif.filter((_, i) => isSoalTerjawab(i)).length;
       document.getElementById('labelTotalDijawab').innerText = `${answeredCount}/${daftarSoalAktif.length} Terjawab`;
     }
 
@@ -1254,11 +1651,7 @@
        PENILAIAN OTOMATIS & EVALUASI CT
     ------------------------------------------------------------- */
     function selesaikanUjianKonfirmasi() {
-      const answeredCount = Object.keys(userAnswers).filter(k => {
-        const val = userAnswers[k];
-        return val !== undefined && Object.keys(val).length > 0;
-      }).length;
-
+      const answeredCount = daftarSoalAktif.filter((_, i) => isSoalTerjawab(i)).length;
       const pesan = `Kamu sudah menjawab ${answeredCount} dari ${daftarSoalAktif.length} soal.\nIngat ya: Soal Pilihan Ganda ada PENALTI nilai jika salah.\nYakin ingin mengumpulkan sekarang?`;
       if (confirm(pesan)) {
         kalkulasiHasilUjian();
@@ -1267,6 +1660,7 @@
 
     function kalkulasiHasilUjian() {
       clearInterval(timerInterval);
+      isExamRunning = false;
 
       let totalSkor = 0;
       let countBenar = 0;
@@ -1299,7 +1693,7 @@
             status = "kosong";
             poinDidapat = 0;
             countKosong++;
-          } else if (userAns.trim() === soal.kunci) {
+          } else if (userAns.trim().toUpperCase() === soal.kunci.toUpperCase()) {
             status = "benar";
             poinDidapat = soal.poinBenar;
             countBenar++;
@@ -1332,10 +1726,10 @@
         }
 
         totalSkor += poinDidapat;
-        detailEvaluasi.push({ soal, userAns, status, poinDidapat });
+        detailEvaluasi.push({ soal, userAns, status, poinDidapat, nomorAsli: idx + 1 });
       });
 
-      // Tampilkan Hasil
+      lastRincianEvaluasi = detailEvaluasi;
       tampilkanLayarHasil(totalSkor, countBenar, countSalah, countKosong, detailEvaluasi);
     }
 
@@ -1346,12 +1740,14 @@
       document.getElementById('navMotto').classList.remove('hidden');
 
       const skorFinal = Math.max(0, skor);
+      const skorMaks = daftarSoalAktif.length * 100;
       document.getElementById('resNamaPeserta').innerText = namaPesertaSD;
-      let katLabel = "SiKecil (Kls 1-3 SD)";
-      if (currentKategoriSD === 'siaga') katLabel = "Siaga (Kls 4-6 SD)";
-      else if (currentKategoriSD === 'lengkap') katLabel = "Paket Lengkap SiKecil & Siaga (12 Soal)";
+      let katLabel = "SiKecil (Kls 1-3 SD • 12 Soal)";
+      if (currentKategoriSD === 'siaga') katLabel = "Siaga (Kls 4-6 SD • 12 Soal)";
+      else if (currentKategoriSD === 'lengkap') katLabel = "Paket Lengkap SiKecil & Siaga (24 Soal)";
       document.getElementById('resKategoriPeserta').innerText = katLabel;
       document.getElementById('resTotalSkor').innerText = skorFinal;
+      document.getElementById('resKetPenalti').innerText = `Skor maksimal paket ini: ${skorMaks} poin (Skor mentah: ${skor})`;
       document.getElementById('resCountBenar').innerText = benar;
       document.getElementById('resCountSalah').innerText = salah;
       document.getElementById('resCountKosong').innerText = kosong;
@@ -1365,12 +1761,12 @@
         document.getElementById('resWaktuPakai').innerText = `${menitPakai}m ${detikPakai}s`;
       }
 
-      // Suara & Emoji
+      const persen = (skorFinal / skorMaks) * 100;
       const emojiEl = document.getElementById('scoreEmoji');
-      if (skorFinal >= 800) {
+      if (persen >= 80) {
         emojiEl.innerText = "🥇";
         playTone(700, 'triangle', 0.3);
-      } else if (skorFinal >= 500) {
+      } else if (persen >= 50) {
         emojiEl.innerText = "🥈";
         playTone(550, 'sine', 0.25);
       } else {
@@ -1378,11 +1774,28 @@
         playTone(450, 'sine', 0.2);
       }
 
-      // Render Rincian Pembahasan
+      renderKartuPembahasan(rincian);
+    }
+
+    function filterPembahasan(mode) {
+      if (mode === 'salah') {
+        const filtered = lastRincianEvaluasi.filter(item => item.status !== 'benar');
+        renderKartuPembahasan(filtered);
+      } else {
+        renderKartuPembahasan(lastRincianEvaluasi);
+      }
+    }
+
+    function renderKartuPembahasan(rincian) {
       const wadah = document.getElementById('wadahPembahasanList');
       wadah.innerHTML = "";
 
-      rincian.forEach((item, i) => {
+      if (rincian.length === 0) {
+        wadah.innerHTML = `<div class="p-6 text-center bg-emerald-50 border border-emerald-200 rounded-3xl text-emerald-800 font-bold text-sm">🎉 Luar biasa! Semua soal terjawab benar tanpa kesalahan!</div>`;
+        return;
+      }
+
+      rincian.forEach((item) => {
         const card = document.createElement('div');
         let statusBadge = "";
         let borderStyle = "";
@@ -1401,16 +1814,19 @@
         let jawabanUserText = "-";
         if (item.soal.tipe === 'matching') {
           jawabanUserText = item.userAns ? JSON.stringify(item.userAns).replace(/[{}"]/g, ' ') : "Kosong";
+        } else if (item.soal.tipe === 'mc' && item.userAns) {
+          const optObj = item.soal.opsi.find(o => o.key === item.userAns);
+          jawabanUserText = optObj ? `${item.userAns} (${optObj.teks})` : item.userAns;
         } else {
           jawabanUserText = item.userAns || "Kosong";
         }
 
-        card.className = `p-5 rounded-3xl border shadow-sm space-y-3 ${borderStyle}`;
+        card.className = `eval-card p-5 rounded-3xl border shadow-sm space-y-3 ${borderStyle}`;
         card.innerHTML = `
           <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-2">
             <div>
-              <span class="font-title font-bold text-sm sm:text-base text-slate-900">Soal ${i + 1}: ${item.soal.judul}</span>
-              <p class="text-[11px] text-amber-700 font-bold">${item.soal.id} • Pilar: ${item.soal.pilarCT}</p>
+              <span class="font-title font-bold text-sm sm:text-base text-slate-900">Soal ${item.nomorAsli}: ${item.soal.judul}</span>
+              <p class="text-[11px] text-amber-700 font-bold">${item.soal.id} • ${item.soal.kesulitan} • Pilar: ${item.soal.pilarCT}</p>
             </div>
             ${statusBadge}
           </div>
@@ -1419,10 +1835,9 @@
             <p>Jawaban Siswa: <b class="text-slate-900">${jawabanUserText}</b></p>
           </div>
 
-          <!-- Kotak Pembahasan CT Anak SD -->
           <div class="p-3.5 bg-amber-50/80 border border-amber-200 rounded-2xl text-xs text-slate-800 leading-relaxed space-y-1">
             <p class="font-title font-bold text-amber-900 flex items-center gap-1.5">
-              <i class="fa-solid fa-lightbulb text-amber-500"></i> Mengapa Jawabannya Begitu? (Logika CT):
+              <i class="fa-solid fa-lightbulb text-amber-500"></i> Mengapa Jawabannya Begitu? (Logika CT & Analisis Jebakan):
             </p>
             <div>${item.soal.penjelasan}</div>
           </div>
